@@ -18,29 +18,73 @@ module.exports = {
         const textChosen = interaction.options.getString('about');
 
         if (textChosen === 'server') {
-            const guildTextChannelCount = interaction.guild.channels.cache.filter((c) => c.type === 0).toJSON().length;
-            const guildVoiceChannelCount = interaction.guild.channels.cache.filter((c) => c.type === 2).toJSON().length;
-            const guildCategoryChannelCount = interaction.guild.channels.cache.filter((c) => c.type === 4).toJSON().length;
-            const guildThreadsChannelCount = interaction.guild.channels.cache.filter((c) => c.type === 5).toJSON().length;
+            const { guild } = interaction;
 
-            const serverEmbed = new EmbedBuilder()
-                .setTitle(`Server Information`)
-                .setThumbnail(interaction.guild.iconURL())
-                .setDescription(`
-                    <a:server:1174372626475528226> **Server name:** ${interaction.guild.name}
-                    <:owner:1220961237647622155> **Owner:** ${(await interaction.guild.fetchOwner()).user}
-                    <:time:1220962252421599252> **Created at:** <t:${parseInt(interaction.guild.createdTimestamp / 1000)}:F>
-                    <:globe:1220960794993492019> **Total Channels:** \`${guildTextChannelCount + guildVoiceChannelCount + guildThreadsChannelCount}\`
-                    <:BF5:1220490510981009521> **Text Channels:** \`${guildTextChannelCount}\`
-                    <:BF5:1220490510981009521> **Voice Channels:** \`${guildVoiceChannelCount}\`
-                    <:BF5:1220490510981009521> **Category Channels:** \`${guildCategoryChannelCount}\`
-                    <:BF5:1220490510981009521> **Threads Channels:** \`${guildThreadsChannelCount}\`
-                    <:members:1220960228242227260> **Total members:** \`${interaction.guild.memberCount}\`
-                    <:roleplaying:1220959187773685830> **Roles:** \`${interaction.guild.roles.cache.size}\`
-                    <a:evolvingnitro:1174216699092930620> **Total boosts:** \`${interaction.guild.premiumSubscriptionCount}\`
-                `);
+            const serverName = guild.name;
+            const serverID = guild.id;
+            const owner = await guild.fetchOwner();
+            const memberCount = guild.memberCount;
+            const createdAt = guild.createdAt;
+            const iconURL = guild.iconURL({ dynamic: true, size: 512 });
+            const textChannelsCount = guild.channels.cache.filter(channel => channel.type === 0).size; // Type 0 is for GUILD_TEXT
+            const voiceChannelsCount = guild.channels.cache.filter(channel => channel.type === 2).size; // Type 2 is for GUILD_VOICE
+            const rolesCount = guild.roles.cache.size;
+            const emojisCount = guild.emojis.cache.size;
+            const boostLevel = guild.premiumTier;
+            const boostsCount = guild.premiumSubscriptionCount;
+            const verificationLevel = guild.verificationLevel;
+            const description = guild.description || 'No description';
+            const bannerURL = guild.bannerURL({ size: 512 }) || 'No banner';
+            const afkChannel = guild.afkChannel ? guild.afkChannel.name : 'None';
+            const afkTimeout = guild.afkTimeout / 60; // in minutes
+            const explicitContentFilter = guild.explicitContentFilter;
+            const defaultMessageNotifications = guild.defaultMessageNotifications;
+            const maxMembers = guild.maximumMembers || 'Unlimited';
+            const maxPresences = guild.maximumPresences || 'Unlimited';
+            const onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online').size;
+            const dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd').size;
+            const idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle').size;
+            const offlineMembers = guild.members.cache.filter(member => !member.presence || member.presence.status === 'offline').size;
+            const mfaLevel = guild.mfaLevel;
+            const systemChannel = guild.systemChannel ? guild.systemChannel.name : 'None';
+            const rulesChannel = guild.rulesChannel ? guild.rulesChannel.name : 'None';
+            const vanityURLCode = guild.vanityURLCode || 'None';
+            const partnered = guild.partnered;
+            const verified = guild.verified;
+            const preferredLocale = guild.preferredLocale;
+            const boostProgressBarEnabled = guild.premiumProgressBarEnabled;
 
-            await interaction.reply({ embeds: [serverEmbed] });
+            // Calculate server creation time in years
+            const creationDate = new Date(createdAt);
+            const currentDate = new Date();
+            const yearsAgo = currentDate.getFullYear() - creationDate.getFullYear();
+
+            // Create an embed with the server info
+            const serverInfoEmbed = new EmbedBuilder()
+                .setTitle(`Server Information [ ${serverName} ]`)
+                .setThumbnail(iconURL)
+                .addFields(
+                    { name: '📋 Name', value: serverName, inline: true },
+                    { name: '🆔 ID', value: serverID, inline: true },
+                    { name: '👑 Owner', value: `${owner.user.tag}`, inline: true },
+                    { name: '📅 Created', value: `${yearsAgo} years ago`, inline: true },
+                    { name: '📊 Channels', value: `Text: ${textChannelsCount} | Voice: ${voiceChannelsCount}`, inline: true },
+                    { name: '👥 Members', value: `Total: ${memberCount}\nOnline: ${onlineMembers}\nDND: ${dndMembers}\nIdle: ${idleMembers}`, inline: true },
+                    { name: '🎭 Roles', value: `${rolesCount}`, inline: true },
+                    { name: '😁 Emojis', value: `${emojisCount}`, inline: true },
+                    { name: '🔰 Boost Level', value: `${boostLevel} (${boostsCount} boosts)`, inline: true },
+                    { name: '🛡️ Verification', value: `${verificationLevel}`, inline: true },
+                    { name: '📝 Description', value: description, inline: false },
+                    { name: '⚙️ System', value: `AFK: ${afkChannel}, Timeout: ${afkTimeout}m, Sys: ${systemChannel}`, inline: true },
+                    { name: '🔒 MFA Level', value: `${mfaLevel}`, inline: true },
+                    { name: '🌍 Locale', value: `${preferredLocale}`, inline: true },
+                    { name: '🏅 Partnered', value: `${partnered}`, inline: true },
+                    { name: '✅ Verified', value: `${verified}`, inline: true },
+                    { name: '🔗 Vanity URL', value: vanityURLCode, inline: true },
+                    { name: '📊 Boost Progress Bar', value: `${boostProgressBarEnabled}`, inline: true }
+                )
+                .setColor(0x00AE86);
+            await interaction.reply({ embeds: [serverInfoEmbed] });
 		}
         else if (textChosen === 'bot') {
             try {

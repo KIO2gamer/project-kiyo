@@ -4,7 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
     .setName('user')
     .setDescription('Get info about a user')
-    .addIntegerOption(option => option.setName('target').setDescription('The user id').setRequired(true)),
+    .addUserOption(option => option.setName('target').setDescription('The user id')),
     category: 'utility',
     async execute(interaction) {
         const user = interaction.options.getInteger('target') || interaction.user;
@@ -12,12 +12,15 @@ module.exports = {
         const UserEmbed = new EmbedBuilder()
             .setThumbnail(user.displayAvatarURL())
             .addFields(
-                { name: '**Username:** ', value: `\`${user.username}\``, inline: true },
-                { name: '**User ID:** ', value: `\`${user.id}\``, inline: true },
-                { name: '**Roles:** \n', value: `${guildUser.roles.cache.map(r => r).join(' ')}` },
-                { name: '**Joined at:** ', value: `<t:${parseInt(guildUser.joinedAt / 1000)}:F>` },
+                { name: '**Username:** ', value: `\`${user.username}\``},
+                { name: '**Roles:** \n', value: `${guildUser.roles.cache.map(r => r).join(' | ')}` },
+                { name: '**Joined server:** ', value: `<t:${parseInt(guildUser.joinedAt / 1000)}:R>`, inline: true },
+                { name: '**Created Discord:** ', value: `<t:${parseInt(user.createdAt / 1000)}:R>`, inline: true },
             )
+            .setFooter({ text: `User ID: ${user.id}` })
+            .setTimestamp()
             .setColor('Random')
         await interaction.reply({ embeds: [UserEmbed] });
+        console.log(guildUser)
     }
 }
