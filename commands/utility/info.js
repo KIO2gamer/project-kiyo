@@ -28,60 +28,75 @@ module.exports = {
             const iconURL = guild.iconURL({ dynamic: true, size: 512 });
             const textChannelsCount = guild.channels.cache.filter(channel => channel.type === 0).size; // Type 0 is for GUILD_TEXT
             const voiceChannelsCount = guild.channels.cache.filter(channel => channel.type === 2).size; // Type 2 is for GUILD_VOICE
+            const categoryChannelsCount = guild.channels.cache.filter(channel => channel.type === 4).size;
+            const forumChannelsCount = guild.channels.cache.filter(channel => channel.type === 15).size;
             const rolesCount = guild.roles.cache.size;
             const emojisCount = guild.emojis.cache.size;
             const boostLevel = guild.premiumTier;
             const boostsCount = guild.premiumSubscriptionCount;
             const verificationLevel = guild.verificationLevel;
             const description = guild.description || 'No description';
-            const bannerURL = guild.bannerURL({ size: 512 }) || 'No banner';
             const afkChannel = guild.afkChannel ? guild.afkChannel.name : 'None';
             const afkTimeout = guild.afkTimeout / 60; // in minutes
-            const explicitContentFilter = guild.explicitContentFilter;
-            const defaultMessageNotifications = guild.defaultMessageNotifications;
-            const maxMembers = guild.maximumMembers || 'Unlimited';
-            const maxPresences = guild.maximumPresences || 'Unlimited';
             const onlineMembers = guild.members.cache.filter(member => member.presence?.status === 'online').size;
             const dndMembers = guild.members.cache.filter(member => member.presence?.status === 'dnd').size;
             const idleMembers = guild.members.cache.filter(member => member.presence?.status === 'idle').size;
             const offlineMembers = guild.members.cache.filter(member => !member.presence || member.presence.status === 'offline').size;
             const mfaLevel = guild.mfaLevel;
             const systemChannel = guild.systemChannel ? guild.systemChannel.name : 'None';
-            const rulesChannel = guild.rulesChannel ? guild.rulesChannel.name : 'None';
             const vanityURLCode = guild.vanityURLCode || 'None';
-            const partnered = guild.partnered;
-            const verified = guild.verified;
             const preferredLocale = guild.preferredLocale;
-            const boostProgressBarEnabled = guild.premiumProgressBarEnabled;
+            var verificationLeveltext = ''
+            var mfaLeveltext = ''
+
+            if (verificationLevel === 0) {
+                verificationLeveltext = 'None';
+            } else if (verificationLevel === 1) {
+                verificationLeveltext = 'Low';
+            } else if (verificationLevel === 2) {
+                verificationLeveltext = 'Medium';
+            } else if (verificationLevel === 3) {
+                verificationLeveltext = 'High';
+            } else {
+                verificationLeveltext = 'Very High';
+            }
+
+            if (mfaLevel === 0) {
+                mfaLeveltext = 'None';
+            } else {
+                mfaLeveltext = 'Elevated';
+            } 
+            
 
             // Calculate server creation time in years
-            const creationDate = new Date(createdAt);
-            const currentDate = new Date();
-            const yearsAgo = currentDate.getFullYear() - creationDate.getFullYear();
+            // const creationDate = new Date(createdAt);
+            // const currentDate = new Date();
+            // const yearsAgo = currentDate.getFullYear() - creationDate.getFullYear();
 
             // Create an embed with the server info
             const serverInfoEmbed = new EmbedBuilder()
                 .setTitle(`Server Information [ ${serverName} ]`)
                 .setThumbnail(iconURL)
                 .addFields(
+                    { name: '**__Server Details__**', value: '\n' },
                     { name: '📋 Name', value: serverName, inline: true },
-                    { name: '🆔 ID', value: serverID, inline: true },
+                    { name: '📝 Description', value: description, inline: false },
                     { name: '👑 Owner', value: `${owner.user.tag}`, inline: true },
-                    { name: '📅 Created', value: `${yearsAgo} years ago`, inline: true },
-                    { name: '📊 Channels', value: `Text: ${textChannelsCount} | Voice: ${voiceChannelsCount}`, inline: true },
-                    { name: '👥 Members', value: `Total: ${memberCount}\nOnline: ${onlineMembers}\nDND: ${dndMembers}\nIdle: ${idleMembers}`, inline: true },
+                    { name: '🆔 Server ID', value: serverID, inline: true },
+                    { name: '📅 Created', value: `${createdAt} years ago`, inline: true },
+                    { name: '**__Server Stats__**', value: '\n' },
+                    { name: '📊 Channels', value: `Text: ${textChannelsCount}\nVoice: ${voiceChannelsCount}\nCategory: ${categoryChannelsCount}\nForums: ${forumChannelsCount}`, inline: true },
+                    { name: '👥 Members', value: `**Total: ${memberCount}**\n<:list_round_extend:1252524348800110685> Online: ${onlineMembers}\n<:list_round_extend:1252524348800110685> DND: ${dndMembers}\n<:list_round_extend:1252524348800110685> Idle: ${idleMembers}\n<:list_end_round_extend:1252524478592716800> Offline: ${offlineMembers}`, inline: true },
                     { name: '🎭 Roles', value: `${rolesCount}`, inline: true },
                     { name: '😁 Emojis', value: `${emojisCount}`, inline: true },
                     { name: '🔰 Boost Level', value: `${boostLevel} (${boostsCount} boosts)`, inline: true },
-                    { name: '🛡️ Verification', value: `${verificationLevel}`, inline: true },
-                    { name: '📝 Description', value: description, inline: false },
-                    { name: '⚙️ System', value: `AFK: ${afkChannel}, Timeout: ${afkTimeout}m, Sys: ${systemChannel}`, inline: true },
-                    { name: '🔒 MFA Level', value: `${mfaLevel}`, inline: true },
+                    { name: '**__Server System Settings__**', value: '\n' },
+                    { name: '🛡️ Verification', value: `${verificationLeveltext}`, inline: true },
+                    { name: '⚙️ System', value: `AFK: ${afkChannel}\nTimeout: ${afkTimeout}m\nSys: ${systemChannel}`, inline: true },
+                    { name: '🔒 MFA Level', value: `${mfaLeveltext}`, inline: true },
                     { name: '🌍 Locale', value: `${preferredLocale}`, inline: true },
-                    { name: '🏅 Partnered', value: `${partnered}`, inline: true },
-                    { name: '✅ Verified', value: `${verified}`, inline: true },
+                    { name: '**__Invite Settings__**', value: '\n' },
                     { name: '🔗 Vanity URL', value: vanityURLCode, inline: true },
-                    { name: '📊 Boost Progress Bar', value: `${boostProgressBarEnabled}`, inline: true }
                 )
                 .setColor(0x00AE86);
             await interaction.reply({ embeds: [serverInfoEmbed] });
@@ -93,7 +108,7 @@ module.exports = {
           
                 const description = `\`\`\`fix\nDeveloper:   kio2gamer\nStatus:      Under Development\nLanguage:    JavaScript\nCreated on:  ${interaction.client.user.createdAt.toUTCString()}\`\`\``
                 const pingField = `\`\`\`fix\nPing:   ${sent.createdTimestamp - interaction.createdTimestamp} ms\nWS:     ${interaction.client.ws.ping} ms\nUptime: ${uptime}\nNode:   ${process.version}\nDJS:    v${version}\`\`\``
-                const statsField = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommands: 26\nCommands Type: Slash Commands\`\`\``
+                const statsField = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommands: 28\nCommands Type: Slash Commands\`\`\``
           
                 const embed = new EmbedBuilder()
                     .setTitle('Bot Info')
