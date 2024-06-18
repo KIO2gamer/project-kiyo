@@ -83,7 +83,7 @@ module.exports = {
                     { name: '📝 Description', value: description, inline: false },
                     { name: '👑 Owner', value: `${owner.user.tag}`, inline: true },
                     { name: '🆔 Server ID', value: serverID, inline: true },
-                    { name: '📅 Created', value: `${createdAt} years ago`, inline: true },
+                    { name: '📅 Created', value: `${createdAt}`, inline: true },
                     { name: '**__Server Stats__**', value: '\n' },
                     { name: '📊 Channels', value: `Text: ${textChannelsCount}\nVoice: ${voiceChannelsCount}\nCategory: ${categoryChannelsCount}\nForums: ${forumChannelsCount}`, inline: true },
                     { name: '👥 Members', value: `**Total: ${memberCount}**\n<:list_round_extend:1252524348800110685> Online: ${onlineMembers}\n<:list_round_extend:1252524348800110685> DND: ${dndMembers}\n<:list_round_extend:1252524348800110685> Idle: ${idleMembers}\n<:list_end_round_extend:1252524478592716800> Offline: ${offlineMembers}`, inline: true },
