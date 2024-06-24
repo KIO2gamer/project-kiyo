@@ -24,7 +24,7 @@ module.exports = {
             const serverID = guild.id;
             const owner = await guild.fetchOwner();
             const memberCount = guild.memberCount;
-            const createdAt = guild.createdAt;
+            const createdAt = Math.floor((guild.createdTimestamp)/1000);
             const iconURL = guild.iconURL({ dynamic: true, size: 512 });
             const textChannelsCount = guild.channels.cache.filter(channel => channel.type === 0).size; // Type 0 is for GUILD_TEXT
             const voiceChannelsCount = guild.channels.cache.filter(channel => channel.type === 2).size; // Type 2 is for GUILD_VOICE
@@ -65,25 +65,19 @@ module.exports = {
                 mfaLeveltext = 'None';
             } else {
                 mfaLeveltext = 'Elevated';
-            } 
-            
-
-            // Calculate server creation time in years
-            // const creationDate = new Date(createdAt);
-            // const currentDate = new Date();
-            // const yearsAgo = currentDate.getFullYear() - creationDate.getFullYear();
+            }
 
             // Create an embed with the server info
             const serverInfoEmbed = new EmbedBuilder()
-                .setTitle(`Server Information [ ${serverName} ]`)
+                .setTitle(`__Server Information__`)
                 .setThumbnail(iconURL)
                 .addFields(
                     { name: '**__Server Details__**', value: '\n' },
                     { name: '📋 Name', value: serverName, inline: true },
                     { name: '📝 Description', value: description, inline: false },
                     { name: '👑 Owner', value: `${owner.user.tag}`, inline: true },
-                    { name: '🆔 Server ID', value: serverID, inline: true },
-                    { name: '📅 Created', value: `${createdAt}`, inline: true },
+                    { name: '🆔 Server ID', value: `\`${serverID}\``, inline: true },
+                    { name: '📅 Created', value: `<t:${createdAt}:R>`, inline: true },
                     { name: '**__Server Stats__**', value: '\n' },
                     { name: '📊 Channels', value: `Text: ${textChannelsCount}\nVoice: ${voiceChannelsCount}\nCategory: ${categoryChannelsCount}\nForums: ${forumChannelsCount}`, inline: true },
                     { name: '👥 Members', value: `**Total: ${memberCount}**\n<:list_round_extend:1252524348800110685> Online: ${onlineMembers}\n<:list_round_extend:1252524348800110685> DND: ${dndMembers}\n<:list_round_extend:1252524348800110685> Idle: ${idleMembers}\n<:list_end_round_extend:1252524478592716800> Offline: ${offlineMembers}`, inline: true },
