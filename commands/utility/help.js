@@ -16,7 +16,6 @@ module.exports = {
                 .setName("category")
                 .setRequired(false)
                 .setDescription("What command category do you want to view?")
-                // Make sure the value of the choices are exactly equal to the folder names
                 .addChoices(
                     { name: "Fun", value: "fun" },
                     { name: "Moderation", value: "moderation" },
@@ -25,9 +24,11 @@ module.exports = {
         ),
     category: "Utility",
     async execute(interaction) {
+        await interaction.deferReply();  // Immediately acknowledge the interaction
+
         const category = interaction.options.getString("category");
+
         function getCategoryNameForMainMenu(choice) {
-            // Make sure to update command categories
             if (choice === "fun") {
                 return `> **Fun**\n> Commands which can be used for funsies.\n`;
             }
@@ -40,7 +41,6 @@ module.exports = {
         }
 
         function getCategoryTitle(choice) {
-            // Make sure to update command categories
             if (choice === "fun") {
                 return `Fun`;
             }
@@ -56,8 +56,9 @@ module.exports = {
         const modFields = [];
         const utilFields = [];
 
-        // eslint-disable-next-line no-unused-vars
-        for (const [index, folder] of fs.readdirSync("commands").entries()) {
+        // Fetch command IDs asynchronously
+        const commandFolders = fs.readdirSync("commands");
+        for (const folder of commandFolders) {
             const files = fs
                 .readdirSync(`commands/${folder}`)
                 .filter((file) => file.endsWith(".js"));
@@ -68,26 +69,21 @@ module.exports = {
                 try {
                     const commandId = await interaction.guild.commands
                         .fetch()
-                        .then(
-                            (commands) =>
-                                commands.find((cmd) => cmd.name === name).id,
-                        );
+                        .then((commands) => commands.find((cmd) => cmd.name === name)?.id);
 
-                    // Make sure to update command categories
-                    if (folder === "fun") {
-                        funFields.push(`</${name}:${commandId}>`);
-                    }
-                    if (folder === "moderation") {
-                        modFields.push(`</${name}:${commandId}>`);
-                    }
-                    if (folder === "utility") {
-                        utilFields.push(`</${name}:${commandId}>`);
+                    if (commandId) {
+                        if (folder === "fun") {
+                            funFields.push(`</${name}:${commandId}>`);
+                        }
+                        if (folder === "moderation") {
+                            modFields.push(`</${name}:${commandId}>`);
+                        }
+                        if (folder === "utility") {
+                            utilFields.push(`</${name}:${commandId}>`);
+                        }
                     }
                 } catch (error) {
-                    console.error(
-                        `Error fetching ID for ${name}: ${error.message}`,
-                    );
-                    console.log(error);
+                    console.error(`Error fetching ID for ${name}: ${error.message}`);
                 }
             }
         }
@@ -96,20 +92,19 @@ module.exports = {
             .setColor("White")
             .setTitle("Command List")
             .setDescription(
-                `\`/help [category] - View specific category\`\n(NOTE: The non-blue command links have subcommands because discord doesnt allow to add blue command links to them.)`,
+                `\`/help [category] - View specific category\`\n(NOTE: The non-blue command links have subcommands because discord doesn't allow adding blue command links to them.)`,
             )
             .setAuthor({
                 name: "Kiyo Bot HelpDesk",
                 iconURL: interaction.client.user.avatarURL(),
             })
-            // Make sure to update command categories
             .addFields([
-                { name: `**Fun**`, value: `${funFields.join(", ")}` },
-                { name: `**Moderation**`, value: `${modFields.join(", ")}` },
-                { name: `**Utility**`, value: `${utilFields.join(", ")}` },
+                { name: `**Fun**`, value: funFields.join(", ") || "No commands available" },
+                { name: `**Moderation**`, value: modFields.join(", ") || "No commands available" },
+                { name: `**Utility**`, value: utilFields.join(", ") || "No commands available" },
             ]);
 
-        if (category === null) {
+        if (!category) {
             const mainMenuEmbed = new EmbedBuilder()
                 .setColor("White")
                 .setDescription("`/help [category] - View specific category`")
@@ -120,12 +115,10 @@ module.exports = {
                 .addFields([
                     {
                         name: `Categories`,
-                        value: `${fs
-                            .readdirSync("./commands")
-                            .map(getCategoryNameForMainMenu)
-                            .join("\n")}`,
+                        value: commandFolders.map(getCategoryNameForMainMenu).join("\n"),
                     },
                 ]);
+
             const cmdListButton = new ButtonBuilder()
                 .setLabel("Command List")
                 .setStyle(ButtonStyle.Secondary)
@@ -136,12 +129,9 @@ module.exports = {
                 .setStyle(ButtonStyle.Secondary)
                 .setCustomId("home");
 
-            const rowWithCmdBtn = new ActionRowBuilder().addComponents(
-                cmdListButton,
-            );
-            const rowWithHomeBtn = new ActionRowBuilder().addComponents(
-                mainMenuBtn,
-            );
+            const rowWithCmdBtn = new ActionRowBuilder().addComponents(cmdListButton);
+            const rowWithHomeBtn = new ActionRowBuilder().addComponents(mainMenuBtn);
+
             const reply = await interaction.editReply({
                 embeds: [mainMenuEmbed],
                 components: [rowWithCmdBtn],
@@ -150,6 +140,7 @@ module.exports = {
             const collector = reply.createMessageComponentCollector({
                 time: 60_000 * 5,
             });
+
             collector.on("collect", async (i) => {
                 if (i.user.id === interaction.user.id) {
                     if (i.customId === "cmdList") {
@@ -166,58 +157,57 @@ module.exports = {
                     }
                 } else {
                     await i.reply({
-                        content:
-                            "You should run the command to use this interaction",
+                        content: "You should run the command to use this interaction",
                         ephemeral: true,
                     });
                 }
             });
+
             collector.on("end", async (collected, reason) => {
                 if (reason === "time") {
                     await reply.edit({ components: [] });
                 }
             });
+
             return;
         }
 
-        const embedDescription = [];
+        if (commandFolders.includes(category)) {
+            const embedDescription = [];
 
-        const commandFiles = fs
-            .readdirSync(`commands/${category}`)
-            .filter((file) => file.endsWith(".js"));
+            const commandFiles = fs
+                .readdirSync(`commands/${category}`)
+                .filter((file) => file.endsWith(".js"));
 
-        for (const file of commandFiles) {
-            const command = require(`./../${category}/${file}`);
-            const name = `${command.data.name}`;
-            const description = `${command.data.description}`;
+            for (const file of commandFiles) {
+                const command = require(`./../${category}/${file}`);
+                const name = `${command.data.name}`;
+                const description = `${command.data.description}`;
 
-            // Handle errors when fetching the command ID in case the command is not registered
-            try {
-                const commandId = await interaction.guild.commands
-                    .fetch()
-                    .then(
-                        (commands) =>
-                            commands.find((cmd) => cmd.name === name).id,
-                    );
+                try {
+                    const commandId = await interaction.guild.commands
+                        .fetch()
+                        .then((commands) => commands.find((cmd) => cmd.name === name)?.id);
 
-                embedDescription.push(
-                    `</${name}:${commandId}> \n> ${description}`,
-                );
-            } catch (error) {
-                console.error(
-                    `Error fetching ID for ${name}: ${error.message}`,
-                );
-                console.log(error);
+                    if (commandId) {
+                        embedDescription.push(`</${name}:${commandId}> \n> ${description}`);
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ID for ${name}: ${error.message}`);
+                }
             }
-        }
 
-        const categoryEmbed = new EmbedBuilder()
-            .setColor("White")
-            .setTitle(`${getCategoryTitle(category)}`)
-            .setDescription(`${embedDescription.join("\n\n")}`);
+            const categoryEmbed = new EmbedBuilder()
+                .setColor("White")
+                .setTitle(`${getCategoryTitle(category)}`)
+                .setDescription(embedDescription.join("\n\n") || "No commands available");
 
-        if (fs.readdirSync("commands").includes(category)) {
             return await interaction.editReply({ embeds: [categoryEmbed] });
+        } else {
+            await interaction.editReply({
+                content: "Invalid category.",
+                ephemeral: true,
+            });
         }
     },
 };
