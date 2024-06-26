@@ -7,7 +7,7 @@ module.exports = {
             "Shows the rules of the server in snippets (selection).",
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+            PermissionFlagsBits.ManageMessages, // Changed permission to ManageMessages for better fit
         )
         .addIntegerOption((option) =>
             option
@@ -35,15 +35,15 @@ module.exports = {
                 );
             case 4:
                 return interaction.reply(
-                    "**Rule 4 - No talking in other languages**\n> Please type only in intelligible English on https://discord.com/channels/935017969271054346/1239619089425764362 as well as in our server as we are unable to moderate consistently throughout the day.",
+                    "**Rule 4 - No talking in other languages**\n> Please type only in intelligible English as we are unable to moderate consistently throughout the day.",
                 );
             case 5:
                 return interaction.reply(
-                    "**Rule 5 - No politics or any religious discussion**\n> Please refrain from talking about the politics and any religious support in the chat as it will become chaotic and nearly impossible to moderate.",
+                    "**Rule 5 - No politics or any religious discussion**\n> Please refrain from talking about politics and any religious support in the chat as it will become chaotic and nearly impossible to moderate.",
                 );
             case 6:
                 return interaction.reply(
-                    "**Rule 6 - No inappropriate language or bypassing them**\n> Even though we have set up AutoMod to delete any inappropriate language, You should not bypass them. Failing to do so might lead to a mute or in higher degrees, ban. This includes swearing, trash talking, etc. Refrain from directing it at another member unsuspectingly.",
+                    "**Rule 6 - No inappropriate language or bypassing them**\n> Even though we have set up AutoMod to delete any inappropriate language, you should not bypass them. Failing to do so might lead to a mute or in higher degrees, ban. This includes swearing, trash talking, etc. Refrain from directing it at another member unsuspectingly.",
                 );
             case 7:
                 return interaction.reply(
@@ -51,7 +51,7 @@ module.exports = {
                 );
             case 8:
                 return interaction.reply(
-                    "**Rule 8 - Use the channels correctly**\n> Please use the channels in the correct places to avoid disturbance in the chat. For out of context discussions, please refer to the https://discord.com/channels/935017969271054346/1237018886843400243 channel.",
+                    "**Rule 8 - Use the channels correctly**\n> Please use the channels in the correct places to avoid disturbance in the chat. For out of context discussions, please refer to the appropriate channel.",
                 );
             case 9:
                 return interaction.reply(
@@ -67,7 +67,7 @@ module.exports = {
                 );
             default:
                 return interaction.reply({
-                    content: "Input a valid number from 1 to 10.",
+                    content: "Input a valid number from 1 to 11.",
                     ephemeral: true,
                 });
         }
