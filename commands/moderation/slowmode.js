@@ -4,17 +4,18 @@ const {
     PermissionFlagsBits,
     ChannelType,
   } = require('discord.js');
-  
+  const ms = require('ms');
+
   module.exports = {
     data: new SlashCommandBuilder()
       .setName('slowmode')
       .setDescription('Set slowmode for a channel')
       .setDMPermission(false)
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
-      .addIntegerOption(option =>
+      .addStringOption(option =>
         option
           .setName('duration')
-          .setDescription('Slowmode duration in seconds')
+          .setDescription('Slowmode duration')
           .setRequired(true)
       )
       .addChannelOption(option =>
