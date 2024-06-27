@@ -22,7 +22,7 @@ module.exports = {
             .join(' | ');
 
         const presence = guildUser.presence ? guildUser.presence.status : 'offline';
-        const userFlags = guildUser.user.flags.toArray().map(flag => flag.replace(/_/g, ' '));
+        const userFlags = guildUser.user.flags.toArray().map(flag => flag.replace(/_/g, ' ')).join('\n');
 
         const UserEmbed = new EmbedBuilder()
             .setTitle(`${user.username}'s Information`)
