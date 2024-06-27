@@ -8,17 +8,23 @@ module.exports = {
 	category: "utility",
 
 	async execute(interaction) {
-
-		const embed = new EmbedBuilder()
+		// Create initial embed
+		const initialEmbed = new EmbedBuilder()
 			.setTitle('Pinging...')
-			.setColor('Blue')
-			
-		const sent = await interaction.reply({ embeds: [embed], fetchReply: true });
+			.setColor('Blue');
+		
+		// Reply with the initial embed and fetch the reply to calculate latency
+		const sent = await interaction.reply({ embeds: [initialEmbed], fetchReply: true });
 
-		const embed2 = new EmbedBuilder()
-			.setTitle(`Roundtrip latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms`)
-			.setColor('Green')
+		// Calculate latency
+		const latency = sent.createdTimestamp - interaction.createdTimestamp;
 
-		interaction.editReply({ embeds: [embed2], ephemeral: true });
+		// Create the final embed with the latency
+		const finalEmbed = new EmbedBuilder()
+			.setTitle(`Roundtrip latency: ${latency}ms`)
+			.setColor('Green');
+
+		// Edit the reply with the final embed
+		await interaction.editReply({ embeds: [finalEmbed] });
 	},
 };
