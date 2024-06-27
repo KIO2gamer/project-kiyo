@@ -3,6 +3,7 @@ const {
 	EmbedBuilder,
 	PermissionFlagsBits,
 } = require('discord.js');
+const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -109,6 +110,15 @@ module.exports = {
 
 		// Attempt to ban the user
 		try {
+			const logEntry = new ModerationLog({
+				action: 'ban',
+				moderator: interaction.user.id,
+				user: targetUser.id,
+				reason: reason,
+			});
+		
+			await logEntry.save();
+
 			await targetUser.ban({ deleteMessageSeconds: deleteMessageSeconds, reason: reason });
 			await interaction.editReply({
 				embeds: [

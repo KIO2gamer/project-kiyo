@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -92,6 +93,15 @@ module.exports = {
 		}
 
 		try {
+			const logEntry = new ModerationLog({
+				action: 'kick',
+				moderator: interaction.user.id,
+				user: targetUser.id,
+				reason: reason,
+			});
+		
+			await logEntry.save();
+
 			await targetUser.kick(reason);
 			await interaction.editReply({
 				embeds: [
