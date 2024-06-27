@@ -46,11 +46,11 @@ module.exports = {
         .setColor('Blue')
         .setTitle(`Current weather of ${name}`)
         .addFields(
-          { name: `Temperature`, value: `${temp}°${temperatureFormat}`, inline: true },
+          { name: 'Temperature', value: `${temp}°${temperatureFormat}`, inline: true },
           { name: 'Feels Like', value: `${feel}°${temperatureFormat}`, inline: true },
           { name: 'Weather', value: `${type}`, inline: true },
-          { name: 'Pressure', value: `${pressure}pa`, inline: true },
-          { name: 'Wind Speed, Angle & Direction', value: `${wind}mph at angle of ${weatherData.current.wind_degree}° in ${weatherData.current.wind_dir}`, inline: true }
+          { name: 'Pressure', value: `${pressure} mb`, inline: true },
+          { name: 'Wind Speed, Angle & Direction', value: `${wind} mph at angle of ${weatherData.current.wind_degree}° in ${weatherData.current.wind_dir}`, inline: true }
         )
         .setThumbnail(`https:${icon}`);
 
@@ -62,4 +62,3 @@ module.exports = {
     }
   },
 };
-
