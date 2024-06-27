@@ -28,7 +28,7 @@ const {
     category: 'moderation',
     async execute(interaction) {
       const channel = interaction.options.getChannel('channel') || interaction.channel;
-      const durationRaw = interaction.options.getInteger('duration');
+      const durationRaw = interaction.options.getString('duration');
       const duration = ms(durationRaw);
   
       if (!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)) {
