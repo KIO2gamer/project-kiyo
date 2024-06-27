@@ -3,7 +3,7 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   ChannelType,
-} = require('discord.js')
+} = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,40 +18,63 @@ module.exports = {
         .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
         .setRequired(false)
     ),
-    category: 'moderation',
+  category: 'moderation',
   async execute(interaction) {
-      const channel = interaction.options.getChannel('channel') || interaction.channel
-      await interaction.deferReply({ ephemeral: true })
+    const channel = interaction.options.getChannel('channel') || interaction.channel;
+    await interaction.deferReply({ ephemeral: true });
 
-      const embed = new EmbedBuilder().setTitle(`${channel} has been locked`).setColor('Red').setFooter({
-        text: `Done by: ${interaction.user.username}`,
-        iconURL: `${interaction.user.avatarURL()}`,
-      })
+    // Check if the bot has the required permissions
+    if (!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)) {
+      const noPermissionEmbed = new EmbedBuilder()
+        .setTitle('ERROR')
+        .setColor('Red')
+        .setDescription('I do not have the required permissions to lock the channel.');
+      await interaction.editReply({ embeds: [noPermissionEmbed] });
+      return;
+    }
 
-      const errorEmbed = new EmbedBuilder().setTitle(`ERROR`).setColor('Red').setDescription(`${channel} is already locked`)
+    // Check if the channel is already locked
+    if (channel.permissionOverwrites.cache.get(interaction.guild.id)?.deny.has(PermissionFlagsBits.SendMessages)) {
+      const alreadyLockedEmbed = new EmbedBuilder()
+        .setTitle('ERROR')
+        .setColor('Red')
+        .setDescription(`${channel} is already locked.`);
+      await interaction.editReply({ embeds: [alreadyLockedEmbed] });
+      return;
+    }
 
-      
-      if (channel.permissionOverwrites.cache.get(interaction.guild.id).deny.has(PermissionFlagsBits.SendMessages)) {
-        await interaction.editReply({
-          embeds: [errorEmbed],
-        })
-        return
-      }
-
-      channel.permissionOverwrites.create(interaction.guild.id, {
+    try {
+      // Lock the channel
+      await channel.permissionOverwrites.create(interaction.guild.id, {
         SendMessages: false,
-      })
+      });
+
+      const lockEmbed = new EmbedBuilder()
+        .setTitle(`${channel.name} has been locked`)
+        .setColor('Red')
+        .setFooter({
+          text: `Done by: ${interaction.user.username}`,
+          iconURL: `${interaction.user.avatarURL()}`,
+        })
+        .setTimestamp();
 
       if (channel === interaction.channel) {
         await interaction.editReply({
-          embeds: [embed],
-        })
-      }
-      else {
-        await interaction.editReply({ content: '**Locked Successfully**' })
+          embeds: [lockEmbed],
+        });
+      } else {
+        await interaction.editReply({ content: '**Locked Successfully**' });
         await channel.send({
-          embeds: [embed],
-        })
+          embeds: [lockEmbed],
+        });
       }
+
+    } catch (error) {
+      const errorEmbed = new EmbedBuilder()
+        .setTitle('ERROR')
+        .setColor('Red')
+        .setDescription(`An error occurred while trying to lock the channel: ${error.message}`);
+      await interaction.editReply({ embeds: [errorEmbed] });
+    }
   },
-}
+};
