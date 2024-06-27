@@ -138,10 +138,7 @@ for (const file of eventFiles) {
 async function connectToMongoDB(retries = 5) {
   try {
     mongoose.set('strictQuery', false);
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URL);
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error(`Failed to connect to MongoDB: ${error.message}`);
