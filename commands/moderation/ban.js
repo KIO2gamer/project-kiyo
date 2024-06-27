@@ -2,7 +2,7 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	PermissionFlagsBits,
-  } = require('discord.js');
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -17,14 +17,24 @@ module.exports = {
 			option
 				.setName('reason')
 				.setDescription('The reason for banning'))
+		.addIntegerOption(option =>
+			option
+				.setName('duration')
+				.setDescription('The duration of the ban in days')
+				.setRequired(false))
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
 		.setDMPermission(false),
-    category: 'moderation',
+	category: 'moderation',
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
 		const reason = interaction.options.getString('reason') ?? 'No reason provided';
+		const durationDays = interaction.options.getInteger('duration') ?? 7; // Default to 7 days if not specified
+		const deleteMessageSeconds = durationDays * 24 * 60 * 60; // Convert days to seconds
+
+		// Defer the reply to allow time for the operation
 		await interaction.deferReply();
 
+		// Check if the target user exists
 		if (!targetUser) {
 			await interaction.editReply({
 				embeds: [
@@ -34,14 +44,14 @@ module.exports = {
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						}
-					),
-				]
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
 			});
 			return;
 		}
 
+		// Check if the target user is the server owner
 		if (targetUser.id === interaction.guild.ownerId) {
 			await interaction.editReply({
 				embeds: [
@@ -51,19 +61,19 @@ module.exports = {
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						})
-					]
-				}
-			);
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
+			});
 			return;
 		}
 
-		console.log(targetUser);
+		// Get role positions
 		const targetUserRolePosition = targetUser.roles.highest.position;
 		const requestUserRolePosition = interaction.member.roles.highest.position;
 		const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
+		// Check if the user trying to ban has a higher role than the target
 		if (targetUserRolePosition >= requestUserRolePosition) {
 			await interaction.editReply({
 				embeds: [
@@ -73,14 +83,14 @@ module.exports = {
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						})
-					]
-				}
-			);
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
+			});
 			return;
 		}
 
+		// Check if the bot has a higher role than the target
 		if (targetUserRolePosition >= botRolePosition) {
 			await interaction.editReply({
 				embeds: [
@@ -90,30 +100,30 @@ module.exports = {
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						})
-					]
-				}
-			);
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
+			});
 			return;
 		}
 
+		// Attempt to ban the user
 		try {
-			await targetUser.ban({ deleteMessageSeconds: 60 * 60 * 24 * 7, reason: reason });
+			await targetUser.ban({ deleteMessageSeconds: deleteMessageSeconds, reason: reason });
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('BANNED!!!')
-						.setDescription(`<@${targetUser.id}> has been banned for reason: \`${reason}\``)
+						.setDescription(`<@${targetUser.id}> has been banned for ${durationDays} day(s) for reason: \`${reason}\``)
 						.setColor('Green')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						})
-					]
-				}
-			)
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
+			});
 		} catch (error) {
+			console.error('Error banning user:', error);
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
@@ -122,11 +132,10 @@ module.exports = {
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
-							iconURL: `${interaction.user.avatarURL()}`,
-						})
-					]
-				}
-			)
+							iconURL: `${interaction.user.displayAvatarURL()}`,
+						}),
+				],
+			});
 		}
-	}
-}
+	},
+};
