@@ -22,18 +22,25 @@ module.exports = {
                     { name: "Moderation", value: "moderation" },
                     { name: "Utility", value: "utility" },
                 ),
+        )
+        .addStringOption((option) =>
+            option
+                .setName("search")
+                .setRequired(false)
+                .setDescription("Search for a command by name or description")
         ),
     category: "Utility",
     async execute(interaction) {
         await interaction.deferReply(); // Immediately acknowledge the interaction
 
         const category = interaction.options.getString("category");
+        const searchQuery = interaction.options.getString("search")?.toLowerCase();
 
         const getCategoryNameForMainMenu = (choice) => {
             const categories = {
-                fun: "> **Fun**\n> Commands which can be used for fun activities.\n",
-                moderation: "> **Moderation**\n> Commands for server moderation.\n",
-                utility: "> **Utility**\n> Commands for various utilities.",
+                fun: "> **🎉 Fun**\n> Commands which can be used for fun activities.\n",
+                moderation: "> **🛡️ Moderation**\n> Commands for server moderation.\n",
+                utility: "> **🛠️ Utility**\n> Commands for various utilities.\n",
             };
             return categories[choice];
         };
@@ -47,14 +54,20 @@ module.exports = {
             return titles[choice];
         };
 
-        const fetchCommandIds = async (folder) => {
+        const fetchCommands = async (folder) => {
+            const folderPath = path.join("C:\\Users\\KIO2gamer\\OneDrive\\Documents\\discordbot\\commands", `${folder}`);
+            if (!fs.existsSync(folderPath)) {
+                console.error(`Directory ${folderPath} does not exist`);
+                return [];
+            }
+
             const files = fs
-                .readdirSync(`commands/${folder}`)
+                .readdirSync(folderPath)
                 .filter((file) => file.endsWith(".js"));
 
             const commands = [];
             for (const file of files) {
-                const command = require(`../${folder}/${file}`);
+                const command = require(path.join(folderPath, file));
                 const name = command.data.name;
                 try {
                     const commandId = await interaction.guild.commands.fetch()
@@ -70,15 +83,25 @@ module.exports = {
             return commands;
         };
 
-        const commandFolders = fs.readdirSync("commands");
+        const commandFolders = ['fun', 'moderation', 'utility'];
 
         const [funCommands, modCommands, utilCommands] = await Promise.all([
-            fetchCommandIds("fun"),
-            fetchCommandIds("moderation"),
-            fetchCommandIds("utility"),
+            fetchCommands('fun'),
+            fetchCommands('moderation'),
+            fetchCommands('utility'),
         ]);
 
-        const buildCommandFields = (commands) => commands.map(cmd => `</${cmd.name}:${cmd.id}>`).join(", ") || "No commands available";
+        const allCommands = {
+            fun: funCommands,
+            moderation: modCommands,
+            utility: utilCommands,
+        };
+
+        const buildCommandFields = (commands) => {
+            return commands
+                .map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`)
+                .join("\n\n") || "No commands available";
+        };
 
         const cmdListEmbed = new EmbedBuilder()
             .setColor("#3498db")
@@ -101,6 +124,37 @@ module.exports = {
                 iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
             })
             .setTimestamp();
+
+        if (searchQuery) {
+            const searchResults = [];
+            if (category) {
+                allCommands[category].forEach(cmd => {
+                    if (cmd.name.toLowerCase().includes(searchQuery) || cmd.description.toLowerCase().includes(searchQuery)) {
+                        searchResults.push(cmd);
+                    }
+                });
+            } else {
+                for (const key in allCommands) {
+                    allCommands[key].forEach(cmd => {
+                        if (cmd.name.toLowerCase().includes(searchQuery) || cmd.description.toLowerCase().includes(searchQuery)) {
+                            searchResults.push(cmd);
+                        }
+                    });
+                }
+            }
+
+            const searchEmbed = new EmbedBuilder()
+                .setColor("#f39c12")
+                .setTitle(`🔍 Search Results: ${searchQuery}`)
+                .setDescription(searchResults.map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`).join("\n\n") || "No commands found")
+                .setFooter({
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+                })
+                .setTimestamp();
+
+            return await interaction.editReply({ embeds: [searchEmbed] });
+        }
 
         if (!category) {
             const mainMenuEmbed = new EmbedBuilder()
@@ -177,8 +231,8 @@ module.exports = {
         }
 
         if (commandFolders.includes(category)) {
-            const commands = await fetchCommandIds(category);
-            const embedDescription = commands.map(cmd => `</${cmd.name}:${cmd.id}> \n> ${cmd.description}`).join("\n\n") || "No commands available";
+            const commands = allCommands[category];
+            const embedDescription = commands.map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`).join("\n\n") || "No commands available";
 
             const categoryEmbed = new EmbedBuilder()
                 .setColor("#e74c3c")
