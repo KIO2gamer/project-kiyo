@@ -6,6 +6,7 @@ const {
     ActionRowBuilder,
 } = require("discord.js");
 const fs = require("fs");
+const path = require("path");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,108 +25,111 @@ module.exports = {
         ),
     category: "Utility",
     async execute(interaction) {
-        await interaction.deferReply();  // Immediately acknowledge the interaction
+        await interaction.deferReply(); // Immediately acknowledge the interaction
 
         const category = interaction.options.getString("category");
 
-        function getCategoryNameForMainMenu(choice) {
-            if (choice === "fun") {
-                return `> **Fun**\n> Commands which can be used for funsies.\n`;
-            }
-            if (choice === "moderation") {
-                return `> **Moderation**\n> Commands only for moderators.\n`;
-            }
-            if (choice === "utility") {
-                return `> **Utility**\n> Commands which can be used for various utilities.`;
-            }
-        }
+        const getCategoryNameForMainMenu = (choice) => {
+            const categories = {
+                fun: "> **Fun**\n> Commands which can be used for fun activities.\n",
+                moderation: "> **Moderation**\n> Commands for server moderation.\n",
+                utility: "> **Utility**\n> Commands for various utilities.",
+            };
+            return categories[choice];
+        };
 
-        function getCategoryTitle(choice) {
-            if (choice === "fun") {
-                return `Fun`;
-            }
-            if (choice === "moderation") {
-                return `Moderation`;
-            }
-            if (choice === "utility") {
-                return `Utility`;
-            }
-        }
+        const getCategoryTitle = (choice) => {
+            const titles = {
+                fun: "🎉 Fun Commands",
+                moderation: "🛡️ Moderation Commands",
+                utility: "🛠️ Utility Commands",
+            };
+            return titles[choice];
+        };
 
-        const funFields = [];
-        const modFields = [];
-        const utilFields = [];
-
-        // Fetch command IDs asynchronously
-        const commandFolders = fs.readdirSync("commands");
-        for (const folder of commandFolders) {
+        const fetchCommandIds = async (folder) => {
             const files = fs
                 .readdirSync(`commands/${folder}`)
                 .filter((file) => file.endsWith(".js"));
 
+            const commands = [];
             for (const file of files) {
-                const command = require(`./../${folder}/${file}`);
-                const name = `${command.data.name}`;
+                const command = require(`../${folder}/${file}`);
+                const name = command.data.name;
                 try {
-                    const commandId = await interaction.guild.commands
-                        .fetch()
-                        .then((commands) => commands.find((cmd) => cmd.name === name)?.id);
+                    const commandId = await interaction.guild.commands.fetch()
+                        .then((cmds) => cmds.find((cmd) => cmd.name === name)?.id);
 
                     if (commandId) {
-                        if (folder === "fun") {
-                            funFields.push(`</${name}:${commandId}>`);
-                        }
-                        if (folder === "moderation") {
-                            modFields.push(`</${name}:${commandId}>`);
-                        }
-                        if (folder === "utility") {
-                            utilFields.push(`</${name}:${commandId}>`);
-                        }
+                        commands.push({ name, id: commandId, description: command.data.description });
                     }
                 } catch (error) {
                     console.error(`Error fetching ID for ${name}: ${error.message}`);
                 }
             }
-        }
+            return commands;
+        };
+
+        const commandFolders = fs.readdirSync("commands");
+
+        const [funCommands, modCommands, utilCommands] = await Promise.all([
+            fetchCommandIds("fun"),
+            fetchCommandIds("moderation"),
+            fetchCommandIds("utility"),
+        ]);
+
+        const buildCommandFields = (commands) => commands.map(cmd => `</${cmd.name}:${cmd.id}>`).join(", ") || "No commands available";
 
         const cmdListEmbed = new EmbedBuilder()
-            .setColor("White")
-            .setTitle("Command List")
+            .setColor("#3498db")
+            .setTitle("📜 Command List")
             .setDescription(
-                `\`/help [category] - View specific category\`\n(NOTE: The non-blue command links have subcommands because discord doesn't allow adding blue command links to them.)`,
+                "`/help [category] - View specific category`\n(NOTE: The non-blue command links have subcommands because Discord doesn't allow adding blue command links to them.)"
             )
             .setAuthor({
                 name: "Kiyo Bot HelpDesk",
                 iconURL: interaction.client.user.avatarURL(),
             })
+            .setThumbnail(interaction.client.user.avatarURL())
             .addFields([
-                { name: `**Fun**`, value: funFields.join(", ") || "No commands available" },
-                { name: `**Moderation**`, value: modFields.join(", ") || "No commands available" },
-                { name: `**Utility**`, value: utilFields.join(", ") || "No commands available" },
-            ]);
+                { name: `**🎉 Fun**`, value: buildCommandFields(funCommands) },
+                { name: `**🛡️ Moderation**`, value: buildCommandFields(modCommands) },
+                { name: `**🛠️ Utility**`, value: buildCommandFields(utilCommands) },
+            ])
+            .setFooter({
+                text: `Requested by ${interaction.user.tag}`,
+                iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+            })
+            .setTimestamp();
 
         if (!category) {
             const mainMenuEmbed = new EmbedBuilder()
-                .setColor("White")
+                .setColor("#2ecc71")
                 .setDescription("`/help [category] - View specific category`")
                 .setAuthor({
                     name: "Kiyo Bot HelpDesk",
                     iconURL: interaction.client.user.avatarURL(),
                 })
+                .setThumbnail(interaction.client.user.avatarURL())
                 .addFields([
                     {
-                        name: `Categories`,
+                        name: `📂 Categories`,
                         value: commandFolders.map(getCategoryNameForMainMenu).join("\n"),
                     },
-                ]);
+                ])
+                .setFooter({
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+                })
+                .setTimestamp();
 
             const cmdListButton = new ButtonBuilder()
-                .setLabel("Command List")
+                .setLabel("📜 Command List")
                 .setStyle(ButtonStyle.Secondary)
                 .setCustomId("cmdList");
 
             const mainMenuBtn = new ButtonBuilder()
-                .setLabel("Home")
+                .setLabel("🏠 Home")
                 .setStyle(ButtonStyle.Secondary)
                 .setCustomId("home");
 
@@ -157,7 +161,7 @@ module.exports = {
                     }
                 } else {
                     await i.reply({
-                        content: "You should run the command to use this interaction",
+                        content: "You should run the command to use this interaction.",
                         ephemeral: true,
                     });
                 }
@@ -173,34 +177,18 @@ module.exports = {
         }
 
         if (commandFolders.includes(category)) {
-            const embedDescription = [];
-
-            const commandFiles = fs
-                .readdirSync(`commands/${category}`)
-                .filter((file) => file.endsWith(".js"));
-
-            for (const file of commandFiles) {
-                const command = require(`./../${category}/${file}`);
-                const name = `${command.data.name}`;
-                const description = `${command.data.description}`;
-
-                try {
-                    const commandId = await interaction.guild.commands
-                        .fetch()
-                        .then((commands) => commands.find((cmd) => cmd.name === name)?.id);
-
-                    if (commandId) {
-                        embedDescription.push(`</${name}:${commandId}> \n> ${description}`);
-                    }
-                } catch (error) {
-                    console.error(`Error fetching ID for ${name}: ${error.message}`);
-                }
-            }
+            const commands = await fetchCommandIds(category);
+            const embedDescription = commands.map(cmd => `</${cmd.name}:${cmd.id}> \n> ${cmd.description}`).join("\n\n") || "No commands available";
 
             const categoryEmbed = new EmbedBuilder()
-                .setColor("White")
-                .setTitle(`${getCategoryTitle(category)}`)
-                .setDescription(embedDescription.join("\n\n") || "No commands available");
+                .setColor("#e74c3c")
+                .setTitle(getCategoryTitle(category))
+                .setDescription(embedDescription)
+                .setFooter({
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+                })
+                .setTimestamp();
 
             return await interaction.editReply({ embeds: [categoryEmbed] });
         } else {
