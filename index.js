@@ -64,7 +64,6 @@ const path = require('node:path');
 require('dotenv').config();
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const mongoose = require('mongoose');
-const { preloadCommands } = require('./utils/preloadCommands');
 
 // Validate environment variables
 const requiredEnvVars = ['DISCORD_TOKEN', 'MONGODB_URL'];
@@ -86,11 +85,6 @@ const client = new Client({
     GatewayIntentBits.DirectMessageReactions,
     GatewayIntentBits.MessageContent,
   ],
-});
-
-client.once('ready', async () => {
-  await preloadCommands(client);
-  console.log('Commands preloaded and cached.');
 });
 
 // Command collection

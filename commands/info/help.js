@@ -5,7 +5,8 @@ const {
     ButtonStyle,
     ActionRowBuilder,
 } = require("discord.js");
-const { commandsCache } = require('C:\\Users\\KIO2gamer\\OneDrive\\Documents\\discordbot\\utils\\preloadCommands.js');
+const fs = require("fs");
+const path = require("path");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -59,7 +60,52 @@ module.exports = {
             return titles[choice];
         };
 
-        const allCommands = commandsCache;
+        const fetchCommands = async (folder) => {
+            const folderPath = path.join("C:\\Users\\KIO2gamer\\OneDrive\\Documents\\discordbot\\commands", `${folder}`);
+            if (!fs.existsSync(folderPath)) {
+                console.error(`Directory ${folderPath} does not exist`);
+                return [];
+            }
+
+            const files = fs
+                .readdirSync(folderPath)
+                .filter((file) => file.endsWith(".js"));
+
+            const commands = [];
+            for (const file of files) {
+                const command = require(path.join(folderPath, file));
+                const name = command.data.name;
+                try {
+                    const commandId = await interaction.guild.commands.fetch()
+                        .then((cmds) => cmds.find((cmd) => cmd.name === name)?.id);
+
+                    if (commandId) {
+                        commands.push({ name, id: commandId, description: command.data.description });
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ID for ${name}: ${error.message}`);
+                }
+            }
+            return commands;
+        };
+
+        const commandFolders = ['fun','info', 'logs', 'moderation', 'utility'];
+
+        const [funCommands, infoCommands, logCommands, modCommands, utilCommands] = await Promise.all([
+            fetchCommands('fun'),
+            fetchCommands('info'),
+            fetchCommands('logs'),
+            fetchCommands('moderation'),
+            fetchCommands('utility'),
+        ]);
+
+        const allCommands = {
+            fun: funCommands,
+            info: infoCommands,
+            logs: logCommands,
+            moderation: modCommands,
+            utility: utilCommands,
+        };
 
         const buildCommandFields = (commands) => {
             const chunks = [];
@@ -80,8 +126,6 @@ module.exports = {
 
             return chunks;
         };
-
-        const commandFolders = ['fun', 'info', 'logs', 'moderation', 'utility'];
 
         const cmdListEmbed = new EmbedBuilder()
             .setColor("#3498db")
