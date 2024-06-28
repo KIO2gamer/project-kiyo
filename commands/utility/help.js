@@ -98,9 +98,23 @@ module.exports = {
         };
 
         const buildCommandFields = (commands) => {
-            return commands
-                .map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`)
-                .join("\n\n") || "No commands available";
+            const chunks = [];
+            let currentChunk = [];
+
+            commands.forEach((cmd) => {
+                const cmdStr = `</${cmd.name}:${cmd.id}> - ${cmd.description}`;
+                if (currentChunk.join("\n").length + cmdStr.length > 1024) {
+                    chunks.push(currentChunk.join("\n"));
+                    currentChunk = [];
+                }
+                currentChunk.push(cmdStr);
+            });
+
+            if (currentChunk.length > 0) {
+                chunks.push(currentChunk.join("\n"));
+            }
+
+            return chunks;
         };
 
         const cmdListEmbed = new EmbedBuilder()
@@ -113,17 +127,24 @@ module.exports = {
                 name: "Kiyo Bot HelpDesk",
                 iconURL: interaction.client.user.avatarURL(),
             })
-            .setThumbnail(interaction.client.user.avatarURL())
-            .addFields([
-                { name: `**🎉 Fun**`, value: buildCommandFields(funCommands) },
-                { name: `**🛡️ Moderation**`, value: buildCommandFields(modCommands) },
-                { name: `**🛠️ Utility**`, value: buildCommandFields(utilCommands) },
-            ])
-            .setFooter({
-                text: `Requested by ${interaction.user.tag}`,
-                iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-            })
-            .setTimestamp();
+            .setThumbnail(interaction.client.user.avatarURL());
+
+        buildCommandFields(funCommands).forEach((chunk, index) => {
+            cmdListEmbed.addFields({ name: index === 0 ? "**🎉 Fun**" : "\u200B", value: chunk });
+        });
+
+        buildCommandFields(modCommands).forEach((chunk, index) => {
+            cmdListEmbed.addFields({ name: index === 0 ? "**🛡️ Moderation**" : "\u200B", value: chunk });
+        });
+
+        buildCommandFields(utilCommands).forEach((chunk, index) => {
+            cmdListEmbed.addFields({ name: index === 0 ? "**🛠️ Utility**" : "\u200B", value: chunk });
+        });
+
+        cmdListEmbed.setFooter({
+            text: `Requested by ${interaction.user.tag}`,
+            iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+        }).setTimestamp();
 
         if (searchQuery) {
             const searchResults = [];
@@ -146,7 +167,7 @@ module.exports = {
             const searchEmbed = new EmbedBuilder()
                 .setColor("#f39c12")
                 .setTitle(`🔍 Search Results: ${searchQuery}`)
-                .setDescription(searchResults.map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`).join("\n\n") || "No commands found")
+                .setDescription(searchResults.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`).join("\n") || "No commands found")
                 .setFooter({
                     text: `Requested by ${interaction.user.tag}`,
                     iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
@@ -232,7 +253,7 @@ module.exports = {
 
         if (commandFolders.includes(category)) {
             const commands = allCommands[category];
-            const embedDescription = commands.map(cmd => `• </${cmd.name}:${cmd.id}> \n  > ${cmd.description}`).join("\n\n") || "No commands available";
+            const embedDescription = commands.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`).join("\n") || "No commands available";
 
             const categoryEmbed = new EmbedBuilder()
                 .setColor("#e74c3c")
