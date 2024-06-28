@@ -11,29 +11,39 @@ module.exports = {
       option.setName('limit')
         .setDescription('The number of logs to retrieve')
         .setRequired(false))
-    .addStringOption(option =>
-      option.setName('user_id')
-        .setDescription('The user id to filter logs by')
+    .addUserOption(option =>
+      option.setName('user')
+        .setDescription('The user to filter logs by')
+        .setRequired(false))
+    .addIntegerOption(option =>
+      option.setName('lognumber')
+        .setDescription('The log number to search for')
         .setRequired(false)),
   async execute(interaction) {
     const limit = interaction.options.getInteger('limit') || 10;
-    const user = interaction.options.getString('user_id');
+    const user = interaction.options.getUser('user');
+    const logNumber = interaction.options.getInteger('lognumber');
 
     try {
-      // Fetch logs from MongoDB
       let logs;
-      if (user) {
-        logs = await ModerationLog.find({ user: user }).sort({ timestamp: -1 }).limit(limit);
-      } else {
-        logs = await ModerationLog.find().sort({ timestamp: -1 }).limit(limit);
-      }
 
-      if (logs.length === 0) {
-        return interaction.reply('No moderation logs of that user are found.');
+      if (logNumber) {
+        // Fetch log by logNumber
+        logs = await ModerationLog.find({ logNumber: logNumber });
+
+        if (logs.length === 0) {
+          return interaction.reply(`No moderation log found for log number ${logNumber}.`);
+        }
+      } else if (user) {
+        // Fetch logs for a specific user
+        logs = await ModerationLog.find({ user: user.id }).sort({ logNumber: -1 }).limit(limit);
+      } else {
+        // Fetch latest logs
+        logs = await ModerationLog.find().sort({ logNumber: -1 }).limit(limit);
       }
 
       const embed = new EmbedBuilder()
-        .setTitle('Moderation Logs')
+        .setTitle(`Moderation Logs`)
         .setColor('#FF0000')
         .setTimestamp();
 
@@ -54,7 +64,7 @@ module.exports = {
         const punishedUser = `<@${log.user}>`;
         const formattedTimestamp = formatter.format(new Date(log.timestamp));
 
-        description += `**Action**: ${log.action}\n**Moderator**: ${moderator}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n\n`;
+        description += `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderator}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n\n`;
       });
 
       embed.setDescription(description);

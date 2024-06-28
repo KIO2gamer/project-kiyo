@@ -152,6 +152,16 @@ module.exports = {
                     ]
                 });
             } else {
+                const logEntry = new ModerationLog({
+                    action: 'timeout',
+                    duration: newTimeoutDuration,
+                    moderator: moderator.id,
+                    user: target.id,
+                    reason: reason,
+                });
+                  
+                await logEntry.save();
+
                 await targetUser.timeout(newTimeoutDuration, reason);
                 await interaction.editReply({
                     embeds: [
