@@ -5,8 +5,7 @@ const {
     ButtonStyle,
     ActionRowBuilder,
 } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
+const { commandsCache } = require('C:\\Users\\KIO2gamer\\OneDrive\\Documents\\discordbot\\utils\\preloadCommands.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -19,6 +18,8 @@ module.exports = {
                 .setDescription("What command category do you want to view?")
                 .addChoices(
                     { name: "Fun", value: "fun" },
+                    { name: "Info", value: "info" },
+                    { name: "Logs", value: "logs" },
                     { name: "Moderation", value: "moderation" },
                     { name: "Utility", value: "utility" },
                 ),
@@ -29,7 +30,7 @@ module.exports = {
                 .setRequired(false)
                 .setDescription("Search for a command by name or description")
         ),
-    category: "Utility",
+    category: "info",
     async execute(interaction) {
         await interaction.deferReply(); // Immediately acknowledge the interaction
 
@@ -39,6 +40,8 @@ module.exports = {
         const getCategoryNameForMainMenu = (choice) => {
             const categories = {
                 fun: "> **🎉 Fun**\n> Commands which can be used for fun activities.\n",
+                info: "> **📖 Info**\n> Commands for getting information.\n",
+                logs: "> **📜 Logs**\n> Commands for logging.\n",
                 moderation: "> **🛡️ Moderation**\n> Commands for server moderation.\n",
                 utility: "> **🛠️ Utility**\n> Commands for various utilities.\n",
             };
@@ -48,54 +51,15 @@ module.exports = {
         const getCategoryTitle = (choice) => {
             const titles = {
                 fun: "🎉 Fun Commands",
+                info: "📖 Info Commands",
+                logs: "📜 Logs Commands",
                 moderation: "🛡️ Moderation Commands",
                 utility: "🛠️ Utility Commands",
             };
             return titles[choice];
         };
 
-        const fetchCommands = async (folder) => {
-            const folderPath = path.join("C:\\Users\\KIO2gamer\\OneDrive\\Documents\\discordbot\\commands", `${folder}`);
-            if (!fs.existsSync(folderPath)) {
-                console.error(`Directory ${folderPath} does not exist`);
-                return [];
-            }
-
-            const files = fs
-                .readdirSync(folderPath)
-                .filter((file) => file.endsWith(".js"));
-
-            const commands = [];
-            for (const file of files) {
-                const command = require(path.join(folderPath, file));
-                const name = command.data.name;
-                try {
-                    const commandId = await interaction.guild.commands.fetch()
-                        .then((cmds) => cmds.find((cmd) => cmd.name === name)?.id);
-
-                    if (commandId) {
-                        commands.push({ name, id: commandId, description: command.data.description });
-                    }
-                } catch (error) {
-                    console.error(`Error fetching ID for ${name}: ${error.message}`);
-                }
-            }
-            return commands;
-        };
-
-        const commandFolders = ['fun', 'moderation', 'utility'];
-
-        const [funCommands, modCommands, utilCommands] = await Promise.all([
-            fetchCommands('fun'),
-            fetchCommands('moderation'),
-            fetchCommands('utility'),
-        ]);
-
-        const allCommands = {
-            fun: funCommands,
-            moderation: modCommands,
-            utility: utilCommands,
-        };
+        const allCommands = commandsCache;
 
         const buildCommandFields = (commands) => {
             const chunks = [];
@@ -117,11 +81,13 @@ module.exports = {
             return chunks;
         };
 
+        const commandFolders = ['fun', 'info', 'logs', 'moderation', 'utility'];
+
         const cmdListEmbed = new EmbedBuilder()
             .setColor("#3498db")
             .setTitle("📜 Command List")
             .setDescription(
-                "`/help [category] - View specific category`\n(NOTE: The non-blue command links have subcommands because Discord doesn't allow adding blue command links to them.)"
+                "`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`"
             )
             .setAuthor({
                 name: "Kiyo Bot HelpDesk",
@@ -129,17 +95,26 @@ module.exports = {
             })
             .setThumbnail(interaction.client.user.avatarURL());
 
-        buildCommandFields(funCommands).forEach((chunk, index) => {
+        buildCommandFields(allCommands.fun).forEach((chunk, index) => {
             cmdListEmbed.addFields({ name: index === 0 ? "**🎉 Fun**" : "\u200B", value: chunk });
         });
 
-        buildCommandFields(modCommands).forEach((chunk, index) => {
+        buildCommandFields(allCommands.info).forEach((chunk, index) => {
+            cmdListEmbed.addFields({ name: index === 0 ? "**📖 Info**" : "\u200B", value: chunk });
+        });
+
+        buildCommandFields(allCommands.logs).forEach((chunk, index) => {
+            cmdListEmbed.addFields({ name: index === 0 ? "**📜 Logs**" : "\u200B", value: chunk });
+        });
+
+        buildCommandFields(allCommands.moderation).forEach((chunk, index) => {
             cmdListEmbed.addFields({ name: index === 0 ? "**🛡️ Moderation**" : "\u200B", value: chunk });
         });
 
-        buildCommandFields(utilCommands).forEach((chunk, index) => {
+        buildCommandFields(allCommands.utility).forEach((chunk, index) => {
             cmdListEmbed.addFields({ name: index === 0 ? "**🛠️ Utility**" : "\u200B", value: chunk });
         });
+
 
         cmdListEmbed.setFooter({
             text: `Requested by ${interaction.user.tag}`,
@@ -180,7 +155,7 @@ module.exports = {
         if (!category) {
             const mainMenuEmbed = new EmbedBuilder()
                 .setColor("#2ecc71")
-                .setDescription("`/help [category] - View specific category`")
+                .setDescription("`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`")
                 .setAuthor({
                     name: "Kiyo Bot HelpDesk",
                     iconURL: interaction.client.user.avatarURL(),
