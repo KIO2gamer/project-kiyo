@@ -658,17 +658,94 @@ module.exports = {
                     `<@&944618320232075284> must abide by the server's rules. Failing to do so can lead to warn, mute, kick, or even ban. Any attempts of bypassing, exploiting etc. towards the server will get you instantly banned and reported.`
                 )
                 .addFields(
-                    { name: "Rule 1", value: "No Spamming", inline: true },
-                    { name: "Rule 2", value: "No unnecessary explicit content", inline: true },
-                    { name: "Rule 3", value: "No harassment", inline: true },
-                    { name: "Rule 4", value: "No talking in other languages", inline: true },
-                    { name: "Rule 5", value: "No politics or any religious discussion", inline: true },
-                    { name: "Rule 6", value: "No inappropriate language or bypassing them", inline: true },
-                    { name: "Rule 7", value: "Username should be pingable", inline: true },
-                    { name: "Rule 8", value: "Use the channels correctly", inline: true },
-                    { name: "Rule 9", value: "No ghost pinging", inline: true },
-                    { name: "Rule 10", value: "No advertising", inline: true },
-                    { name: "Rule 11", value: "Follow Discord's community guidelines.", inline: true }
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 1 - No Spamming**",
+                        value: "> This includes obnoxious noises in voice, @mention spam, character spam, image spam, and interaction spam.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 2 - No unnecessary explicit content**",
+                        value: "> This includes NSFW, 18+, sexual and offensive content which makes the members uncomfortable to see.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 3 - No harassment**",
+                        value: "> This includes any form of harassment or encouraging of harassment.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 4 - No talking in other languages**",
+                        value: `> Please type only in intelligible English in our server as we are unable to moderate other languages consistently throughout the day.`,
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 5 - No politics or any religious discussion**",
+                        value: "> Please refrain from talking about the politics and any religious support in the chas it will become chaotic and nearly impossible to moderate.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 6 - No inappropriate language or bypassing them**",
+                        value: "> Even though we have set up AutoMod to delete any inappropriate language, You should not bypass them. Failing to do so might lead to a mute or in higher degrees, ban. This includes swearing, trash talking, etc. Refrain from directing it another member unsuspectingly.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 7 - Username should be pingable**",
+                        value: "> Please do not use special characters or unicodes in your username as you might be pinged for something.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 8 - Use the channels correctly**",
+                        value: "> Please use the channels in the correct places to avoid disturbance in the chat. For out of context discussions, please refer to the https://discord.com/channels/935017969271054346/1237018886843400243 channel.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 9 - No ghost pinging**",
+                        value: "> Please refrain from ghost pinging members as they are quite annoying and waste others valuable time.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: `**Rule 10 - No advertising**`,
+                        value: "> Please do not advertise anything in our server. This includes websites, social media, etc. Same applies to DM-advertising.",
+                    },
+                    {
+                        name: `\n`,
+                        value: "\n",
+                    },
+                    {
+                        name: "**Rule 11 - Follow Discord's community guidelines.**",
+                        value: "> <https://discord.com/guidelines>",
+                    },
                 )
                 .setThumbnail('https://example.com/rules.png')
                 .setColor("Purple")
