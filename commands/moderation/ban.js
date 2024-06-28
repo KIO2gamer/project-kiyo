@@ -18,19 +18,12 @@ module.exports = {
 			option
 				.setName('reason')
 				.setDescription('The reason for banning'))
-		.addIntegerOption(option =>
-			option
-				.setName('duration')
-				.setDescription('The duration of the ban in days')
-				.setRequired(false))
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
 		.setDMPermission(false),
 	category: 'moderation',
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
 		const reason = interaction.options.getString('reason') ?? 'No reason provided';
-		const durationDays = interaction.options.getInteger('duration') ?? 7; // Default to 7 days if not specified
-		const deleteMessageSeconds = durationDays * 24 * 60 * 60; // Convert days to seconds
 
 		// Defer the reply to allow time for the operation
 		await interaction.deferReply();
@@ -119,12 +112,12 @@ module.exports = {
 		
 			await logEntry.save();
 
-			await targetUser.ban({ deleteMessageSeconds: deleteMessageSeconds, reason: reason });
+			await targetUser.ban({ reason: reason });
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('BANNED!!!')
-						.setDescription(`<@${targetUser.id}> has been banned for ${durationDays} day(s) for reason: \`${reason}\``)
+						.setDescription(`<@${targetUser.id}> has been banned for reason: \`${reason}\``)
 						.setColor('Green')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
