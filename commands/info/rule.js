@@ -17,7 +17,7 @@ module.exports = {
                 )
                 .setRequired(true),
         ),
-    category: "moderation",
+    category: "info",
     async execute(interaction) {
         const number = interaction.options.getInteger("number");
         switch (number) {
