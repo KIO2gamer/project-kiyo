@@ -1,12 +1,12 @@
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const mongoose = require('mongoose');
 
 // Validate environment variables
 const requiredEnvVars = ['DISCORD_TOKEN', 'MONGODB_URL'];
-requiredEnvVars.forEach((envVar) => {
+requiredEnvVars.forEach(envVar => {
   if (!process.env[envVar]) {
     console.error(`Missing required environment variable: ${envVar}`);
     process.exit(1);
@@ -28,18 +28,11 @@ const client = new Client({
 
 // Command collection
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
-
-for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
-  const commandFiles = fs
-    .readdirSync(commandsPath)
-    .filter((file) => file.endsWith('.js'));
+const loadCommands = dir => {
+  const commandFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
   for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
+    const command = require(path.join(dir, file));
     if ('data' in command && 'execute' in command) {
       client.commands.set(command.data.name, command);
       if (command.data.aliases) {
@@ -49,29 +42,32 @@ for (const folder of commandFolders) {
       }
       console.log(`Registered command: ${command.data.name}`);
     } else {
-      console.warn(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
-      );
+      console.warn(`[WARNING] The command at ${path.join(dir, file)} is missing a required "data" or "execute" property.`);
     }
   }
+};
+
+const commandFolders = fs.readdirSync(path.join(__dirname, 'commands'));
+for (const folder of commandFolders) {
+  loadCommands(path.join(__dirname, 'commands', folder));
 }
 
 // Event handling
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs
-  .readdirSync(eventsPath)
-  .filter((file) => file.endsWith('.js'));
+const loadEvents = dir => {
+  const eventFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
-for (const file of eventFiles) {
-  const filePath = path.join(eventsPath, file);
-  const event = require(filePath);
-  if (event.once) {
-    client.once(event.name, (...args) => event.execute(...args));
-  } else {
-    client.on(event.name, (...args) => event.execute(...args));
+  for (const file of eventFiles) {
+    const event = require(path.join(dir, file));
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args));
+    }
+    console.log(`Registered event: ${event.name}`);
   }
-  console.log(`Registered event: ${event.name}`);
-}
+};
+
+loadEvents(path.join(__dirname, 'events'));
 
 // MongoDB connection
 async function connectToMongoDB(retries = 5) {
