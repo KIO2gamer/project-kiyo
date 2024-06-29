@@ -39,9 +39,9 @@ module.exports = {
 
         const getCategoryNameForMainMenu = (choice) => {
             const categories = {
-                fun: "> **🎉 Fun**\n> Commands which can be used for fun activities.\n",
-                info: "> **📖 Info**\n> Commands for getting information.\n",
-                moderation: "> **🛡️ Moderation**\n> Commands for server moderation.\n",
+                fun: "\n> **🎉 Fun**\n> Commands which can be used for fun activities.\n> ",
+                info: "> **📖 Info**\n> Commands for getting information.\n> ",
+                moderation: "> **🛡️ Moderation**\n> Commands for server moderation.\n> ",
                 utility: "> **🛠️ Utility**\n> Commands for various utilities.\n",
             };
             return categories[choice];
