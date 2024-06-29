@@ -47,6 +47,15 @@ module.exports = {
 				return;
 			}
 
+			const logEntry = new ModerationLog({
+                action: 'unban',
+                moderator: interaction.user.id,
+                user: userId,
+                reason: reason,
+            });
+
+            await logEntry.save();
+			
 			// Attempt to unban the user
 			await interaction.guild.members.unban(userId, reason);
 			await interaction.editReply({
