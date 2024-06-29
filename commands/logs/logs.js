@@ -42,8 +42,12 @@ module.exports = {
         logs = await ModerationLog.find().sort({ logNumber: -1 }).limit(limit);
       }
 
+      if (logs.length === 0) {
+        return interaction.reply('No moderation logs found.');
+      }
+
       const embed = new EmbedBuilder()
-        .setTitle(`Moderation Logs`)
+        .setTitle('Moderation Logs')
         .setColor('#FF0000')
         .setTimestamp();
 
@@ -57,17 +61,15 @@ module.exports = {
         timeZoneName: 'short'
       });
 
-      let description = '';
-
-      logs.forEach(log => {
+      const logDescriptions = logs.map(log => {
         const moderator = `<@${log.moderator}>`;
         const punishedUser = `<@${log.user}>`;
         const formattedTimestamp = formatter.format(new Date(log.timestamp));
 
-        description += `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderator}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n\n`;
-      });
+        return `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderator}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n`;
+      }).join('\n');
 
-      embed.setDescription(description);
+      embed.setDescription(logDescriptions);
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
