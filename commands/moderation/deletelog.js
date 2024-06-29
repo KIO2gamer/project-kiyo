@@ -10,6 +10,7 @@ module.exports = {
       option.setName('lognumber')
         .setDescription('The log number to delete')
         .setRequired(true)),
+  category: 'moderation',
   async execute(interaction) {
     const logNumber = interaction.options.getInteger('lognumber');
 

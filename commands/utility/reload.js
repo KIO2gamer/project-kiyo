@@ -29,7 +29,7 @@ module.exports = {
             option.setName('all')
                 .setDescription('Reload all commands.')
                 .setRequired(false)),
-    category: 'moderation',
+                category: 'utility',
     async execute(interaction) {
         const commandName = interaction.options.getString('command', false)?.toLowerCase();
         const reloadAll = interaction.options.getBoolean('all', false);

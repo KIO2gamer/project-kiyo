@@ -14,6 +14,7 @@ module.exports = {
       option.setName('reason')
         .setDescription('The new reason for the log entry')
         .setRequired(true)),
+  category: 'moderation',
   async execute(interaction) {
     const logNumber = interaction.options.getInteger('lognumber');
     const newReason = interaction.options.getString('reason');

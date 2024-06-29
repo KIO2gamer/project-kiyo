@@ -26,7 +26,7 @@ module.exports = {
                 .setDescription("The target language to translate to.")
                 .setRequired(true)
         ),
-    category: "Utility",
+    category: "utility",
     async execute(interaction) {
         await interaction.deferReply();
 

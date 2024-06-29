@@ -19,6 +19,7 @@ module.exports = {
       option.setName('lognumber')
         .setDescription('The log number to search for')
         .setRequired(false)),
+  category: 'moderation',
   async execute(interaction) {
     const limit = interaction.options.getInteger('limit') || 10;
     const user = interaction.options.getUser('user');
