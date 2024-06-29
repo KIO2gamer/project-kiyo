@@ -8,7 +8,7 @@ module.exports = {
         .addUserOption(option => option.setName('user1').setDescription('The first user to change the topic of.').setRequired(false))
         .addUserOption(option => option.setName('user2').setDescription('The second user to change the topic of.').setRequired(false))
         .addUserOption(option => option.setName('user3').setDescription('The third user to change the topic of.').setRequired(false)),
-    category: 'info',
+        category: 'utility',
     async execute(interaction) {
         const user1 = interaction.options.getUser('user1');
         const user2 = interaction.options.getUser('user2');

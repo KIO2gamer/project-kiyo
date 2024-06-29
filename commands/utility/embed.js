@@ -555,7 +555,7 @@ module.exports = {
         .setDefaultMemberPermissions(
             PermissionFlagsBits.BanMembers || PermissionFlagsBits.KickMembers,
         ),
-    category: "info",
+        category: 'utility',
 
     async execute(interaction) {
         const textChosen = interaction.options.getString("text");

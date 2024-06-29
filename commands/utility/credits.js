@@ -4,7 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('credits')
         .setDescription('Shows an embed of users who helped make this bot.'),
-    category: 'fun',
+    category: 'utility',
     async execute(interaction) {
         const embed = new EmbedBuilder()
             .setTitle('Credits')
