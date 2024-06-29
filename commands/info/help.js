@@ -20,7 +20,6 @@ module.exports = {
                 .addChoices(
                     { name: "Fun", value: "fun" },
                     { name: "Info", value: "info" },
-                    { name: "Logs", value: "logs" },
                     { name: "Moderation", value: "moderation" },
                     { name: "Utility", value: "utility" },
                 ),
@@ -42,7 +41,6 @@ module.exports = {
             const categories = {
                 fun: "> **🎉 Fun**\n> Commands which can be used for fun activities.\n",
                 info: "> **📖 Info**\n> Commands for getting information.\n",
-                logs: "> **📜 Logs**\n> Commands for logging.\n",
                 moderation: "> **🛡️ Moderation**\n> Commands for server moderation.\n",
                 utility: "> **🛠️ Utility**\n> Commands for various utilities.\n",
             };
@@ -53,7 +51,6 @@ module.exports = {
             const titles = {
                 fun: "🎉 Fun Commands",
                 info: "📖 Info Commands",
-                logs: "📜 Logs Commands",
                 moderation: "🛡️ Moderation Commands",
                 utility: "🛠️ Utility Commands",
             };
@@ -89,12 +86,11 @@ module.exports = {
             return commands;
         };
 
-        const commandFolders = ['fun','info', 'logs', 'moderation', 'utility'];
+        const commandFolders = ['fun','info', 'moderation', 'utility'];
 
-        const [funCommands, infoCommands, logCommands, modCommands, utilCommands] = await Promise.all([
+        const [funCommands, infoCommands, modCommands, utilCommands] = await Promise.all([
             fetchCommands('fun'),
             fetchCommands('info'),
-            fetchCommands('logs'),
             fetchCommands('moderation'),
             fetchCommands('utility'),
         ]);
@@ -102,7 +98,6 @@ module.exports = {
         const allCommands = {
             fun: funCommands,
             info: infoCommands,
-            logs: logCommands,
             moderation: modCommands,
             utility: utilCommands,
         };
@@ -145,10 +140,6 @@ module.exports = {
 
         buildCommandFields(allCommands.info).forEach((chunk, index) => {
             cmdListEmbed.addFields({ name: index === 0 ? "**📖 Info**" : "\u200B", value: chunk });
-        });
-
-        buildCommandFields(allCommands.logs).forEach((chunk, index) => {
-            cmdListEmbed.addFields({ name: index === 0 ? "**📜 Logs**" : "\u200B", value: chunk });
         });
 
         buildCommandFields(allCommands.moderation).forEach((chunk, index) => {
