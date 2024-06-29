@@ -23,6 +23,7 @@ const client = new Client({
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.DirectMessageReactions,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessagePolls,
   ],
 });
 
