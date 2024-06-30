@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
@@ -7,10 +7,7 @@ module.exports = {
 		.setName('logs')
 		.setDescription('Show the moderation logs.')
 		.addIntegerOption(option =>
-			option
-				.setName('limit')
-				.setDescription('The number of logs to retrieve')
-				.setRequired(false)
+			option.setName('limit').setDescription('The number of logs per page').setRequired(false)
 		)
 		.addUserOption(option =>
 			option.setName('user').setDescription('The user to filter logs by').setRequired(false)
@@ -43,11 +40,12 @@ module.exports = {
 		),
 	category: 'moderation',
 	async execute(interaction) {
-		const limit = interaction.options.getInteger('limit') || 10;
+		const limit = interaction.options.getInteger('limit') || 5;
 		const user = interaction.options.getUser('user');
 		const logNumber = interaction.options.getInteger('lognumber');
 		const action = interaction.options.getString('action');
 		const moderator = interaction.options.getUser('moderator');
+		let page = 1;
 
 		try {
 			let query = {};
@@ -65,40 +63,102 @@ module.exports = {
 				query.moderator = moderator.id;
 			}
 
-			let logs = await ModerationLog.find(query).sort({ logNumber: -1 }).limit(limit);
+			const logs = await ModerationLog.find(query).sort({ logNumber: -1 });
 
 			if (logs.length === 0) {
 				return interaction.reply('No moderation logs found.');
 			}
 
-			const embed = new EmbedBuilder()
-				.setTitle('Moderation Logs')
-				.setColor('#FF0000')
-				.setTimestamp();
+			const totalPages = Math.ceil(logs.length / limit);
 
-			const formatter = new Intl.DateTimeFormat('en-US', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
-				hour: 'numeric',
-				minute: 'numeric',
-				second: 'numeric',
-				timeZoneName: 'short',
+			const generateEmbed = page => {
+				const start = (page - 1) * limit;
+				const end = page * limit;
+				const currentLogs = logs.slice(start, end);
+
+				const embed = new EmbedBuilder()
+					.setTitle('Moderation Logs')
+					.setColor('#FF0000')
+					.setTimestamp()
+					.setFooter({ text: `Page ${page} of ${totalPages}` });
+
+				const formatter = new Intl.DateTimeFormat('en-US', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: 'numeric',
+					minute: 'numeric',
+					second: 'numeric',
+					timeZoneName: 'short',
+				});
+
+				const logDescriptions = currentLogs
+					.map(log => {
+						const moderatorMention = `<@${log.moderator}>`;
+						const punishedUser = `<@${log.user}>`;
+						const formattedTimestamp = formatter.format(new Date(log.timestamp));
+
+						return `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderatorMention}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n`;
+					})
+					.join('\n');
+
+				embed.setDescription(logDescriptions);
+				return embed;
+			};
+
+			const generateButtons = page => {
+				const row = new ActionRowBuilder();
+				if (page > 1) {
+					row.addComponents(
+						new ButtonBuilder()
+							.setCustomId('prev')
+							.setLabel('Previous')
+							.setStyle(ButtonStyle.Primary)
+					);
+				}
+
+				if (page < totalPages) {
+					row.addComponents(
+						new ButtonBuilder()
+							.setCustomId('next')
+							.setLabel('Next')
+							.setStyle(ButtonStyle.Primary)
+					);
+				}
+
+				return row;
+			};
+
+			const embed = generateEmbed(page);
+			const buttons = generateButtons(page);
+
+			const message = await interaction.reply({
+				embeds: [embed],
+				components: [buttons],
+				fetchReply: true,
 			});
 
-			const logDescriptions = logs
-				.map(log => {
-					const moderatorMention = `<@${log.moderator}>`;
-					const punishedUser = `<@${log.user}>`;
-					const formattedTimestamp = formatter.format(new Date(log.timestamp));
+			const filter = i => i.user.id === interaction.user.id;
+			const collector = message.createMessageComponentCollector({ filter, time: 60000 });
 
-					return `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderatorMention}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n`;
-				})
-				.join('\n');
+			collector.on('collect', async i => {
+				if (i.customId === 'prev') {
+					page--;
+				} else if (i.customId === 'next') {
+					page++;
+				}
 
-			embed.setDescription(logDescriptions);
+				const embed = generateEmbed(page);
+				const buttons = generateButtons(page);
 
-			await interaction.reply({ embeds: [embed] });
+				await i.update({ embeds: [embed], components: [buttons] });
+			});
+
+			collector.on('end', () => {
+				if (message) {
+					message.edit({ components: [] });
+				}
+			});
 		} catch (error) {
 			console.error(error);
 			await interaction.reply('Failed to retrieve logs.');
