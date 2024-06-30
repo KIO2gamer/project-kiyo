@@ -24,9 +24,7 @@ module.exports = {
 				.setRequired(true)
 		)
 		.addBooleanOption(option =>
-			option
-				.setName('embed')
-				.setDescription('Whether or not the echo should be embedded')
+			option.setName('embed').setDescription('Whether or not the echo should be embedded')
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 	category: 'fun',
@@ -59,9 +57,7 @@ module.exports = {
 
 				await channel.send({ embeds: [echoEmbed] });
 			} else {
-				await channel.send(
-					`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`
-				);
+				await channel.send(`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`);
 			}
 
 			await interaction.reply({

@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const ms = require('ms');
 
 module.exports = {
@@ -12,9 +8,7 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName('duration')
-				.setDescription(
-					'The duration of the slowmode (e.g., 10s, 5m, 1h)'
-				)
+				.setDescription('The duration of the slowmode (e.g., 10s, 5m, 1h)')
 				.setRequired(true)
 		)
 		.addChannelOption(option =>
@@ -27,8 +21,7 @@ module.exports = {
 		.setDMPermission(false),
 	category: 'moderation',
 	async execute(interaction) {
-		const channel =
-			interaction.options.getChannel('channel') || interaction.channel;
+		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		const durationInput = interaction.options.getString('duration');
 		const duration = ms(durationInput) / 1000;
 
@@ -81,9 +74,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'An error occurred while trying to set the slowmode.'
-						)
+						.setDescription('An error occurred while trying to set the slowmode.')
 						.setColor('Red')
 						.setFooter({
 							text: `Set by: ${interaction.user.username}`,

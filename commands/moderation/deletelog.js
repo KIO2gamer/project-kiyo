@@ -7,10 +7,7 @@ module.exports = {
 		.setName('deletelog')
 		.setDescription('Delete a moderation log by log number.')
 		.addIntegerOption(option =>
-			option
-				.setName('lognumber')
-				.setDescription('The log number to delete')
-				.setRequired(true)
+			option.setName('lognumber').setDescription('The log number to delete').setRequired(true)
 		),
 	category: 'moderation',
 	async execute(interaction) {
@@ -22,19 +19,13 @@ module.exports = {
 			});
 
 			if (log) {
-				await interaction.reply(
-					`Successfully deleted log #${logNumber}.`
-				);
+				await interaction.reply(`Successfully deleted log #${logNumber}.`);
 			} else {
-				await interaction.reply(
-					`No log found with log number ${logNumber}.`
-				);
+				await interaction.reply(`No log found with log number ${logNumber}.`);
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.reply(
-				'Failed to delete the log. Please try again later.'
-			);
+			await interaction.reply('Failed to delete the log. Please try again later.');
 		}
 	},
 };

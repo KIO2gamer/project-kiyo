@@ -18,9 +18,7 @@ const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs
-		.readdirSync(commandsPath)
-		.filter(file => file.endsWith('.js'));
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
@@ -39,9 +37,7 @@ const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 (async () => {
 	try {
-		console.log(
-			`Started refreshing ${commands.length} application (/) commands.`
-		);
+		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
 		// Reset global commands (if needed)
 		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] });
@@ -50,18 +46,12 @@ const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 		// Deploy commands to specific guilds
 		for (const guildId of GUILD_IDS) {
 			try {
-				const data = await rest.put(
-					Routes.applicationGuildCommands(CLIENT_ID, guildId),
-					{ body: commands }
-				);
-				console.log(
-					`Successfully reloaded ${data.length} commands for guild ${guildId}.`
-				);
+				const data = await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
+					body: commands,
+				});
+				console.log(`Successfully reloaded ${data.length} commands for guild ${guildId}.`);
 			} catch (error) {
-				console.error(
-					`Failed to deploy commands for guild ${guildId}:`,
-					error
-				);
+				console.error(`Failed to deploy commands for guild ${guildId}:`, error);
 			}
 		}
 	} catch (error) {

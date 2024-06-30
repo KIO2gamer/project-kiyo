@@ -39,8 +39,7 @@ module.exports = {
 		),
 	category: 'utility',
 	async execute(interaction) {
-		const userTarget =
-			interaction.options.getUser('target') || interaction.user;
+		const userTarget = interaction.options.getUser('target') || interaction.user;
 		const size = interaction.options.getString('size') || '512';
 		const format = interaction.options.getString('format') || 'webp';
 
@@ -51,9 +50,7 @@ module.exports = {
 		});
 
 		const embed = new EmbedBuilder()
-			.setTitle(
-				`${userTarget.username}'s Avatar [Click here to see full image]`
-			)
+			.setTitle(`${userTarget.username}'s Avatar [Click here to see full image]`)
 			.setImage(avatarURL)
 			.setURL(avatarURL)
 			.setFooter({

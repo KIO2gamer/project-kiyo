@@ -41,8 +41,7 @@ module.exports = {
 
 		if (!userMentions) {
 			return interaction.reply({
-				content:
-					'No users provided. Please specify at least one user to change the topic.',
+				content: 'No users provided. Please specify at least one user to change the topic.',
 				ephemeral: true,
 			});
 		}

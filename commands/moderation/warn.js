@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
@@ -10,15 +6,10 @@ module.exports = {
 		.setName('warn')
 		.setDescription('Warn a member.')
 		.addUserOption(option =>
-			option
-				.setName('target')
-				.setDescription('The member to warn')
-				.setRequired(true)
+			option.setName('target').setDescription('The member to warn').setRequired(true)
 		)
 		.addStringOption(option =>
-			option
-				.setName('reason')
-				.setDescription('The reason for the warning')
+			option.setName('reason').setDescription('The reason for the warning')
 		)
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
@@ -26,8 +17,7 @@ module.exports = {
 	category: 'moderation',
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 		await interaction.deferReply();
 
 		if (!targetUser) {
@@ -51,9 +41,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'You cannot warn the owner of the server'
-						)
+						.setDescription('You cannot warn the owner of the server')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -65,10 +53,8 @@ module.exports = {
 		}
 
 		const targetUserRolePosition = targetUser.roles.highest.position;
-		const requestUserRolePosition =
-			interaction.member.roles.highest.position;
-		const botRolePosition =
-			interaction.guild.members.me.roles.highest.position;
+		const requestUserRolePosition = interaction.member.roles.highest.position;
+		const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
 			await interaction.editReply({
@@ -135,9 +121,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'An error occurred while trying to warn the user'
-						)
+						.setDescription('An error occurred while trying to warn the user')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,

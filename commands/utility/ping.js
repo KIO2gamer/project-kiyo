@@ -1,16 +1,12 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('ping')
-		.setDescription("Checks the bot's latency"),
+	data: new SlashCommandBuilder().setName('ping').setDescription("Checks the bot's latency"),
 	category: 'utility',
 	async execute(interaction) {
 		try {
 			// Create initial embed
-			const initialEmbed = new EmbedBuilder()
-				.setTitle('Pinging...')
-				.setColor('Blue');
+			const initialEmbed = new EmbedBuilder().setTitle('Pinging...').setColor('Blue');
 
 			// Reply with the initial embed and fetch the reply to calculate latency
 			const sent = await interaction.reply({
@@ -19,8 +15,7 @@ module.exports = {
 			});
 
 			// Calculate latency
-			const latency =
-				sent.createdTimestamp - interaction.createdTimestamp;
+			const latency = sent.createdTimestamp - interaction.createdTimestamp;
 
 			// Get WebSocket ping
 			const websocketPing = interaction.client.ws.ping;

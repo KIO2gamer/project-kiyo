@@ -20,9 +20,7 @@ module.exports = {
 		.setName('userinfo')
 		.setDescription('Get info about a user')
 		.addUserOption(option =>
-			option
-				.setName('target')
-				.setDescription('The user to get info about')
+			option.setName('target').setDescription('The user to get info about')
 		),
 	category: 'info',
 	async execute(interaction) {
@@ -43,16 +41,11 @@ module.exports = {
 			.map(role => role.toString())
 			.join(' | ');
 
-		const presence = guildUser.presence
-			? guildUser.presence.status
-			: 'offline';
+		const presence = guildUser.presence ? guildUser.presence.status : 'offline';
 		const userFlags = guildUser.user.flags.toArray();
 
 		const badges = userFlags
-			.map(
-				flag =>
-					badgeEmojis[flag] || flag.replace(/_/g, ' ').toLowerCase()
-			)
+			.map(flag => badgeEmojis[flag] || flag.replace(/_/g, ' ').toLowerCase())
 			.join(' ');
 
 		const embed = new EmbedBuilder()

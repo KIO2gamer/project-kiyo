@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
@@ -10,10 +6,7 @@ module.exports = {
 		.setName('kick')
 		.setDescription('Select a member and kick them.')
 		.addUserOption(option =>
-			option
-				.setName('target')
-				.setDescription('The member to kick')
-				.setRequired(true)
+			option.setName('target').setDescription('The member to kick').setRequired(true)
 		)
 		.addStringOption(option =>
 			option.setName('reason').setDescription('The reason for the kick')
@@ -24,8 +17,7 @@ module.exports = {
 	category: 'moderation',
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 		await interaction.deferReply();
 
 		if (!targetUser) {
@@ -49,9 +41,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'You cannot kick the owner of the server'
-						)
+						.setDescription('You cannot kick the owner of the server')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -62,10 +52,8 @@ module.exports = {
 			return;
 		}
 		const targetUserRolePosition = targetUser.roles.highest.position;
-		const requestUserRolePosition =
-			interaction.member.roles.highest.position;
-		const botRolePosition =
-			interaction.guild.members.me.roles.highest.position;
+		const requestUserRolePosition = interaction.member.roles.highest.position;
+		const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
 			await interaction.editReply({
@@ -133,9 +121,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'An error occurred while trying to kick the user'
-						)
+						.setDescription('An error occurred while trying to kick the user')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,

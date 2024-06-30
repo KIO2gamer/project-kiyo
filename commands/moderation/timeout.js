@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const ms = require('ms');
 
 module.exports = {
@@ -10,10 +6,7 @@ module.exports = {
 		.setName('timeout')
 		.setDescription('Select a member and timeout them.')
 		.addUserOption(option =>
-			option
-				.setName('target')
-				.setDescription('The member to timeout')
-				.setRequired(true)
+			option.setName('target').setDescription('The member to timeout').setRequired(true)
 		)
 		.addStringOption(option =>
 			option
@@ -31,8 +24,7 @@ module.exports = {
 	category: 'moderation',
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 		const duration = interaction.options.getString('amount');
 		const durationMs = ms(duration);
 
@@ -59,9 +51,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'You cannot timeout the owner of the server'
-						)
+						.setDescription('You cannot timeout the owner of the server')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -73,10 +63,8 @@ module.exports = {
 		}
 
 		const targetUserRolePosition = targetUser.roles.highest.position;
-		const requestUserRolePosition =
-			interaction.member.roles.highest.position;
-		const botRolePosition =
-			interaction.guild.members.me.roles.highest.position;
+		const requestUserRolePosition = interaction.member.roles.highest.position;
+		const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
 			await interaction.editReply({
@@ -119,9 +107,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'Please provide a valid duration (max 28 days)'
-						)
+						.setDescription('Please provide a valid duration (max 28 days)')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -137,9 +123,7 @@ module.exports = {
 			const newTimeoutDuration =
 				targetUser.communicationDisabledUntilTimestamp &&
 				targetUser.communicationDisabledUntilTimestamp > currentTime
-					? targetUser.communicationDisabledUntilTimestamp -
-						currentTime +
-						durationMs
+					? targetUser.communicationDisabledUntilTimestamp - currentTime + durationMs
 					: durationMs;
 
 			if (newTimeoutDuration <= 0) {

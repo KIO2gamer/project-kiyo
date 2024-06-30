@@ -6,10 +6,7 @@ module.exports = {
 		.setName('snipe')
 		.setDescription('Snipes the user')
 		.addUserOption(option =>
-			option
-				.setName('user')
-				.setDescription('The user to snipe')
-				.setRequired(true)
+			option.setName('user').setDescription('The user to snipe').setRequired(true)
 		),
 	category: 'fun',
 	async execute(interaction) {
@@ -52,9 +49,7 @@ module.exports = {
 			);
 		} catch (error) {
 			console.error('Error executing snipe command:', error);
-			interaction.reply(
-				'There was an error while executing this command.'
-			);
+			interaction.reply('There was an error while executing this command.');
 		}
 	},
 };

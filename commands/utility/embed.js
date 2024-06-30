@@ -523,11 +523,7 @@
 //     },
 // };
 
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -590,9 +586,7 @@ module.exports = {
 		// Embeds
 		const embeds = {
 			welcome: new EmbedBuilder()
-				.setTitle(
-					'🌟 Welcome to The KIO2gamer Official Discord (TKOD) Server! 🌟'
-				)
+				.setTitle('🌟 Welcome to The KIO2gamer Official Discord (TKOD) Server! 🌟')
 				.setDescription(
 					`**Welcome new members to the amazing server of The KIO2gamer Official Discord (TKOD) Server. We are a friendly community and we will always try to help you. Below are some of the important things you need to explore first as a new member. We hope you enjoy your stay here!**
                     <:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649><:line:1221277678393622649>
@@ -689,9 +683,7 @@ module.exports = {
 
 			forms: new EmbedBuilder()
 				.setTitle('📋 Forms 📋')
-				.setDescription(
-					'Below are some forms for various applications.'
-				)
+				.setDescription('Below are some forms for various applications.')
 				.addFields(
 					{
 						name: 'Moderator Application',
@@ -710,9 +702,7 @@ module.exports = {
 				}),
 
 			rules: new EmbedBuilder()
-				.setTitle(
-					'📜 Rules for The Official KIO2gamer Discord Server (TOKD) 📜'
-				)
+				.setTitle('📜 Rules for The Official KIO2gamer Discord Server (TOKD) 📜')
 				.setDescription(
 					`<@&944618320232075284> must abide by the server's rules. Failing to do so can lead to warn, mute, kick, or even ban. Any attempts of bypassing, exploiting etc. towards the server will get you instantly banned and reported.`
 				)
@@ -888,20 +878,14 @@ module.exports = {
 				}
 			} else if (textChosen === 'role_all') {
 				await interaction.channel.send({
-					embeds: [
-						embeds.role_ranks,
-						embeds.role_booster,
-						embeds.role_others,
-					],
+					embeds: [embeds.role_ranks, embeds.role_booster, embeds.role_others],
 				});
 			} else {
 				return interaction.reply('Invalid embed type chosen!');
 			}
 
 			// Log the embed posting activity
-			console.log(
-				`Embed posted by ${interaction.user.tag}: ${textChosen}`
-			);
+			console.log(`Embed posted by ${interaction.user.tag}: ${textChosen}`);
 		} catch (error) {
 			console.error('Error posting embed:', error);
 			await interaction.reply({

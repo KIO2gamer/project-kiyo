@@ -3,18 +3,14 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('rule')
-		.setDescription(
-			'Shows the rules of the server in snippets (selection).'
-		)
+		.setDescription('Shows the rules of the server in snippets (selection).')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.ManageMessages // Changed permission to ManageMessages for better fit
 		)
 		.addIntegerOption(option =>
 			option
 				.setName('number')
-				.setDescription(
-					'Input a number which corresponds to that rule.'
-				)
+				.setDescription('Input a number which corresponds to that rule.')
 				.setRequired(true)
 		),
 	category: 'info',

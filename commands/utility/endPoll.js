@@ -5,14 +5,10 @@ module.exports = {
 		.setName('end_poll')
 		.setDescription('Ends a poll')
 		.addStringOption(option =>
-			option
-				.setName('message_id')
-				.setDescription('Message ID of the poll')
+			option.setName('message_id').setDescription('Message ID of the poll')
 		)
 		.addChannelOption(option =>
-			option
-				.setName('channel')
-				.setDescription('Channel where the poll is created')
+			option.setName('channel').setDescription('Channel where the poll is created')
 		),
 	category: 'utility',
 	async execute(interaction) {
