@@ -20,6 +20,12 @@ module.exports = {
 		)
 		.addStringOption(option =>
 			option
+				.setName('logrange')
+				.setDescription('The range of log numbers to search for (e.g., 1-5)')
+				.setRequired(false)
+		)
+		.addStringOption(option =>
+			option
 				.setName('action')
 				.setDescription('The action to filter logs by')
 				.setRequired(false)
@@ -43,6 +49,7 @@ module.exports = {
 		const limit = interaction.options.getInteger('limit') || 5;
 		const user = interaction.options.getUser('user');
 		const logNumber = interaction.options.getInteger('lognumber');
+		const logRange = interaction.options.getString('logrange');
 		const action = interaction.options.getString('action');
 		const moderator = interaction.options.getUser('moderator');
 		let page = 1;
@@ -52,6 +59,16 @@ module.exports = {
 
 			if (logNumber) {
 				query.logNumber = logNumber;
+			}
+			if (logRange) {
+				const [start, end] = logRange.split('-').map(num => parseInt(num.trim()));
+				if (!isNaN(start) && !isNaN(end)) {
+					query.logNumber = { $gte: start, $lte: end };
+				} else {
+					return interaction.reply(
+						'Invalid log range. Please provide a valid range (e.g., 1-5).'
+					);
+				}
 			}
 			if (user) {
 				query.user = user.id;
@@ -126,7 +143,7 @@ module.exports = {
 					);
 				}
 
-				return row;
+				return row.components.length > 0 ? [row] : [];
 			};
 
 			const embed = generateEmbed(page);
@@ -134,7 +151,7 @@ module.exports = {
 
 			const message = await interaction.reply({
 				embeds: [embed],
-				components: [buttons],
+				components: buttons,
 				fetchReply: true,
 			});
 
@@ -151,7 +168,7 @@ module.exports = {
 				const embed = generateEmbed(page);
 				const buttons = generateButtons(page);
 
-				await i.update({ embeds: [embed], components: [buttons] });
+				await i.update({ embeds: [embed], components: buttons });
 			});
 
 			collector.on('end', () => {
