@@ -5,7 +5,7 @@ const ModerationLog = require('../../models/ModerationLog');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('deletelog')
-		.setDescription('Delete a moderation log or logs by log number or range.')
+		.setDescription('Delete a moderation log/logs by log number/range.')
 		.addIntegerOption(option =>
 			option
 				.setName('lognumber')
