@@ -5,14 +5,10 @@ module.exports = {
 		.setName('fetch_poll_answers')
 		.setDescription('Fetchs the answers of the poll.')
 		.addStringOption(option =>
-			option
-				.setName('message_id')
-				.setDescription('Message ID of the poll')
+			option.setName('message_id').setDescription('Message ID of the poll')
 		)
 		.addChannelOption(option =>
-			option
-				.setName('channel')
-				.setDescription('Channel where the poll is created')
+			option.setName('channel').setDescription('Channel where the poll is created')
 		),
 	category: 'utility',
 	async execute(interaction) {
@@ -22,10 +18,7 @@ module.exports = {
 		await interaction.reply(
 			`Question : \`${message.poll.question.text}\`\n\n` +
 				message.poll.answers
-					.map(
-						answer =>
-							`Option : \`${answer.text}\`\nVotes: ${answer.voteCount}`
-					)
+					.map(answer => `Option : \`${answer.text}\`\nVotes: ${answer.voteCount}`)
 					.join('\n\n')
 		);
 	},

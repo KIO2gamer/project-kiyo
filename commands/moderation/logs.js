@@ -1,4 +1,3 @@
-// commands/moderation/logs.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const ModerationLog = require('../../models/ModerationLog');
@@ -14,15 +13,32 @@ module.exports = {
 				.setRequired(false)
 		)
 		.addUserOption(option =>
-			option
-				.setName('user')
-				.setDescription('The user to filter logs by')
-				.setRequired(false)
+			option.setName('user').setDescription('The user to filter logs by').setRequired(false)
 		)
 		.addIntegerOption(option =>
 			option
 				.setName('lognumber')
 				.setDescription('The log number to search for')
+				.setRequired(false)
+		)
+		.addStringOption(option =>
+			option
+				.setName('action')
+				.setDescription('The action to filter logs by')
+				.setRequired(false)
+				.addChoices(
+					{ name: 'warn', value: 'warn' },
+					{ name: 'ban', value: 'ban' },
+					{ name: 'timeout', value: 'timeout' },
+					{ name: 'kick', value: 'kick' },
+					{ name: 'tempban', value: 'tempban' },
+					{ name: 'unban', value: 'unban' }
+				)
+		)
+		.addUserOption(option =>
+			option
+				.setName('moderator')
+				.setDescription('The moderator to filter logs by')
 				.setRequired(false)
 		),
 	category: 'moderation',
@@ -30,30 +46,26 @@ module.exports = {
 		const limit = interaction.options.getInteger('limit') || 10;
 		const user = interaction.options.getUser('user');
 		const logNumber = interaction.options.getInteger('lognumber');
+		const action = interaction.options.getString('action');
+		const moderator = interaction.options.getUser('moderator');
 
 		try {
-			let logs;
+			let query = {};
 
 			if (logNumber) {
-				// Fetch log by logNumber
-				logs = await ModerationLog.find({ logNumber: logNumber });
-
-				if (logs.length === 0) {
-					return interaction.reply(
-						`No moderation log found for log number ${logNumber}.`
-					);
-				}
-			} else if (user) {
-				// Fetch logs for a specific user
-				logs = await ModerationLog.find({ user: user.id })
-					.sort({ logNumber: -1 })
-					.limit(limit);
-			} else {
-				// Fetch latest logs
-				logs = await ModerationLog.find()
-					.sort({ logNumber: -1 })
-					.limit(limit);
+				query.logNumber = logNumber;
 			}
+			if (user) {
+				query.user = user.id;
+			}
+			if (action) {
+				query.action = action;
+			}
+			if (moderator) {
+				query.moderator = moderator.id;
+			}
+
+			let logs = await ModerationLog.find(query).sort({ logNumber: -1 }).limit(limit);
 
 			if (logs.length === 0) {
 				return interaction.reply('No moderation logs found.');
@@ -76,13 +88,11 @@ module.exports = {
 
 			const logDescriptions = logs
 				.map(log => {
-					const moderator = `<@${log.moderator}>`;
+					const moderatorMention = `<@${log.moderator}>`;
 					const punishedUser = `<@${log.user}>`;
-					const formattedTimestamp = formatter.format(
-						new Date(log.timestamp)
-					);
+					const formattedTimestamp = formatter.format(new Date(log.timestamp));
 
-					return `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderator}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n`;
+					return `**Log #${log.logNumber}**\n**Action**: ${log.action}\n**Moderator**: ${moderatorMention}\n**User**: ${punishedUser}\n**Reason**: ${log.reason}\n**Time**: ${formattedTimestamp}\n`;
 				})
 				.join('\n');
 

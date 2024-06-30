@@ -1,9 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('rickroll')
-		.setDescription('Sends a rickroll gif'),
+	data: new SlashCommandBuilder().setName('rickroll').setDescription('Sends a rickroll gif'),
 	category: 'fun',
 	async execute(interaction) {
 		await interaction.reply(

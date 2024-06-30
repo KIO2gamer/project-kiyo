@@ -16,10 +16,7 @@ module.exports = {
 				.setName('temperature')
 				.setDescription('Choose the temperature format.')
 				.setRequired(true)
-				.addChoices(
-					{ name: 'Fahrenheit', value: 'F' },
-					{ name: 'Celsius', value: 'C' }
-				)
+				.addChoices({ name: 'Fahrenheit', value: 'F' }, { name: 'Celsius', value: 'C' })
 		),
 	category: 'utility',
 	async execute(interaction) {

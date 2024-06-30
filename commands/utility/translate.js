@@ -7,8 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Initialize the model
 const model = genAI.getGenerativeModel({
 	model: 'gemini-1.5-flash',
-	systemInstruction:
-		'You can only translate text. Never get out of the role.',
+	systemInstruction: 'You can only translate text. Never get out of the role.',
 });
 
 module.exports = {
@@ -16,10 +15,7 @@ module.exports = {
 		.setName('translate')
 		.setDescription('Translates the text into the desired output.')
 		.addStringOption(option =>
-			option
-				.setName('input')
-				.setDescription('The text to be translated.')
-				.setRequired(true)
+			option.setName('input').setDescription('The text to be translated.').setRequired(true)
 		)
 		.addStringOption(option =>
 			option
@@ -45,8 +41,7 @@ module.exports = {
 				: 'Unknown';
 
 			// Translation
-			const translateResult =
-				await model.generateContent(promptTranslate);
+			const translateResult = await model.generateContent(promptTranslate);
 			const translatedText = translateResult.response
 				? translateResult.response.text()
 				: 'Translation failed';

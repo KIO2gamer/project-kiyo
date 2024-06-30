@@ -5,10 +5,7 @@ module.exports = {
 		.setName('create_poll')
 		.setDescription('Create a poll')
 		.addStringOption(option =>
-			option
-				.setName('question')
-				.setDescription('The question of the poll')
-				.setRequired(true)
+			option.setName('question').setDescription('The question of the poll').setRequired(true)
 		)
 		.addStringOption(option =>
 			option
@@ -23,10 +20,7 @@ module.exports = {
 				.setRequired(true)
 		)
 		.addIntegerOption(option =>
-			option
-				.setName('duration')
-				.setDescription('Duration of poll in hours')
-				.setRequired(true)
+			option.setName('duration').setDescription('Duration of poll in hours').setRequired(true)
 		),
 	category: 'utility',
 	async execute(interaction) {

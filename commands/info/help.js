@@ -9,9 +9,7 @@ const {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('help')
-		.setDescription(
-			'Displays all commands or info about a specific command'
-		)
+		.setDescription('Displays all commands or info about a specific command')
 		.addStringOption(option =>
 			option
 				.setName('category')
@@ -36,9 +34,7 @@ module.exports = {
 
 		const { client, guild } = interaction;
 		const category = interaction.options.getString('category');
-		const searchQuery = interaction.options
-			.getString('search')
-			?.toLowerCase();
+		const searchQuery = interaction.options.getString('search')?.toLowerCase();
 
 		// Fetching guild commands
 		const guildCommands = await guild.commands.fetch();
@@ -157,10 +153,7 @@ module.exports = {
 				.setTitle(`🔍 Search Results: ${searchQuery}`)
 				.setDescription(
 					searchResults
-						.map(
-							cmd =>
-								`</${cmd.name}:${cmd.id}> - ${cmd.description}`
-						)
+						.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`)
 						.join('\n') || 'No commands found'
 				)
 				.setFooter({
@@ -214,12 +207,8 @@ module.exports = {
 				.setStyle(ButtonStyle.Secondary)
 				.setCustomId('home');
 
-			const rowWithCmdBtn = new ActionRowBuilder().addComponents(
-				cmdListButton
-			);
-			const rowWithHomeBtn = new ActionRowBuilder().addComponents(
-				mainMenuBtn
-			);
+			const rowWithCmdBtn = new ActionRowBuilder().addComponents(cmdListButton);
+			const rowWithHomeBtn = new ActionRowBuilder().addComponents(mainMenuBtn);
 
 			const reply = await interaction.editReply({
 				embeds: [mainMenuEmbed],
@@ -246,8 +235,7 @@ module.exports = {
 					}
 				} else {
 					await i.reply({
-						content:
-							'You should run the command to use this interaction.',
+						content: 'You should run the command to use this interaction.',
 						ephemeral: true,
 					});
 				}
@@ -265,15 +253,12 @@ module.exports = {
 		if (Object.keys(categories).includes(category)) {
 			const commands = categories[category];
 			const embedDescription =
-				commands
-					.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`)
-					.join('\n') || 'No commands available';
+				commands.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`).join('\n') ||
+				'No commands available';
 
 			const categoryEmbed = new EmbedBuilder()
 				.setColor('#e74c3c')
-				.setTitle(
-					`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`
-				)
+				.setTitle(`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
 				.setDescription(embedDescription)
 				.setFooter({
 					text: `Requested by ${interaction.user.tag}`,

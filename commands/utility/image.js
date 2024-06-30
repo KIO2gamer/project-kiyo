@@ -109,9 +109,7 @@ module.exports = {
 					content: caption,
 					files: [imagePaths[options]],
 				});
-				console.log(
-					`Image posted by ${interaction.user.tag}: ${options}`
-				);
+				console.log(`Image posted by ${interaction.user.tag}: ${options}`);
 				await interaction.reply({
 					content: `Image successfully posted: ${options}`,
 					ephemeral: true,

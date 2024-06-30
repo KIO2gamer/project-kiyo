@@ -6,10 +6,7 @@ module.exports = {
 		.setName('summon')
 		.setDescription('Summons the user from the undead')
 		.addUserOption(option =>
-			option
-				.setName('user')
-				.setDescription('The user to summon')
-				.setRequired(true)
+			option.setName('user').setDescription('The user to summon').setRequired(true)
 		),
 	category: 'fun',
 	async execute(interaction) {
@@ -52,9 +49,7 @@ module.exports = {
 			);
 		} catch (error) {
 			console.error('Error executing summon command:', error);
-			interaction.reply(
-				'There was an error while executing this command.'
-			);
+			interaction.reply('There was an error while executing this command.');
 		}
 	},
 };

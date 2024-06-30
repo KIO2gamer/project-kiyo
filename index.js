@@ -30,9 +30,7 @@ const client = new Client({
 // Command collection
 client.commands = new Collection();
 const loadCommands = dir => {
-	const commandFiles = fs
-		.readdirSync(dir)
-		.filter(file => file.endsWith('.js'));
+	const commandFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
 	for (const file of commandFiles) {
 		const command = require(path.join(dir, file));
@@ -83,9 +81,7 @@ async function connectToMongoDB(retries = 5) {
 	} catch (error) {
 		console.error(`Failed to connect to MongoDB: ${error.message}`);
 		if (retries > 0) {
-			console.log(
-				`Retrying to connect to MongoDB (${retries} attempts left)...`
-			);
+			console.log(`Retrying to connect to MongoDB (${retries} attempts left)...`);
 			setTimeout(() => connectToMongoDB(retries - 1), 5000);
 		} else {
 			console.error('Exhausted all retries. Shutting down...');

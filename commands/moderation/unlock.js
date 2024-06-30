@@ -15,30 +15,22 @@ module.exports = {
 			option
 				.setName('channel')
 				.setDescription('The channel you want to unlock')
-				.addChannelTypes(
-					ChannelType.GuildText,
-					ChannelType.GuildAnnouncement
-				)
+				.addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
 				.setRequired(false)
 		),
 	category: 'moderation',
 	async execute(interaction) {
-		const channel =
-			interaction.options.getChannel('channel') || interaction.channel;
+		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		await interaction.deferReply({ ephemeral: true });
 
 		// Check if the bot has the required permissions
 		if (
-			!channel
-				.permissionsFor(interaction.client.user)
-				.has(PermissionFlagsBits.ManageChannels)
+			!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)
 		) {
 			const noPermissionEmbed = new EmbedBuilder()
 				.setTitle('ERROR')
 				.setColor('Red')
-				.setDescription(
-					'I do not have the required permissions to unlock the channel.'
-				);
+				.setDescription('I do not have the required permissions to unlock the channel.');
 			await interaction.editReply({ embeds: [noPermissionEmbed] });
 			return;
 		}

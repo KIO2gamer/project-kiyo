@@ -31,22 +31,14 @@ module.exports = {
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		)
 		.addStringOption(option =>
-			option
-				.setName('command')
-				.setDescription('The command to reload.')
-				.setRequired(false)
+			option.setName('command').setDescription('The command to reload.').setRequired(false)
 		)
 		.addBooleanOption(option =>
-			option
-				.setName('all')
-				.setDescription('Reload all commands.')
-				.setRequired(false)
+			option.setName('all').setDescription('Reload all commands.').setRequired(false)
 		),
 	category: 'utility',
 	async execute(interaction) {
-		const commandName = interaction.options
-			.getString('command', false)
-			?.toLowerCase();
+		const commandName = interaction.options.getString('command', false)?.toLowerCase();
 		const reloadAll = interaction.options.getBoolean('all', false);
 
 		if (reloadAll) {
@@ -185,8 +177,7 @@ async function paginate(interaction, page = 1) {
 	});
 
 	const filter = i =>
-		['prev_page', 'next_page'].includes(i.customId) &&
-		i.user.id === interaction.user.id;
+		['prev_page', 'next_page'].includes(i.customId) && i.user.id === interaction.user.id;
 	const collector = interaction.channel.createMessageComponentCollector({
 		filter,
 		time: 60000,
@@ -207,10 +198,7 @@ async function paginate(interaction, page = 1) {
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
 
-	if (
-		interaction.customId === 'prev_page' ||
-		interaction.customId === 'next_page'
-	) {
+	if (interaction.customId === 'prev_page' || interaction.customId === 'next_page') {
 		await paginate(interaction);
 	}
 });

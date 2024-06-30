@@ -5,14 +5,9 @@ const ModerationLog = require('../../models/ModerationLog');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('editlog')
-		.setDescription(
-			'Edit the reason for a specific log entry by log number.'
-		)
+		.setDescription('Edit the reason for a specific log entry by log number.')
 		.addIntegerOption(option =>
-			option
-				.setName('lognumber')
-				.setDescription('The log number to edit')
-				.setRequired(true)
+			option.setName('lognumber').setDescription('The log number to edit').setRequired(true)
 		)
 		.addStringOption(option =>
 			option
@@ -35,15 +30,11 @@ module.exports = {
 					`Successfully updated reason for log #${logNumber} to: ${newReason}`
 				);
 			} else {
-				await interaction.reply(
-					`No log found with log number ${logNumber}.`
-				);
+				await interaction.reply(`No log found with log number ${logNumber}.`);
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.reply(
-				'Failed to update the log. Please try again later.'
-			);
+			await interaction.reply('Failed to update the log. Please try again later.');
 		}
 	},
 };

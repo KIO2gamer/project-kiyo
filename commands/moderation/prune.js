@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -51,9 +47,7 @@ module.exports = {
 			const embed = new EmbedBuilder()
 				.setColor('#00ff00')
 				.setTitle('Purge Successful')
-				.setDescription(
-					`Pruned ${userMessages.length} messages from <@${userId}>`
-				);
+				.setDescription(`Pruned ${userMessages.length} messages from <@${userId}>`);
 
 			await interaction.reply({ embeds: [embed], ephemeral: true });
 		} catch (error) {

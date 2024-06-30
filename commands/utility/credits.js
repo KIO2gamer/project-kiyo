@@ -6,8 +6,7 @@ module.exports = {
 		.setDescription('Shows an embed of users who helped make this bot.'),
 	category: 'utility',
 	async execute(interaction) {
-		const embed = new EmbedBuilder().setTitle('Credits').setColor('Random')
-			.setDescription(`
+		const embed = new EmbedBuilder().setTitle('Credits').setColor('Random').setDescription(`
                 __**Slash Commands Contributors:**__
                 </steel:1204487408511483976> - steeles.0
                 </koifish:1204462350913114159> - hallow_spice

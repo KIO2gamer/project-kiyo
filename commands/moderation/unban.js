@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,8 +18,7 @@ module.exports = {
 	category: 'moderation',
 	async execute(interaction) {
 		const userId = interaction.options.getString('userid');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 
 		// Defer the reply to allow time for the operation
 		await interaction.deferReply();
@@ -63,9 +58,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('UNBANNED!!!')
-						.setDescription(
-							`<@${userId}> has been unbanned for reason: \`${reason}\``
-						)
+						.setDescription(`<@${userId}> has been unbanned for reason: \`${reason}\``)
 						.setColor('Green')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -79,9 +72,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'An error occurred while trying to unban the user'
-						)
+						.setDescription('An error occurred while trying to unban the user')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
