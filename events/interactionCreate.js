@@ -1,4 +1,4 @@
-const { Events } = require("discord.js");
+const { Events } = require('discord.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -7,12 +7,12 @@ module.exports = {
 
 		if (interaction.isChatInputCommand()) {
 			const command = interaction.client.commands.get(
-				interaction.commandName,
+				interaction.commandName
 			);
 
 			if (!command) {
 				console.error(
-					`No command matching ${interaction.commandName} was found.`,
+					`No command matching ${interaction.commandName} was found.`
 				);
 				return;
 			}

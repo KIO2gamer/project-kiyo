@@ -2,34 +2,34 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	PermissionFlagsBits,
-} = require("discord.js");
-const ms = require("ms");
+} = require('discord.js');
+const ms = require('ms');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("slowmode")
-		.setDescription("Set a slowmode for a channel.")
-		.addStringOption((option) =>
+		.setName('slowmode')
+		.setDescription('Set a slowmode for a channel.')
+		.addStringOption(option =>
 			option
-				.setName("duration")
+				.setName('duration')
 				.setDescription(
-					"The duration of the slowmode (e.g., 10s, 5m, 1h)",
+					'The duration of the slowmode (e.g., 10s, 5m, 1h)'
 				)
-				.setRequired(true),
+				.setRequired(true)
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
-				.setName("channel")
-				.setDescription("The channel to set slowmode in")
-				.setRequired(false),
+				.setName('channel')
+				.setDescription('The channel to set slowmode in')
+				.setRequired(false)
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 		.setDMPermission(false),
-	category: "moderation",
+	category: 'moderation',
 	async execute(interaction) {
 		const channel =
-			interaction.options.getChannel("channel") || interaction.channel;
-		const durationInput = interaction.options.getString("duration");
+			interaction.options.getChannel('channel') || interaction.channel;
+		const durationInput = interaction.options.getString('duration');
 		const duration = ms(durationInput) / 1000;
 
 		// Defer the reply to allow time for the operation
@@ -39,11 +39,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"Invalid duration. Please provide a duration between 0 seconds and 6 hours.",
+							'Invalid duration. Please provide a duration between 0 seconds and 6 hours.'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Set by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -66,9 +66,9 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("Slowmode Set")
+						.setTitle('Slowmode Set')
 						.setDescription(description)
-						.setColor("Green")
+						.setColor('Green')
 						.setFooter({
 							text: `Set by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -76,15 +76,15 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			console.error("Error setting slowmode:", error);
+			console.error('Error setting slowmode:', error);
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"An error occurred while trying to set the slowmode.",
+							'An error occurred while trying to set the slowmode.'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Set by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,

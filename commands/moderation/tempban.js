@@ -2,39 +2,39 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	PermissionFlagsBits,
-} = require("discord.js");
-const ModerationLog = require("../../models/ModerationLog");
-const ms = require("ms"); // Use ms library to parse duration strings
+} = require('discord.js');
+const ModerationLog = require('../../models/ModerationLog');
+const ms = require('ms'); // Use ms library to parse duration strings
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("tempban")
-		.setDescription("Temporarily ban a member for a specified duration.")
-		.addUserOption((option) =>
+		.setName('tempban')
+		.setDescription('Temporarily ban a member for a specified duration.')
+		.addUserOption(option =>
 			option
-				.setName("target")
-				.setDescription("The member to ban")
-				.setRequired(true),
+				.setName('target')
+				.setDescription('The member to ban')
+				.setRequired(true)
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
-				.setName("duration")
-				.setDescription("The duration of the ban (e.g., 1h, 1d)")
-				.setRequired(true),
+				.setName('duration')
+				.setDescription('The duration of the ban (e.g., 1h, 1d)')
+				.setRequired(true)
 		)
-		.addStringOption((option) =>
-			option.setName("reason").setDescription("The reason for banning"),
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for banning')
 		)
 		.setDefaultMemberPermissions(
-			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		)
 		.setDMPermission(false),
-	category: "moderation",
+	category: 'moderation',
 	async execute(interaction) {
-		const targetUser = interaction.options.getMember("target");
-		const duration = interaction.options.getString("duration");
+		const targetUser = interaction.options.getMember('target');
+		const duration = interaction.options.getString('duration');
 		const reason =
-			interaction.options.getString("reason") ?? "No reason provided";
+			interaction.options.getString('reason') ?? 'No reason provided';
 
 		// Defer the reply to allow time for the operation
 		await interaction.deferReply();
@@ -44,9 +44,9 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
-						.setDescription("User not found")
-						.setColor("Red")
+						.setTitle('ERROR')
+						.setDescription('User not found')
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -61,11 +61,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"You cannot ban the owner of the server",
+							'You cannot ban the owner of the server'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -87,11 +87,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"You cannot ban someone with a higher or equal role than you",
+							'You cannot ban someone with a higher or equal role than you'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -106,11 +106,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"I cannot ban someone with a higher or equal role than myself",
+							'I cannot ban someone with a higher or equal role than myself'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -126,11 +126,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"Invalid duration format. Please use formats like 1h, 1d, etc.",
+							'Invalid duration format. Please use formats like 1h, 1d, etc.'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -143,7 +143,7 @@ module.exports = {
 		// Attempt to ban the user
 		try {
 			const logEntry = new ModerationLog({
-				action: "tempban",
+				action: 'tempban',
 				moderator: interaction.user.id,
 				user: targetUser.id,
 				reason: reason,
@@ -156,11 +156,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("TEMPORARY BAN")
+						.setTitle('TEMPORARY BAN')
 						.setDescription(
-							`<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``,
+							`<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``
 						)
-						.setColor("Green")
+						.setColor('Green')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -173,24 +173,24 @@ module.exports = {
 				try {
 					await interaction.guild.members.unban(targetUser.id);
 					console.log(
-						`Successfully unbanned ${targetUser.tag} after ${duration}`,
+						`Successfully unbanned ${targetUser.tag} after ${duration}`
 					);
 				} catch (error) {
 					console.error(
-						`Failed to unban ${targetUser.tag}: ${error}`,
+						`Failed to unban ${targetUser.tag}: ${error}`
 					);
 				}
 			}, durationMs);
 		} catch (error) {
-			console.error("Error banning user:", error);
+			console.error('Error banning user:', error);
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"An error occurred while trying to ban the user",
+							'An error occurred while trying to ban the user'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
