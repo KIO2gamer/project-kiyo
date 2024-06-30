@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const mongoose = require('mongoose');
 
 // Validate environment variables
@@ -24,6 +24,11 @@ const client = new Client({
 		GatewayIntentBits.DirectMessageReactions,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildMessagePolls,
+	],
+	partials: [
+		Partials.Message, 
+		Partials.Channel, 
+		Partials.Reaction,
 	],
 });
 
