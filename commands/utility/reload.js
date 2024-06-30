@@ -5,9 +5,9 @@ const {
 	PermissionFlagsBits,
 	MessageActionRow,
 	MessageButton,
-} = require("discord.js");
-const path = require("path");
-const fs = require("fs");
+} = require('discord.js');
+const path = require('path');
+const fs = require('fs');
 
 const ITEMS_PER_PAGE = 5; // Number of commands per page
 
@@ -25,29 +25,29 @@ const client = new Client({
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("reload")
-		.setDescription("Reloads a command.")
+		.setName('reload')
+		.setDescription('Reloads a command.')
 		.setDefaultMemberPermissions(
-			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
-				.setName("command")
-				.setDescription("The command to reload.")
-				.setRequired(false),
+				.setName('command')
+				.setDescription('The command to reload.')
+				.setRequired(false)
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option
-				.setName("all")
-				.setDescription("Reload all commands.")
-				.setRequired(false),
+				.setName('all')
+				.setDescription('Reload all commands.')
+				.setRequired(false)
 		),
-	category: "utility",
+	category: 'utility',
 	async execute(interaction) {
 		const commandName = interaction.options
-			.getString("command", false)
+			.getString('command', false)
 			?.toLowerCase();
-		const reloadAll = interaction.options.getBoolean("all", false);
+		const reloadAll = interaction.options.getBoolean('all', false);
 
 		if (reloadAll) {
 			try {
@@ -56,17 +56,17 @@ module.exports = {
 				for (const file of commandFiles) {
 					const commandPath = path.resolve(
 						__dirname,
-						`../${getCommandCategory(file)}/${file}.js`,
+						`../${getCommandCategory(file)}/${file}.js`
 					);
 					reloadCommand(interaction.client, commandPath, file);
 				}
 
 				await interaction.reply({
-					content: "All commands have been reloaded successfully!",
+					content: 'All commands have been reloaded successfully!',
 					ephemeral: true,
 				});
 			} catch (error) {
-				console.error("Error reloading all commands:", error);
+				console.error('Error reloading all commands:', error);
 				await interaction.reply({
 					content: `There was an error while reloading all commands:\n\`${error.message}\``,
 					ephemeral: true,
@@ -75,7 +75,7 @@ module.exports = {
 		} else if (commandName) {
 			const commandPath = path.resolve(
 				__dirname,
-				`../${getCommandCategory(commandName)}/${commandName}.js`,
+				`../${getCommandCategory(commandName)}/${commandName}.js`
 			);
 
 			try {
@@ -100,26 +100,26 @@ module.exports = {
 
 // Helper function to get all command files
 function getAllCommandFiles() {
-	const commandsDir = path.resolve(__dirname, "..");
+	const commandsDir = path.resolve(__dirname, '..');
 	const commandFiles = fs
 		.readdirSync(commandsDir, { withFileTypes: true })
-		.filter((dirent) => dirent.isDirectory())
-		.flatMap((dirent) => {
+		.filter(dirent => dirent.isDirectory())
+		.flatMap(dirent => {
 			const categoryDir = path.join(commandsDir, dirent.name);
 			return fs
 				.readdirSync(categoryDir)
-				.filter((file) => file.endsWith(".js"))
-				.map((file) => path.basename(file, ".js"));
+				.filter(file => file.endsWith('.js'))
+				.map(file => path.basename(file, '.js'));
 		});
 	return commandFiles;
 }
 
 // Helper function to get the category of a command
 function getCommandCategory(commandName) {
-	const commandsDir = path.resolve(__dirname, "..");
+	const commandsDir = path.resolve(__dirname, '..');
 	const categories = fs
 		.readdirSync(commandsDir, { withFileTypes: true })
-		.filter((dirent) => dirent.isDirectory());
+		.filter(dirent => dirent.isDirectory());
 
 	for (const category of categories) {
 		const categoryDir = path.join(commandsDir, category.name);
@@ -167,35 +167,35 @@ async function paginate(interaction, page = 1) {
 
 	const row = new MessageActionRow().addComponents(
 		new MessageButton()
-			.setCustomId("prev_page")
-			.setLabel("Previous")
-			.setStyle("PRIMARY")
+			.setCustomId('prev_page')
+			.setLabel('Previous')
+			.setStyle('PRIMARY')
 			.setDisabled(page === 1),
 		new MessageButton()
-			.setCustomId("next_page")
-			.setLabel("Next")
-			.setStyle("PRIMARY")
-			.setDisabled(page === totalPages),
+			.setCustomId('next_page')
+			.setLabel('Next')
+			.setStyle('PRIMARY')
+			.setDisabled(page === totalPages)
 	);
 
 	await interaction.reply({
-		content: `Commands:\n${commandsOnPage.join("\n")}`,
+		content: `Commands:\n${commandsOnPage.join('\n')}`,
 		components: [row],
 		ephemeral: true,
 	});
 
-	const filter = (i) =>
-		["prev_page", "next_page"].includes(i.customId) &&
+	const filter = i =>
+		['prev_page', 'next_page'].includes(i.customId) &&
 		i.user.id === interaction.user.id;
 	const collector = interaction.channel.createMessageComponentCollector({
 		filter,
 		time: 60000,
 	});
 
-	collector.on("collect", async (i) => {
-		if (i.customId === "prev_page") {
+	collector.on('collect', async i => {
+		if (i.customId === 'prev_page') {
 			page--;
-		} else if (i.customId === "next_page") {
+		} else if (i.customId === 'next_page') {
 			page++;
 		}
 		await paginate(i, page);
@@ -204,12 +204,12 @@ async function paginate(interaction, page = 1) {
 }
 
 // Event listener for interactions
-client.on("interactionCreate", async (interaction) => {
+client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
 
 	if (
-		interaction.customId === "prev_page" ||
-		interaction.customId === "next_page"
+		interaction.customId === 'prev_page' ||
+		interaction.customId === 'next_page'
 	) {
 		await paginate(interaction);
 	}

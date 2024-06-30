@@ -2,41 +2,41 @@ const {
 	SlashCommandBuilder,
 	PermissionFlagsBits,
 	EmbedBuilder,
-} = require("discord.js");
-const ModerationLog = require("../../models/ModerationLog");
+} = require('discord.js');
+const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("warn")
-		.setDescription("Warn a member.")
-		.addUserOption((option) =>
+		.setName('warn')
+		.setDescription('Warn a member.')
+		.addUserOption(option =>
 			option
-				.setName("target")
-				.setDescription("The member to warn")
-				.setRequired(true),
+				.setName('target')
+				.setDescription('The member to warn')
+				.setRequired(true)
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
-				.setName("reason")
-				.setDescription("The reason for the warning"),
+				.setName('reason')
+				.setDescription('The reason for the warning')
 		)
 		.setDefaultMemberPermissions(
-			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		),
-	category: "moderation",
+	category: 'moderation',
 	async execute(interaction) {
-		const targetUser = interaction.options.getMember("target");
+		const targetUser = interaction.options.getMember('target');
 		const reason =
-			interaction.options.getString("reason") ?? "No reason provided";
+			interaction.options.getString('reason') ?? 'No reason provided';
 		await interaction.deferReply();
 
 		if (!targetUser) {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
-						.setDescription("User not found")
-						.setColor("Red")
+						.setTitle('ERROR')
+						.setDescription('User not found')
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,
@@ -50,11 +50,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"You cannot warn the owner of the server",
+							'You cannot warn the owner of the server'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,
@@ -74,11 +74,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"You cannot warn someone with a higher or equal role than you",
+							'You cannot warn someone with a higher or equal role than you'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,
@@ -92,11 +92,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"I cannot warn someone with a higher or equal role than myself",
+							'I cannot warn someone with a higher or equal role than myself'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,
@@ -108,7 +108,7 @@ module.exports = {
 
 		try {
 			const logEntry = new ModerationLog({
-				action: "warn",
+				action: 'warn',
 				moderator: interaction.user.id,
 				user: targetUser.id,
 				reason: reason,
@@ -119,11 +119,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("WARNED!!!")
+						.setTitle('WARNED!!!')
 						.setDescription(
-							`<@${targetUser.id}> has been warned for reason: \`${reason}\``,
+							`<@${targetUser.id}> has been warned for reason: \`${reason}\``
 						)
-						.setColor("Yellow")
+						.setColor('Yellow')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,
@@ -134,11 +134,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"An error occurred while trying to warn the user",
+							'An error occurred while trying to warn the user'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.avatarURL()}`,

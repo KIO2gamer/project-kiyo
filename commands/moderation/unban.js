@@ -2,28 +2,28 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	PermissionFlagsBits,
-} = require("discord.js");
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("unban")
-		.setDescription("Unban a member from the server.")
-		.addStringOption((option) =>
+		.setName('unban')
+		.setDescription('Unban a member from the server.')
+		.addStringOption(option =>
 			option
-				.setName("userid")
-				.setDescription("The ID of the member to unban")
-				.setRequired(true),
+				.setName('userid')
+				.setDescription('The ID of the member to unban')
+				.setRequired(true)
 		)
-		.addStringOption((option) =>
-			option.setName("reason").setDescription("The reason for unbanning"),
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for unbanning')
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
 		.setDMPermission(false),
-	category: "moderation",
+	category: 'moderation',
 	async execute(interaction) {
-		const userId = interaction.options.getString("userid");
+		const userId = interaction.options.getString('userid');
 		const reason =
-			interaction.options.getString("reason") ?? "No reason provided";
+			interaction.options.getString('reason') ?? 'No reason provided';
 
 		// Defer the reply to allow time for the operation
 		await interaction.deferReply();
@@ -36,9 +36,9 @@ module.exports = {
 				await interaction.editReply({
 					embeds: [
 						new EmbedBuilder()
-							.setTitle("ERROR")
-							.setDescription("User is not banned or not found")
-							.setColor("Red")
+							.setTitle('ERROR')
+							.setDescription('User is not banned or not found')
+							.setColor('Red')
 							.setFooter({
 								text: `Done by: ${interaction.user.username}`,
 								iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -49,7 +49,7 @@ module.exports = {
 			}
 
 			const logEntry = new ModerationLog({
-				action: "unban",
+				action: 'unban',
 				moderator: interaction.user.id,
 				user: userId,
 				reason: reason,
@@ -62,11 +62,11 @@ module.exports = {
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("UNBANNED!!!")
+						.setTitle('UNBANNED!!!')
 						.setDescription(
-							`<@${userId}> has been unbanned for reason: \`${reason}\``,
+							`<@${userId}> has been unbanned for reason: \`${reason}\``
 						)
-						.setColor("Green")
+						.setColor('Green')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -74,15 +74,15 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			console.error("Error unbanning user:", error);
+			console.error('Error unbanning user:', error);
 			await interaction.editReply({
 				embeds: [
 					new EmbedBuilder()
-						.setTitle("ERROR")
+						.setTitle('ERROR')
 						.setDescription(
-							"An error occurred while trying to unban the user",
+							'An error occurred while trying to unban the user'
 						)
-						.setColor("Red")
+						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
 							iconURL: `${interaction.user.displayAvatarURL()}`,

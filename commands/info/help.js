@@ -4,40 +4,40 @@ const {
 	ButtonBuilder,
 	ButtonStyle,
 	ActionRowBuilder,
-} = require("discord.js");
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("help")
+		.setName('help')
 		.setDescription(
-			"Displays all commands or info about a specific command",
+			'Displays all commands or info about a specific command'
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
-				.setName("category")
+				.setName('category')
 				.setRequired(false)
-				.setDescription("What command category do you want to view?")
+				.setDescription('What command category do you want to view?')
 				.addChoices(
-					{ name: "Fun", value: "fun" },
-					{ name: "Info", value: "info" },
-					{ name: "Moderation", value: "moderation" },
-					{ name: "Utility", value: "utility" },
-				),
+					{ name: 'Fun', value: 'fun' },
+					{ name: 'Info', value: 'info' },
+					{ name: 'Moderation', value: 'moderation' },
+					{ name: 'Utility', value: 'utility' }
+				)
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
-				.setName("search")
+				.setName('search')
 				.setRequired(false)
-				.setDescription("Search for a command by name or description"),
+				.setDescription('Search for a command by name or description')
 		),
-	category: "info",
+	category: 'info',
 	async execute(interaction) {
 		await interaction.deferReply(); // Immediately acknowledge the interaction
 
 		const { client, guild } = interaction;
-		const category = interaction.options.getString("category");
+		const category = interaction.options.getString('category');
 		const searchQuery = interaction.options
-			.getString("search")
+			.getString('search')
 			?.toLowerCase();
 
 		// Fetching guild commands
@@ -50,7 +50,7 @@ module.exports = {
 			utility: [],
 		};
 
-		guildCommands.forEach((command) => {
+		guildCommands.forEach(command => {
 			const commandData = client.commands.get(command.name);
 			if (commandData && categories[commandData.category]) {
 				categories[commandData.category].push({
@@ -61,62 +61,62 @@ module.exports = {
 			}
 		});
 
-		const buildCommandFields = (commands) => {
+		const buildCommandFields = commands => {
 			const chunks = [];
 			let currentChunk = [];
 
-			commands.forEach((cmd) => {
+			commands.forEach(cmd => {
 				const cmdStr = `</${cmd.name}:${cmd.id}> - ${cmd.description}`;
-				if (currentChunk.join("\n").length + cmdStr.length > 1024) {
-					chunks.push(currentChunk.join("\n"));
+				if (currentChunk.join('\n').length + cmdStr.length > 1024) {
+					chunks.push(currentChunk.join('\n'));
 					currentChunk = [];
 				}
 				currentChunk.push(cmdStr);
 			});
 
 			if (currentChunk.length > 0) {
-				chunks.push(currentChunk.join("\n"));
+				chunks.push(currentChunk.join('\n'));
 			}
 
 			return chunks;
 		};
 
 		const cmdListEmbed = new EmbedBuilder()
-			.setColor("#3498db")
-			.setTitle("📜 Command List")
+			.setColor('#3498db')
+			.setTitle('📜 Command List')
 			.setDescription(
-				"`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`",
+				'`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`'
 			)
 			.setAuthor({
-				name: "Kiyo Bot HelpDesk",
+				name: 'Kiyo Bot HelpDesk',
 				iconURL: interaction.client.user.avatarURL(),
 			})
 			.setThumbnail(interaction.client.user.avatarURL());
 
 		buildCommandFields(categories.fun).forEach((chunk, index) => {
 			cmdListEmbed.addFields({
-				name: index === 0 ? "🎉 Fun" : "\u200B",
+				name: index === 0 ? '🎉 Fun' : '\u200B',
 				value: chunk,
 			});
 		});
 
 		buildCommandFields(categories.info).forEach((chunk, index) => {
 			cmdListEmbed.addFields({
-				name: index === 0 ? "📖 Info" : "\u200B",
+				name: index === 0 ? '📖 Info' : '\u200B',
 				value: chunk,
 			});
 		});
 
 		buildCommandFields(categories.moderation).forEach((chunk, index) => {
 			cmdListEmbed.addFields({
-				name: index === 0 ? "🛡️ Moderation" : "\u200B",
+				name: index === 0 ? '🛡️ Moderation' : '\u200B',
 				value: chunk,
 			});
 		});
 
 		buildCommandFields(categories.utility).forEach((chunk, index) => {
 			cmdListEmbed.addFields({
-				name: index === 0 ? "🛠️ Utility" : "\u200B",
+				name: index === 0 ? '🛠️ Utility' : '\u200B',
 				value: chunk,
 			});
 		});
@@ -131,7 +131,7 @@ module.exports = {
 		if (searchQuery) {
 			const searchResults = [];
 			if (category) {
-				categories[category].forEach((cmd) => {
+				categories[category].forEach(cmd => {
 					if (
 						cmd.name.toLowerCase().includes(searchQuery) ||
 						cmd.description.toLowerCase().includes(searchQuery)
@@ -141,7 +141,7 @@ module.exports = {
 				});
 			} else {
 				for (const key in categories) {
-					categories[key].forEach((cmd) => {
+					categories[key].forEach(cmd => {
 						if (
 							cmd.name.toLowerCase().includes(searchQuery) ||
 							cmd.description.toLowerCase().includes(searchQuery)
@@ -153,15 +153,15 @@ module.exports = {
 			}
 
 			const searchEmbed = new EmbedBuilder()
-				.setColor("#f39c12")
+				.setColor('#f39c12')
 				.setTitle(`🔍 Search Results: ${searchQuery}`)
 				.setDescription(
 					searchResults
 						.map(
-							(cmd) =>
-								`</${cmd.name}:${cmd.id}> - ${cmd.description}`,
+							cmd =>
+								`</${cmd.name}:${cmd.id}> - ${cmd.description}`
 						)
-						.join("\n") || "No commands found",
+						.join('\n') || 'No commands found'
 				)
 				.setFooter({
 					text: `Requested by ${interaction.user.tag}`,
@@ -176,24 +176,24 @@ module.exports = {
 
 		if (!category) {
 			const mainMenuEmbed = new EmbedBuilder()
-				.setColor("#2ecc71")
+				.setColor('#2ecc71')
 				.setDescription(
-					"`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`",
+					'`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`'
 				)
 				.setAuthor({
-					name: "Kiyo Bot HelpDesk",
+					name: 'Kiyo Bot HelpDesk',
 					iconURL: interaction.client.user.avatarURL(),
 				})
 				.setThumbnail(interaction.client.user.avatarURL())
 				.addFields([
 					{
-						name: "📂 Categories",
+						name: '📂 Categories',
 						value: Object.keys(categories)
 							.map(
-								(key) =>
-									`> **${key.charAt(0).toUpperCase() + key.slice(1)}**\n> Commands for ${key}.\n`,
+								key =>
+									`> **${key.charAt(0).toUpperCase() + key.slice(1)}**\n> Commands for ${key}.\n`
 							)
-							.join("\n"),
+							.join('\n'),
 					},
 				])
 				.setFooter({
@@ -205,20 +205,20 @@ module.exports = {
 				.setTimestamp();
 
 			const cmdListButton = new ButtonBuilder()
-				.setLabel("📜 Command List")
+				.setLabel('📜 Command List')
 				.setStyle(ButtonStyle.Secondary)
-				.setCustomId("cmdList");
+				.setCustomId('cmdList');
 
 			const mainMenuBtn = new ButtonBuilder()
-				.setLabel("🏠 Home")
+				.setLabel('🏠 Home')
 				.setStyle(ButtonStyle.Secondary)
-				.setCustomId("home");
+				.setCustomId('home');
 
 			const rowWithCmdBtn = new ActionRowBuilder().addComponents(
-				cmdListButton,
+				cmdListButton
 			);
 			const rowWithHomeBtn = new ActionRowBuilder().addComponents(
-				mainMenuBtn,
+				mainMenuBtn
 			);
 
 			const reply = await interaction.editReply({
@@ -230,15 +230,15 @@ module.exports = {
 				time: 60_000 * 5,
 			});
 
-			collector.on("collect", async (i) => {
+			collector.on('collect', async i => {
 				if (i.user.id === interaction.user.id) {
-					if (i.customId === "cmdList") {
+					if (i.customId === 'cmdList') {
 						await i.update({
 							embeds: [cmdListEmbed],
 							components: [rowWithHomeBtn],
 						});
 					}
-					if (i.customId === "home") {
+					if (i.customId === 'home') {
 						await i.update({
 							embeds: [mainMenuEmbed],
 							components: [rowWithCmdBtn],
@@ -247,14 +247,14 @@ module.exports = {
 				} else {
 					await i.reply({
 						content:
-							"You should run the command to use this interaction.",
+							'You should run the command to use this interaction.',
 						ephemeral: true,
 					});
 				}
 			});
 
-			collector.on("end", async (collected, reason) => {
-				if (reason === "time") {
+			collector.on('end', async (collected, reason) => {
+				if (reason === 'time') {
 					await reply.edit({ components: [] });
 				}
 			});
@@ -266,16 +266,13 @@ module.exports = {
 			const commands = categories[category];
 			const embedDescription =
 				commands
-					.map(
-						(cmd) =>
-							`</${cmd.name}:${cmd.id}> - ${cmd.description}`,
-					)
-					.join("\n") || "No commands available";
+					.map(cmd => `</${cmd.name}:${cmd.id}> - ${cmd.description}`)
+					.join('\n') || 'No commands available';
 
 			const categoryEmbed = new EmbedBuilder()
-				.setColor("#e74c3c")
+				.setColor('#e74c3c')
 				.setTitle(
-					`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`,
+					`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`
 				)
 				.setDescription(embedDescription)
 				.setFooter({
@@ -289,7 +286,7 @@ module.exports = {
 			return await interaction.editReply({ embeds: [categoryEmbed] });
 		} else {
 			await interaction.editReply({
-				content: "Invalid category.",
+				content: 'Invalid category.',
 				ephemeral: true,
 			});
 		}

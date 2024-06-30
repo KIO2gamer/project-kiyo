@@ -3,37 +3,37 @@ const {
 	ChannelType,
 	EmbedBuilder,
 	PermissionFlagsBits,
-} = require("discord.js");
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("echo")
-		.setDescription("Replies with your input!")
-		.addStringOption((option) =>
+		.setName('echo')
+		.setDescription('Replies with your input!')
+		.addStringOption(option =>
 			option
-				.setName("input")
-				.setDescription("The input to echo back")
+				.setName('input')
+				.setDescription('The input to echo back')
 				.setMaxLength(2000)
-				.setRequired(true),
+				.setRequired(true)
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
-				.setName("channel")
-				.setDescription("The channel to echo into")
+				.setName('channel')
+				.setDescription('The channel to echo into')
 				.addChannelTypes(ChannelType.GuildText)
-				.setRequired(true),
+				.setRequired(true)
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option
-				.setName("embed")
-				.setDescription("Whether or not the echo should be embedded"),
+				.setName('embed')
+				.setDescription('Whether or not the echo should be embedded')
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-	category: "fun",
+	category: 'fun',
 	async execute(interaction) {
-		const input = interaction.options.getString("input");
-		const channel = interaction.options.getChannel("channel");
-		const useEmbed = interaction.options.getBoolean("embed");
+		const input = interaction.options.getString('input');
+		const channel = interaction.options.getChannel('channel');
+		const useEmbed = interaction.options.getBoolean('embed');
 
 		// Check if the bot has permission to send messages in the target channel
 		// if (!channel || !channel.permissionsFor(interaction.guild.me).has(PermissionFlagsBits.SendMessages)) {
@@ -46,7 +46,7 @@ module.exports = {
 		try {
 			if (useEmbed) {
 				const echoEmbed = new EmbedBuilder()
-					.setColor("#0099ff")
+					.setColor('#0099ff')
 					.setTitle(`Echoed by ${interaction.user.tag}`)
 					.setDescription(`**Message:** ${input}`)
 					.setFooter({
@@ -60,7 +60,7 @@ module.exports = {
 				await channel.send({ embeds: [echoEmbed] });
 			} else {
 				await channel.send(
-					`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`,
+					`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`
 				);
 			}
 
@@ -69,9 +69,9 @@ module.exports = {
 				ephemeral: true,
 			});
 		} catch (error) {
-			console.error("Error sending echo message:", error);
+			console.error('Error sending echo message:', error);
 			await interaction.reply({
-				content: "There was an error trying to execute that command.",
+				content: 'There was an error trying to execute that command.',
 				ephemeral: true,
 			});
 		}

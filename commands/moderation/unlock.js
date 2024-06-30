@@ -3,28 +3,28 @@ const {
 	EmbedBuilder,
 	PermissionFlagsBits,
 	ChannelType,
-} = require("discord.js");
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName("unlock")
-		.setDescription("Unlock a channel")
+		.setName('unlock')
+		.setDescription('Unlock a channel')
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
-				.setName("channel")
-				.setDescription("The channel you want to unlock")
+				.setName('channel')
+				.setDescription('The channel you want to unlock')
 				.addChannelTypes(
 					ChannelType.GuildText,
-					ChannelType.GuildAnnouncement,
+					ChannelType.GuildAnnouncement
 				)
-				.setRequired(false),
+				.setRequired(false)
 		),
-	category: "moderation",
+	category: 'moderation',
 	async execute(interaction) {
 		const channel =
-			interaction.options.getChannel("channel") || interaction.channel;
+			interaction.options.getChannel('channel') || interaction.channel;
 		await interaction.deferReply({ ephemeral: true });
 
 		// Check if the bot has the required permissions
@@ -34,10 +34,10 @@ module.exports = {
 				.has(PermissionFlagsBits.ManageChannels)
 		) {
 			const noPermissionEmbed = new EmbedBuilder()
-				.setTitle("ERROR")
-				.setColor("Red")
+				.setTitle('ERROR')
+				.setColor('Red')
 				.setDescription(
-					"I do not have the required permissions to unlock the channel.",
+					'I do not have the required permissions to unlock the channel.'
 				);
 			await interaction.editReply({ embeds: [noPermissionEmbed] });
 			return;
@@ -45,15 +45,15 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setTitle(`${channel} has been unlocked`)
-			.setColor("Green")
+			.setColor('Green')
 			.setFooter({
 				text: `Done by: ${interaction.user.username}`,
 				iconURL: `${interaction.user.avatarURL()}`,
 			});
 
 		const errorEmbed = new EmbedBuilder()
-			.setTitle("ERROR")
-			.setColor("Red")
+			.setTitle('ERROR')
+			.setColor('Red')
 			.setDescription(`${channel} is already unlocked`);
 
 		// Check if the channel is already unlocked
@@ -80,7 +80,7 @@ module.exports = {
 				});
 			} else {
 				await interaction.editReply({
-					content: "**Unlocked Successfully**",
+					content: '**Unlocked Successfully**',
 				});
 				await channel.send({
 					embeds: [embed],
@@ -88,10 +88,10 @@ module.exports = {
 			}
 		} catch (error) {
 			const errorEmbed = new EmbedBuilder()
-				.setTitle("ERROR")
-				.setColor("Red")
+				.setTitle('ERROR')
+				.setColor('Red')
 				.setDescription(
-					`An error occurred while trying to unlock the channel: ${error.message}`,
+					`An error occurred while trying to unlock the channel: ${error.message}`
 				);
 			await interaction.editReply({ embeds: [errorEmbed] });
 		}
