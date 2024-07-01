@@ -17,19 +17,28 @@ requiredEnvVars.forEach(envVar => {
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildModeration,
+		GatewayIntentBits.GuildEmojisAndStickers,
+		GatewayIntentBits.GuildIntegrations,
+		GatewayIntentBits.GuildWebhooks,
+		GatewayIntentBits.GuildInvites,
+		GatewayIntentBits.GuildVoiceStates,
 		GatewayIntentBits.GuildPresences,
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMessageTyping,
 		GatewayIntentBits.DirectMessages,
 		GatewayIntentBits.DirectMessageReactions,
+		GatewayIntentBits.DirectMessageTyping,
 		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildScheduledEvents,
+		GatewayIntentBits.AutoModerationConfiguration,
+		GatewayIntentBits.AutoModerationExecution,
 		GatewayIntentBits.GuildMessagePolls,
+		GatewayIntentBits.DirectMessagePolls,
 	],
-	partials: [
-		Partials.Message, 
-		Partials.Channel, 
-		Partials.Reaction,
-	],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
 // Command collection
@@ -46,7 +55,6 @@ const loadCommands = dir => {
 					client.commands.set(alias, command);
 				}
 			}
-			console.log(`Registered command: ${command.data.name}`);
 		} else {
 			console.warn(
 				`[WARNING] The command at ${path.join(dir, file)} is missing a required "data" or "execute" property.`
@@ -71,7 +79,6 @@ const loadEvents = dir => {
 		} else {
 			client.on(event.name, (...args) => event.execute(...args));
 		}
-		console.log(`Registered event: ${event.name}`);
 	}
 };
 
