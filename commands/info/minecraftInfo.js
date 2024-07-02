@@ -1,4 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 minutes
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,18 +15,28 @@ module.exports = {
     async execute(interaction) {
         const username = interaction.options.getString('username');
 
+        // Check if the data is in cache
+        const cachedData = cache.get(username);
+        if (cachedData) {
+            await interaction.reply({ embeds: [createEmbed(cachedData)] });
+            return;
+        }
+
         try {
             const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
             const data = await response.json();
 
             if (data && data.id && data.name) {
-                const skinUrl = `https://crafatar.com/avatars/${data.id}?size=512&overlay`;
+                const skinUrl = `https://minotar.net/helm/${data.id}/256.png`;
 
                 const playerData = {
                     name: data.name,
                     uuid: data.id,
                     skinUrl: skinUrl
                 };
+
+                // Cache the data
+                cache.set(username, playerData);
 
                 await interaction.reply({ embeds: [createEmbed(playerData)] });
             } else {
@@ -41,7 +53,7 @@ function createEmbed(playerData) {
     return new EmbedBuilder()
         .setColor('#0099ff')
         .setTitle(`Minecraft Player: ${playerData.name}`)
-        .setImage(playerData.skinUrl)
+        .setThumbnail(playerData.skinUrl)
         .addFields(
             { name: 'Username', value: playerData.name, inline: true },
             { name: 'UUID', value: playerData.uuid, inline: true }
