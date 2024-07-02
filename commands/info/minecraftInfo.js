@@ -11,7 +11,6 @@ module.exports = {
             .setDescription('Search for a Minecraft player')
             .setRequired(true)),
     category: 'fun',
-    cooldown: 10, // Command cooldown in seconds
     async execute(interaction) {
         const username = interaction.options.getString('username');
 
