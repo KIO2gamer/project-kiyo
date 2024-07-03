@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const ModerationLog = require('../../models/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
