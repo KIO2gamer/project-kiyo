@@ -1,6 +1,6 @@
 // commands/moderation/editlog.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const ModerationLog = require('../../models/ModerationLog');
+const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
