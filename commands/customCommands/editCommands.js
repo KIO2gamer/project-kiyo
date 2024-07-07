@@ -67,7 +67,7 @@ module.exports = {
         .setDescription('A dynamically created command'),
     category: 'customCommands',
     async execute(interaction) {
-        await interaction.reply('${newResponse}');
+        ${newResponse}
     },
 };
 `;
