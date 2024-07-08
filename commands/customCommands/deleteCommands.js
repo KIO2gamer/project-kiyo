@@ -22,7 +22,6 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const name = interaction.options.getString('name');
-        const category = interaction.options.getString('category');
 
         if (protectedCommands.includes(name)) {
             return interaction.reply(`Command \`/${name}\` is protected and cannot be deleted.`);

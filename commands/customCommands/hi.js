@@ -3,11 +3,10 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('yo_bro')
-        .setDescription('whats up'),
+        .setName('hi')
+        .setDescription('dasf'),
     category: 'customCommands',
     async execute(interaction) {
-        await interaction.reply('whats up')
-        await interaction.reply('pretty good myself')
+        await interaction.reply({ content: 'hellow', ephemeral: true })
     },
 };

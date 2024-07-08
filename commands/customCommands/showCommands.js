@@ -37,7 +37,9 @@ module.exports = {
                 const end = start + commandsPerPage;
                 const currentCommands = commandFiles.slice(start, end);
                 
-                const embedDescription = currentCommands.map((file, index) => `${start + index + 1}. ${file.replace('.js', '')}`).join('\n');
+                const embedDescription = currentCommands.length > 0 
+                    ? currentCommands.map((file, index) => `${start + index + 1}. ${file.replace('.js', '')}`).join('\n')
+                    : 'No commands available on this page.';
 
                 return new EmbedBuilder()
                     .setTitle('Custom Commands')
@@ -57,11 +59,13 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId('previous')
                         .setLabel('Previous')
-                        .setStyle(ButtonStyle.Primary),
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(currentPage === 0),
                     new ButtonBuilder()
                         .setCustomId('next')
                         .setLabel('Next')
                         .setStyle(ButtonStyle.Primary)
+                        .setDisabled(currentPage === totalPages - 1)
                 );
 
             // Send the initial message with the embed and buttons
@@ -75,9 +79,9 @@ module.exports = {
                     return btnInteraction.reply({ content: 'You cannot interact with this button.', ephemeral: true });
                 }
 
-                if (btnInteraction.customId === 'previous') {
+                if (btnInteraction.customId === 'previous' && currentPage > 0) {
                     currentPage--;
-                } else if (btnInteraction.customId === 'next') {
+                } else if (btnInteraction.customId === 'next' && currentPage < totalPages - 1) {
                     currentPage++;
                 }
 
