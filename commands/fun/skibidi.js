@@ -12,7 +12,7 @@ module.exports = {
                 { name: 'No', value: 'no' }
             )
         .setRequired(true)),
-    category: 'customCommands',
+    category: 'fun',
     async execute(interaction) {
         const option = interaction.options.getString('option')
         if (option === 'yes'){
