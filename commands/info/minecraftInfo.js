@@ -12,7 +12,7 @@ module.exports = {
 				.setDescription('Search for a Minecraft player')
 				.setRequired(true)
 		),
-	category: 'fun',
+	category: 'info',
 	async execute(interaction) {
 		const username = interaction.options.getString('username');
 
@@ -30,18 +30,25 @@ module.exports = {
 			const data = await response.json();
 
 			if (data && data.id && data.name) {
-				const skinUrl = `https://minotar.net/helm/${data.id}/256.png`;
+				const skinHeadUrl = `https://minotar.net/helm/${data.id}/256.png`;
+				const skinFullUrl = `https://minotar.net/skin/${data.id}`;
 
-				const playerData = {
-					name: data.name,
-					uuid: data.id,
-					skinUrl: skinUrl,
-				};
+
+				const infoMinecraftEmbed = new EmbedBuilder()
+					.setColor('#0099ff')
+					.setTitle(`Minecraft Player: ${data.name}`)
+					.setThumbnail(skinHeadUrl)
+					.addFields(
+						{ name: 'Username', value: data.name, inline: true },
+						{ name: 'UUID', value: data.id, inline: true }
+					)
+					.setImage(skinFullUrl)
+					.setTimestamp();
 
 				// Cache the data
-				cache.set(username, playerData);
+				cache.set(username, infoMinecraftEmbed);
 
-				await interaction.reply({ embeds: [createEmbed(playerData)] });
+				await interaction.reply({ embeds: [infoMinecraftEmbed] });
 			} else {
 				await interaction.reply('Could not find the Minecraft player.');
 			}
