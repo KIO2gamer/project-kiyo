@@ -9,6 +9,7 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('code').setDescription('The code to evaluate').setRequired(true)
 		),
+	category: 'info',
 	async execute(interaction) {
 		// Check if the user has permission to use this command
 		if (
