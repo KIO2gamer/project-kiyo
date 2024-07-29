@@ -1,5 +1,30 @@
 const discord = require('discord.js');
-const client = new discord.Client();
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildModeration,
+		GatewayIntentBits.GuildEmojisAndStickers,
+		GatewayIntentBits.GuildIntegrations,
+		GatewayIntentBits.GuildWebhooks,
+		GatewayIntentBits.GuildInvites,
+		GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildPresences,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMessageTyping,
+		GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.DirectMessageReactions,
+		GatewayIntentBits.DirectMessageTyping,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildScheduledEvents,
+		GatewayIntentBits.AutoModerationConfiguration,
+		GatewayIntentBits.AutoModerationExecution,
+		GatewayIntentBits.GuildMessagePolls,
+		GatewayIntentBits.DirectMessagePolls,
+	],
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+});
 
 client.once('ready', () => {
     console.log('Bot is online for workflow check!');
