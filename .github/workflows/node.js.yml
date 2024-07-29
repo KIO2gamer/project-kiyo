@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -21,5 +21,10 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
-    - run: ls -la # This will list all files in the directory to ensure index.js exists
-    - run: node index.js
+    - name: Run node index.js
+      run: node index.js
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        MONGODB_URL: ${{ secrets.MONGODB_URL }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        # Add more secrets as needed
