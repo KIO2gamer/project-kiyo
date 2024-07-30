@@ -43,7 +43,6 @@ module.exports = {
 		const count = interaction.options.getInteger('count') || 1;
 		const orientation = interaction.options.getString('orientation');
 		const size = interaction.options.getString('size');
-		const random = interaction.options.getBoolean('random');
 
 		const apiKey = process.env.PEXELS_API_KEY;
 		let url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${count}`;
