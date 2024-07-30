@@ -712,125 +712,133 @@ module.exports = {
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 1 - No Spamming**',
-					  value: 'Spamming disrupts the flow of conversation and can be very annoying. This includes, but is not limited to:\n' +
-							 '- Excessive @mentions\n' +
-							 '- Repeated characters or words\n' +
-							 '- Continuous posting of images, links, or messages\n' +
-							 '- Making obnoxious noises in voice channels\n\n' +
-							 '**Violators will be warned or muted.**\n\n',
+						name: '**Rule 1 - No Spamming**',
+						value:
+							'Spamming disrupts the flow of conversation and can be very annoying. This includes, but is not limited to:\n' +
+							'- Excessive @mentions\n' +
+							'- Repeated characters or words\n' +
+							'- Continuous posting of images, links, or messages\n' +
+							'- Making obnoxious noises in voice channels\n\n' +
+							'**Violators will be warned or muted.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 2 - Respectful Content Only**',
-					  value: 'We strive to create a welcoming and safe environment for everyone. Do not post:\n\n' +
-							 '- NSFW (Not Safe For Work) content\n' +
-							 '- Sexually explicit or suggestive material\n' +
-							 '- Offensive content that targets or belittles any group or individual\n' +
-							 '- Any content that could make other members uncomfortable\n\n' +
-							 '**Such posts will be removed, and the user may be banned.**\n\n',
+						name: '**Rule 2 - Respectful Content Only**',
+						value:
+							'We strive to create a welcoming and safe environment for everyone. Do not post:\n\n' +
+							'- NSFW (Not Safe For Work) content\n' +
+							'- Sexually explicit or suggestive material\n' +
+							'- Offensive content that targets or belittles any group or individual\n' +
+							'- Any content that could make other members uncomfortable\n\n' +
+							'**Such posts will be removed, and the user may be banned.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 3 - No Harassment**',
-					  value: 'Everyone deserves to feel safe here. Harassment includes:\n\n' +
-							 '- Bullying or targeting individuals\n' +
-							 '- Intimidating or threatening behavior\n' +
-							 '- Encouraging others to harass someone\n' +
-							 '- Stalking or personal attacks\n\n' +
-							 '**Any form of harassment will result in an immediate ban.**\n\n',
+						name: '**Rule 3 - No Harassment**',
+						value:
+							'Everyone deserves to feel safe here. Harassment includes:\n\n' +
+							'- Bullying or targeting individuals\n' +
+							'- Intimidating or threatening behavior\n' +
+							'- Encouraging others to harass someone\n' +
+							'- Stalking or personal attacks\n\n' +
+							'**Any form of harassment will result in an immediate ban.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 4 - English Only**',
-					  value: 'To ensure clear communication and effective moderation, please use English in all public channels. Non-English conversations can hinder our ability to moderate effectively. If you need a channel for another language, please request it from the staff.\n\n',
+						name: '**Rule 4 - English Only**',
+						value: 'To ensure clear communication and effective moderation, please use English in all public channels. Non-English conversations can hinder our ability to moderate effectively. If you need a channel for another language, please request it from the staff.\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 5 - No Politics or Religious Discussions**',
-					  value: 'Discussions about politics and religion can easily become heated and divisive. To maintain harmony, please refrain from:\n\n' +
-							 '- Political debates\n' +
-							 '- Religious arguments or proselytizing\n' +
-							 '- Supporting or denouncing political or religious figures\n\n' +
-							 '**Such discussions will be redirected or removed to keep the peace.**\n\n',
+						name: '**Rule 5 - No Politics or Religious Discussions**',
+						value:
+							'Discussions about politics and religion can easily become heated and divisive. To maintain harmony, please refrain from:\n\n' +
+							'- Political debates\n' +
+							'- Religious arguments or proselytizing\n' +
+							'- Supporting or denouncing political or religious figures\n\n' +
+							'**Such discussions will be redirected or removed to keep the peace.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 6 - Appropriate Language**',
-					  value: 'We want to maintain a respectful environment. Do not use:\n\n' +
-							 '- Inappropriate or offensive language\n' +
-							 '- Slurs, hate speech, or derogatory terms\n' +
-							 '- Attempts to bypass language filters\n' +
-							 '- Insults or trash talk directed at others\n\n' +
-							 '**Violations can lead to warnings, mutes, or bans.**\n\n',
+						name: '**Rule 6 - Appropriate Language**',
+						value:
+							'We want to maintain a respectful environment. Do not use:\n\n' +
+							'- Inappropriate or offensive language\n' +
+							'- Slurs, hate speech, or derogatory terms\n' +
+							'- Attempts to bypass language filters\n' +
+							'- Insults or trash talk directed at others\n\n' +
+							'**Violations can lead to warnings, mutes, or bans.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 7 - Pingable Usernames**',
-					  value: 'For effective communication, make sure your username:\n\n' +
-							 '- Can be easily mentioned (pinged)\n' +
-							 '- Avoids special characters or symbols that complicate pinging\n' +
-							 '- Is not offensive or inappropriate\n\n' +
-							 '**Users with unpingable usernames will be asked to change them.**\n\n',
+						name: '**Rule 7 - Pingable Usernames**',
+						value:
+							'For effective communication, make sure your username:\n\n' +
+							'- Can be easily mentioned (pinged)\n' +
+							'- Avoids special characters or symbols that complicate pinging\n' +
+							'- Is not offensive or inappropriate\n\n' +
+							'**Users with unpingable usernames will be asked to change them.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 8 - Use Channels Correctly**',
-					  value: 'Help keep our server organized by using the right channels for the right topics:\n\n' +
-							 '- Post content relevant to the channel\'s purpose\n' +
-							 '- For off-topic or random discussions, use designated channels like <#1237018886843400243>\n' +
-							 '- Avoid derailing ongoing conversations with unrelated topics\n\n' +
-							 '**Misuse of channels may result in content being moved or deleted.**\n\n',
+						name: '**Rule 8 - Use Channels Correctly**',
+						value:
+							'Help keep our server organized by using the right channels for the right topics:\n\n' +
+							"- Post content relevant to the channel's purpose\n" +
+							'- For off-topic or random discussions, use designated channels like <#1237018886843400243>\n' +
+							'- Avoid derailing ongoing conversations with unrelated topics\n\n' +
+							'**Misuse of channels may result in content being moved or deleted.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 9 - No Ghost Pinging**',
-					  value: 'Ghost pinging (mentioning someone and then deleting the message) is disruptive and frustrating. It wastes members\' time and is considered rude. Repeated ghost pingers will be warned or muted.\n\n',
+						name: '**Rule 9 - No Ghost Pinging**',
+						value: "Ghost pinging (mentioning someone and then deleting the message) is disruptive and frustrating. It wastes members' time and is considered rude. Repeated ghost pingers will be warned or muted.\n\n",
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: '**Rule 10 - No Advertising**',
-					  value: 'Advertising is not allowed unless explicitly permitted by the staff. This includes:\n\n' +
-							 '- Websites or social media accounts\n' +
-							 '- Other Discord servers\n' +
-							 '- Personal projects or businesses\n' +
-							 '- Advertising via direct messages\n\n' +
-							 '**Violations will result in post deletion and possible bans.**\n\n',
+						name: '**Rule 10 - No Advertising**',
+						value:
+							'Advertising is not allowed unless explicitly permitted by the staff. This includes:\n\n' +
+							'- Websites or social media accounts\n' +
+							'- Other Discord servers\n' +
+							'- Personal projects or businesses\n' +
+							'- Advertising via direct messages\n\n' +
+							'**Violations will result in post deletion and possible bans.**\n\n',
 					},
 					{
 						name: `\n`,
 						value: `\n`,
 					},
 					{
-					  name: "**Rule 11 - Follow Discord's Community Guidelines**",
-					  value: 'Always adhere to Discord\'s official guidelines, which can be found here: [Discord Guidelines](https://discord.com/guidelines). Failure to comply with these guidelines may result in actions being taken against your account by Discord and our moderation team.\n\n',
+						name: "**Rule 11 - Follow Discord's Community Guidelines**",
+						value: "Always adhere to Discord's official guidelines, which can be found here: [Discord Guidelines](https://discord.com/guidelines). Failure to comply with these guidelines may result in actions being taken against your account by Discord and our moderation team.\n\n",
 					}
 				)
 				.setThumbnail('https://example.com/rules.png')

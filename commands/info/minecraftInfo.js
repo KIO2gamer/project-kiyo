@@ -33,7 +33,6 @@ module.exports = {
 				const skinHeadUrl = `https://minotar.net/helm/${data.id}/256.png`;
 				const skinFullUrl = `https://minotar.net/skin/${data.id}`;
 
-
 				const infoMinecraftEmbed = new EmbedBuilder()
 					.setColor('#0099ff')
 					.setTitle(`Minecraft Player: ${data.name}`)
