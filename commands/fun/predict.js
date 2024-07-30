@@ -12,9 +12,8 @@ module.exports = {
 		const question = interaction.options.getString('question');
 
 		const embed = new EmbedBuilder()
-			.setTitle('Question: ${question}')
 			.setDescription(
-				`***Answer: ${Math.random() < 0.5 ? 'yessir' : 'nuh uh'}***`
+				`# Question: ${question}\nAnswer: ***${Math.random() < 0.5 ? 'yessir' : 'nuh uh'}***`
 			)
 			.setColor('#00ff00')
 			.setFooter({
