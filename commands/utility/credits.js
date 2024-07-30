@@ -15,8 +15,9 @@ module.exports = {
                 </rickroll:1255822140251312241> - flashxdfx
                 </summon:1255822140251312245> - eesmal
                 </snipe:1255822140251312243> - na51f
-                </searchimage:1257395895180201984> - spheroidon
+                </photo:1267798092669784106> - spheroidon
                 </skibidi:1259209405044359180> - zenoz231
+                </quokka:1261574222975864882> - wickiwacka2
             `);
 
 		await interaction.reply({ embeds: [embed] });
