@@ -13,7 +13,7 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setDescription(
-				`# Question: ${question}\nAnswer: ***${Math.random() < 0.5 ? 'yessir' : 'nuh uh'}***`
+				`# Question: ${question}\nAnswer: ***${Math.random() < 0.5 ? (Math.random() < 0.5 ? 'yessir' : 'ayee') : Math.random() < 0.5 ? 'nuh uh' : 'nay'}***`
 			)
 			.setColor('#00ff00')
 			.setFooter({
