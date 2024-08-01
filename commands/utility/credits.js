@@ -6,19 +6,23 @@ module.exports = {
 		.setDescription('Shows an embed of users who helped make this bot.'),
 	category: 'utility',
 	async execute(interaction) {
-		const embed = new EmbedBuilder().setTitle('Credits').setColor('Random').setDescription(`
-                __**Slash Commands Contributors:**__
-
-                </steel:1255822140251312244> - steeles.0
-                </koifish:1255822140251312240> - hallow_spice
-                </donottouch:1255822140251312242> - umbree_on_toast
-                </rickroll:1255822140251312241> - flashxdfx
-                </summon:1255822140251312245> - eesmal
-                </snipe:1255822140251312243> - na51f
-                </photo:1267798092669784106> - spheroidon
-                </skibidi:1259209405044359180> - zenoz231
-                </quokka:1261574222975864882> - wickiwacka2
-            `);
+		const embed = new EmbedBuilder()
+			.setTitle('✨ Credits ✨')
+			.setColor('#0099ff')
+			.setDescription(
+				'__**Slash Commands Contributors:**__\n\n' +
+				'</steel:1255822140251312244> - **steeles.0**\n' +
+				'</koifish:1255822140251312240> - **hallow_spice**\n' +
+				'</donottouch:1255822140251312242> - **umbree_on_toast**\n' +
+				'</rickroll:1255822140251312241> - **flashxdfx**\n' +
+				'</summon:1255822140251312245> - **eesmal**\n' +
+				'</snipe:1255822140251312243> - **na51f**\n' +
+				'</photo:1267798092669784106> - **spheroidon**\n' +
+				'</skibidi:1259209405044359180> - **zenoz231**\n' +
+				'</quokka:1261574222975864882> - **wickiwacka2**\n' +
+				'</uwu:1267834425002164235> - **rizzwan.**'
+			)
+			.setFooter({ text: 'Thanks to all the contributors!', iconURL: 'https://example.com/icon.png' });
 
 		await interaction.reply({ embeds: [embed] });
 	},
