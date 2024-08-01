@@ -1,79 +1,76 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('weather')
-		.setDescription('Get the current weather for a location.')
+		.setDescription('Gets the current weather for a specified city')
 		.addStringOption(option =>
 			option
-				.setName('location')
-				.setDescription('The location for which you want the weather.')
+				.setName('city')
+				.setDescription('The city you want to get the weather for')
 				.setRequired(true)
-		)
-		.addStringOption(option =>
-			option
-				.setName('temperature')
-				.setDescription('Choose the temperature format.')
-				.setRequired(true)
-				.addChoices({ name: 'Fahrenheit', value: 'F' }, { name: 'Celsius', value: 'C' })
 		),
 	category: 'utility',
 	async execute(interaction) {
-		const location = interaction.options.getString('location');
-		const temperatureFormat = interaction.options.getString('temperature');
+		const city = interaction.options.getString('city');
+		const apiKey = process.env.WEATHER_API_KEY; // Replace with your WeatherAPI key
 
 		try {
-			const response = await axios.get(
-				`https://api.weatherapi.com/v1/current.json?key=ea32f85feec2496aac1152011231112&q=${encodeURIComponent(location)}&aqi=no`
-			);
-			const weatherData = response.data;
+			const response = await axios.get(`https://api.weatherapi.com/v1/current.json`, {
+				params: {
+					key: apiKey,
+					q: city,
+				},
+			});
 
-			let temp = weatherData.current.temp_c;
-			if (temperatureFormat === 'F') {
-				temp = weatherData.current.temp_f;
-			}
-			let feel = weatherData.current.feelslike_c;
-			if (temperatureFormat === 'F') {
-				feel = weatherData.current.feelslike_f;
-			}
-			const type = weatherData.current.condition.text;
-			const name = weatherData.location.name;
-			const icon = weatherData.current.condition.icon;
-			const wind = weatherData.current.wind_mph;
-			const pressure = weatherData.current.pressure_mb;
+			const weather = response.data;
+			const {
+				temp_c,
+				temp_f,
+				feelslike_c,
+				feelslike_f,
+				humidity,
+				wind_kph,
+				wind_mph,
+				wind_degree,
+				wind_dir,
+				pressure_mb,
+				precip_mm,
+				cloud,
+				uv,
+				vis_km,
+				vis_miles,
+			} = weather.current;
+
+			const { name, region, country, localtime } = weather.location;
+			const { text: condition, icon } = weather.current.condition;
 
 			const embed = new EmbedBuilder()
-				.setColor('Blue')
-				.setTitle(`Current weather of ${name}`)
+				.setTitle(`Weather in ${name}, ${region}, ${country}`)
+				.setDescription(`**${condition}**`)
+				.setThumbnail(`https:${icon}`)
 				.addFields(
-					{
-						name: 'Temperature',
-						value: `${temp}°${temperatureFormat}`,
-						inline: true,
-					},
-					{
-						name: 'Feels Like',
-						value: `${feel}°${temperatureFormat}`,
-						inline: true,
-					},
-					{ name: 'Weather', value: `${type}`, inline: true },
-					{ name: 'Pressure', value: `${pressure} mb`, inline: true },
-					{
-						name: 'Wind Speed, Angle & Direction',
-						value: `${wind} mph at angle of ${weatherData.current.wind_degree}° in ${weatherData.current.wind_dir}`,
-						inline: true,
-					}
+					{ name: 'Temperature', value: `${temp_c} °C / ${temp_f} °F`, inline: true },
+					{ name: 'Feels Like', value: `${feelslike_c} °C / ${feelslike_f} °F`, inline: true },
+					{ name: 'Humidity', value: `${humidity}%`, inline: true },
+					{ name: 'Wind Speed', value: `${wind_kph} kph / ${wind_mph} mph`, inline: true },
+					{ name: 'Wind Direction', value: `${wind_degree}° ${wind_dir}`, inline: true },
+					{ name: 'Pressure', value: `${pressure_mb} mb`, inline: true },
+					{ name: 'Precipitation', value: `${precip_mm} mm`, inline: true },
+					{ name: 'Cloud Cover', value: `${cloud}%`, inline: true },
+					{ name: 'UV Index', value: `${uv}`, inline: true },
+					{ name: 'Visibility', value: `${vis_km} km / ${vis_miles} miles`, inline: true },
+					{ name: 'Local Time', value: `${localtime}`, inline: true },
 				)
-				.setThumbnail(`https:${icon}`);
+				.setFooter({ text: 'Powered by WeatherAPI', iconURL: 'https://www.weatherapi.com/favicon.ico' })
+				.setColor('#00aaff');
 
-			await interaction.reply({ content: '', embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error(error);
-			await interaction.reply({
-				content: 'An error occurred while fetching the weather data.',
-				ephemeral: true,
-			});
+			await interaction.reply('Could not fetch the weather. Please make sure the city name is correct.');
 		}
 	},
 };
