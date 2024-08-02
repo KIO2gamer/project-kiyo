@@ -37,7 +37,7 @@ module.exports = {
 		.addBooleanOption(option =>
 			option.setName('random').setDescription('Fetch a random photo')
 		),
-	category: 'fun',
+	category: 'utility',
 	async execute(interaction) {
 		const query = interaction.options.getString('query');
 		const count = interaction.options.getInteger('count') || 1;
