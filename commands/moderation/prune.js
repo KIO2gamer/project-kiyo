@@ -27,18 +27,18 @@ module.exports = {
 		const userId = userOption.id;
 		const amount = amountOption;
 
+		// Defer the reply to give more time for processing
+		await interaction.deferReply({ ephemeral: true });
+
 		try {
-			const fetchedMessages = await interaction.channel.messages.fetch({
-				limit: 100,
-			});
+			const fetchedMessages = await interaction.channel.messages.fetch({ limit: 100 });
 			const userMessages = fetchedMessages
 				.filter(message => message.author.id === userId)
 				.first(amount);
 
 			if (userMessages.length === 0) {
-				return interaction.reply({
+				return interaction.editReply({
 					content: `No messages found from ${userOption.username}`,
-					ephemeral: true,
 				});
 			}
 
@@ -49,7 +49,7 @@ module.exports = {
 				.setTitle('Purge Successful')
 				.setDescription(`Pruned ${userMessages.length} messages from <@${userId}>`);
 
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.editReply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Failed to prune messages:', error);
 
@@ -60,7 +60,7 @@ module.exports = {
 					`Failed to prune messages from <@${userId}>\nError: \`${error.message}\``
 				);
 
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.editReply({ embeds: [embed] });
 		}
 	},
 };

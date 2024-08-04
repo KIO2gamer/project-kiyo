@@ -10,10 +10,7 @@ module.exports = {
 				.setName('option')
 				.setDescription('Did you watch Skibidi Toilet?')
 				.setRequired(true)
-				.addChoices(
-					{ name: 'Yes', value: 'yes' },
-					{ name: 'No', value: 'no' }
-				)
+				.addChoices({ name: 'Yes', value: 'yes' }, { name: 'No', value: 'no' })
 		),
 	category: 'fun',
 	async execute(interaction) {
@@ -36,10 +33,14 @@ module.exports = {
 				await interaction.editReply({ embeds: [embed] });
 			} catch (error) {
 				console.error('Error fetching GIF:', error);
-				await interaction.editReply('***Failed to fetch Skibidi powers GIF. Please try again later.***');
+				await interaction.editReply(
+					'***Failed to fetch Skibidi powers GIF. Please try again later.***'
+				);
 			}
 		} else {
-			await interaction.editReply('***You are not worthy enough to wield the powers, mortal***');
+			await interaction.editReply(
+				'***You are not worthy enough to wield the powers, mortal***'
+			);
 		}
 	},
 };

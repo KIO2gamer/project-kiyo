@@ -21,23 +21,21 @@ module.exports = {
 			return permName ? permName.replace(/_/g, ' ').toLowerCase() : perm;
 		});
 
-		const embed = new EmbedBuilder()
-			.setTitle(`Role Info: ${role.name}`)
-			.addFields(
-				{ name: 'Role ID', value: role.id, inline: true },
-				{ name: 'Role Color', value: role.hexColor, inline: true },
-				{
-					name: 'Role Permissions',
-					value: permissions.length > 0 ? permissions.join('\n') : 'No permissions',
-					inline: true,
-				},
-				{ name: 'Role Created At', value: role.createdAt.toDateString(), inline: true },
-				{
-					name: 'Number of Members with Role',
-					value: role.members.size.toString(),
-					inline: true,
-				}
-			);
+		const embed = new EmbedBuilder().setTitle(`Role Info: ${role.name}`).addFields(
+			{ name: 'Role ID', value: role.id, inline: true },
+			{ name: 'Role Color', value: role.hexColor, inline: true },
+			{
+				name: 'Role Permissions',
+				value: permissions.length > 0 ? permissions.join('\n') : 'No permissions',
+				inline: true,
+			},
+			{ name: 'Role Created At', value: role.createdAt.toDateString(), inline: true },
+			{
+				name: 'Number of Members with Role',
+				value: role.members.size.toString(),
+				inline: true,
+			}
+		);
 
 		await interaction.reply({ embeds: [embed] });
 	},

@@ -15,10 +15,7 @@ module.exports = {
 		.setName('translate')
 		.setDescription('Translates the text into the desired output language.')
 		.addStringOption(option =>
-			option
-				.setName('input')
-				.setDescription('The text to be translated.')
-				.setRequired(true)
+			option.setName('input').setDescription('The text to be translated.').setRequired(true)
 		)
 		.addStringOption(option =>
 			option

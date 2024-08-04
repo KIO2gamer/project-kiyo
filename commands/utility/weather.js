@@ -53,24 +53,41 @@ module.exports = {
 				.setThumbnail(`https:${icon}`)
 				.addFields(
 					{ name: 'Temperature', value: `${temp_c} °C / ${temp_f} °F`, inline: true },
-					{ name: 'Feels Like', value: `${feelslike_c} °C / ${feelslike_f} °F`, inline: true },
+					{
+						name: 'Feels Like',
+						value: `${feelslike_c} °C / ${feelslike_f} °F`,
+						inline: true,
+					},
 					{ name: 'Humidity', value: `${humidity}%`, inline: true },
-					{ name: 'Wind Speed', value: `${wind_kph} kph / ${wind_mph} mph`, inline: true },
+					{
+						name: 'Wind Speed',
+						value: `${wind_kph} kph / ${wind_mph} mph`,
+						inline: true,
+					},
 					{ name: 'Wind Direction', value: `${wind_degree}° ${wind_dir}`, inline: true },
 					{ name: 'Pressure', value: `${pressure_mb} mb`, inline: true },
 					{ name: 'Precipitation', value: `${precip_mm} mm`, inline: true },
 					{ name: 'Cloud Cover', value: `${cloud}%`, inline: true },
 					{ name: 'UV Index', value: `${uv}`, inline: true },
-					{ name: 'Visibility', value: `${vis_km} km / ${vis_miles} miles`, inline: true },
-					{ name: 'Local Time', value: `${localtime}`, inline: true },
+					{
+						name: 'Visibility',
+						value: `${vis_km} km / ${vis_miles} miles`,
+						inline: true,
+					},
+					{ name: 'Local Time', value: `${localtime}`, inline: true }
 				)
-				.setFooter({ text: 'Powered by WeatherAPI', iconURL: 'https://www.weatherapi.com/favicon.ico' })
+				.setFooter({
+					text: 'Powered by WeatherAPI',
+					iconURL: 'https://www.weatherapi.com/favicon.ico',
+				})
 				.setColor('#00aaff');
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error(error);
-			await interaction.reply('Could not fetch the weather. Please make sure the city name is correct.');
+			await interaction.reply(
+				'Could not fetch the weather. Please make sure the city name is correct.'
+			);
 		}
 	},
 };
