@@ -1,11 +1,17 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField, ActivityType } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	PermissionsBitField,
+	ActivityType,
+} = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('userinfo')
 		.setDescription('Displays information about a user.')
 		.addUserOption(option =>
-			option.setName('target')
+			option
+				.setName('target')
 				.setDescription('The user to get information about')
 				.setRequired(false)
 		),
@@ -15,7 +21,8 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(user.id);
 
 		// Determine discriminator availability
-		let discrim = user.discriminator === '0' ? 'Not available for users' : `#${user.discriminator}`;
+		let discrim =
+			user.discriminator === '0' ? 'Not available for users' : `#${user.discriminator}`;
 
 		// User's presence status
 		const presence = member.presence?.status || 'offline';
@@ -30,43 +37,58 @@ module.exports = {
 		const joinedAt = `<t:${Math.floor(member.joinedTimestamp / 1000)}:F>`;
 
 		// User's permissions in the server
-		const permissions = member.permissions.toArray().map(perm => {
-			return PermissionsBitField.resolve(perm) === 0 ? '' : perm.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-		}).join('\n') || 'No permissions';
+		const permissions =
+			member.permissions
+				.toArray()
+				.map(perm => {
+					return PermissionsBitField.resolve(perm) === 0
+						? ''
+						: perm
+								.replace(/_/g, ' ')
+								.toLowerCase()
+								.replace(/\b\w/g, char => char.toUpperCase());
+				})
+				.join('\n') || 'No permissions';
 
 		// User's current activity
 		const activities = member.presence?.activities || [];
-		const activityList = activities.length 
-			? activities.map(activity => {
-				let type;
-				switch (activity.type) {
-					case ActivityType.Playing:
-						type = 'Playing';
-						break;
-					case ActivityType.Streaming:
-						type = 'Streaming';
-						break;
-					case ActivityType.Listening:
-						type = 'Listening';
-						break;
-					case ActivityType.Watching:
-						type = 'Watching';
-						break;
-					case ActivityType.Competing:
-						type = 'Competing';
-						break;
-					default:
-						type = 'Unknown';
-				}
-				return `${type}: ${activity.name}`;
-			}).join('\n')
+		const activityList = activities.length
+			? activities
+					.map(activity => {
+						let type;
+						switch (activity.type) {
+							case ActivityType.Playing:
+								type = 'Playing';
+								break;
+							case ActivityType.Streaming:
+								type = 'Streaming';
+								break;
+							case ActivityType.Listening:
+								type = 'Listening';
+								break;
+							case ActivityType.Watching:
+								type = 'Watching';
+								break;
+							case ActivityType.Competing:
+								type = 'Competing';
+								break;
+							default:
+								type = 'Unknown';
+						}
+						return `${type}: ${activity.name}`;
+					})
+					.join('\n')
 			: 'None';
 
 		// Is the user a server booster?
-		const isBooster = member.premiumSince ? `<t:${Math.floor(member.premiumSinceTimestamp / 1000)}:F>` : 'No';
+		const isBooster = member.premiumSince
+			? `<t:${Math.floor(member.premiumSinceTimestamp / 1000)}:F>`
+			: 'No';
 
 		// List of user's devices (Desktop, Mobile, Web)
-		const clientStatus = member.presence?.clientStatus ? Object.keys(member.presence.clientStatus).join(', ') : 'Unknown';
+		const clientStatus = member.presence?.clientStatus
+			? Object.keys(member.presence.clientStatus).join(', ')
+			: 'Unknown';
 
 		// User's display color (role color)
 		const displayColor = highestRole.hexColor !== '#000000' ? highestRole.hexColor : 'Default';
