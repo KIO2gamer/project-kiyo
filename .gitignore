@@ -1,4 +1,3 @@
 .env
 .prettierrc
-error.log
 node_modules
