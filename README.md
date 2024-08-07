@@ -3,7 +3,7 @@
  <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
 </p>
 
-<h3 align="center">Kiyo - All in One Discord Bot</h3>
+<h3 align="center">Kiyo - Multipurpose Discord Bot</h3>
 
 <div align="center">
 
@@ -138,7 +138,7 @@ We welcome all contributions to make Kiyo even better!
 
 - [@KIO2gamer](https://github.com/KIO2gamer) - Initial Work and Idea
 
-## 🎉 Acknowledgments <a name = "authors"></a>
+## 🎉 Acknowledgments <a name = "acknowledgments"></a>
 
 - A big thank you to the Discord.js community for the fantastic library and support.
 - Thanks to all the contributors (Use `/credits` in Discord) who have helped make Kiyo possible!
