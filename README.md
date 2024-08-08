@@ -84,11 +84,19 @@ These instructions will get you a copy of the project up and running on your loc
 3. **Configuration:**
 
     1. Create a .env file in the root directory of the project.
-    2. Add the following to your .env file, replacing the placeholders with your actual credentials:
+    2. Add the following to your .env file, replacing the `<1>` with your actual credentials:
 
     ```bash
-    TOKEN=YOUR_DISCORD_BOT_TOKEN
-    MONGODB_URI=YOUR_MONGODB_CONNECTION_URI
+    DISCORD_TOKEN=<1>
+    MONGODB_URL=<1>
+    GEMINI_API_KEY=<1>
+    CLIENT_ID=<1>
+    GUILD_IDS=<1>
+    TENOR_API_KEY=<1>
+    PEXELS_API_KEY=<1>
+    WEATHER_API_KEY=<1>
+    GIPHY_API_KEY=<1>
+    GIANT_BOMB_API_KEY=<1>
     ```
 
 4. **Start the bot:**
