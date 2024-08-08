@@ -23,6 +23,8 @@
 -   [About](#about)
 -   [Features](#features)
 -   [Getting Started](#getting_started)
+    -   [Prerequisites](#prerequisites)
+    -   [Installing](#installing)
 -   [Commands](#commands)
 -   [Built Using](#built_using)
 -   [Contributing](#contributing)
@@ -55,7 +57,7 @@ Here are some of Kiyo's key features:
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+### Prerequisites <a name = "prerequisites"></a>
 
 -   **Node.js and npm:** You'll need Node.js (version 16.6.0 or higher recommended) and npm installed. You can download them from [https://nodejs.org/](https://nodejs.org/).
 -   **MongoDB Account:** You'll need a free MongoDB Atlas account to store your bot's data. Sign up at [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
@@ -90,7 +92,7 @@ These instructions will get you a copy of the project up and running on your loc
        - The Giant Bomb API key is used to fetch video game information.
        - Sign up at [Giant Bomb](https://www.giantbomb.com/api) and generate an API key.
 
-### Installing
+### Installing <a name = "installing"></a>
 
 1. **Clone the Repository:**
 
