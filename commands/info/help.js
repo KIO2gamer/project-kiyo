@@ -5,23 +5,13 @@ const {
 	ButtonStyle,
 	ActionRowBuilder,
 } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Displays all commands or info about a specific command')
-		.addStringOption(option =>
-			option
-				.setName('category')
-				.setRequired(false)
-				.setDescription('What command category do you want to view?')
-				.addChoices(
-					{ name: 'Fun', value: 'fun' },
-					{ name: 'Info', value: 'info' },
-					{ name: 'Moderation', value: 'moderation' },
-					{ name: 'Utility', value: 'utility' }
-				)
-		)
 		.addStringOption(option =>
 			option
 				.setName('search')
@@ -36,73 +26,111 @@ module.exports = {
 		const category = interaction.options.getString('category');
 		const searchQuery = interaction.options.getString('search')?.toLowerCase();
 
-		// Pre-fetch all necessary data 
-		const guildCommands = await guild.commands.fetch(); 
-        
-		// Use a map for faster lookups (optional but improves performance)
-		const commandsByCategory = new Map([
-			['fun', []],
-			['information', []],
-			['moderation', []],
-			['utility', []],
-		]);
+		const guildCommands = await guild.commands.fetch(); // Fetch commands for this guild
+		const commandsDirectory = path.join(__dirname, '..');
+		const categoryFolders = fs
+			.readdirSync(commandsDirectory)
+			.filter(dir => fs.statSync(path.join(commandsDirectory, dir)).isDirectory());
 
-		// Populate the map in a single loop for efficiency 
-		guildCommands.forEach(command => {
-			const commandData = client.commands.get(command.name);
-			if (commandData && commandsByCategory.has(commandData.category)) {
-				commandsByCategory.get(commandData.category).push({
-					id: command.id,
-					name: command.name,
-					description: command.description,
+		const commandsByCategory = new Map();
+		for (const category of categoryFolders) {
+			commandsByCategory.set(category, []);
+
+			const commandFiles = fs
+				.readdirSync(path.join(commandsDirectory, category))
+				.filter(file => file.endsWith('.js'));
+
+			for (const file of commandFiles) {
+				const filePath = path.join(commandsDirectory, category, file);
+				const command = require(filePath);
+				commandsByCategory.get(category).push({
+					id: guildCommands.find(c => c.name === command.data.name).id,
+					name: command.data.name,
+					description: command.data.description,
 				});
 			}
-		});
+		}
 
-		// Create a function to build embeds with command lists 
+		const categoryChoices = Array.from(commandsByCategory.keys()).map(category => ({
+			name: category.charAt(0).toUpperCase() + category.slice(1),
+			value: category,
+		}));
+
+		// Dynamically Add & Re-Register 'category' Option
+		this.data.addStringOption(option =>
+			option
+				.setName('category')
+				.setRequired(false)
+				.setDescription('What command category do you want to view?')
+				.addChoices(...categoryChoices)
+		);
+
+		try {
+			// 1. Get the command ID:
+			const existingCommand = await guild.commands.cache.find(c => c.name === this.data.name);
+
+			if (!existingCommand) {
+				console.error(
+					"Command not found in cache for editing. This might mean it hasn't been registered yet."
+				);
+				return; // Or handle this case differently
+			}
+
+			// 2. Use the command ID to edit:
+			await guild.commands.edit(existingCommand.id, this.data);
+
+			console.log('Successfully re-registered command to update category options');
+		} catch (error) {
+			console.error('Error registering command:', error);
+			// ... error handling ...
+		}
+
 		const createCommandListEmbed = (commands, title, color) => {
-			const embed = new EmbedBuilder()
-				.setColor(color)
-				.setTitle(title)
-				.setTimestamp();
+			const embed = new EmbedBuilder().setColor(color).setTitle(title).setTimestamp();
 
-			// Efficiently split command lists into multiple fields
 			const fieldValueMaxLength = 1024;
 			let currentFieldValue = '';
 
-			commands.forEach(cmd => {
-				const cmdStr = `</${cmd.name}:${cmd.id}> - ${cmd.description}\n`;
+			commands.forEach((cmd, index) => {
+				const cmdStr = `> \`${index + 1}.\` </${cmd.name}:${
+					cmd.id
+				}> - ${cmd.description}\n`;
+
 				if (currentFieldValue.length + cmdStr.length <= fieldValueMaxLength) {
 					currentFieldValue += cmdStr;
 				} else {
-					embed.addFields({ name: '\u200B', value: currentFieldValue });
+					embed.addFields({
+						name: currentFieldValue.length > 0 ? '\u200B' : title, // Only add title to the first field
+						value: currentFieldValue,
+					});
 					currentFieldValue = cmdStr;
 				}
 			});
 
 			if (currentFieldValue.length > 0) {
-				embed.addFields({ name: '\u200B', value: currentFieldValue });
+				embed.addFields({
+					name: '\u200B', // Subsequent fields have empty names
+					value: currentFieldValue,
+				});
 			}
 
 			return embed;
 		};
 
-        // Create embeds only when needed 
-
-        if (searchQuery) {
-            const searchResults = [];
+		if (searchQuery) {
+			const searchResults = [];
 			if (category) {
-                commandsByCategory.get(category).forEach(cmd => {
+				commandsByCategory.get(category).forEach(cmd => {
 					if (
 						cmd.name.toLowerCase().includes(searchQuery) ||
 						cmd.description.toLowerCase().includes(searchQuery)
 					) {
 						searchResults.push(cmd);
 					}
-				}); 
+				});
 			} else {
-                for (const commands of commandsByCategory.values()) { 
-                    commands.forEach(cmd => {
+				for (const commands of commandsByCategory.values()) {
+					commands.forEach(cmd => {
 						if (
 							cmd.name.toLowerCase().includes(searchQuery) ||
 							cmd.description.toLowerCase().includes(searchQuery)
@@ -113,59 +141,46 @@ module.exports = {
 				}
 			}
 
-            const searchEmbed = createCommandListEmbed(searchResults, `🔍 Search Results: ${searchQuery}`, '#f39c12')
-				.setFooter({
-					text: `Requested by ${interaction.user.tag}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-				}); 
-            return await interaction.editReply({ embeds: [searchEmbed] }); 
-        }
+			const searchEmbed = createCommandListEmbed(
+				searchResults,
+				`🔍 Search Results for "${searchQuery}"`,
+				'#f39c12'
+			).setFooter({
+				text: `Requested by ${interaction.user.tag}`,
+				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+			});
+			return await interaction.editReply({ embeds: [searchEmbed] });
+		}
 
-
-		if (!category) { 
-			const mainMenuEmbed = new EmbedBuilder() 
+		if (!category) {
+			const mainMenuEmbed = new EmbedBuilder()
 				.setColor('#2ecc71')
+				.setTitle('Kiyo Bot Help Desk')
 				.setDescription(
-					'`/help [category] - View commands in a specific category`\n`/help [search] - Search commands from all categories`\n`/help [category] [search] - Search commands from a specific category`'
+					'Explore my commands using the buttons below! \n Use `/help [category]` to directly view a category, or `/help [search]` to search for commands.'
 				)
-				.setAuthor({
-					name: 'Kiyo Bot HelpDesk',
-					iconURL: interaction.client.user.avatarURL(),
-				})
 				.setThumbnail(interaction.client.user.avatarURL())
-				.addFields([
-					{
-						name: '📂 Categories',
-						value: Array.from(commandsByCategory.keys())
-							.map(
-								key =>
-									`> **${key.charAt(0).toUpperCase() + key.slice(1)}**\n`
-							)
-							.join('\n'),
-					},
-				])
 				.setFooter({
 					text: `Requested by ${interaction.user.tag}`,
 					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 				})
 				.setTimestamp();
 
-			const cmdListButton = new ButtonBuilder()
-				.setLabel('📜 Command List')
-				.setStyle(ButtonStyle.Secondary)
-				.setCustomId('cmdList');
+			const categoryButtons = Array.from(commandsByCategory.keys()).map((category, index) =>
+				new ButtonBuilder()
+					.setCustomId(`help-${category}`)
+					.setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+					.setStyle(ButtonStyle.Primary)
+			);
 
-			const mainMenuBtn = new ButtonBuilder()
-				.setLabel('🏠 Home')
-				.setStyle(ButtonStyle.Secondary)
-				.setCustomId('home');
-
-			const rowWithCmdBtn = new ActionRowBuilder().addComponents(cmdListButton);
-			const rowWithHomeBtn = new ActionRowBuilder().addComponents(mainMenuBtn);
+			const rows = [];
+			for (let i = 0; i < categoryButtons.length; i += 5) {
+				rows.push(new ActionRowBuilder().addComponents(categoryButtons.slice(i, i + 5)));
+			}
 
 			const reply = await interaction.editReply({
 				embeds: [mainMenuEmbed],
-				components: [rowWithCmdBtn],
+				components: rows,
 			});
 
 			const collector = reply.createMessageComponentCollector({
@@ -173,72 +188,55 @@ module.exports = {
 			});
 
 			collector.on('collect', async i => {
-				if (i.user.id !== interaction.user.id) { 
+				if (i.user.id !== interaction.user.id) {
 					return await i.reply({
 						content: 'You should run the command to use this interaction.',
 						ephemeral: true,
-					}); 
-				}
-				if (i.customId === 'cmdList') {
-					// Flatten the map's values into a single array safely 
-					const allCommands = [];
-					for (const commands of commandsByCategory.values()) {
-						if (commands) { 
-							allCommands.push(...commands);
-						}
-					}
-		
-					const cmdListEmbed = createCommandListEmbed(
-						allCommands, // Pass the flattened array 
-						'📜 Command List', 
-						'#3498db'
-					).setFooter({
-						text: `Requested by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-					}); 
-					await i.update({
-						embeds: [cmdListEmbed],
-						components: [rowWithHomeBtn],
 					});
 				}
-				if (i.customId === 'home') {
-					await i.update({
-						embeds: [mainMenuEmbed],
-						components: [rowWithCmdBtn],
-					});
-				}
+
+				const requestedCategory = i.customId.replace('help-', '');
+				const commands = commandsByCategory.get(requestedCategory) || [];
+
+				const embed = createCommandListEmbed(
+					commands,
+					`Commands: ${
+						requestedCategory.charAt(0).toUpperCase() + requestedCategory.slice(1)
+					}`,
+					'#e74c3c'
+				).setFooter({
+					text: `Requested by ${i.user.tag}`,
+					iconURL: i.user.displayAvatarURL({ dynamic: true }),
+				});
+
+				await i.update({ embeds: [embed], components: [] });
 			});
 
-			collector.on('end', async (collected, reason) => {
-				if (reason === 'time') {
-					await reply.edit({ components: [] });
-				}
+			collector.on('end', () => {
+				reply.edit({ components: [] });
 			});
 
 			return;
 		}
 
-        // Handle category display here 
-        if (commandsByCategory.has(category)) {
-            const commands = commandsByCategory.get(category);
+		if (commandsByCategory.has(category)) {
+			const commands = commandsByCategory.get(category);
 			const embed = createCommandListEmbed(
-			    commands,
-                `${category.charAt(0).toUpperCase() + category.slice(1)} Commands`, 
-                '#e74c3c'
-            ) 
-			.setFooter({
+				commands,
+				`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`,
+				'#e74c3c'
+			).setFooter({
 				text: `Requested by ${interaction.user.tag}`,
 				iconURL: interaction.user.displayAvatarURL({
 					dynamic: true,
 				}),
 			});
-			return await interaction.editReply({ embeds: [embed] }); 
-        } else { 
-            // Invalid Category Handling
+			return await interaction.editReply({ embeds: [embed] });
+		} else {
 			await interaction.editReply({
 				content: 'Invalid category.',
 				ephemeral: true,
-			}); 
-        } 
+			});
+		}
 	},
 };
