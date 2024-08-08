@@ -27,15 +27,39 @@ module.exports = {
 					.setDescription(game.deck || 'No description available')
 					.setThumbnail(game.image ? game.image.small_url : null)
 					.addFields(
-						{ name: 'Genres', value: game.genres ? game.genres.map(g => g.name).join(', ') : 'N/A', inline: true },
-						{ name: 'Release Date', value: game.original_release_date || 'Unknown', inline: true },
-						{ name: 'Rating', value: game.original_game_rating ? game.original_game_rating.map(r => r.name).join(', ') : 'No rating available', inline: true },
-						{ name: 'Platforms', value: game.platforms ? game.platforms.map(p => p.name).join(', ') : 'N/A', inline: true },
-						{ name: 'Site Detail URL', value: `[Link](${game.site_detail_url})`, inline: true }
+						{
+							name: 'Genres',
+							value: game.genres ? game.genres.map(g => g.name).join(', ') : 'N/A',
+							inline: true,
+						},
+						{
+							name: 'Release Date',
+							value: game.original_release_date || 'Unknown',
+							inline: true,
+						},
+						{
+							name: 'Rating',
+							value: game.original_game_rating
+								? game.original_game_rating.map(r => r.name).join(', ')
+								: 'No rating available',
+							inline: true,
+						},
+						{
+							name: 'Platforms',
+							value: game.platforms
+								? game.platforms.map(p => p.name).join(', ')
+								: 'N/A',
+							inline: true,
+						},
+						{
+							name: 'Site Detail URL',
+							value: `[Link](${game.site_detail_url})`,
+							inline: true,
+						}
 					)
 					.setFooter({
 						text: `Requested by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 					})
 					.setTimestamp();
 

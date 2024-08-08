@@ -18,11 +18,11 @@ module.exports = {
 
 		if (option === 'yes') {
 			await interaction.reply('Skibidi powers activated successfully ✅');
-			await interaction.channel.send('https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344' )
-		} else {
-			await interaction.reply(
-				'***You are not worthy enough to wield the powers, mortal***'
+			await interaction.channel.send(
+				'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344'
 			);
+		} else {
+			await interaction.reply('***You are not worthy enough to wield the powers, mortal***');
 		}
 	},
 };
