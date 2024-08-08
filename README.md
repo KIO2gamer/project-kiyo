@@ -109,11 +109,11 @@ These instructions will get you a copy of the project up and running on your loc
     Create a .env file in the root directory of the project and add the following to your .env file, replacing the `<1>` with your actual credentials:
 
     ```bash
-    DISCORD_TOKEN=<1>
+    DISCORD_TOKEN=<1>    // The secret Bot token
     MONGODB_URL=<1>
     GEMINI_API_KEY=<1>
-    CLIENT_ID=<1>
-    GUILD_IDS=<1>
+    CLIENT_ID=<1>        // Discord User/Client ID
+    GUILD_IDS=<1>        // The server ID(s)
     TENOR_API_KEY=<1>
     PEXELS_API_KEY=<1>
     WEATHER_API_KEY=<1>
@@ -181,3 +181,4 @@ We welcome all contributions to make Kiyo even better!
 
 -   A big thank you to the Discord.js community for the fantastic library and support.
 -   Thanks to all the contributors (Use `/credits` in Discord) who have helped make Kiyo possible!
+-   Thanks to ChatGPT's custom GPT, Discord Bot Builder, for optimizing and giving more suggestions to the errors I've encountered.
