@@ -43,15 +43,12 @@ Here are some of Kiyo's key features:
     -   Kicking/banning users
     -   Managing roles
     -   Deleting messages in bulk
-    -   Setting up custom welcome messages
 -   **Fun & Games:** Engage your community with:
     -   Fun commands (e.g., 8ball, dice rolling, memes)
     -   Mini-games
 -   **Utility:** Make life easier with:
-    -   Information lookup (weather, definitions)
-    -   Reminders
+    -   Information lookup (weather, translation)
     -   Polls
-    -   Custom command creation
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
