@@ -82,9 +82,7 @@ These instructions will get you a copy of the project up and running on your loc
     ```
 
 3. **Configuration:**
-
-    1. Create a .env file in the root directory of the project.
-    2. Add the following to your .env file, replacing the `<1>` with your actual credentials:
+    Create a .env file in the root directory of the project and add the following to your .env file, replacing the `<1>` with your actual credentials:
 
     ```bash
     DISCORD_TOKEN=<1>
