@@ -5,10 +5,7 @@ module.exports = {
 		.setName('create_poll')
 		.setDescription('Create a poll')
 		.addStringOption(option =>
-			option
-				.setName('question')
-				.setDescription('The question of the poll')
-				.setRequired(true)
+			option.setName('question').setDescription('The question of the poll').setRequired(true)
 		)
 		.addStringOption(option =>
 			option
@@ -32,7 +29,10 @@ module.exports = {
 	async execute(interaction) {
 		try {
 			const question = interaction.options.getString('question');
-			const options = interaction.options.getString('options').split(',').map(option => option.trim());
+			const options = interaction.options
+				.getString('options')
+				.split(',')
+				.map(option => option.trim());
 			const multiSelect = interaction.options.getBoolean('multi_select');
 			let duration = interaction.options.getInteger('duration');
 

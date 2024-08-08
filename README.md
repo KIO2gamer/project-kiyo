@@ -31,25 +31,25 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Kiyo is built to be a jack-of-all-trades, aiming to provide a little something for everyone.  It's built with [Discord.js](https://discord.js.org/) and utilizes a [MongoDB](https://www.mongodb.com/) database for persistent storage. 
+Kiyo is built to be a jack-of-all-trades, aiming to provide a little something for everyone. It's built with [Discord.js](https://discord.js.org/) and utilizes a [MongoDB](https://www.mongodb.com/) database for persistent storage.
 
-## ✨ Features  <a name = "features"></a>
+## ✨ Features <a name = "features"></a>
 
 Here are some of Kiyo's key features:
 
-- **Moderation:** Keep your server clean and organized with commands for:
-    - Kicking/banning users
-    - Managing roles
-    - Deleting messages in bulk
-    - Setting up custom welcome messages
-- **Fun & Games:** Engage your community with:
-    - Fun commands (e.g., 8ball, dice rolling, memes)
-    - Mini-games 
-- **Utility:** Make life easier with:
-    - Information lookup (weather, definitions)
-    - Reminders 
-    - Polls 
-    - Custom command creation 
+-   **Moderation:** Keep your server clean and organized with commands for:
+    -   Kicking/banning users
+    -   Managing roles
+    -   Deleting messages in bulk
+    -   Setting up custom welcome messages
+-   **Fun & Games:** Engage your community with:
+    -   Fun commands (e.g., 8ball, dice rolling, memes)
+    -   Mini-games
+-   **Utility:** Make life easier with:
+    -   Information lookup (weather, definitions)
+    -   Reminders
+    -   Polls
+    -   Custom command creation
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -57,57 +57,61 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- **Node.js and npm:**  You'll need Node.js (version 16.6.0 or higher recommended) and npm installed. You can download them from [https://nodejs.org/](https://nodejs.org/).
-- **MongoDB Account:** You'll need a free MongoDB Atlas account to store your bot's data. Sign up at [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
-- **Discord Bot Application:**  Follow these steps to create a Discord bot application and get your bot token:
+-   **Node.js and npm:** You'll need Node.js (version 16.6.0 or higher recommended) and npm installed. You can download them from [https://nodejs.org/](https://nodejs.org/).
+-   **MongoDB Account:** You'll need a free MongoDB Atlas account to store your bot's data. Sign up at [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
+-   **Discord Bot Application:** Follow these steps to create a Discord bot application and get your bot token:
     1. Go to the Discord Developer Portal: [https://discord.com/developers/applications](https://discord.com/developers/applications)
     2. Click on "New Application" and give your application a name.
     3. Go to the "Bot" tab within your application settings.
-    4. Click on "Add Bot" and confirm. 
-    5. **Keep your bot token secret!** This is like a password for your bot. 
+    4. Click on "Add Bot" and confirm.
+    5. **Keep your bot token secret!** This is like a password for your bot.
 
 ### Installing
 
 1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/KIO2gamer/discordbot.git
-   cd discordbot
-   ```
+
+    ```bash
+    git clone https://github.com/KIO2gamer/discordbot.git
+    cd discordbot
+    ```
 
 2. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
 
-3. **Configuration:** 
-   1. Create a .env file in the root directory of the project.
-   2. Add the following to your .env file, replacing the placeholders with your actual credentials:
-   ```bash
-   TOKEN=YOUR_DISCORD_BOT_TOKEN
-   MONGODB_URI=YOUR_MONGODB_CONNECTION_URI
-   ```
+    ```bash
+    npm install
+    ```
+
+3. **Configuration:**
+
+    1. Create a .env file in the root directory of the project.
+    2. Add the following to your .env file, replacing the placeholders with your actual credentials:
+
+    ```bash
+    TOKEN=YOUR_DISCORD_BOT_TOKEN
+    MONGODB_URI=YOUR_MONGODB_CONNECTION_URI
+    ```
 
 4. **Start the bot:**
-   ```bash
-   npm run
-   ```
-   For development (with hot-reloading):
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    npm run
+    ```
+    For development (with hot-reloading):
+    ```bash
+    npm run dev
+    ```
 
 ## 🎮 Commands <a name = "commands"></a>
 
 Kiyo uses slash commands (introduced in Discord API v9). Here's a glimpse of Kiyo's command categories:
 
--  **Fun/Entertainment:**
-   |Command|Description|
-   | --- | --- |
-   | /8ball <question\> | Ask the magic 8-ball a question. |
-   | /roll  | Roll a dice with a specified number of sides.|
-   | /meme | Get a random meme.|
+-   **Fun/Entertainment:**
+    |Command|Description|
+    | --- | --- |
+    | /8ball <question\> | Ask the magic 8-ball a question. |
+    | /roll | Roll a dice with a specified number of sides.|
+    | /meme | Get a random meme.|
 
--  **Moderation:**
+-   **Moderation:**
     |Command|Description|
     | --- | --- |
     | /kick \<target> \<reason> | Kick a user from the server.|
@@ -136,9 +140,9 @@ We welcome all contributions to make Kiyo even better!
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@KIO2gamer](https://github.com/KIO2gamer) - Initial Work and Idea
+-   [@KIO2gamer](https://github.com/KIO2gamer) - Initial Work and Idea
 
 ## 🎉 Acknowledgments <a name = "acknowledgments"></a>
 
-- A big thank you to the Discord.js community for the fantastic library and support.
-- Thanks to all the contributors (Use `/credits` in Discord) who have helped make Kiyo possible!
+-   A big thank you to the Discord.js community for the fantastic library and support.
+-   Thanks to all the contributors (Use `/credits` in Discord) who have helped make Kiyo possible!

@@ -4,13 +4,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('fetch_poll_answers')
 		.setDescription('Fetches the answers of the poll.')
-		.addStringOption(option => 
-			option.setName('message_id')
-				.setDescription('Message ID of the poll')
-				.setRequired(true)
+		.addStringOption(option =>
+			option.setName('message_id').setDescription('Message ID of the poll').setRequired(true)
 		)
-		.addChannelOption(option => 
-			option.setName('channel')
+		.addChannelOption(option =>
+			option
+				.setName('channel')
 				.setDescription('Channel where the poll is created')
 				.setRequired(true)
 		),
@@ -19,7 +18,7 @@ module.exports = {
 		try {
 			const messageId = interaction.options.getString('message_id');
 			const channel = interaction.options.getChannel('channel');
-			
+
 			// Fetch the message
 			const message = await channel.messages.fetch(messageId);
 			if (!message || !message.poll) {

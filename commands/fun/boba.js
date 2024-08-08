@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+require('dotenv').config();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,15 +12,15 @@ module.exports = {
 
 		try {
 			const response = await fetch(
-				`https://tenor.googleapis.com/v2/search?q=boba&key=${process.env.TENOR_API_KEY}&limit=10`
+				`https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=boba&limit=20`
 			);
 			const data = await response.json();
 
-			if (data.results && data.results.length > 0) {
-				const randomIndex = Math.floor(Math.random() * data.results.length);
-				const bobaGif = data.results[randomIndex].media_formats.gif.url; // Adjust as necessary for the correct URL
+			if (data.data && data.data.length > 0) {
+				const randomIndex = Math.floor(Math.random() * data.data.length);
+				const bobaGif = data.data[randomIndex].images.original.url;
 
-				const embed = new EmbedBuilder().setTitle('Enjoy your Boba GIF!').setImage(bobaGif);
+				const embed = new EmbedBuilder().setTitle('Enjoy your Boba!').setImage(bobaGif);
 
 				await interaction.editReply({ embeds: [embed] });
 			} else {

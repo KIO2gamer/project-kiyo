@@ -6,17 +6,16 @@ module.exports = {
 		.setDescription('YOUR PC WILL GO BOOM-BOOM.'),
 	category: 'fun',
 	async execute(interaction) {
-		const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('defuse')
-					.setLabel('Defuse')
-					.setStyle(ButtonStyle.Primary),
-				new ButtonBuilder()
-					.setCustomId('detonate')
-					.setLabel('Detonate')
-					.setStyle(ButtonStyle.Danger)
-			);
+		const row = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('defuse')
+				.setLabel('Defuse')
+				.setStyle(ButtonStyle.Primary),
+			new ButtonBuilder()
+				.setCustomId('detonate')
+				.setLabel('Detonate')
+				.setStyle(ButtonStyle.Danger)
+		);
 
 		await interaction.reply({
 			content: `Oh? So you found the secret? Well well well, it's time for your PC to blow up.\nAnd also your Discord account is being reported for finding it illegally ||joke btw||\n||or maybe for real?||`,
@@ -24,19 +23,32 @@ module.exports = {
 		});
 
 		const filter = i => i.customId === 'defuse' || i.customId === 'detonate';
-		const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+		const collector = interaction.channel.createMessageComponentCollector({
+			filter,
+			time: 15000,
+		});
 
 		collector.on('collect', async i => {
 			if (i.customId === 'defuse') {
-				await i.update({ content: 'Phew! You defused the bomb. Your PC is safe... for now.', components: [] });
+				await i.update({
+					content: 'Phew! You defused the bomb. Your PC is safe... for now.',
+					components: [],
+				});
 			} else {
-				await i.update({ content: 'BOOM! Your PC just exploded! 💥 Just kidding... or maybe not? 😜', components: [] });
+				await i.update({
+					content: 'BOOM! Your PC just exploded! 💥 Just kidding... or maybe not? 😜',
+					components: [],
+				});
 			}
 		});
 
 		collector.on('end', collected => {
 			if (!collected.size) {
-				interaction.editReply({ content: 'Time is up! The bomb has been defused automatically. Your PC is safe... for now.', components: [] });
+				interaction.editReply({
+					content:
+						'Time is up! The bomb has been defused automatically. Your PC is safe... for now.',
+					components: [],
+				});
 			}
 		});
 	},

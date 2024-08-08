@@ -20,8 +20,8 @@ module.exports = {
 			'Ayeee',
 			'Nay',
 			'Yessirrrrr',
-			'Nuh uh'
-		  ];
+			'Nuh uh',
+		];
 
 		const embed = new EmbedBuilder()
 			.setDescription(

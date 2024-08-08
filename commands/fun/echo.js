@@ -31,22 +31,26 @@ module.exports = {
 	async execute(interaction) {
 		const input = interaction.options.getString('input');
 		const channel = interaction.options.getChannel('channel');
-		const useEmbed = interaction.options.getBoolean('embed');
+		const useEmbed = interaction.options.getBoolean('embed') || false;
 
 		// Check if the bot has permission to send messages in the target channel
-		// if (!channel || !channel.permissionsFor(interaction.guild.me).has(PermissionFlagsBits.SendMessages)) {
-		//     return interaction.reply({
-		//         content: `I don't have permission to send messages in ${channel}.`,
-		//         ephemeral: true
-		//     });
-		// }
+		if (
+			!channel
+				.permissionsFor(interaction.guild.members.me)
+				.has(PermissionFlagsBits.SendMessages)
+		) {
+			return interaction.reply({
+				content: `I don't have permission to send messages in ${channel}.`,
+				ephemeral: true,
+			});
+		}
 
 		try {
 			if (useEmbed) {
 				const echoEmbed = new EmbedBuilder()
 					.setColor('#0099ff')
 					.setTitle(`Echoed by ${interaction.user.tag}`)
-					.setDescription(`**Message:** ${input}`)
+					.setDescription(input)
 					.setFooter({
 						text: `Echoed by ${interaction.user.tag}`,
 						iconURL: interaction.user.displayAvatarURL({
