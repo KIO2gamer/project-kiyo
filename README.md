@@ -185,4 +185,4 @@ We welcome all contributions to make Kiyo even better!
 
 -   A big thank you to the Discord.js community for the fantastic library and support.
 -   Thanks to all the contributors (Use `/credits` in Discord) who have helped make Kiyo possible!
--   Thanks to ChatGPT's custom GPT, Discord Bot Builder, for optimizing and giving more suggestions to the errors I've encountered.
+-   Thanks to ChatGPT's custom GPT, Discord Bot Builder, and Gemini 1.5 Pro (2B Model) for optimizing and giving more suggestions to the errors I've encountered.
