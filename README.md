@@ -70,25 +70,25 @@ These instructions will get you a copy of the project up and running on your loc
        - Gemini is Google's AI Language. This project uses `gemini-1.5-flash` for the translate command.
        - Get the API Key at [Google AI Studio](https://aistudio.google.com/app/apikey)
          
-    2. Tenor API Key
+    2. **Tenor API Key**
        - The Tenor API key is used to fetch GIFs from the Tenor API.
-       - Sign up at Tenor Developers and create an API key.
+       - Sign up at [Tenor Developers](https://tenor.com/gifapi/documentation) and create an API key.
 
-    3. Pexels API Key
+    3. **Pexels API Key**
        - The Pexels API key is used to fetch high-quality images from Pexels.
-       - Sign up at Pexels and generate an API key.
+       - Sign up at [Pexels](https://www.pexels.com/api/) and generate an API key.
 
-    4. Weather API Key
+    4. **Weather API Key**
        - The Weather API key is used to fetch weather data from a weather API service.
-       - You can get a free API key from services like OpenWeatherMap.
+       - You can get a free API key from [WeatherAPI](https://www.weatherapi.com/docs/).
 
-    5. Giphy API Key
+    5. **Giphy API Key**
        - The Giphy API key is used to fetch GIFs from Giphy.
-       - Sign up at Giphy Developers and create an API key.
+       - Sign up at [Giphy Developers](https://developers.giphy.com/docs/api/) and create an API key.
 
-    6. Giant Bomb API Key
+    6. **Giant Bomb API Key**
        - The Giant Bomb API key is used to fetch video game information.
-       - Sign up at Giant Bomb and generate an API key.
+       - Sign up at [Giant Bomb](https://www.giantbomb.com/api) and generate an API key.
 
 ### Installing
 
