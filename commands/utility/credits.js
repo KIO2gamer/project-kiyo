@@ -23,7 +23,9 @@ module.exports = {
 		const embed = new EmbedBuilder()
 			.setTitle('✨ Credits ✨')
 			.setColor('#0099ff')
-			.setDescription('A big thank you to all the amazing contributors who helped make this bot possible!')
+			.setDescription(
+				'A big thank you to all the amazing contributors who helped make this bot possible!'
+			)
 			.setTimestamp()
 			.setFooter({ text: 'Thanks to all the contributors!' });
 

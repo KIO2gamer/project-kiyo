@@ -4,13 +4,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('end_poll')
 		.setDescription('Ends a poll')
-		.addStringOption(option => 
-			option.setName('message_id')
-				.setDescription('Message ID of the poll')
-				.setRequired(true)
+		.addStringOption(option =>
+			option.setName('message_id').setDescription('Message ID of the poll').setRequired(true)
 		)
-		.addChannelOption(option => 
-			option.setName('channel')
+		.addChannelOption(option =>
+			option
+				.setName('channel')
 				.setDescription('Channel where the poll is created')
 				.setRequired(true)
 		),

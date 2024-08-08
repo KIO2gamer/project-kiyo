@@ -2,9 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('meme')
-		.setDescription('Send a random meme.'),
+	data: new SlashCommandBuilder().setName('meme').setDescription('Send a random meme.'),
 	category: 'fun',
 	async execute(interaction) {
 		let attempts = 0;
@@ -37,7 +35,9 @@ module.exports = {
 
 			await interaction.reply({ embeds: [memeEmbed] });
 		} else {
-			await interaction.reply('Could not fetch a non-NSFW meme at this time. Please try again later.');
+			await interaction.reply(
+				'Could not fetch a non-NSFW meme at this time. Please try again later.'
+			);
 		}
 	},
 };
