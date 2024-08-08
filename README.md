@@ -65,29 +65,33 @@ These instructions will get you a copy of the project up and running on your loc
     4. Click on "Add Bot" and confirm.
     5. **Keep your bot token secret!** This is like a password for your bot.
 -   **API Keys:** You'll need several API keys for different functionalities of the bot. Here are the required keys and how to obtain them:
+
     1. **Gemini API Key**
-       - Gemini is Google's AI Language. This project uses `gemini-1.5-flash` for the translate command.
-       - Get the API Key at [Google AI Studio](https://aistudio.google.com/app/apikey)
-         
+        - Gemini is Google's AI Language. This project uses `gemini-1.5-flash` for the translate command.
+        - Get the API Key at [Google AI Studio](https://aistudio.google.com/app/apikey)
     2. **Tenor API Key**
-       - The Tenor API key is used to fetch GIFs from the Tenor API.
-       - Sign up at [Tenor Developers](https://tenor.com/gifapi/documentation) and create an API key.
+
+        - The Tenor API key is used to fetch GIFs from the Tenor API.
+        - Sign up at [Tenor Developers](https://tenor.com/gifapi/documentation) and create an API key.
 
     3. **Pexels API Key**
-       - The Pexels API key is used to fetch high-quality images from Pexels.
-       - Sign up at [Pexels](https://www.pexels.com/api/) and generate an API key.
+
+        - The Pexels API key is used to fetch high-quality images from Pexels.
+        - Sign up at [Pexels](https://www.pexels.com/api/) and generate an API key.
 
     4. **Weather API Key**
-       - The Weather API key is used to fetch weather data from a weather API service.
-       - You can get a free API key from [WeatherAPI](https://www.weatherapi.com/docs/).
+
+        - The Weather API key is used to fetch weather data from a weather API service.
+        - You can get a free API key from [WeatherAPI](https://www.weatherapi.com/docs/).
 
     5. **Giphy API Key**
-       - The Giphy API key is used to fetch GIFs from Giphy.
-       - Sign up at [Giphy Developers](https://developers.giphy.com/docs/api/) and create an API key.
+
+        - The Giphy API key is used to fetch GIFs from Giphy.
+        - Sign up at [Giphy Developers](https://developers.giphy.com/docs/api/) and create an API key.
 
     6. **Giant Bomb API Key**
-       - The Giant Bomb API key is used to fetch video game information.
-       - Sign up at [Giant Bomb](https://www.giantbomb.com/api) and generate an API key.
+        - The Giant Bomb API key is used to fetch video game information.
+        - Sign up at [Giant Bomb](https://www.giantbomb.com/api) and generate an API key.
 
 ### Installing <a name = "installing"></a>
 
@@ -105,7 +109,7 @@ These instructions will get you a copy of the project up and running on your loc
     ```
 
 3. **Configuration:**
-    Create a .env file in the root directory of the project and add the following to your .env file, replacing the `<1>` with your actual credentials:
+   Create a .env file in the root directory of the project and add the following to your .env file, replacing the `<1>` with your actual credentials:
 
     ```bash
     DISCORD_TOKEN=<1>    // The secret Bot token
@@ -121,6 +125,7 @@ These instructions will get you a copy of the project up and running on your loc
     ```
 
     For `GUILD_IDS`, You can either add only one (stated above) or a array of them:
+
     ```bash
     GUILD_IDS=[<1>,<2>,...]
     ```
