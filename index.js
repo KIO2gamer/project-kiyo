@@ -6,16 +6,16 @@ const mongoose = require('mongoose');
 
 // Validate environment variables
 const requiredEnvVars = ['DISCORD_TOKEN', 'MONGODB_URL', 'CLIENT_ID'];
-requiredEnvVars.forEach(envVar => {
-	if (!process.env[envVar]) {
-		console.error(`Missing required environment variable: ${envVar}`);
-		process.exit(1);
-	}
-});
+if (!requiredEnvVars.every(envVar => process.env[envVar])) {
+	console.error(
+		`Missing required environment variable(s): ${requiredEnvVars.filter(v => !process.env[v]).join(', ')}`
+	);
+	process.exit(1);
+}
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const GUILD_IDS = process.env.GUILD_IDS ? process.env.GUILD_IDS.split(',') : [];
+const { CLIENT_ID, DISCORD_TOKEN, GUILD_IDS = '' } = process.env;
+
+const GUILD_ID_ARRAY = GUILD_IDS.split(',').filter(Boolean);
 
 // Initialize the client
 const client = new Client({
@@ -45,109 +45,78 @@ const client = new Client({
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
-// Command collection
-client.commands = new Collection();
-const loadCommands = dir => {
-	const commandFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
-
-	for (const file of commandFiles) {
-		const command = require(path.join(dir, file));
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-			if (command.data.aliases) {
-				for (const alias of command.data.aliases) {
-					client.commands.set(alias, command);
-				}
-			}
+// Command & Event Handling
+const loadItems = (type, dir) => {
+	const items = fs.readdirSync(dir, { withFileTypes: true });
+  
+	for (const item of items) {
+	  const fullPath = path.join(dir, item.name);
+	  if (item.isDirectory()) {
+		loadItems(type, fullPath);
+	  } else if (item.isFile() && item.name.endsWith('.js')) {
+		const loadedItem = require(fullPath);
+		if (type === 'commands' && 'data' in loadedItem && 'execute' in loadedItem) {
+		  client.commands.set(loadedItem.data.name, loadedItem);
+		  loadedItem.data.aliases?.forEach(alias => client.commands.set(alias, loadedItem));
+		} else if (type === 'events' && ['name', 'execute'].every(prop => prop in loadedItem)) {
+		  client[loadedItem.once ? 'once' : 'on'](loadedItem.name, (...args) => loadedItem.execute(...args, client)); 
 		} else {
-			console.warn(
-				`[WARNING] The command at ${path.join(dir, file)} is missing a required "data" or "execute" property.`
-			);
+		  console.warn(`[WARNING] The ${type} at ${fullPath} is missing required properties.`);
 		}
+	  }
 	}
-};
-
-const commandFolders = fs.readdirSync(path.join(__dirname, 'commands'));
-for (const folder of commandFolders) {
-	loadCommands(path.join(__dirname, 'commands', folder));
-}
-
-// Event handling
-const loadEvents = dir => {
-	const eventFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
-
-	for (const file of eventFiles) {
-		const event = require(path.join(dir, file));
-		if (event.once) {
-			client.once(event.name, (...args) => event.execute(...args));
-		} else {
-			client.on(event.name, (...args) => event.execute(...args));
-		}
-	}
-};
-
-loadEvents(path.join(__dirname, 'events'));
+  };
+  
+  client.commands = new Collection();
+  loadItems('commands', path.join(__dirname, 'commands'));
+  loadItems('events', path.join(__dirname, 'events'));
 
 // MongoDB connection
-async function connectToMongoDB(retries = 5) {
-	try {
-		mongoose.set('strictQuery', false);
-		await mongoose.connect(process.env.MONGODB_URL);
-		console.log('Connected to MongoDB');
-	} catch (error) {
-		console.error(`Failed to connect to MongoDB: ${error.message}`);
-		if (retries > 0) {
-			console.log(`Retrying to connect to MongoDB (${retries} attempts left)...`);
-			setTimeout(() => connectToMongoDB(retries - 1), 5000);
-		} else {
-			console.error('Exhausted all retries. Shutting down...');
-			process.exit(1);
+const connectToMongoDB = async () => {
+	let retries = 5;
+	while (retries > 0) {
+		try {
+			mongoose.set('strictQuery', false);
+			await mongoose.connect(process.env.MONGODB_URL);
+			console.log('Connected to MongoDB');
+			return;
+		} catch (error) {
+			retries--;
+			console.error(
+				`Failed to connect to MongoDB (attempts left: ${retries}): ${error.message}`
+			);
+			if (retries > 0) {
+				console.log(`Retrying in 5 seconds...`);
+				await new Promise(resolve => setTimeout(resolve, 5000));
+			}
 		}
 	}
-}
+	console.error('Exhausted all MongoDB connection attempts. Shutting down...');
+	process.exit(1);
+};
 
 // Deploy commands
 const deployCommands = async () => {
-	const commands = [];
-	const foldersPath = path.join(__dirname, 'commands');
-	const commandFolders = fs.readdirSync(foldersPath);
-
-	for (const folder of commandFolders) {
-		const commandsPath = path.join(foldersPath, folder);
-		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
-		for (const file of commandFiles) {
-			const filePath = path.join(commandsPath, file);
-			const command = require(filePath);
-			if (command.data && command.execute) {
-				commands.push(command.data.toJSON());
-			} else {
-				console.warn(
-					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-				);
-			}
-		}
-	}
+	const commands = Array.from(client.commands.values()).map(c => c.data.toJSON());
 
 	const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 	try {
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-		// Reset global commands (if needed)
-		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] });
-		console.log('Successfully reset global commands.');
+		if (GUILD_ID_ARRAY.length === 0) {
+			await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] });
+			console.log('Successfully reset global commands.');
+		}
 
-		// Deploy commands to specific guilds
-		for (const guildId of GUILD_IDS) {
-			try {
-				const data = await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
-					body: commands,
-				});
-				console.log(`Successfully reloaded ${data.length} commands for guild ${guildId}.`);
-			} catch (error) {
-				console.error(`Failed to deploy commands for guild ${guildId}:`, error);
-			}
+		for (const guildId of GUILD_ID_ARRAY.length ? GUILD_ID_ARRAY : [null]) {
+			const route = guildId
+				? Routes.applicationGuildCommands(CLIENT_ID, guildId)
+				: Routes.applicationCommands(CLIENT_ID);
+			const data = await rest.put(route, { body: commands });
+			console.log(
+				`Successfully reloaded ${data.length} commands for ${guildId ? `guild ${guildId}` : 'globally'}.`
+			);
 		}
 	} catch (error) {
 		console.error('Error deploying commands:', error);
@@ -157,19 +126,25 @@ const deployCommands = async () => {
 // Graceful shutdown
 process.on('SIGINT', async () => {
 	console.log('Shutting down gracefully...');
-	await mongoose.connection.close();
-	client.destroy();
-	process.exit(0);
+	try {
+		await mongoose.connection.close();
+		client.destroy();
+		console.log('Disconnected from MongoDB and Discord.');
+		process.exit(0);
+	} catch (error) {
+		console.error('Error during shutdown:', error);
+		process.exit(1);
+	}
 });
 
-// Login to Discord and start the bot
+// Start the bot
 (async () => {
 	try {
 		await connectToMongoDB();
 		await deployCommands();
 		await client.login(DISCORD_TOKEN);
 	} catch (error) {
-		console.error(`Failed to start the bot: ${error.message}`);
+		console.error('Failed to start:', error);
 		process.exit(1);
 	}
 })();
