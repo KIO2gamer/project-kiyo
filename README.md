@@ -99,6 +99,11 @@ These instructions will get you a copy of the project up and running on your loc
     GIANT_BOMB_API_KEY=<1>
     ```
 
+    For `GUILD_IDS`, You can either add only one (stated above) or a array of them:
+    ```bash
+    GUILD_IDS=[<1>,<2>,...]
+    ```
+
 4. **Start the bot:**
     ```bash
     npm run
