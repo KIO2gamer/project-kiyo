@@ -129,7 +129,9 @@ module.exports = {
 		const toggleChoice = interaction.options.getString('toggle');
 		const role = interaction.options.getRole('role') || interaction.guild.roles.everyone;
 
-		if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+		if (
+			!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageChannels)
+		) {
 			return interaction.reply({
 				content: 'I do not have permission to manage channels.',
 				ephemeral: true,
@@ -166,10 +168,15 @@ module.exports = {
 				if (permissionChoice && toggleChoice) {
 					const permissionFlag = PermissionsBitField.Flags[permissionChoice];
 					const currentOverwrites = channel.permissionOverwrites.cache.get(role.id);
-					const currentPermissions = currentOverwrites ? currentOverwrites.allow : new PermissionsBitField();
+					const currentPermissions = currentOverwrites
+						? currentOverwrites.allow
+						: new PermissionsBitField();
 					const isPermissionSet = currentPermissions.has(permissionFlag);
 
-					if ((toggleChoice === 'on' && isPermissionSet) || (toggleChoice === 'off' && !isPermissionSet)) {
+					if (
+						(toggleChoice === 'on' && isPermissionSet) ||
+						(toggleChoice === 'off' && !isPermissionSet)
+					) {
 						return `The permission \`${permissionChoice}\` is already set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name}\`.`;
 					}
 
