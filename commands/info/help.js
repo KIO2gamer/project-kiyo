@@ -8,16 +8,32 @@ const {
 const fs = require('fs');
 const path = require('path');
 
+// 1. Create the SlashCommandBuilder outside the execute function
+const commandData = new SlashCommandBuilder()
+	.setName('help')
+	.setDescription('Displays all commands or info about a specific command')
+	.addStringOption(option =>
+		option
+			.setName('search')
+			.setRequired(false)
+			.setDescription('Search for a command by name or description')
+	)
+	// 2. Add the 'category' option here, but don't populate choices yet
+	.addStringOption(option =>
+		option
+			.setName('category')
+			.setRequired(false)
+			.setDescription('What command category do you want to view?')
+			.addChoices(
+				{ name: 'Fun', value: 'fun' },
+				{ name: 'Info', value: 'info' },
+				{ name: 'Moderation', value: 'moderation' },
+				{ name: 'Utility', value: 'utility' }
+			)
+	);
+
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('help')
-		.setDescription('Displays all commands or info about a specific command')
-		.addStringOption(option =>
-			option
-				.setName('search')
-				.setRequired(false)
-				.setDescription('Search for a command by name or description')
-		),
+	data: commandData, // Export the commandData object
 	category: 'info',
 	async execute(interaction) {
 		await interaction.deferReply();
@@ -26,7 +42,7 @@ module.exports = {
 		const category = interaction.options.getString('category');
 		const searchQuery = interaction.options.getString('search')?.toLowerCase();
 
-		const guildCommands = await guild.commands.fetch(); // Fetch commands for this guild
+		const guildCommands = await guild.commands.fetch();
 		const commandsDirectory = path.join(__dirname, '..');
 		const categoryFolders = fs
 			.readdirSync(commandsDirectory)
@@ -51,39 +67,14 @@ module.exports = {
 			}
 		}
 
+		// 3. Dynamically populate category choices here
 		const categoryChoices = Array.from(commandsByCategory.keys()).map(category => ({
 			name: category.charAt(0).toUpperCase() + category.slice(1),
 			value: category,
 		}));
-
-		// Dynamically Add & Re-Register 'category' Option
-		this.data.addStringOption(option =>
-			option
-				.setName('category')
-				.setRequired(false)
-				.setDescription('What command category do you want to view?')
-				.addChoices(...categoryChoices)
-		);
-
-		try {
-			// 1. Get the command ID:
-			const existingCommand = await guild.commands.cache.find(c => c.name === this.data.name);
-
-			if (!existingCommand) {
-				console.error(
-					"Command not found in cache for editing. This might mean it hasn't been registered yet."
-				);
-				return; // Or handle this case differently
-			}
-
-			// 2. Use the command ID to edit:
-			await guild.commands.edit(existingCommand.id, this.data);
-
-			console.log('Successfully re-registered command to update category options');
-		} catch (error) {
-			console.error('Error registering command:', error);
-			// ... error handling ...
-		}
+		commandData.options
+			.find(option => option.name === 'category')
+			.addChoices(...categoryChoices);
 
 		const createCommandListEmbed = (commands, title, color) => {
 			const embed = new EmbedBuilder().setColor(color).setTitle(title).setTimestamp();

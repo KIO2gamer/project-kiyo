@@ -48,28 +48,32 @@ const client = new Client({
 // Command & Event Handling
 const loadItems = (type, dir) => {
 	const items = fs.readdirSync(dir, { withFileTypes: true });
-  
+
 	for (const item of items) {
-	  const fullPath = path.join(dir, item.name);
-	  if (item.isDirectory()) {
-		loadItems(type, fullPath);
-	  } else if (item.isFile() && item.name.endsWith('.js')) {
-		const loadedItem = require(fullPath);
-		if (type === 'commands' && 'data' in loadedItem && 'execute' in loadedItem) {
-		  client.commands.set(loadedItem.data.name, loadedItem);
-		  loadedItem.data.aliases?.forEach(alias => client.commands.set(alias, loadedItem));
-		} else if (type === 'events' && ['name', 'execute'].every(prop => prop in loadedItem)) {
-		  client[loadedItem.once ? 'once' : 'on'](loadedItem.name, (...args) => loadedItem.execute(...args, client)); 
-		} else {
-		  console.warn(`[WARNING] The ${type} at ${fullPath} is missing required properties.`);
+		const fullPath = path.join(dir, item.name);
+		if (item.isDirectory()) {
+			loadItems(type, fullPath);
+		} else if (item.isFile() && item.name.endsWith('.js')) {
+			const loadedItem = require(fullPath);
+			if (type === 'commands' && 'data' in loadedItem && 'execute' in loadedItem) {
+				client.commands.set(loadedItem.data.name, loadedItem);
+				loadedItem.data.aliases?.forEach(alias => client.commands.set(alias, loadedItem));
+			} else if (type === 'events' && ['name', 'execute'].every(prop => prop in loadedItem)) {
+				client[loadedItem.once ? 'once' : 'on'](loadedItem.name, (...args) =>
+					loadedItem.execute(...args, client)
+				);
+			} else {
+				console.warn(
+					`[WARNING] The ${type} at ${fullPath} is missing required properties.`
+				);
+			}
 		}
-	  }
 	}
-  };
-  
-  client.commands = new Collection();
-  loadItems('commands', path.join(__dirname, 'commands'));
-  loadItems('events', path.join(__dirname, 'events'));
+};
+
+client.commands = new Collection();
+loadItems('commands', path.join(__dirname, 'commands'));
+loadItems('events', path.join(__dirname, 'events'));
 
 // MongoDB connection
 const connectToMongoDB = async () => {

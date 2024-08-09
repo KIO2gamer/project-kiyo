@@ -97,7 +97,7 @@ module.exports = {
 							{ name: 'Mute Members', value: 'MuteMembers' },
 							{ name: 'Deafen Members', value: 'DeafenMembers' },
 							{ name: 'Move Members', value: 'MoveMembers' },
-							{ name: 'Use VAD', value: 'UseVad' },
+							{ name: 'Use VAD', value: 'UseVAD' },
 							{ name: 'Priority Speaker', value: 'PrioritySpeaker' },
 							{ name: 'Stream', value: 'Stream' },
 							{ name: 'Manage Webhooks', value: 'ManageWebhooks' },
@@ -129,17 +129,13 @@ module.exports = {
 		const toggleChoice = interaction.options.getString('toggle');
 		const role = interaction.options.getRole('role') || interaction.guild.roles.everyone;
 
-		// Check if bot has permission
-		if (
-			!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageChannels)
-		) {
+		if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
 			return interaction.reply({
 				content: 'I do not have permission to manage channels.',
 				ephemeral: true,
 			});
 		}
 
-		// Check if the user has permission
 		if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
 			return interaction.reply({
 				content: 'You do not have permission to manage channels.',
@@ -158,7 +154,6 @@ module.exports = {
 			let updated = false;
 			let response = 'Channel modified: ';
 
-			// Helper functions to refactor common logic
 			async function updateChannelName(channel, newChannelName) {
 				if (newChannelName) {
 					await channel.setName(newChannelName);
@@ -171,15 +166,10 @@ module.exports = {
 				if (permissionChoice && toggleChoice) {
 					const permissionFlag = PermissionsBitField.Flags[permissionChoice];
 					const currentOverwrites = channel.permissionOverwrites.cache.get(role.id);
-					const currentPermissions = currentOverwrites
-						? currentOverwrites.allow
-						: new PermissionsBitField();
+					const currentPermissions = currentOverwrites ? currentOverwrites.allow : new PermissionsBitField();
 					const isPermissionSet = currentPermissions.has(permissionFlag);
 
-					if (
-						(toggleChoice === 'on' && isPermissionSet) ||
-						(toggleChoice === 'off' && !isPermissionSet)
-					) {
+					if ((toggleChoice === 'on' && isPermissionSet) || (toggleChoice === 'off' && !isPermissionSet)) {
 						return `The permission \`${permissionChoice}\` is already set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name}\`.`;
 					}
 
@@ -191,7 +181,6 @@ module.exports = {
 				return '';
 			}
 
-			// Use helper functions in your subcommand logic
 			if (subcommand === 'text') {
 				response += await updateChannelName(channel, newChannelName);
 				const permissionResponse = await updateChannelPermission(
@@ -202,7 +191,6 @@ module.exports = {
 				);
 
 				if (permissionResponse.startsWith('The permission')) {
-					// Permission already in that state
 					return interaction.reply({ content: permissionResponse, ephemeral: true });
 				} else {
 					response += permissionResponse;
