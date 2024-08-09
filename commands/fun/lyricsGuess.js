@@ -2,12 +2,11 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Genius = require('genius-api');
 const cheerio = require('cheerio');
 
-const GENIUS_API_TOKEN = process.env.GENIUS_API_KEY_MUSIC;
-const genius = new Genius(GENIUS_API_TOKEN);
+const GENIUS_API_TOKEN = 'YOUR_GENIUS_API_TOKEN_HERE';
 
 const ROUND_TIME_LIMIT = 30000;
 const HINT_PENALTY = 1;
-const REQUESTS_PER_MINUTE = 10; // Genius API's recommended limit
+const REQUESTS_PER_MINUTE = 10;
 const RATE_LIMIT_DELAY = 60000 / REQUESTS_PER_MINUTE;
 let lastRequestTime = 0;
 
@@ -208,16 +207,19 @@ async function getSongFromGeniusAPI() {
 	]);
 
 	try {
-		const searches = await genius.searchSongs(randomSearchTerm);
+		// Correct client instantiation (genius-api 8.0.0+)
+		const geniusClient = new Genius({ accessToken: GENIUS_API_TOKEN });
+
+		const searches = await geniusClient.songs.search(randomSearchTerm);
 		lastRequestTime = Date.now();
 
-		if (searches.hits.length === 0) {
+		if (searches.length === 0) {
 			console.log('No results found for:', randomSearchTerm);
 			return null;
 		}
 
-		const firstHit = searches.hits[0].result;
-		const lyrics = await genius.getLyrics(firstHit.id);
+		const firstHit = searches[0];
+		const lyrics = await geniusClient.songs.lyrics(firstHit.id);
 		lastRequestTime = Date.now();
 
 		return { lyrics: lyrics };
