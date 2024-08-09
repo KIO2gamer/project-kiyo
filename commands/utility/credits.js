@@ -7,17 +7,18 @@ module.exports = {
 	category: 'utility',
 	async execute(interaction) {
 		const contributors = [
-			{ command: 'steel', name: 'steeles.0', id: '1255822140251312244' },
-			{ command: 'koifish', name: 'hallow_spice', id: '1255822140251312240' },
-			{ command: 'donottouch', name: 'umbree_on_toast', id: '1255822140251312242' },
-			{ command: 'rickroll', name: 'flashxdfx', id: '1255822140251312241' },
-			{ command: 'summon', name: 'eesmal', id: '1255822140251312245' },
-			{ command: 'snipe', name: 'na51f', id: '1255822140251312243' },
-			{ command: 'photo', name: 'spheroidon', id: '1267798092669784106' },
-			{ command: 'skibidi', name: 'zenoz231', id: '1259209405044359180' },
-			{ command: 'quokka', name: 'wickiwacka2', id: '1261574222975864882' },
-			{ command: 'uwu', name: 'rizzwan.', id: '1267834425002164235' },
-			{ command: 'boba', name: 'pepsi_pro', id: '1268899141652713535' },
+			{ command: 'steel', name: 'steeles.0', id: '1271082993427021825' },
+			{ command: 'koifish', name: 'hallow_spice', id: '1271082992953069570' },
+			{ command: 'donottouch', name: 'umbree_on_toast', id: '1271082992953069576' },
+			{ command: 'rickroll', name: 'flashxdfx', id: '1271082992953069573' },
+			{ command: 'summon', name: 'eesmal', id: '1271082993427021826' },
+			{ command: 'snipe', name: 'na51f', id: '1271082993427021824' },
+			{ command: 'photo', name: 'spheroidon', id: '1271082994102440083' },
+			{ command: 'skibidi', name: 'zenoz231', id: '1271082992953069577' },
+			{ command: 'quokka', name: 'wickiwacka2', id: '1271082992953069572' },
+			{ command: 'uwu', name: 'rizzwan.', id: '1271082993427021828' },
+			{ command: 'boba', name: 'pepsi_pro', id: '1271082992453816412' },
+			{ command: 'lyricwhiz', name: 'vipraz', id: '1271391276155011072' },
 		];
 
 		const embed = new EmbedBuilder()
