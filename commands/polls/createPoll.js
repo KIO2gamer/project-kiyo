@@ -25,7 +25,7 @@ module.exports = {
 				.setDescription('Duration of poll in hours (max 32 hours)')
 				.setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		try {
 			const question = interaction.options.getString('question');

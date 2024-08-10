@@ -16,7 +16,7 @@ module.exports = {
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
 		.setDMPermission(false),
-	 
+
 	async execute(interaction) {
 		const userId = interaction.options.getString('userid');
 		const reason = interaction.options.getString('reason') ?? 'No reason provided';

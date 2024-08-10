@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('credits')
 		.setDescription('Shows an embed of users who helped make this bot.'),
-	 
+
 	async execute(interaction) {
 		const contributors = [
 			{ command: 'steel', name: 'steeles.0', id: '1271082993427021825' },

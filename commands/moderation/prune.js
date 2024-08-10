@@ -18,8 +18,6 @@ module.exports = {
 				.setRequired(true)
 		),
 
-	 
-
 	async execute(interaction) {
 		const userOption = interaction.options.getUser('user');
 		const amountOption = interaction.options.getInteger('amount');

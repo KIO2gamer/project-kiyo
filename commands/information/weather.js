@@ -12,7 +12,7 @@ module.exports = {
 				.setDescription('The city you want to get the weather for')
 				.setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		const city = interaction.options.getString('city');
 		const apiKey = process.env.WEATHER_API_KEY; // Replace with your WeatherAPI key

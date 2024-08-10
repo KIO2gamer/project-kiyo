@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('donottouch')
 		.setDescription('YOUR PC WILL GO BOOM-BOOM.'),
-	 
+
 	async execute(interaction) {
 		const row = new ActionRowBuilder().addComponents(
 			new ButtonBuilder()

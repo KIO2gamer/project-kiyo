@@ -21,7 +21,6 @@ module.exports = {
 				)
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-	 
 
 	async execute(interaction) {
 		const embedType = interaction.options.getString('type');

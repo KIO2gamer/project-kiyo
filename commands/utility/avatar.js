@@ -37,7 +37,7 @@ module.exports = {
 					{ name: 'GIF', value: 'gif' }
 				)
 		),
-	 
+
 	async execute(interaction) {
 		const userTarget = interaction.options.getUser('target') || interaction.user;
 		const size = interaction.options.getString('size') || '512';

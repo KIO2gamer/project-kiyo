@@ -120,7 +120,7 @@ module.exports = {
 						.setRequired(false)
 				)
 		),
-	 
+
 	async execute(interaction) {
 		const subcommand = interaction.options.getSubcommand();
 		const channel = interaction.options.getChannel('channel');
