@@ -1,11 +1,12 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('hangman').setDescription('Play a game of Hangman!'),
 	async execute(interaction) {
-		const words = ['programming', 'javascript', 'discord', 'coding', 'bot'];
-		const wordToGuess = words[Math.floor(Math.random() * words.length)];
-		const wordDisplay = '_ '.repeat(wordToGuess.length).trim();
+		const wordToGuess = getWordToGuess();
+		let wordDisplay = '_ '.repeat(wordToGuess.length).trim();
 		let incorrectGuesses = 0;
 		const maxIncorrectGuesses = 6;
 		const guessedLetters = [];
@@ -43,10 +44,9 @@ module.exports = {
 					if (wordToGuess[i] === guess || wordDisplay[i * 2] !== '_') {
 						updatedWordDisplay += wordDisplay[i * 2] + ' ';
 					} else {
-						updatedWordDisplay += '_ ';
+						updatedWordDisplay += '\_';
 					}
 				}
-
 				updatedWordDisplay = updatedWordDisplay.trim();
 
 				embed.setDescription(`Word: ${updatedWordDisplay}`);
@@ -75,11 +75,11 @@ module.exports = {
 		collector.on('end', (collected, reason) => {
 			if (reason === 'won') {
 				embed.setDescription(`You won! The word was **${wordToGuess}**`);
-				embed.setColor('#00FF00'); // Set color to green for a win
+				embed.setColor('#00FF00');
 				interaction.followUp({ embeds: [embed] });
 			} else if (reason === 'lost') {
 				embed.setDescription(`You lost! The word was **${wordToGuess}**`);
-				embed.setColor('#FF0000'); // Set color to red for a loss
+				embed.setColor('#FF0000');
 				interaction.followUp({ embeds: [embed] });
 			} else {
 				embed.setDescription(`Time's up! The word was **${wordToGuess}**`);
@@ -88,3 +88,11 @@ module.exports = {
 		});
 	},
 };
+
+function getWordToGuess() {
+	const wordListFile = path.join('./assets/texts/hangmanWords.txt');
+	const fileContent = fs.readFileSync(wordListFile, 'utf-8');
+	const words = fileContent.split('\n');
+	const randomIndex = Math.floor(Math.random() * words.length);
+	return words[randomIndex];
+}
