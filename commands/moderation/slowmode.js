@@ -19,7 +19,7 @@ module.exports = {
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 		.setDMPermission(false),
-	 
+
 	async execute(interaction) {
 		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		const durationInput = interaction.options.getString('duration');

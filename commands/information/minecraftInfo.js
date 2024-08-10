@@ -12,7 +12,7 @@ module.exports = {
 				.setDescription('Search for a Minecraft player')
 				.setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		const username = interaction.options.getString('username');
 

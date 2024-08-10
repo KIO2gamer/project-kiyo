@@ -21,7 +21,7 @@ module.exports = {
 				.setDescription('The range of log numbers to edit (e.g., 1-5)')
 				.setRequired(false)
 		),
-	 
+
 	async execute(interaction) {
 		const logNumber = interaction.options.getInteger('lognumber');
 		const logRange = interaction.options.getString('logrange');

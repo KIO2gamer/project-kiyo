@@ -77,7 +77,7 @@ permissionGroups.forEach(group => {
 
 module.exports = {
 	data: commandBuilder,
-	 
+
 	async execute(interaction) {
 		const name = interaction.options.getString('name');
 		const color = interaction.options.getString('color');

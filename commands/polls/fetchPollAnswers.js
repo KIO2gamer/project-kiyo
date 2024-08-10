@@ -13,7 +13,7 @@ module.exports = {
 				.setDescription('Channel where the poll is created')
 				.setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		try {
 			const messageId = interaction.options.getString('message_id');

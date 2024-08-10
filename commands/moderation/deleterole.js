@@ -7,7 +7,7 @@ module.exports = {
 		.addRoleOption(option =>
 			option.setName('role').setDescription('The role to delete').setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		const role = interaction.options.getRole('role');
 		await role.delete();

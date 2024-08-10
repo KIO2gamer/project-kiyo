@@ -8,7 +8,7 @@ module.exports = {
 		.addUserOption(option =>
 			option.setName('user').setDescription('The user to summon').setRequired(true)
 		),
-	 
+
 	async execute(interaction) {
 		const cooldownAmount = 5 * 60 * 1000; // 5 minutes
 		const now = Date.now();

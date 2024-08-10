@@ -3,7 +3,7 @@ const os = require('os');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('botinfo').setDescription('Get info about the bot.'),
-	 
+
 	async execute(interaction) {
 		await sendBotInfo(interaction);
 	},

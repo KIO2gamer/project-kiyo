@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('kill')
 		.setDescription('Sends a humorous assassin message to the user.'),
-	 
+
 	async execute(interaction) {
 		const assassinMessages = [
 			'An assassin has been dispatched to your location... just kidding!',

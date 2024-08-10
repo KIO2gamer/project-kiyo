@@ -5,7 +5,7 @@ module.exports = {
 		.setName('viewroles')
 		.setDescription('Shows all the roles in the server.')
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),
-	 
+
 	async execute(interaction) {
 		const roles = interaction.guild.roles.cache
 			.sort((a, b) => b.position - a.position)

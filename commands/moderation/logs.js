@@ -1,184 +1,197 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+const {
+	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ComponentType,
+} = require('discord.js');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 const ACTION_CHOICES = [
-    { name: 'Warn', value: 'warn' },
-    { name: 'Ban', value: 'ban' },
-    { name: 'Timeout', value: 'timeout' },
-    { name: 'Kick', value: 'kick' },
-    { name: 'Tempban', value: 'tempban' },
-    { name: 'Unban', value: 'unban' },
+	{ name: 'Warn', value: 'warn' },
+	{ name: 'Ban', value: 'ban' },
+	{ name: 'Timeout', value: 'timeout' },
+	{ name: 'Kick', value: 'kick' },
+	{ name: 'Tempban', value: 'tempban' },
+	{ name: 'Unban', value: 'unban' },
 ];
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('logs')
-        .setDescription('Show the moderation logs.')
-        .addIntegerOption(option =>
-            option.setName('limit').setDescription('The number of logs per page').setMinValue(1).setMaxValue(25).setRequired(false)
-        )
-        .addUserOption(option =>
-            option.setName('user').setDescription('The user to filter logs by').setRequired(false)
-        )
-        .addIntegerOption(option =>
-            option
-                .setName('lognumber')
-                .setDescription('The log number to search for')
-                .setMinValue(1)
-                .setRequired(false)
-        )
-        .addStringOption(option =>
-            option
-                .setName('logrange')
-                .setDescription('The range of log numbers to search for (e.g., 1-5)')
-                .setRequired(false)
-        )
-        .addStringOption(option =>
-            option
-                .setName('action')
-                .setDescription('The action to filter logs by')
-                .setRequired(false)
-                .addChoices(...ACTION_CHOICES) 
-        )
-        .addUserOption(option =>
-            option
-                .setName('moderator')
-                .setDescription('The moderator to filter logs by')
-                .setRequired(false)
-        ),
-     
-    async execute(interaction) {
-        const limit = interaction.options.getInteger('limit') || 5; 
-        const user = interaction.options.getUser('user');
-        const logNumber = interaction.options.getInteger('lognumber'); 
-        const logRange = interaction.options.getString('logrange'); 
-        const action = interaction.options.getString('action');
-        const moderator = interaction.options.getUser('moderator'); 
+	data: new SlashCommandBuilder()
+		.setName('logs')
+		.setDescription('Show the moderation logs.')
+		.addIntegerOption(option =>
+			option
+				.setName('limit')
+				.setDescription('The number of logs per page')
+				.setMinValue(1)
+				.setMaxValue(25)
+				.setRequired(false)
+		)
+		.addUserOption(option =>
+			option.setName('user').setDescription('The user to filter logs by').setRequired(false)
+		)
+		.addIntegerOption(option =>
+			option
+				.setName('lognumber')
+				.setDescription('The log number to search for')
+				.setMinValue(1)
+				.setRequired(false)
+		)
+		.addStringOption(option =>
+			option
+				.setName('logrange')
+				.setDescription('The range of log numbers to search for (e.g., 1-5)')
+				.setRequired(false)
+		)
+		.addStringOption(option =>
+			option
+				.setName('action')
+				.setDescription('The action to filter logs by')
+				.setRequired(false)
+				.addChoices(...ACTION_CHOICES)
+		)
+		.addUserOption(option =>
+			option
+				.setName('moderator')
+				.setDescription('The moderator to filter logs by')
+				.setRequired(false)
+		),
 
-        try {
-            const query = {}; 
+	async execute(interaction) {
+		const limit = interaction.options.getInteger('limit') || 5;
+		const user = interaction.options.getUser('user');
+		const logNumber = interaction.options.getInteger('lognumber');
+		const logRange = interaction.options.getString('logrange');
+		const action = interaction.options.getString('action');
+		const moderator = interaction.options.getUser('moderator');
 
-            if (logNumber) {
-                query.logNumber = logNumber;
-            }
+		try {
+			const query = {};
 
-            if (logRange) {
-                const [start, end] = logRange
-                    .split('-')
-                    .map(num => parseInt(num.trim())); 
-                if (!isNaN(start) && !isNaN(end) && start <= end) { 
-                    query.logNumber = { $gte: start, $lte: end };
-                } else {
-                    return interaction.reply({
-                        content: 'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
-                        ephemeral: true
-                    }); 
-                } 
-            } 
+			if (logNumber) {
+				query.logNumber = logNumber;
+			}
 
-            if (user) {
-                query.user = user.id;
-            } 
-            if (action) {
-                query.action = action; 
-            } 
-            if (moderator) { 
-                query.moderator = moderator.id; 
-            } 
+			if (logRange) {
+				const [start, end] = logRange.split('-').map(num => parseInt(num.trim()));
+				if (!isNaN(start) && !isNaN(end) && start <= end) {
+					query.logNumber = { $gte: start, $lte: end };
+				} else {
+					return interaction.reply({
+						content:
+							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
+						ephemeral: true,
+					});
+				}
+			}
 
-            const logs = await ModerationLog.find(query).sort({ logNumber: -1 });
+			if (user) {
+				query.user = user.id;
+			}
+			if (action) {
+				query.action = action;
+			}
+			if (moderator) {
+				query.moderator = moderator.id;
+			}
 
-            if (logs.length === 0) {
-                return interaction.reply({ content: 'No moderation logs found.', ephemeral: true }); 
-            }
+			const logs = await ModerationLog.find(query).sort({ logNumber: -1 });
 
-            let currentPage = 1; 
-            const totalPages = Math.ceil(logs.length / limit); 
+			if (logs.length === 0) {
+				return interaction.reply({ content: 'No moderation logs found.', ephemeral: true });
+			}
 
-            const createEmbed = (page = 1) => {
-                const startIndex = (page - 1) * limit; 
-                const endIndex = Math.min(page * limit, logs.length); 
+			let currentPage = 1;
+			const totalPages = Math.ceil(logs.length / limit);
 
-                const embed = new EmbedBuilder() 
-                    .setTitle('Moderation Logs') 
-                    .setColor('#FF0000') 
-                    .setTimestamp()
-                    .setFooter({ text: `Page ${page} of ${totalPages}` }); 
+			const createEmbed = (page = 1) => {
+				const startIndex = (page - 1) * limit;
+				const endIndex = Math.min(page * limit, logs.length);
 
-                const logDescriptions = logs.slice(startIndex, endIndex).map(log => {
-                    const moderatorMention = `<@${log.moderator}>`; 
-                    const userMention = `<@${log.user}>`;
-                    const timestamp = new Date(log.timestamp).toLocaleString(); 
+				const embed = new EmbedBuilder()
+					.setTitle('Moderation Logs')
+					.setColor('#FF0000')
+					.setTimestamp()
+					.setFooter({ text: `Page ${page} of ${totalPages}` });
 
-                    return `**Log #${log.logNumber}**\n**Action:** ${log.action}\n**Moderator:** ${moderatorMention}\n**User:** ${userMention}\n**Reason:** ${log.reason}\n**Timestamp:** ${timestamp}`; 
-                }).join('\n\n'); 
+				const logDescriptions = logs
+					.slice(startIndex, endIndex)
+					.map(log => {
+						const moderatorMention = `<@${log.moderator}>`;
+						const userMention = `<@${log.user}>`;
+						const timestamp = new Date(log.timestamp).toLocaleString();
 
-                embed.setDescription(logDescriptions);
-                return embed; 
-            }; 
+						return `**Log #${log.logNumber}**\n**Action:** ${log.action}\n**Moderator:** ${moderatorMention}\n**User:** ${userMention}\n**Reason:** ${log.reason}\n**Timestamp:** ${timestamp}`;
+					})
+					.join('\n\n');
 
-            const createButtons = (page) => { 
-                const row = new ActionRowBuilder();
+				embed.setDescription(logDescriptions);
+				return embed;
+			};
 
-                if (page > 1) {
-                    row.addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('prevPage')
-                            .setLabel('Previous') 
-                            .setStyle(ButtonStyle.Primary) 
-                    ); 
-                }
+			const createButtons = page => {
+				const row = new ActionRowBuilder();
 
-                if (page < totalPages) {
-                    row.addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('nextPage')
-                            .setLabel('Next')
-                            .setStyle(ButtonStyle.Primary) 
-                    ); 
-                }
+				if (page > 1) {
+					row.addComponents(
+						new ButtonBuilder()
+							.setCustomId('prevPage')
+							.setLabel('Previous')
+							.setStyle(ButtonStyle.Primary)
+					);
+				}
 
-                return row.components.length > 0 ? [row] : [];
-            };
+				if (page < totalPages) {
+					row.addComponents(
+						new ButtonBuilder()
+							.setCustomId('nextPage')
+							.setLabel('Next')
+							.setStyle(ButtonStyle.Primary)
+					);
+				}
 
-            const initialEmbed = createEmbed(currentPage);
-            const initialButtons = createButtons(currentPage); 
+				return row.components.length > 0 ? [row] : [];
+			};
 
-            const message = await interaction.reply({
-                embeds: [initialEmbed], 
-                components: initialButtons,
-                fetchReply: true
-            }); 
+			const initialEmbed = createEmbed(currentPage);
+			const initialButtons = createButtons(currentPage);
 
-            const collector = message.createMessageComponentCollector({
-                componentType: ComponentType.Button, // Listen for button interactions
-                filter: i => i.user.id === interaction.user.id, 
-                time: 60000
-            });
+			const message = await interaction.reply({
+				embeds: [initialEmbed],
+				components: initialButtons,
+				fetchReply: true,
+			});
 
-            collector.on('collect', async i => {
-                if (i.customId === 'prevPage') { 
-                    currentPage--; 
-                } else if (i.customId === 'nextPage') {
-                    currentPage++;
-                } 
-                const newEmbed = createEmbed(currentPage);
-                const newButtons = createButtons(currentPage); 
+			const collector = message.createMessageComponentCollector({
+				componentType: ComponentType.Button, // Listen for button interactions
+				filter: i => i.user.id === interaction.user.id,
+				time: 60000,
+			});
 
-                await i.update({ embeds: [newEmbed], components: newButtons });
-            }); 
+			collector.on('collect', async i => {
+				if (i.customId === 'prevPage') {
+					currentPage--;
+				} else if (i.customId === 'nextPage') {
+					currentPage++;
+				}
+				const newEmbed = createEmbed(currentPage);
+				const newButtons = createButtons(currentPage);
 
-            collector.on('end', () => {
-                message.edit({ components: [] }); // Update, not reply
-            });
-        } catch (error) {
-            console.error('Error retrieving logs:', error);
-            // Only one reply if an error occurs:
-            await interaction.reply({ 
-                content: 'Failed to retrieve logs.', 
-                ephemeral: true 
-            });
-        }
-    }
+				await i.update({ embeds: [newEmbed], components: newButtons });
+			});
+
+			collector.on('end', () => {
+				message.edit({ components: [] }); // Update, not reply
+			});
+		} catch (error) {
+			console.error('Error retrieving logs:', error);
+			// Only one reply if an error occurs:
+			await interaction.reply({
+				content: 'Failed to retrieve logs.',
+				ephemeral: true,
+			});
+		}
+	},
 };

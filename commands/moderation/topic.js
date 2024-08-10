@@ -27,7 +27,7 @@ module.exports = {
 				.setDescription('The third user to change the topic of.')
 				.setRequired(false)
 		),
-	 
+
 	async execute(interaction) {
 		const user1 = interaction.options.getUser('user1');
 		const user2 = interaction.options.getUser('user2');

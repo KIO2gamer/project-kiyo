@@ -22,7 +22,7 @@ module.exports = {
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		)
 		.setDMPermission(false),
-	 
+
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
 		const duration = interaction.options.getString('duration');

@@ -27,7 +27,7 @@ module.exports = {
 			option.setName('embed').setDescription('Whether or not the echo should be embedded')
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-	 
+
 	async execute(interaction) {
 		const input = interaction.options.getString('input');
 		const channel = interaction.options.getChannel('channel');
