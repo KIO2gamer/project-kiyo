@@ -1,7 +1,6 @@
 const {
 	SlashCommandBuilder,
 	EmbedBuilder,
-	PermissionsBitField,
 	ActivityType,
 } = require('discord.js');
 
