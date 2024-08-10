@@ -7,7 +7,7 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('search').setDescription('Name of the game').setRequired(true)
 		),
-	category: 'info',
+	 
 	async execute(interaction) {
 		const gameName = interaction.options.getString('search');
 

@@ -3,7 +3,7 @@ const axios = require('axios');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('meme').setDescription('Send a random meme.'),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		let attempts = 0;
 		let meme;

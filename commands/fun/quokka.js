@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('quokka')
 		.setDescription('Send a pic of a quokka because it is cute.'),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		// Defer the reply to give more time for processing
 		await interaction.deferReply();

@@ -18,7 +18,7 @@ module.exports = {
 				.setRequired(true)
 		),
 
-	category: 'moderation',
+	 
 
 	async execute(interaction) {
 		const userOption = interaction.options.getUser('user');

@@ -8,7 +8,7 @@ module.exports = {
 		.addUserOption(option =>
 			option.setName('user').setDescription('The user to snipe').setRequired(true)
 		),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		const cooldownAmount = 5 * 60 * 1000; // 5 minutes
 		const now = Date.now();

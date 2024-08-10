@@ -4,7 +4,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('guess_the_number')
 		.setDescription('Try to guess the secret number between 1 and 100!'),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		const randomNumber = Math.floor(Math.random() * 100) + 1;
 		let guessesLeft = 7;

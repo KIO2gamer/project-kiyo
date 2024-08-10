@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('uwu').setDescription('uwu'),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		// Defer the reply to give more time for processing
 		await interaction.deferReply();

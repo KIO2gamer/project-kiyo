@@ -18,7 +18,7 @@ module.exports = {
 				.addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
 				.setRequired(false)
 		),
-	category: 'moderation',
+	 
 	async execute(interaction) {
 		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		await interaction.deferReply({ ephemeral: true });
