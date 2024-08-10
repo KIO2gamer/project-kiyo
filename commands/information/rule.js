@@ -13,7 +13,7 @@ module.exports = {
 				.setDescription('Input a number which corresponds to that rule.')
 				.setRequired(true)
 		),
-	category: 'info',
+	 
 	async execute(interaction) {
 		const number = interaction.options.getInteger('number');
 		switch (number) {

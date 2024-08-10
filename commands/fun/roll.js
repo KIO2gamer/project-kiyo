@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('roll').setDescription('Roll a dice.'),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		const sides = 6; // You can customize the number of sides
 		const roll = Math.floor(Math.random() * sides) + 1;

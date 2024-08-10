@@ -23,7 +23,7 @@ module.exports = {
 				.setDescription('The target language to translate to (e.g., French, Spanish).')
 				.setRequired(true)
 		),
-	category: 'utility',
+	 
 	async execute(interaction) {
 		await interaction.deferReply();
 

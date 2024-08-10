@@ -12,7 +12,7 @@ module.exports = {
 				.setRequired(true)
 				.addChoices({ name: 'Yes', value: 'yes' }, { name: 'No', value: 'no' })
 		),
-	category: 'fun',
+	 
 	async execute(interaction) {
 		const option = interaction.options.getString('option');
 

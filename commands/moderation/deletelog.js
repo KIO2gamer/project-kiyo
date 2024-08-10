@@ -18,7 +18,7 @@ module.exports = {
 				.setDescription('The range of log numbers to delete (e.g., 1-5)')
 				.setRequired(false)
 		),
-	category: 'moderation',
+	 
 	async execute(interaction) {
 		const logNumber = interaction.options.getInteger('lognumber');
 		const logRange = interaction.options.getString('logrange');

@@ -47,7 +47,7 @@ module.exports = {
                 .setDescription('The moderator to filter logs by')
                 .setRequired(false)
         ),
-    category: 'moderation',
+     
     async execute(interaction) {
         const limit = interaction.options.getInteger('limit') || 5; 
         const user = interaction.options.getUser('user');

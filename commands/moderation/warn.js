@@ -14,7 +14,7 @@ module.exports = {
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
 		),
-	category: 'moderation',
+	 
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
 		const reason = interaction.options.getString('reason') ?? 'No reason provided';

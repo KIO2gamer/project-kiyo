@@ -13,7 +13,7 @@ module.exports = {
 		.addRoleOption(option =>
 			option.setName('role').setDescription('The role to remove').setRequired(true)
 		),
-	category: 'moderation',
+	 
 	async execute(interaction) {
 		const target = interaction.options.getUser('target');
 		const role = interaction.options.getRole('role');

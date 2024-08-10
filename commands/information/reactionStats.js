@@ -20,7 +20,7 @@ module.exports = {
 				.setDescription('The timeframe to get stats for (e.g., "24h", "7d")')
 				.setRequired(false)
 		),
-	category: 'info',
+	 
 	async execute(interaction) {
 		const channel = interaction.options.getChannel('channel');
 		const timeframe = interaction.options.getString('timeframe') || '7d';

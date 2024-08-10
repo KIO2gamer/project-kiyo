@@ -26,7 +26,7 @@ module.exports = {
 				.setDescription('Add a caption to the image')
 				.setRequired(false)
 		),
-	category: 'utility',
+	 
 	async execute(interaction) {
 		const options = interaction.options.getString('options');
 		const caption = interaction.options.getString('caption') || null;
