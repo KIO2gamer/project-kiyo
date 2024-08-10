@@ -1,0 +1,1001 @@
+[
+	{
+		"options": [
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Welcome", "value": "welcome" },
+					{ "name": "Level Roles", "value": "level_roles" },
+					{ "name": "Server Booster Perks", "value": "booster_perks" },
+					{ "name": "Other Roles", "value": "other_roles" },
+					{ "name": "All Role Information", "value": "all_roles" },
+					{ "name": "Forms", "value": "forms" },
+					{ "name": "Server Rules", "value": "rules" },
+					{ "name": "Self-Assignable Roles", "value": "self_roles" }
+				],
+				"name": "type",
+				"description": "Select the type of embed to post",
+				"required": true
+			}
+		],
+		"name": "embed",
+		"description": "Posts a pre-formatted embed message.",
+		"default_member_permissions": "8192"
+	},
+	{
+		"options": [
+			{ "type": 3, "name": "code", "description": "The code to evaluate", "required": true }
+		],
+		"name": "eval",
+		"description": "Evaluates JavaScript code."
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "command",
+				"description": "The command to reload.",
+				"required": false
+			}
+		],
+		"name": "reload",
+		"description": "Reloads a command.",
+		"default_member_permissions": "8"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "question",
+				"description": "The question to ask",
+				"required": true
+			}
+		],
+		"name": "8ball",
+		"description": "Ask the magic 8ball a question."
+	},
+	{ "options": [], "name": "boba", "description": "Send a pic of boba because it is the best." },
+	{ "options": [], "name": "chairhit", "description": "yeet the chair fr" },
+	{ "options": [], "name": "coinflip", "description": "Flip a coin!" },
+	{
+		"options": [],
+		"name": "guess_the_number",
+		"description": "Try to guess the secret number between 1 and 100!"
+	},
+	{
+		"options": [],
+		"name": "kill",
+		"description": "Sends a humorous assassin message to the user."
+	},
+	{ "options": [], "name": "koifish", "description": "Fish" },
+	{ "options": [], "name": "lyricwhiz", "description": "Start a music lyric guessing game!" },
+	{ "options": [], "name": "meme", "description": "Send a random meme." },
+	{
+		"options": [],
+		"name": "quokka",
+		"description": "Send a pic of a quokka because it is cute."
+	},
+	{ "options": [], "name": "rickroll", "description": "Rickroll someone" },
+	{
+		"options": [
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Rock", "value": "rock" },
+					{ "name": "Paper", "value": "paper" },
+					{ "name": "Scissors", "value": "scissors" }
+				],
+				"name": "choice",
+				"description": "Choose Rock, Paper, or Scissors",
+				"required": true
+			}
+		],
+		"name": "rock_paper_scissors",
+		"description": "Play Rock, Paper, Scissors!"
+	},
+	{ "options": [], "name": "roll", "description": "Roll a dice." },
+	{ "options": [], "name": "donottouch", "description": "YOUR PC WILL GO BOOM-BOOM." },
+	{
+		"options": [
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Yes", "value": "yes" },
+					{ "name": "No", "value": "no" }
+				],
+				"name": "option",
+				"description": "Did you watch Skibidi Toilet?",
+				"required": true
+			}
+		],
+		"name": "skibidi",
+		"description": "Gives you skibidi powers"
+	},
+	{
+		"options": [
+			{ "name": "user", "description": "The user to snipe", "required": true, "type": 6 }
+		],
+		"name": "snipe",
+		"description": "Snipes the user"
+	},
+	{ "options": [], "name": "steel", "description": "steel" },
+	{
+		"options": [
+			{ "name": "user", "description": "The user to summon", "required": true, "type": 6 }
+		],
+		"name": "summon",
+		"description": "Summons the user from the undead"
+	},
+	{ "options": [], "name": "trivia", "description": "Answer a trivia question! (Only 1 try!!!)" },
+	{ "options": [], "name": "uwu", "description": "uwu" },
+	{ "options": [], "name": "yeet", "description": "yeet" },
+	{ "options": [], "name": "botinfo", "description": "Get info about the bot." },
+	{
+		"options": [
+			{
+				"name": "channel",
+				"description": "The channel to get information about",
+				"required": true,
+				"type": 7
+			}
+		],
+		"name": "channelinfo",
+		"description": "Provides information about a specific channel"
+	},
+	{
+		"options": [],
+		"name": "credits",
+		"description": "Shows an embed of users who helped make this bot."
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "emoji",
+				"description": "The emoji to get information about",
+				"required": true
+			}
+		],
+		"name": "emoji-info",
+		"description": "Provides information about a specific emoji"
+	},
+	{
+		"options": [
+			{ "type": 3, "name": "search", "description": "Name of the game", "required": true }
+		],
+		"name": "gameinfo",
+		"description": "Fetches game information"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "search",
+				"description": "Search for a command by name or description",
+				"required": false
+			}
+		],
+		"name": "help",
+		"description": "Displays all commands or info about a specific command"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "username",
+				"description": "Search for a Minecraft player",
+				"required": true
+			}
+		],
+		"name": "minecraft",
+		"description": "Sends info about a Minecraft player"
+	},
+	{
+		"options": [
+			{
+				"name": "channel",
+				"description": "The channel to get reaction stats from (optional)",
+				"required": false,
+				"type": 7
+			},
+			{
+				"type": 3,
+				"name": "timeframe",
+				"description": "The timeframe to get stats for (e.g., \"24h\", \"7d\")",
+				"required": false
+			}
+		],
+		"name": "reactionstats",
+		"description": "Displays statistics on reactions given in a specific channel or server-wide."
+	},
+	{
+		"options": [
+			{
+				"name": "role",
+				"description": "The role to get information about",
+				"required": true,
+				"type": 8
+			}
+		],
+		"name": "roleinfo",
+		"description": "Provides information about a specific role"
+	},
+	{
+		"options": [
+			{
+				"type": 4,
+				"name": "number",
+				"description": "Input a number which corresponds to that rule.",
+				"required": true
+			}
+		],
+		"name": "rule",
+		"description": "Shows the rules of the server in snippets (selection).",
+		"default_member_permissions": "8192"
+	},
+	{ "options": [], "name": "serverinfo", "description": "Get info about a server!" },
+	{
+		"options": [
+			{
+				"name": "target",
+				"description": "The user to get information about",
+				"required": false,
+				"type": 6
+			}
+		],
+		"name": "userinfo",
+		"description": "Displays information about a user."
+	},
+	{
+		"options": [],
+		"name": "viewroles",
+		"description": "Shows all the roles in the server.",
+		"default_member_permissions": "268435456"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "city",
+				"description": "The city you want to get the weather for",
+				"required": true
+			}
+		],
+		"name": "weather",
+		"description": "Gets the current weather for a specified city"
+	},
+	{
+		"options": [
+			{
+				"name": "target",
+				"description": "The user to assign the role to",
+				"required": true,
+				"type": 6
+			},
+			{ "name": "role", "description": "The role to assign", "required": true, "type": 8 }
+		],
+		"name": "addrole",
+		"description": "Adds a role to a user"
+	},
+	{
+		"options": [
+			{ "name": "target", "description": "The member to ban", "required": true, "type": 6 },
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for banning",
+				"required": false
+			}
+		],
+		"name": "ban",
+		"description": "Select a member and ban them.",
+		"default_member_permissions": "6",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{ "type": 3, "name": "name", "description": "The name of the role", "required": true },
+			{
+				"type": 3,
+				"name": "color",
+				"description": "The color of the role",
+				"required": false
+			},
+			{
+				"name": "hoist",
+				"description": "Display role members separately",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "mentionable",
+				"description": "Allow the role to be mentionable",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "admin",
+				"description": "Administrator permissions (includes manage everything)",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "manage",
+				"description": "Management permissions (channels, roles, guild, webhooks)",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "messages",
+				"description": "Message permissions (send, manage, embed, reactions)",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "voice",
+				"description": "Voice permissions (connect, speak, mute, deafen, move)",
+				"required": false,
+				"type": 5
+			},
+			{
+				"name": "misc",
+				"description": "Miscellaneous permissions (nickname, audit log, insights)",
+				"required": false,
+				"type": 5
+			}
+		],
+		"name": "createrole",
+		"description": "Creates a new role"
+	},
+	{
+		"options": [
+			{
+				"type": 4,
+				"name": "lognumber",
+				"description": "The log number to delete",
+				"required": false
+			},
+			{
+				"type": 3,
+				"name": "logrange",
+				"description": "The range of log numbers to delete (e.g., 1-5)",
+				"required": false
+			}
+		],
+		"name": "deletelog",
+		"description": "Delete a moderation log/logs by log number/range."
+	},
+	{
+		"options": [
+			{ "name": "role", "description": "The role to delete", "required": true, "type": 8 }
+		],
+		"name": "deleterole",
+		"description": "Deletes an existing role"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The new reason for the log entry or entries",
+				"required": true
+			},
+			{
+				"type": 4,
+				"name": "lognumber",
+				"description": "The log number to edit",
+				"required": false
+			},
+			{
+				"type": 3,
+				"name": "logrange",
+				"description": "The range of log numbers to edit (e.g., 1-5)",
+				"required": false
+			}
+		],
+		"name": "editlog",
+		"description": "Edit the reason for a specific log entry / a range of log entries."
+	},
+	{
+		"options": [
+			{ "name": "target", "description": "The member to kick", "required": true, "type": 6 },
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for the kick",
+				"required": false
+			}
+		],
+		"name": "kick",
+		"description": "Select a member and kick them.",
+		"default_member_permissions": "6"
+	},
+	{
+		"options": [
+			{
+				"channel_types": [0, 5],
+				"name": "channel",
+				"description": "The channel you want to lock",
+				"required": false,
+				"type": 7
+			}
+		],
+		"name": "lock",
+		"description": "Lock a channel",
+		"default_member_permissions": "16",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{
+				"type": 4,
+				"name": "limit",
+				"description": "The number of logs per page",
+				"required": false
+			},
+			{
+				"name": "user",
+				"description": "The user to filter logs by",
+				"required": false,
+				"type": 6
+			},
+			{
+				"type": 4,
+				"name": "lognumber",
+				"description": "The log number to search for",
+				"required": false
+			},
+			{
+				"type": 3,
+				"name": "logrange",
+				"description": "The range of log numbers to search for (e.g., 1-5)",
+				"required": false
+			},
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "warn", "value": "warn" },
+					{ "name": "ban", "value": "ban" },
+					{ "name": "timeout", "value": "timeout" },
+					{ "name": "kick", "value": "kick" },
+					{ "name": "tempban", "value": "tempban" },
+					{ "name": "unban", "value": "unban" }
+				],
+				"name": "action",
+				"description": "The action to filter logs by",
+				"required": false
+			},
+			{
+				"name": "moderator",
+				"description": "The moderator to filter logs by",
+				"required": false,
+				"type": 6
+			}
+		],
+		"name": "logs",
+		"description": "Show the moderation logs."
+	},
+	{
+		"options": [
+			{
+				"type": 1,
+				"name": "text",
+				"description": "Modify text channel permissions",
+				"options": [
+					{
+						"channel_types": [0],
+						"name": "channel",
+						"description": "The text channel to modify",
+						"required": true,
+						"type": 7
+					},
+					{
+						"type": 3,
+						"name": "newname",
+						"description": "The new name for the channel",
+						"required": false
+					},
+					{
+						"type": 3,
+						"choices": [
+							{ "name": "View Channel", "value": "ViewChannel" },
+							{ "name": "Manage Channels", "value": "ManageChannels" },
+							{ "name": "Manage Roles", "value": "ManageRoles" },
+							{ "name": "Add Reactions", "value": "AddReactions" },
+							{ "name": "Send Messages", "value": "SendMessages" },
+							{ "name": "Send TTS Messages", "value": "SendTtsMessages" },
+							{ "name": "Manage Messages", "value": "ManageMessages" },
+							{ "name": "Embed Links", "value": "EmbedLinks" },
+							{ "name": "Attach Files", "value": "AttachFiles" },
+							{ "name": "Read Message History", "value": "ReadMessageHistory" },
+							{ "name": "Mention Everyone", "value": "MentionEveryone" },
+							{ "name": "Use External Emojis", "value": "UseExternalEmojis" },
+							{ "name": "Manage Webhooks", "value": "ManageWebhooks" },
+							{ "name": "Manage Threads", "value": "ManageThreads" },
+							{ "name": "Create Public Threads", "value": "CreatePublicThreads" },
+							{ "name": "Create Private Threads", "value": "CreatePrivateThreads" },
+							{ "name": "Use External Stickers", "value": "UseExternalStickers" },
+							{
+								"name": "Send Messages In Threads",
+								"value": "SendMessagesInThreads"
+							},
+							{ "name": "Use Embedded Activities", "value": "UseEmbeddedActivities" },
+							{ "name": "Send Voice Messages", "value": "SendVoiceMessages" },
+							{ "name": "Send Polls", "value": "SendPolls" }
+						],
+						"name": "permission",
+						"description": "Permission to modify for the text channel",
+						"required": false
+					},
+					{
+						"type": 3,
+						"choices": [
+							{ "name": "On", "value": "on" },
+							{ "name": "Off", "value": "off" }
+						],
+						"name": "toggle",
+						"description": "Toggle permission on or off",
+						"required": false
+					},
+					{
+						"name": "role",
+						"description": "The role to modify permissions for (leave empty for everyone)",
+						"required": false,
+						"type": 8
+					}
+				]
+			},
+			{
+				"type": 1,
+				"name": "voice",
+				"description": "Modify voice channel permissions",
+				"options": [
+					{
+						"channel_types": [2],
+						"name": "channel",
+						"description": "The voice channel to modify",
+						"required": true,
+						"type": 7
+					},
+					{
+						"type": 3,
+						"name": "newname",
+						"description": "The new name for the channel",
+						"required": false
+					},
+					{
+						"type": 3,
+						"choices": [
+							{ "name": "View Channel", "value": "ViewChannel" },
+							{ "name": "Manage Channels", "value": "ManageChannels" },
+							{ "name": "Manage Roles", "value": "ManageRoles" },
+							{ "name": "Connect", "value": "Connect" },
+							{ "name": "Speak", "value": "Speak" },
+							{ "name": "Mute Members", "value": "MuteMembers" },
+							{ "name": "Deafen Members", "value": "DeafenMembers" },
+							{ "name": "Move Members", "value": "MoveMembers" },
+							{ "name": "Use VAD", "value": "UseVAD" },
+							{ "name": "Priority Speaker", "value": "PrioritySpeaker" },
+							{ "name": "Stream", "value": "Stream" },
+							{ "name": "Manage Webhooks", "value": "ManageWebhooks" },
+							{ "name": "Create Instant Invite", "value": "CreateInstantInvite" }
+						],
+						"name": "permission",
+						"description": "Permission to modify for the voice channel",
+						"required": false
+					},
+					{
+						"type": 3,
+						"choices": [
+							{ "name": "On", "value": "on" },
+							{ "name": "Off", "value": "off" }
+						],
+						"name": "toggle",
+						"description": "Toggle permission on or off",
+						"required": false
+					},
+					{
+						"name": "role",
+						"description": "The role to modify permissions for (leave empty for everyone)",
+						"required": false,
+						"type": 8
+					}
+				]
+			}
+		],
+		"name": "modifychannel",
+		"description": "Modify a text or voice channel."
+	},
+	{
+		"options": [
+			{
+				"name": "user",
+				"description": "The user to prune messages from",
+				"required": true,
+				"type": 6
+			},
+			{
+				"type": 4,
+				"name": "amount",
+				"description": "The number of messages to prune",
+				"required": true
+			}
+		],
+		"name": "purge",
+		"description": "Prune messages from a user",
+		"default_member_permissions": "8192"
+	},
+	{
+		"options": [
+			{
+				"name": "target",
+				"description": "The user to remove the role from",
+				"required": true,
+				"type": 6
+			},
+			{ "name": "role", "description": "The role to remove", "required": true, "type": 8 }
+		],
+		"name": "removerole",
+		"description": "Removes a role from a user"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "duration",
+				"description": "The duration of the slowmode (e.g., 10s, 5m, 1h)",
+				"required": true
+			},
+			{
+				"name": "channel",
+				"description": "The channel to set slowmode in",
+				"required": false,
+				"type": 7
+			}
+		],
+		"name": "slowmode",
+		"description": "Set a slowmode for a channel.",
+		"default_member_permissions": "16",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{ "name": "target", "description": "The member to ban", "required": true, "type": 6 },
+			{
+				"type": 3,
+				"name": "duration",
+				"description": "The duration of the ban (e.g., 1h, 1d)",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for banning",
+				"required": false
+			}
+		],
+		"name": "tempban",
+		"description": "Temporarily ban a member for a specified duration.",
+		"default_member_permissions": "6",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{
+				"name": "target",
+				"description": "The member to timeout",
+				"required": true,
+				"type": 6
+			},
+			{
+				"type": 3,
+				"name": "amount",
+				"description": "The duration of the timeout (max 28 days) e.g. 1d | 2 weeks | 3hrs",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for timeout",
+				"required": false
+			}
+		],
+		"name": "timeout",
+		"description": "Select a member and timeout them.",
+		"default_member_permissions": "1099511627776",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{
+				"name": "user1",
+				"description": "The first user to change the topic of.",
+				"required": false,
+				"type": 6
+			},
+			{
+				"name": "user2",
+				"description": "The second user to change the topic of.",
+				"required": false,
+				"type": 6
+			},
+			{
+				"name": "user3",
+				"description": "The third user to change the topic of.",
+				"required": false,
+				"type": 6
+			}
+		],
+		"name": "topic",
+		"description": "Sends a message about changing the topic.",
+		"default_member_permissions": "22"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "userid",
+				"description": "The ID of the member to unban",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for unbanning",
+				"required": false
+			}
+		],
+		"name": "unban",
+		"description": "Unban a member from the server.",
+		"default_member_permissions": "4",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{
+				"channel_types": [0, 5],
+				"name": "channel",
+				"description": "The channel you want to unlock",
+				"required": false,
+				"type": 7
+			}
+		],
+		"name": "unlock",
+		"description": "Unlock a channel",
+		"default_member_permissions": "16",
+		"dm_permission": false
+	},
+	{
+		"options": [
+			{ "name": "target", "description": "The member to warn", "required": true, "type": 6 },
+			{
+				"type": 3,
+				"name": "reason",
+				"description": "The reason for the warning",
+				"required": false
+			}
+		],
+		"name": "warn",
+		"description": "Warn a member.",
+		"default_member_permissions": "6"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "question",
+				"description": "The question of the poll",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "options",
+				"description": "The options of the poll, separated by commas",
+				"required": true
+			},
+			{
+				"name": "multi_select",
+				"description": "Allow multi selection of answers or not",
+				"required": true,
+				"type": 5
+			},
+			{
+				"type": 4,
+				"name": "duration",
+				"description": "Duration of poll in hours (max 32 hours)",
+				"required": true
+			}
+		],
+		"name": "create_poll",
+		"description": "Create a poll"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "message_id",
+				"description": "Message ID of the poll",
+				"required": true
+			},
+			{
+				"name": "channel",
+				"description": "Channel where the poll is created",
+				"required": true,
+				"type": 7
+			}
+		],
+		"name": "end_poll",
+		"description": "Ends a poll"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "message_id",
+				"description": "Message ID of the poll",
+				"required": true
+			},
+			{
+				"name": "channel",
+				"description": "Channel where the poll is created",
+				"required": true,
+				"type": 7
+			}
+		],
+		"name": "fetch_poll_answers",
+		"description": "Fetches the answers of the poll."
+	},
+	{
+		"options": [
+			{
+				"name": "target",
+				"description": "The user's avatar to show",
+				"required": false,
+				"type": 6
+			},
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "128", "value": "128" },
+					{ "name": "256", "value": "256" },
+					{ "name": "512", "value": "512" },
+					{ "name": "1024", "value": "1024" },
+					{ "name": "2048", "value": "2048" },
+					{ "name": "4096", "value": "4096" }
+				],
+				"name": "size",
+				"description": "The size of the avatar",
+				"required": false
+			},
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "WebP", "value": "webp" },
+					{ "name": "PNG", "value": "png" },
+					{ "name": "JPEG", "value": "jpg" },
+					{ "name": "GIF", "value": "gif" }
+				],
+				"name": "format",
+				"description": "The format of the avatar",
+				"required": false
+			}
+		],
+		"name": "avatar",
+		"description": "Get the avatar of the user."
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "input",
+				"description": "The input to echo back",
+				"required": true,
+				"max_length": 2000
+			},
+			{
+				"channel_types": [0],
+				"name": "channel",
+				"description": "The channel to echo into",
+				"required": true,
+				"type": 7
+			},
+			{
+				"name": "embed",
+				"description": "Whether or not the echo should be embedded",
+				"required": false,
+				"type": 5
+			}
+		],
+		"name": "echo",
+		"description": "Replies with your input!",
+		"default_member_permissions": "16"
+	},
+	{
+		"options": [
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Welcome", "value": "welcome" },
+					{ "name": "Self Roles", "value": "self_roles" },
+					{ "name": "Rules", "value": "rules" },
+					{ "name": "Roles", "value": "roles" },
+					{ "name": "Forms", "value": "forms" }
+				],
+				"name": "options",
+				"description": "Select an image to send",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "caption",
+				"description": "Add a caption to the image",
+				"required": false
+			}
+		],
+		"name": "image",
+		"description": "Posts an image.",
+		"default_member_permissions": "6"
+	},
+	{
+		"options": [
+			{ "type": 3, "name": "query", "description": "The search query", "required": true },
+			{
+				"max_value": 5,
+				"min_value": 1,
+				"type": 4,
+				"name": "count",
+				"description": "Number of photos to fetch (1-5)",
+				"required": false
+			},
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Landscape", "value": "landscape" },
+					{ "name": "Portrait", "value": "portrait" },
+					{ "name": "Square", "value": "square" }
+				],
+				"name": "orientation",
+				"description": "Photo orientation",
+				"required": false
+			},
+			{
+				"type": 3,
+				"choices": [
+					{ "name": "Small", "value": "small" },
+					{ "name": "Medium", "value": "medium" },
+					{ "name": "Large", "value": "large" }
+				],
+				"name": "size",
+				"description": "Photo size",
+				"required": false
+			},
+			{
+				"name": "random",
+				"description": "Fetch a random photo",
+				"required": false,
+				"type": 5
+			}
+		],
+		"name": "photo",
+		"description": "Search for a photo."
+	},
+	{ "options": [], "name": "ping", "description": "Checks the bot's latency" },
+	{
+		"options": [
+			{
+				"type": 3,
+				"name": "input",
+				"description": "The text to be translated.",
+				"required": true
+			},
+			{
+				"type": 3,
+				"name": "target_lang",
+				"description": "The target language to translate to (e.g., French, Spanish).",
+				"required": true
+			}
+		],
+		"name": "translate",
+		"description": "Translates the text into the desired output language."
+	}
+]
