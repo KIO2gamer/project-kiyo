@@ -14,55 +14,60 @@ module.exports = {
 	async execute(interaction) {
 		const channel = interaction.options.getChannel('channel');
 
-		// Map channel type to a readable format
 		const channelTypes = {
 			[ChannelType.GuildText]: 'Text',
 			[ChannelType.GuildVoice]: 'Voice',
 			[ChannelType.GuildCategory]: 'Category',
-			[ChannelType.GuildAnnouncement]: 'Announcement',
-			[ChannelType.GuildStore]: 'Store',
-			[ChannelType.GuildStageVoice]: 'Stage Voice',
+			[ChannelType.GuildNews]: 'Announcement',
+			[ChannelType.GuildNewsThread]: 'News Thread',
+			[ChannelType.GuildPublicThread]: 'Public Thread',
+			[ChannelType.GuildPrivateThread]: 'Private Thread',
+			[ChannelType.GuildStageVoice]: 'Stage',
 			[ChannelType.GuildForum]: 'Forum',
 		};
 
-		// Get the permissions in a readable format
-		const permissions = channel
-			.permissionsFor(interaction.guild.roles.everyone)
-			.toArray()
-			.map(perm => {
-				const permName = Object.keys(PermissionsBitField.Flags).find(
-					key => PermissionsBitField.Flags[key] === perm
-				);
-				return permName ? permName.replace(/_/g, ' ').toLowerCase() : perm;
-			});
+		const getPermissions = (channel, guild) => {
+			const permissions = channel.permissionsFor(guild.roles.everyone);
+			if (!permissions) return 'No permissions';
 
-		const embed = new EmbedBuilder().setTitle(`Channel Info: ${channel.name}`).addFields(
-			{
-				name: 'Channel ID',
-				value: channel.id,
-				inline: true,
-			},
-			{
-				name: 'Channel Type',
-				value: channelTypes[channel.type] || 'Unknown',
-				inline: true,
-			},
-			{
-				name: 'Channel Topic',
-				value: channel.topic || 'No topic set',
-				inline: true,
-			},
-			{
-				name: 'Channel Created At',
-				value: channel.createdAt.toDateString(),
-				inline: true,
-			},
-			{
-				name: 'Channel Permissions',
-				value: permissions.length > 0 ? permissions.join('\n') : 'No permissions',
-				inline: false,
-			}
-		);
+			const permsArray = permissions.toArray();
+
+			return permsArray.length > 0
+				? permsArray
+						.map(
+							perm =>
+								Object.keys(PermissionsBitField.Flags)
+									.find(key => PermissionsBitField.Flags[key] === perm)
+									?.replace(/_/g, ' ')
+									.toLowerCase() || perm
+						)
+						.join(', ')
+				: 'No permissions';
+		};
+
+		const embed = new EmbedBuilder()
+			.setTitle(`Channel Info: ${channel.name}`)
+			.setColor(interaction.guild.members.me.displayHexColor)
+			.setThumbnail(interaction.guild.iconURL())
+			.addFields(
+				{ name: 'ID', value: channel.id, inline: true },
+				{ name: 'Type', value: channelTypes[channel.type] || 'Unknown', inline: true },
+				{
+					name: 'Created At',
+					value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}>`,
+					inline: true,
+				},
+				{ name: 'Topic', value: channel.topic || 'No topic set', inline: false },
+				{ name: 'NSFW', value: channel.nsfw ? 'Yes' : 'No', inline: true },
+				{
+					name: 'Permissions',
+					value: getPermissions(channel, interaction.guild),
+					inline: false,
+				}
+			);
+		if (channel.parent) {
+			embed.addFields({ name: 'Category', value: channel.parent.name, inline: true });
+		}
 
 		await interaction.reply({ embeds: [embed] });
 	},
