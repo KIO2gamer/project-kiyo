@@ -1,12 +1,4 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    StringSelectMenuBuilder,
-    ActionRowBuilder,
-    ComponentType,
-    ButtonBuilder,
-    ButtonStyle,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ComponentType, ButtonBuilder, ButtonStyle } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -22,7 +14,6 @@ const commandData = new SlashCommandBuilder()
 
 module.exports = {
     data: commandData,
-    category: 'info',
     async execute(interaction) {
         await interaction.deferReply();
 
