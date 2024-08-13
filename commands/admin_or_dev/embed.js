@@ -25,8 +25,7 @@ module.exports = {
 	async execute(interaction) {
 		const embedType = interaction.options.getString('type');
 
-		const roles = this.getRoles(interaction); // Use helper method to get roles
-
+		const roles = this.getRoles(interaction);
 		const embeds = this.getEmbeds(roles);
 
 		try {
@@ -34,19 +33,14 @@ module.exports = {
 				const embed = embeds[embedType];
 
 				if (Array.isArray(embed)) {
-					for (const e of embed) {
-						await interaction.channel.send({ embeds: [e] });
-					}
+					await interaction.channel.send({ embeds: embed });
 				} else {
 					await interaction.channel.send({ embeds: [embed] });
 				}
-
-				console.log(`Embed posted by ${interaction.user.tag}: ${embedType}`);
 			} else if (embedType === 'all_roles') {
 				await interaction.channel.send({
 					embeds: [embeds.level_roles, embeds.booster_perks, embeds.other_roles],
 				});
-				console.log(`All role embeds posted by ${interaction.user.tag}`);
 			} else {
 				return interaction.reply({
 					content: 'Invalid embed type chosen!',
@@ -54,10 +48,6 @@ module.exports = {
 				});
 			}
 		} catch (error) {
-			console.error(
-				`Error posting embed of type ${embedType} by ${interaction.user.tag}:`,
-				error
-			);
 			await interaction.reply({
 				content: `An error occurred: ${error.message}`,
 				ephemeral: true,
@@ -101,17 +91,10 @@ module.exports = {
 			welcome: new EmbedBuilder()
 				.setTitle('Welcome to [Your Server Name]! 👋')
 				.setDescription(
-					`Welcome to our community! We're glad you're here. 
-                    
-                    **Here are some key things to check out:**
-                    
-                    - **<#channel-id>:** Read our server rules to ensure a positive experience for everyone.
-                    - **<#channel-id>:** Get support or ask any questions you have.
-                    - **<#channel-id>:** Find people to play games with!
-                    - **[Server Invite Link]**: Share the server with your friends!`
+					`Welcome to our community! We're glad you're here. \n\n**Here are some key things to check out:**\n\n>- **<#channel-id>:** Read our server rules to ensure a positive experience for everyone.\n>- **<#channel-id>:** Get support or ask any questions you have.\n>- **<#channel-id>:** Find people to play games with!\n>- **[Server Invite Link]**: Share the server with your friends!`
 				)
 				.setColor('#7289DA')
-				.setThumbnail('https://i.imgur.com/your-welcome-image.png')
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Discord_logo_lavender.svg/800px-Discord_logo_lavender.svg.png')
 				.setFooter({ text: 'We hope you enjoy your time here!' }),
 
 			level_roles: new EmbedBuilder()
@@ -131,7 +114,7 @@ module.exports = {
 						inline: true,
 					}
 				)
-				.setThumbnail('https://example.com/rank.png')
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Discord_logo_lavender.svg/800px-Discord_logo_lavender.svg.png')
 				.setColor('Purple')
 				.setFooter({
 					text: 'Keep chatting to level up!',
@@ -141,13 +124,10 @@ module.exports = {
 			booster_perks: new EmbedBuilder()
 				.setTitle('Thank You, Server Boosters! ❤️')
 				.setDescription(
-					`Boosting our server helps us grow and provides you with amazing perks!
-                    
-                    **Perks:**
-                    - Special ${roles.booster || 'Booster'} role\n- Access to exclusive channels: <#channel-id>, <#channel-id>\n- Ability to change your nickname\n- Use external emojis in the server`
+					`Boosting our server helps us grow and provides you with amazing perks!\n\n **Perks:**\n\n - Special ${roles.booster || 'Booster'} role\n- Access to exclusive channels: <#channel-id>, <#channel-id>\n- Ability to change your nickname\n- Use external emojis in the server`
 				)
 				.setColor('#F47FFF')
-				.setThumbnail('https://i.imgur.com/your-booster-perks-image.png'),
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Discord_logo_lavender.svg/800px-Discord_logo_lavender.svg.png'),
 
 			other_roles: new EmbedBuilder()
 				.setTitle('Other Server Roles')
@@ -172,7 +152,7 @@ module.exports = {
 					}
 				)
 				.setColor('#0099ff')
-				.setThumbnail('https://i.imgur.com/your-other-roles-image.png'),
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Discord_logo_lavender.svg/800px-Discord_logo_lavender.svg.png'),
 
 			forms: new EmbedBuilder()
 				.setTitle('📋 Important Forms 📋')
@@ -180,116 +160,113 @@ module.exports = {
 				.addFields(
 					{
 						name: 'Moderator Application',
-						value: '> Apply to join our moderation team! [Link to Application](https://your-form-link-here)',
+						value: '> Apply to join our moderation team! [Link to Application](https://forms.gle/SRTkYJqYM3xCjoLF7)',
 					},
 					{
 						name: 'Ban/Mute Appeal',
-						value: '> Appeal a ban or mute if you believe it was unjust. [Link to Appeal Form](https://your-form-link-here)',
+						value: '> Appeal a ban or mute if you believe it was unjust. [Link to Appeal Form](https://forms.gle/9xtrkcTzEeTu6pmeA)',
 					}
 				)
-				.setColor('#00FFFF') // Cyan
-				.setThumbnail('https://i.imgur.com/your-forms-image.png'),
+				.setColor('#00FFFF')
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/1/1f/Writing_icon.png'),
 
 			rules: [
 				new EmbedBuilder()
-					.setTitle('Server Rules 📜')
-					.setDescription(
-						`Welcome to our community! To ensure a positive and enjoyable environment for everyone, please familiarize yourself with the following rules.`
-					)
-					.setColor('#FF0000'), // Red
-
-				new EmbedBuilder()
 					.setTitle('Rule 1: No Spamming')
-					.setDescription(
-						`**1.1 Excessive Messages:** Avoid sending a large number of messages in quick succession.
-                        **1.2 Repetitive Content:** Refrain from repeatedly posting the same message, emojis, or similar content.
-                        **1.3 Irrelevant Content:** Keep your messages relevant to the channel's topic. Avoid derailing conversations.
-                        **1.4 Mention Spam:** Do not excessively tag (@mention) users or roles without a valid reason. 
-                        **1.5 Voice Channel Disruption:** Refrain from making unnecessary noise or using soundboards that disrupt conversations in voice channels.`
+					.setDescription('Avoid excessive messaging and posting irrelevant content.')
+					.addFields(
+						{ name: '> 1.1 Excessive Messages', value: 'Avoid sending a large number of messages in quick succession.'},
+						{ name: '> 1.2 Repetitive Content', value: 'Refrain from repeatedly posting the same message, emojis, or similar content.'},
+						{ name: '> 1.3 Irrelevant Content', value: 'Keep your messages relevant to the channel\'s topic. Avoid derailing conversations.'},
+						{ name: '> 1.4 Mention Spam', value: 'Do not excessively tag (@mention) users or roles without a valid reason.'}, 
+						{ name: '> 1.5 Voice Channel Disruption', value: 'Refrain from making unnecessary noise or using soundboards that disrupt conversations in voice channels.'},
+						{ name: '> 1.6 Avoid Ghost Pinging', value: 'Ghost pinging (mentioning someone and then deleting the message) is disruptive and can be frustrating for other members. Try to avoid this behavior.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 2: Be Respectful')
-					.setDescription(
-						`**2.1 Harassment and Bullying:** Treat everyone with courtesy and respect. Harassment, bullying, and personal attacks will not be tolerated.
-                        **2.2 Discrimination:** Discrimination based on race, religion, gender, sexual orientation, or any other protected characteristic is strictly prohibited. 
-                        **2.3 Offensive Language:** Avoid using slurs, hate speech, or other language that could be considered offensive or hurtful.
-                        **2.4 Personal Information:** Do not share anyone's personal information without their explicit consent.
-                        **2.5 Threatening Behavior:** Threats of violence or harm are strictly forbidden and will be reported to Discord.`
+					.setDescription('Treat all members with respect and avoid any form of harassment or discrimination.')
+					.addFields(
+						{ name: '> 2.1 Harassment and Bullying', value: 'Treat everyone with courtesy and respect. Harassment, bullying, and personal attacks will not be tolerated.'},
+						{ name: '> 2.2 Discrimination', value: 'Discrimination based on race, religion, gender, sexual orientation, or any other protected characteristic is strictly prohibited.'}, 
+						{ name: '> 2.3 Offensive Language', value: 'Avoid using slurs, hate speech, or other language that could be considered offensive or hurtful.'},
+						{ name: '> 2.4 Personal Information', value: 'Do not share anyone\'s personal information without their explicit consent.'},
+						{ name: '> 2.5 Threatening Behavior', value: 'Threats of violence or harm are strictly forbidden and will be reported to Discord.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 3: No NSFW Content')
-					.setDescription(
-						`**3.1 Explicit Content:**  This server is intended for a general audience. Do not post NSFW (Not Safe for Work) content, including sexually suggestive material, gore, or violence.
-                        **3.2 NSFW Language:**  Keep your language appropriate for all ages. Avoid using explicit or suggestive terms.`
+					.setDescription('This server is intended for a general audience. Keep content and language appropriate.')
+					.addFields(
+						{ name: '> 3.1 Explicit Content', value: 'Do not post NSFW (Not Safe for Work) content, including sexually suggestive material, gore, or violence.'},
+						{ name: '> 3.2 NSFW Language', value: 'Keep your language appropriate for all ages. Avoid using explicit or suggestive terms.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 4: English Only')
-					.setDescription(
-						`**4.1 Primary Language:** To ensure effective communication and moderation, English is the primary language of this server.
-                        **4.2 Language-Specific Channels:** If you wish to communicate in another language, request a dedicated channel from the staff.`
+					.setDescription('English is the primary language of this server to ensure clear communication.')
+					.addFields(
+						{ name: '> 4.1 Primary Language', value: 'To ensure effective communication and moderation, English is the primary language of this server.'},
+						{ name: '> 4.2 Language-Specific Channels', value: 'If you wish to communicate in another language, request a dedicated channel from the staff.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 5: No Politics or Religious Discussions')
-					.setDescription(
-						`**5.1 Sensitive Topics:** Discussions about politics and religion can be divisive. To maintain a harmonious environment, please refrain from engaging in these topics.
-                        **5.2 Respectful Disagreement:** If these topics arise, please be respectful of differing viewpoints and avoid engaging in heated arguments.`
+					.setDescription('Avoid discussing politics and religion to maintain a respectful and neutral environment.')
+					.addFields(
+						{ name: '> 5.1 Sensitive Topics', value: 'Discussions about politics and religion can be divisive. To maintain a harmonious environment, please refrain from engaging in these topics.'},
+						{ name: '> 5.2 Respectful Disagreement', value: 'If these topics arise, please be respectful of differing viewpoints and avoid engaging in heated arguments.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 6: Appropriate Language')
-					.setDescription(
-						`**6.1 Profanity:**  While some mild profanity might be acceptable, avoid excessive swearing or using offensive language.
-                        **6.2 Hate Speech:**  Hate speech, derogatory terms, and slurs targeting any group or individual are strictly forbidden.
-                        **6.3 Language Filters:**  Do not attempt to bypass any language filters or use creative spellings to circumvent the rules.`
+					.setDescription('Be mindful of your language and avoid excessive profanity or hate speech.')
+					.addFields(
+						{ name: '> 6.1 Profanity', value: 'While some mild profanity might be acceptable, avoid excessive swearing or using offensive language.'},
+						{ name: '> 6.2 Hate Speech', value: 'Hate speech, derogatory terms, and slurs targeting any group or individual are strictly forbidden.'},
+						{ name: '> 6.3 Language Filters', value: 'Do not attempt to bypass any language filters or use creative spellings to circumvent the rules.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 7: Pingable Usernames')
-					.setDescription(
-						`**7.1 Easily Mentionable:** Choose a username that can be easily pinged by other members. 
-                        **7.2 Avoid Disruptive Characters:**  Avoid using special characters, symbols, or excessive capitalization that make it difficult to mention your username.`
+					.setDescription('Choose a username that can be easily mentioned by others.')
+					.addFields(
+						{ name: '> 7.1 Easily Mentionable', value: 'Choose a username that can be easily pinged by other members.'}, 
+						{ name: '> 7.2 Avoid Disruptive Characters', value: 'Avoid using special characters, symbols, or excessive capitalization that make it difficult to mention your username.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
 					.setTitle('Rule 8: Use Channels Correctly')
-					.setDescription(
-						`**8.1 Channel Purpose:** Each channel has a specific purpose. Please post content relevant to the channel's topic.
-                        **8.2 Off-Topic Discussions:** For general or off-topic conversations, use designated channels such as <#your-general-chat-channel-id>.
-                        **8.3 Channel Disruption:** Avoid disrupting ongoing conversations with unrelated topics.`
+					.setDescription('Post content in the appropriate channels to keep the server organized.')
+					.addFields(
+						{ name: '> 8.1 Channel Purpose', value: 'Each channel has a specific purpose. Please post content relevant to the channel\'s topic.'},
+						{ name: '> 8.2 Off-Topic Discussions', value: 'For general or off-topic conversations, use designated channels such as <#your-general-chat-channel-id>.'},
+						{ name: '> 8.3 Channel Disruption', value: 'Avoid disrupting ongoing conversations with unrelated topics.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
-					.setTitle('Rule 9: No Ghost Pinging')
-					.setDescription(
-						`**9.1 Disruptive Behavior:** Ghost pinging (mentioning someone and then deleting the message) is disruptive and can be frustrating for other members. Avoid this behavior.`
+					.setTitle('Rule 9: No Advertising')
+					.setDescription('Advertising without staff permission is prohibited.')
+					.addFields(
+						{ name: '> 9.1 Unauthorized Advertising', value: 'Advertising other servers, websites, social media accounts, or personal projects is not permitted without explicit permission from the staff.'},
+						{ name: '> 9.2 Direct Message Advertising', value: 'Avoid sending unsolicited advertisements or promotional messages to other members.'}
 					)
 					.setColor('#FF0000'),
 
 				new EmbedBuilder()
-					.setTitle('Rule 10: No Advertising')
-					.setDescription(
-						`**10.1 Unauthorized Advertising:** Advertising other servers, websites, social media accounts, or personal projects is not permitted without explicit permission from the staff.
-                        **10.2 Direct Message Advertising:** Avoid sending unsolicited advertisements or promotional messages to other members.`
-					)
-					.setColor('#FF0000'),
-
-				new EmbedBuilder()
-					.setTitle("Rule 11: Follow Discord's Community Guidelines")
-					.setDescription(
-						`**11.1 Discord's Rules:** In addition to our server rules, you must adhere to [Discord's Community Guidelines](https://discord.com/guidelines). 
-                        **11.2 Discord Consequences:** Violation of Discord's guidelines may result in actions against your account by Discord.`
+					.setTitle("Rule 10: Follow Discord's Community Guidelines")
+					.setDescription('Adhere to Discord\'s Community Guidelines to ensure a safe and positive experience for everyone.')
+					.addFields(
+						{ name: '> 10.1 Discord\'s Rules', value: 'In addition to our server rules, you must adhere to [Discord\'s Community Guidelines](https://discord.com/guidelines).'}, 
+						{ name: '> 10.2 Discord Consequences', value: 'Violation of Discord\'s guidelines may result in actions against your account by Discord.'}
 					)
 					.setColor('#FF0000'),
 			],
@@ -297,14 +274,10 @@ module.exports = {
 			self_roles: new EmbedBuilder()
 				.setTitle('Customize Your Experience! 🎨')
 				.setDescription(
-					`Assign yourself roles to personalize your experience and connect with others who share your interests! 
-                    
-                    **How to get roles:**
-                    - Go to the <#channel-id-for-self-roles> channel.
-                    - React to the messages corresponding to the roles you want.`
+					`Assign yourself roles to personalize your experience and connect with others who share your interests! \n\n **How to get roles:**\n\n - Go to the <#channel-id-for-self-roles> channel.\n- React to the messages corresponding to the roles you want.`
 				)
-				.setColor('#800080') // Purple
-				.setThumbnail('https://i.imgur.com/your-self-roles-image.png'),
+				.setColor('#800080')
+				.setThumbnail('https://upload.wikimedia.org/wikipedia/commons/5/50/Assessment_icon.png'),
 		};
 	},
 };

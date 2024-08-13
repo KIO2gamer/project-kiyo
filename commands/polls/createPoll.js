@@ -1,4 +1,7 @@
-const { SlashCommandBuilder, PollLayoutType } = require('discord.js');
+const { SlashCommandBuilder, PollLayoutType, EmbedBuilder } = require('discord.js');
+
+const MAX_POLL_DURATION_HOURS = 32;
+const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,13 +19,15 @@ module.exports = {
 		.addBooleanOption(option =>
 			option
 				.setName('multi_select')
-				.setDescription('Allow multi selection of answers or not')
+				.setDescription('Allow multiple answer selections')
 				.setRequired(true)
 		)
 		.addIntegerOption(option =>
 			option
 				.setName('duration')
-				.setDescription('Duration of poll in hours (max 32 hours)')
+				.setDescription(
+					`Duration of the poll in hours (max ${MAX_POLL_DURATION_HOURS} hours)`
+				)
 				.setRequired(true)
 		),
 
@@ -32,31 +37,49 @@ module.exports = {
 			const options = interaction.options
 				.getString('options')
 				.split(',')
-				.map(option => option.trim());
+				.map(option => option.trim())
+				.filter(option => option !== ''); // Remove empty options
 			const multiSelect = interaction.options.getBoolean('multi_select');
-			let duration = interaction.options.getInteger('duration');
+			let durationHours = interaction.options.getInteger('duration');
 
 			if (options.length < 2) {
-				return interaction.reply('Please provide at least two options for the poll.');
+				return interaction.reply({
+					content: 'Please provide at least two options for the poll.',
+					ephemeral: true,
+				});
 			}
 
-			// Convert hours to minutes and ensure it does not exceed 768 minutes
-			const maxDuration = 768;
-			duration = Math.min(duration * 60, maxDuration);
+			if (durationHours <= 0 || durationHours > MAX_POLL_DURATION_HOURS) {
+				return interaction.reply({
+					content: `Duration must be between 1 and ${MAX_POLL_DURATION_HOURS} hours.`,
+					ephemeral: true,
+				});
+			}
+
+			const durationMinutes = Math.min(durationHours * 60, MAX_POLL_DURATION_MINUTES);
+
+			const pollEmbed = new EmbedBuilder().setColor(0x0099ff).setTitle(question);
+
+			options.forEach((option, index) => {
+				pollEmbed.addFields({ name: `Option ${index + 1}`, value: option, inline: true });
+			});
 
 			await interaction.reply({
-				content: 'Poll created successfully!',
+				embeds: [pollEmbed],
 				poll: {
-					question: { text: question },
+					question: { text: 'Vote for your choices!' }, // Placeholder question
 					answers: options.map(option => ({ text: option })),
 					allowMultiselect: multiSelect,
-					duration: duration, // Duration in minutes
+					duration: durationMinutes,
 					layoutType: PollLayoutType.Default,
 				},
 			});
 		} catch (error) {
 			console.error(error);
-			await interaction.reply('An error occurred while creating the poll.');
+			await interaction.reply({
+				content: 'An error occurred while creating the poll.',
+				ephemeral: true,
+			});
 		}
 	},
 };
