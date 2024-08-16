@@ -12,7 +12,10 @@ module.exports = {
 				return interaction.reply('An error occurred while loading the words.');
 			}
 
-			const words = data.split('\n').map(word => word.trim()).filter(word => word);
+			const words = data
+				.split('\n')
+				.map(word => word.trim())
+				.filter(word => word);
 			if (words.length === 0) {
 				return interaction.reply('The word list is empty!');
 			}
@@ -39,9 +42,7 @@ module.exports = {
 					embed
 						.setColor(0x00ff00)
 						.setTitle('Correct!')
-						.setDescription(
-							`You got it right! The word was **${chosenWord}**. 🎉`
-						)
+						.setDescription(`You got it right! The word was **${chosenWord}**. 🎉`)
 						.setFooter({ text: '' }); // Remove timer footer
 					await interaction.editReply({ embeds: [embed] });
 					collector.stop();
