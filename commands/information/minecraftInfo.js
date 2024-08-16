@@ -1,73 +1,59 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const axios = require('axios');
 const NodeCache = require('node-cache');
+
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 minutes
+const MOJANG_API_BASE = 'https://api.mojang.com/users/profiles/minecraft/'; 
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('minecraft')
-		.setDescription('Sends info about a Minecraft player')
-		.addStringOption(option =>
-			option
-				.setName('username')
-				.setDescription('Search for a Minecraft player')
-				.setRequired(true)
-		),
+  data: new SlashCommandBuilder()
+    .setName('minecraft')
+    .setDescription('Gets info about a Minecraft player')
+    .addStringOption(option =>
+      option
+        .setName('username')
+        .setDescription('The Minecraft username')
+        .setRequired(true)
+    ),
+  async execute(interaction) {
+    const username = interaction.options.getString('username');
 
-	async execute(interaction) {
-		const username = interaction.options.getString('username');
+    // Check Cache
+    const cachedData = cache.get(username);
+    if (cachedData) {
+      await interaction.reply({ embeds: [cachedData] });
+      return;
+    }
 
-		// Check if the data is in cache
-		const cachedData = cache.get(username);
-		if (cachedData) {
-			await interaction.reply({ embeds: [createEmbed(cachedData)] });
-			return;
-		}
+    try {
+      // 1. Get UUID from Mojang API
+      const mojangResponse = await axios.get(`${MOJANG_API_BASE}${username}`);
+      const mojangData = mojangResponse.data;
 
-		try {
-			const response = await fetch(
-				`https://api.mojang.com/users/profiles/minecraft/${username}`
-			);
-			const data = await response.json();
+      if (mojangData && mojangData.id) {
+        const uuid = mojangData.id; 
 
-			if (data && data.id && data.name) {
-				const skinHeadUrl = `https://minotar.net/helm/${data.id}/256.png`;
-				const skinFullUrl = `https://minotar.net/skin/${data.id}`;
+        // 2. Create Embed with Crafatar URL
+        const infoEmbed = new EmbedBuilder()
+          .setColor('#0099ff')
+          .setTitle(`Minecraft Player: ${mojangData.name}`)
+          .setThumbnail(`https://crafatar.com/avatars/${uuid}?size=256`) // Crafatar URL
+          .addFields(
+            { name: 'Username', value: mojangData.name, inline: true },
+            { name: 'UUID', value: uuid, inline: true }
+          )
+          .setTimestamp();
 
-				const infoMinecraftEmbed = new EmbedBuilder()
-					.setColor('#0099ff')
-					.setTitle(`Minecraft Player: ${data.name}`)
-					.setThumbnail(skinHeadUrl)
-					.addFields(
-						{ name: 'Username', value: data.name, inline: true },
-						{ name: 'UUID', value: data.id, inline: true }
-					)
-					.setImage(skinFullUrl)
-					.setTimestamp();
+        // Cache the embed
+        cache.set(username, infoEmbed);
 
-				// Cache the data
-				cache.set(username, infoMinecraftEmbed);
-
-				await interaction.reply({ embeds: [infoMinecraftEmbed] });
-			} else {
-				await interaction.reply('Could not find the Minecraft player.');
-			}
-		} catch (error) {
-			console.error(error);
-			await interaction.reply(
-				'An error occurred while fetching the player information. Please try again later.'
-			);
-		}
-	},
+        await interaction.reply({ embeds: [infoEmbed] });
+      } else {
+        await interaction.reply('Player not found on Mojang API.');
+      }
+    } catch (error) {
+      console.error('Error fetching Minecraft player data:', error);
+      await interaction.reply('An error occurred while fetching player information.');
+    }
+  },
 };
-
-function createEmbed(playerData) {
-	return new EmbedBuilder()
-		.setColor('#0099ff')
-		.setTitle(`Minecraft Player: ${playerData.name}`)
-		.setThumbnail(playerData.skinUrl)
-		.addFields(
-			{ name: 'Username', value: playerData.name, inline: true },
-			{ name: 'UUID', value: playerData.uuid, inline: true }
-		)
-		.setTimestamp();
-}
