@@ -6,16 +6,16 @@ module.exports = {
 		.setDescription("Checks the bot's latency and uptime"), // More descriptive
 
 	async execute(interaction) {
-		const sent = await interaction.reply({ 
+		const sent = await interaction.reply({
 			content: 'Pinging...', // Initial simple message
-			fetchReply: true 
+			fetchReply: true,
 		});
 
 		const latency = sent.createdTimestamp - interaction.createdTimestamp;
 		const apiLatency = Math.round(interaction.client.ws.ping);
 
 		// Improved uptime formatting
-		const uptime = formatUptime(process.uptime()); 
+		const uptime = formatUptime(process.uptime());
 
 		const embed = new EmbedBuilder()
 			.setTitle('🏓 Pong!') // More fun title
@@ -26,21 +26,21 @@ module.exports = {
 				{ name: 'Uptime', value: uptime, inline: false }
 			)
 			.setTimestamp()
-			.setFooter({ 
+			.setFooter({
 				text: `Requested by ${interaction.user.tag}`,
-				iconURL: interaction.user.displayAvatarURL({ dynamic: true }) 
+				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 			});
 
 		await sent.edit({ content: '', embeds: [embed] }); // Edit initial message with embed
 	},
 };
 
-// Helper function for better uptime formatting 
+// Helper function for better uptime formatting
 function formatUptime(seconds) {
-    const days = Math.floor(seconds / (3600*24));
-    const hours = Math.floor(seconds % (3600*24) / 3600);
-    const minutes = Math.floor(seconds % 3600 / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
+	const days = Math.floor(seconds / (3600 * 24));
+	const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+	const minutes = Math.floor((seconds % 3600) / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
 
-    return `${days}d ${hours}h ${minutes}m ${remainingSeconds}s`;
+	return `${days}d ${hours}h ${minutes}m ${remainingSeconds}s`;
 }
