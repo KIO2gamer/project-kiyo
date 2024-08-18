@@ -147,7 +147,7 @@ Kiyo uses slash commands (introduced in Discord API v9). Here's a glimpse of Kiy
     |Command|Description|
     | --- | --- |
     | /8ball <question\> | Ask the magic 8-ball a question. |
-    | /roll | Roll a dice with a specified number of sides.|
+    | /roll | Roll a dice to get a random side. |
     | /meme | Get a random meme.|
 
 -   **Moderation:**
