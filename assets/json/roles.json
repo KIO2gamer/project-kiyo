@@ -1,0 +1,14 @@
+{
+	"roles": [
+		{
+			"roleID": "1238798618115444787",
+			"roleName": "Less than 1K",
+			"roleColor": "1f8b4c"
+		},
+		{
+			"roleID": "1211207812328460308",
+			"roleName": "@everyone",
+			"roleColor": "0"
+		}
+	]
+}
