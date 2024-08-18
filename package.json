@@ -8,6 +8,11 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"nodemonConfig": {
+		"ignore": [
+			"assets/"
+		]
+	},
 	"dependencies": {
 		"@giphy/react-native-sdk": "^3.2.6",
 		"@google/generative-ai": "^0.1.3",
