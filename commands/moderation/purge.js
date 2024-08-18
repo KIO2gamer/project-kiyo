@@ -1,9 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
+// Rate limiting (adjust as needed)
+const MAX_PURGE_PER_REQUEST = 100; // Max messages per bulkDelete
+const PURGE_COOLDOWN_MS = 5000; // Cooldown in milliseconds
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('purge')
-		.setDescription('Prune messages from a user')
+		.setDescription('Prune messages from a user (max 100 messages within 14 days)')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
 		.addUserOption(option =>
 			option
@@ -14,40 +18,67 @@ module.exports = {
 		.addIntegerOption(option =>
 			option
 				.setName('amount')
-				.setDescription('The number of messages to prune')
+				.setDescription('The number of messages to prune (max 100)')
 				.setRequired(true)
+				.setMinValue(1)
+				.setMaxValue(100)
 		),
 
 	async execute(interaction) {
-		const userOption = interaction.options.getUser('user');
-		const amountOption = interaction.options.getInteger('amount');
+		const user = interaction.options.getUser('user');
+		let amount = interaction.options.getInteger('amount');
 
-		const userId = userOption.id;
-		const amount = amountOption;
-
-		// Defer the reply to give more time for processing
-		await interaction.deferReply({ ephemeral: true });
+		// Immediately defer the reply to acknowledge the interaction
+		await interaction.deferReply({ ephemeral: true }).catch(console.error);
 
 		try {
-			const fetchedMessages = await interaction.channel.messages.fetch({ limit: 100 });
-			const userMessages = fetchedMessages
-				.filter(message => message.author.id === userId)
-				.first(amount);
+			// Limit amount to the maximum allowed by Discord
+			amount = Math.min(amount, MAX_PURGE_PER_REQUEST);
 
-			if (userMessages.length === 0) {
+			// Calculate the timestamp for 14 days ago
+			const twoWeeksAgo = Date.now() - 14 * 24 * 60 * 60 * 1000;
+
+			const messagesToDelete = [];
+			let lastMessageId;
+
+			// Fetch messages in batches until 'amount' is reached or no more messages
+			while (messagesToDelete.length < amount) {
+				const fetchedMessages = await interaction.channel.messages.fetch({
+					limit: MAX_PURGE_PER_REQUEST,
+					...(lastMessageId && { before: lastMessageId }),
+				});
+
+				if (fetchedMessages.size === 0) break;
+
+				lastMessageId = fetchedMessages.last().id;
+
+				messagesToDelete.push(
+					...fetchedMessages.filter(
+						msg => msg.author.id === user.id && msg.createdTimestamp > twoWeeksAgo
+					)
+				);
+			}
+
+			// Delete messages if any are found
+			if (messagesToDelete.length > 0) {
+				const deletedCount = (
+					await interaction.channel.bulkDelete(messagesToDelete.slice(0, amount), true)
+				).size;
+
+				const embed = new EmbedBuilder()
+					.setColor('#00ff00')
+					.setTitle('Purge Successful')
+					.setDescription(`Pruned ${deletedCount} messages from ${user}`);
+
+				await interaction.editReply({ embeds: [embed] });
+			} else {
 				return interaction.editReply({
-					content: `No messages found from ${userOption.username}`,
+					content: `No messages found from ${user.username} within the last 14 days.`,
 				});
 			}
 
-			await interaction.channel.bulkDelete(userMessages, true);
-
-			const embed = new EmbedBuilder()
-				.setColor('#00ff00')
-				.setTitle('Purge Successful')
-				.setDescription(`Pruned ${userMessages.length} messages from <@${userId}>`);
-
-			await interaction.editReply({ embeds: [embed] });
+			// Optional: Implement rate limit handling (adjust cooldown as needed)
+			await new Promise(resolve => setTimeout(resolve, PURGE_COOLDOWN_MS));
 		} catch (error) {
 			console.error('Failed to prune messages:', error);
 
@@ -55,10 +86,10 @@ module.exports = {
 				.setColor('#ff0000')
 				.setTitle('Purge Failed')
 				.setDescription(
-					`Failed to prune messages from <@${userId}>\nError: \`${error.message}\``
+					`Failed to prune messages from ${user}\nError: \`${error.message}\``
 				);
 
-			await interaction.editReply({ embeds: [embed] });
+			interaction.editReply({ embeds: [embed] }).catch(console.error);
 		}
 	},
 };
