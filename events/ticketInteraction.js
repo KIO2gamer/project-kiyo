@@ -4,6 +4,8 @@ const fs = require('fs');
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
+		if (!interaction.isButton()) return;
+
 		if (interaction.isButton() && interaction.customId.startsWith('open-ticket')) {
 			// Check for any button with an ID starting with 'open-ticket'
 			await interaction.deferReply({ ephemeral: true });

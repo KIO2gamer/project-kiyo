@@ -7,7 +7,7 @@ const {
 const fs = require('fs');
 
 module.exports = {
-	data: new SlashCommandBuilder().setName('openticket').setDescription('Opens a new ticket.'),
+	data: new SlashCommandBuilder().setName('open_ticket').setDescription('Opens a new ticket.'),
 
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
