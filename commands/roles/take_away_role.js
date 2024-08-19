@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('removerole')
-		.setDescription('Removes a role from a user')
+		.setName('take_away_role')
+		.setDescription('Takes away the role from a user')
 		.addUserOption(option =>
 			option
 				.setName('target')

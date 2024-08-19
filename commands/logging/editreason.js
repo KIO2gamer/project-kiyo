@@ -4,7 +4,7 @@ const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('editlog')
+		.setName('editreason')
 		.setDescription('Edit the reason for a specific log entry / a range of log entries.')
 		.addStringOption(option =>
 			option

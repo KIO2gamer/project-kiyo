@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('image')
+		.setName('image_headers')
 		.setDescription('Posts an image.')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
