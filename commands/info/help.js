@@ -1,7 +1,6 @@
 const {
 	SlashCommandBuilder,
 	EmbedBuilder,
-	StringSelectMenuBuilder,
 	ActionRowBuilder,
 	ComponentType,
 	ButtonBuilder,
@@ -12,13 +11,29 @@ const path = require('path');
 
 const commandData = new SlashCommandBuilder()
 	.setName('help')
-	.setDescription('Displays all commands or info about a specific command')
-	.addStringOption(option =>
-		option
-			.setName('search')
-			.setRequired(false)
-			.setDescription('Search for a command by name or description')
-	);
+	.setDescription('Displays all commands');
+
+// Function to recursively get commands from a directory
+function getCommandsFromDirectory(dirPath) {
+	const commands = [];
+	const files = fs.readdirSync(dirPath);
+
+	for (const file of files) {
+		const filePath = path.join(dirPath, file);
+		const stat = fs.statSync(filePath);
+
+		if (stat.isDirectory()) {
+			commands.push(...getCommandsFromDirectory(filePath));
+		} else if (file.endsWith('.js')) {
+			const command = require(filePath);
+			if (command.data && command.execute) {
+				commands.push(command);
+			}
+		}
+	}
+
+	return commands;
+}
 
 module.exports = {
 	data: commandData,
@@ -26,155 +41,78 @@ module.exports = {
 		await interaction.deferReply();
 
 		const { client, guild } = interaction;
-		const searchQuery = interaction.options.getString('search')?.toLowerCase();
-
 		const guildCommands = await guild.commands.fetch();
 		const commandsDirectory = path.join(__dirname, '..');
-		const categoryFolders = fs
-			.readdirSync(commandsDirectory)
-			.filter(dir => fs.statSync(path.join(commandsDirectory, dir)).isDirectory());
 
+		// Get all commands recursively
+		const allCommands = getCommandsFromDirectory(commandsDirectory);
+
+		// Group commands by category
 		const commandsByCategory = new Map();
-		for (const category of categoryFolders) {
-			commandsByCategory.set(category, []);
-
-			const commandFiles = fs
-				.readdirSync(path.join(commandsDirectory, category))
-				.filter(file => file.endsWith('.js'));
-
-			for (const file of commandFiles) {
-				const filePath = path.join(commandsDirectory, category, file);
-				const command = require(filePath);
-				commandsByCategory.get(category).push({
-					id: guildCommands.find(c => c.name === command.data.name).id,
-					name: command.data.name,
-					description: command.data.description,
-				});
+		allCommands.forEach(command => {
+			const commandFilePath = path.relative(commandsDirectory, require.resolve(`./${command.data.name}`));
+            const category = commandFilePath.split(path.sep)[0]; 
+			if (!commandsByCategory.has(category)) {
+				commandsByCategory.set(category, []);
 			}
-		}
-
-		const categoryOptions = Array.from(commandsByCategory.keys()).map(category => ({
-			label: category.charAt(0).toUpperCase() + category.slice(1),
-			value: category,
-		}));
-
-		const createCommandListEmbed = (commands, title, color) => {
-			const embed = new EmbedBuilder().setColor(color).setTitle(title).setTimestamp();
-
-			const fieldValueMaxLength = 1024;
-			let currentFieldValue = '';
-
-			commands.forEach((cmd, index) => {
-				const cmdStr = `> \`${index + 1}.\` </${cmd.name}:${
-					cmd.id
-				}> - ${cmd.description}\n`;
-
-				if (currentFieldValue.length + cmdStr.length <= fieldValueMaxLength) {
-					currentFieldValue += cmdStr;
-				} else {
-					embed.addFields({
-						name: currentFieldValue.length > 0 ? '\u200B' : title,
-						value: currentFieldValue,
-					});
-					currentFieldValue = cmdStr;
-				}
+			commandsByCategory.get(category).push({
+				name: command.data.name,
+				description: command.data.description,
 			});
+		});
 
-			if (currentFieldValue.length > 0) {
-				embed.addFields({
-					name: '\u200B',
-					value: currentFieldValue,
-				});
-			}
+		// Function to create the embed for a category
+		const createCategoryEmbed = (categoryName, commands) => {
+			const embed = new EmbedBuilder()
+				.setColor('#e74c3c')
+				.setTitle(`Category: ${categoryName}`)
+				.setTimestamp();
+
+			let description = '';
+			commands.forEach((command, index) => {
+				description += `\`${index + 1}.\` **${command.name}** - ${command.description || 'No description available.'}\n`;
+			});
+			embed.setDescription(description);
 
 			return embed;
 		};
 
-		if (searchQuery) {
-			const searchResults = [];
-			for (const commands of commandsByCategory.values()) {
-				commands.forEach(cmd => {
-					if (
-						cmd.name.toLowerCase().includes(searchQuery) ||
-						cmd.description.toLowerCase().includes(searchQuery)
-					) {
-						searchResults.push(cmd);
-					}
-				});
-			}
+		// Pagination logic for categories
+		const categories = Array.from(commandsByCategory.keys());
+		let currentCategoryIndex = 0;
 
-			const searchEmbed = createCommandListEmbed(
-				searchResults,
-				`🔍 Search Results for "${searchQuery}"`,
-				'#f39c12'
-			).setFooter({
-				text: `Requested by ${interaction.user.tag}`,
-				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-			});
-			return await interaction.editReply({ embeds: [searchEmbed] });
-		}
+		// Create the initial embed
+		const initialEmbed = createCategoryEmbed(
+			categories[currentCategoryIndex],
+			commandsByCategory.get(categories[currentCategoryIndex])
+		);
 
-		const generateCategoryEmbed = async (selectedCategory = null) => {
-			let selected = selectedCategory || categoryFolders[0];
+		// Create the button row
+		const buttonRow = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('prevCategory')
+				.setLabel('Previous Category')
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(currentCategoryIndex === 0),
+			new ButtonBuilder()
+				.setCustomId('nextCategory')
+				.setLabel('Next Category')
+				.setStyle(ButtonStyle.Secondary)
+				.setDisabled(currentCategoryIndex === categories.length - 1)
+		);
 
-			const commands = commandsByCategory.get(selected) || [];
-
-			// Separate action rows for dropdown and button
-			const rowDropdown = new ActionRowBuilder().addComponents(
-				new StringSelectMenuBuilder()
-					.setCustomId('help-category-select')
-					.setPlaceholder('Choose a category')
-					.addOptions(categoryOptions)
-			);
-			const rowButton = new ActionRowBuilder().addComponents(
-				new ButtonBuilder()
-					.setCustomId('go-back')
-					.setLabel('Main Menu')
-					.setStyle(ButtonStyle.Secondary)
-			);
-
-			if (selectedCategory) {
-				const embed = createCommandListEmbed(
-					commands,
-					`Commands: ${selected.charAt(0).toUpperCase() + selected.slice(1)}`,
-					'#e74c3c'
-				).setFooter({
-					text: `Requested by ${interaction.user.tag}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-				});
-				return await interaction.editReply({
-					embeds: [embed],
-					components: [rowDropdown, rowButton],
-				});
-			} else {
-				// Custom Main Menu Embed
-				const mainMenuEmbed = new EmbedBuilder()
-					.setColor('#2ecc71')
-					.setTitle('Welcome to Kiyo Bot Help')
-					.setDescription(
-						'Use the dropdown below to select a command category. You can also search for a specific command using `/help [search]`!'
-					)
-					.setThumbnail(interaction.client.user.avatarURL())
-					.setFooter({
-						text: `Requested by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-					})
-					.setTimestamp();
-
-				return await interaction.editReply({
-					embeds: [mainMenuEmbed],
-					components: [rowDropdown],
-				});
-			}
-		};
-
-		const reply = await generateCategoryEmbed();
-		const selectMenuCollector = reply.createMessageComponentCollector({
-			componentType: ComponentType.StringSelect,
-			time: 60_000 * 5,
+		const reply = await interaction.editReply({
+			embeds: [initialEmbed],
+			components: [buttonRow],
 		});
 
-		selectMenuCollector.on('collect', async i => {
+		// Button collector
+		const collector = reply.createMessageComponentCollector({
+			componentType: ComponentType.Button,
+			time: 60_000 * 5, // 5 minutes
+		});
+
+		collector.on('collect', async i => {
 			if (i.user.id !== interaction.user.id) {
 				return await i.reply({
 					content: 'You should run the command to use this interaction.',
@@ -182,29 +120,28 @@ module.exports = {
 				});
 			}
 
-			const selectedCategory = i.values[0];
-			await generateCategoryEmbed(selectedCategory);
-			await i.deferUpdate();
-		});
-
-		selectMenuCollector.on('end', () => {
-			reply.edit({ components: [] });
-		});
-
-		// Back Button Collector
-		const buttonCollector = reply.createMessageComponentCollector({
-			componentType: ComponentType.Button,
-			time: 60_000 * 5,
-		});
-
-		buttonCollector.on('collect', async i => {
-			if (i.customId === 'go-back') {
-				await generateCategoryEmbed();
-				await i.deferUpdate();
+			if (i.customId === 'prevCategory') {
+				currentCategoryIndex--;
+			} else if (i.customId === 'nextCategory') {
+				currentCategoryIndex++;
 			}
+
+			// Update buttons and embed
+			buttonRow.components[0].setDisabled(currentCategoryIndex === 0);
+			buttonRow.components[1].setDisabled(currentCategoryIndex === categories.length - 1);
+
+			const newEmbed = createCategoryEmbed(
+				categories[currentCategoryIndex],
+				commandsByCategory.get(categories[currentCategoryIndex])
+			);
+
+			await i.update({
+				embeds: [newEmbed],
+				components: [buttonRow],
+			});
 		});
 
-		buttonCollector.on('end', () => {
+		collector.on('end', () => {
 			reply.edit({ components: [] });
 		});
 	},

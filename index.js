@@ -47,30 +47,40 @@ const client = new Client({
 
 // Command collection
 client.commands = new Collection();
-const loadCommands = dir => {
-	const commandFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
-	for (const file of commandFiles) {
-		const command = require(path.join(dir, file));
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-			if (command.data.aliases) {
-				for (const alias of command.data.aliases) {
-					client.commands.set(alias, command);
+// Function to recursively load commands from a directory
+function loadCommands(dir) {
+	const files = fs.readdirSync(dir);
+
+	for (const file of files) {
+		const filePath = path.join(dir, file);
+		const stat = fs.statSync(filePath);
+
+		if (stat.isDirectory()) {
+			// Recursively load commands from subdirectories
+			loadCommands(filePath);
+		} else if (file.endsWith('.js')) {
+			const command = require(filePath);
+			// Use hasOwnProperty() to check for properties
+			if (command.hasOwnProperty('data') && command.hasOwnProperty('execute')) {
+				client.commands.set(command.data.name, command);
+
+				if (command.data.aliases) {
+					for (const alias of command.data.aliases) {
+						client.commands.set(alias, command);
+					}
 				}
+			} else {
+				console.warn(
+					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+				);
 			}
-		} else {
-			console.warn(
-				`[WARNING] The command at ${path.join(dir, file)} is missing a required "data" or "execute" property.`
-			);
 		}
 	}
-};
-
-const commandFolders = fs.readdirSync(path.join(__dirname, 'commands'));
-for (const folder of commandFolders) {
-	loadCommands(path.join(__dirname, 'commands', folder));
 }
+
+// Load commands from the 'commands' directory
+loadCommands(path.join(__dirname, 'commands'));
 
 // Event handling
 const loadEvents = dir => {
@@ -109,32 +119,41 @@ async function connectToMongoDB(retries = 5) {
 // Deploy commands
 const deployCommands = async () => {
 	const commands = [];
-	const foldersPath = path.join(__dirname, 'commands');
-	const commandFolders = fs.readdirSync(foldersPath);
+	// Set the base directory for your commands
+	const commandsDir = path.join(__dirname, 'commands');
 
-	for (const folder of commandFolders) {
-		const commandsPath = path.join(foldersPath, folder);
-		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	// Function to recursively get commands from subfolders
+	function getCommandsFromDir(dirPath) {
+		const files = fs.readdirSync(dirPath);
 
-		for (const file of commandFiles) {
-			const filePath = path.join(commandsPath, file);
-			const command = require(filePath);
-			if (command.data && command.execute) {
-				commands.push(command.data.toJSON());
-			} else {
-				console.warn(
-					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-				);
+		for (const file of files) {
+			const filePath = path.join(dirPath, file);
+			const stat = fs.statSync(filePath);
+
+			if (stat.isDirectory()) {
+				getCommandsFromDir(filePath);
+			} else if (file.endsWith('.js')) {
+				const command = require(filePath);
+				if (command.data && command.execute) {
+					commands.push(command.data.toJSON());
+				} else {
+					console.warn(
+						`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+					);
+				}
 			}
 		}
 	}
+
+	// Start getting commands from the base directory
+	getCommandsFromDir(commandsDir);
 
 	const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 	try {
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-		// Reset global commands (if needed)
+		// Reset global commands (if needed) - COMMENT OUT IF NOT NEEDED
 		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] });
 		console.log('Successfully reset global commands.');
 
