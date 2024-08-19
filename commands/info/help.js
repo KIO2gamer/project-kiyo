@@ -1,148 +1,67 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	ActionRowBuilder,
-	ComponentType,
-	ButtonBuilder,
-	ButtonStyle,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 
 const commandData = new SlashCommandBuilder()
-	.setName('help')
-	.setDescription('Displays all commands');
-
-// Function to recursively get commands from a directory
-function getCommandsFromDirectory(dirPath) {
-	const commands = [];
-	const files = fs.readdirSync(dirPath);
-
-	for (const file of files) {
-		const filePath = path.join(dirPath, file);
-		const stat = fs.statSync(filePath);
-
-		if (stat.isDirectory()) {
-			commands.push(...getCommandsFromDirectory(filePath));
-		} else if (file.endsWith('.js')) {
-			const command = require(filePath);
-			if (command.data && command.execute) {
-				commands.push(command);
-			}
-		}
-	}
-
-	return commands;
-}
+    .setName('help')
+    .setDescription('Get help with commands.');
 
 module.exports = {
-	data: commandData,
-	async execute(interaction) {
-		await interaction.deferReply();
+    data: commandData,
+    async execute(interaction) {
+        const commandsDirectory = path.join(__dirname, '..'); 
+        const categories = fs.readdirSync(commandsDirectory).filter(f => fs.statSync(path.join(commandsDirectory, f)).isDirectory());
 
-		const { client, guild } = interaction;
-		const guildCommands = await guild.commands.fetch();
-		const commandsDirectory = path.join(__dirname, '..');
+        const generateHelpEmbed = (categoryIndex) => {
+            const category = categories[categoryIndex];
+            const embed = new EmbedBuilder()
+                .setColor('#2ecc71') 
+                .setTitle(`Help - ${category.toUpperCase()}`)
+                .setDescription(`Use buttons to navigate categories.\n\n**${category.toUpperCase()} Commands:**`);
 
-		// Get all commands recursively
-		const allCommands = getCommandsFromDirectory(commandsDirectory);
+            const commandFiles = fs.readdirSync(path.join(commandsDirectory, category)).filter(file => file.endsWith('.js'));
+            commandFiles.forEach(file => {
+                const command = require(`../${category}/${file}`);
+                embed.addFields({ name: `/${command.data.name}`, value: command.data.description || 'No description provided.' });
+            });
 
-		// Group commands by category
-		const commandsByCategory = new Map();
-		allCommands.forEach(command => {
-			const commandFilePath = path.relative(commandsDirectory, require.resolve(`./${command.data.name}`));
-            const category = commandFilePath.split(path.sep)[0]; 
-			if (!commandsByCategory.has(category)) {
-				commandsByCategory.set(category, []);
-			}
-			commandsByCategory.get(category).push({
-				name: command.data.name,
-				description: command.data.description,
-			});
-		});
+            return embed;
+        };
 
-		// Function to create the embed for a category
-		const createCategoryEmbed = (categoryName, commands) => {
-			const embed = new EmbedBuilder()
-				.setColor('#e74c3c')
-				.setTitle(`Category: ${categoryName}`)
-				.setTimestamp();
+        let currentCategoryIndex = 0;
+        const initialEmbed = generateHelpEmbed(currentCategoryIndex);
 
-			let description = '';
-			commands.forEach((command, index) => {
-				description += `\`${index + 1}.\` **${command.name}** - ${command.description || 'No description available.'}\n`;
-			});
-			embed.setDescription(description);
+        const buttons = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('prev')
+                    .setLabel('◀️ Previous')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(currentCategoryIndex === 0),
+                new ButtonBuilder()
+                    .setCustomId('next')
+                    .setLabel('Next ▶️')
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(currentCategoryIndex === categories.length - 1)
+            );
 
-			return embed;
-		};
+        const message = await interaction.reply({ embeds: [initialEmbed], components: [buttons], fetchReply: true });
 
-		// Pagination logic for categories
-		const categories = Array.from(commandsByCategory.keys());
-		let currentCategoryIndex = 0;
+        const collector = message.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 }); 
 
-		// Create the initial embed
-		const initialEmbed = createCategoryEmbed(
-			categories[currentCategoryIndex],
-			commandsByCategory.get(categories[currentCategoryIndex])
-		);
+        collector.on('collect', async i => {
+            if (i.user.id !== interaction.user.id) return i.reply({ content: "This isn't for you!", ephemeral: true });
 
-		// Create the button row
-		const buttonRow = new ActionRowBuilder().addComponents(
-			new ButtonBuilder()
-				.setCustomId('prevCategory')
-				.setLabel('Previous Category')
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(currentCategoryIndex === 0),
-			new ButtonBuilder()
-				.setCustomId('nextCategory')
-				.setLabel('Next Category')
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(currentCategoryIndex === categories.length - 1)
-		);
+            if (i.customId === 'prev') currentCategoryIndex--;
+            else if (i.customId === 'next') currentCategoryIndex++;
 
-		const reply = await interaction.editReply({
-			embeds: [initialEmbed],
-			components: [buttonRow],
-		});
+            buttons.components[0].setDisabled(currentCategoryIndex === 0); 
+            buttons.components[1].setDisabled(currentCategoryIndex === categories.length - 1); 
 
-		// Button collector
-		const collector = reply.createMessageComponentCollector({
-			componentType: ComponentType.Button,
-			time: 60_000 * 5, // 5 minutes
-		});
+            const newEmbed = generateHelpEmbed(currentCategoryIndex);
+            await i.update({ embeds: [newEmbed], components: [buttons] });
+        });
 
-		collector.on('collect', async i => {
-			if (i.user.id !== interaction.user.id) {
-				return await i.reply({
-					content: 'You should run the command to use this interaction.',
-					ephemeral: true,
-				});
-			}
-
-			if (i.customId === 'prevCategory') {
-				currentCategoryIndex--;
-			} else if (i.customId === 'nextCategory') {
-				currentCategoryIndex++;
-			}
-
-			// Update buttons and embed
-			buttonRow.components[0].setDisabled(currentCategoryIndex === 0);
-			buttonRow.components[1].setDisabled(currentCategoryIndex === categories.length - 1);
-
-			const newEmbed = createCategoryEmbed(
-				categories[currentCategoryIndex],
-				commandsByCategory.get(categories[currentCategoryIndex])
-			);
-
-			await i.update({
-				embeds: [newEmbed],
-				components: [buttonRow],
-			});
-		});
-
-		collector.on('end', () => {
-			reply.edit({ components: [] });
-		});
-	},
+        collector.on('end', () => interaction.editReply({ components: [] })); 
+    }
 };
