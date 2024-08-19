@@ -9,7 +9,7 @@ const {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('setupticket')
+		.setName('setup_ticket')
 		.setDescription('Sends the ticket opening message to a channel.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels) // Require Manage Channels permission
 		.addChannelOption(option =>

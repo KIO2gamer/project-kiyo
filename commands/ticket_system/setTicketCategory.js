@@ -3,7 +3,7 @@ const fs = require('fs');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('setticketcategory')
+		.setName('set_ticket_category')
 		.setDescription('Sets the category where tickets will be created.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 		.addChannelOption(option =>
