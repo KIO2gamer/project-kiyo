@@ -2,12 +2,9 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('view_roles_from_data')
 		.setDescription('View the roles stored in the data.'),

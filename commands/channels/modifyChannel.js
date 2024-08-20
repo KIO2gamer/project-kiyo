@@ -1,12 +1,9 @@
 const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('modifychannel')
 		.setDescription('Modify a text or voice channel.')

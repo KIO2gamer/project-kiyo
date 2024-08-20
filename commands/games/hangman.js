@@ -13,12 +13,9 @@ const hangmanImages = [
 ];
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder().setName('hangman').setDescription('Start a game of hangman!'),
 	async execute(interaction) {
 		fs.readFile('./assets/texts/hangmanWords.txt', 'utf-8', async (err, data) => {

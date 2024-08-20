@@ -2,12 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('roleinfo')
 		.setDescription('Provides information about a specific role')

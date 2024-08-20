@@ -2,12 +2,9 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('disc
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('Select a member and kick them.')
