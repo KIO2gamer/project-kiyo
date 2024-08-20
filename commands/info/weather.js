@@ -3,12 +3,9 @@ const { EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('weather')
 		.setDescription('Gets the current weather for a specified city')

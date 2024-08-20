@@ -7,12 +7,9 @@ const {
 const fs = require('fs');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder().setName('open_ticket').setDescription('Opens a new ticket.'),
 
 	async execute(interaction) {

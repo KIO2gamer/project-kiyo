@@ -6,14 +6,15 @@ const {
 } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: 'Deletes a specified channel.',
+	usage: '/delete_channel [channel]',
+	examples: [
+		'/delete_channel channel:category',
+		'/delete_channel channel:text',
+		'/delete_channel channel:voice',
+	],
 	data: new SlashCommandBuilder()
-		.setName('deletechannel')
+		.setName('delete_channel')
 		.setDescription('Deletes a specified channel.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 		.addChannelOption(option =>
@@ -28,7 +29,7 @@ module.exports = {
 			const embed = new EmbedBuilder()
 				.setTitle('Channel Deleted!')
 				.setColor('Red')
-				.setDescription(`The channel <#${channel.id}> has been successfully deleted.`)
+				.setDescription(`The channel ${channel.id} has been successfully deleted.`)
 				.setTimestamp();
 
 			await interaction.reply({ embeds: [embed] });

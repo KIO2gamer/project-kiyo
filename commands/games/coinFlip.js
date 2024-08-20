@@ -1,12 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder().setName('coinflip').setDescription('Flip a coin!'),
 	async execute(interaction) {
 		const result = Math.floor(Math.random() * 2) === 0 ? 'Heads' : 'Tails';

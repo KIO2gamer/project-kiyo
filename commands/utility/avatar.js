@@ -1,12 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder, ApplicationCommandOptionType } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('avatar')
 		.setDescription('Get the avatar of the user.')

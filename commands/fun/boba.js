@@ -2,12 +2,9 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('boba')
 		.setDescription('Send a pic of boba because it is the best.'),

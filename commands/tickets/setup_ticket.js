@@ -8,12 +8,9 @@ const {
 } = require('discord.js');
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('setup_ticket')
 		.setDescription('Sends the ticket opening message to a channel.')

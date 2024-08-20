@@ -18,12 +18,9 @@ const ACTION_CHOICES = [
 ];
 
 module.exports = {
-    description_full: '',
-    usage: '',
-    examples: [
-        '',
-        '',
-    ],
+	description_full: '',
+	usage: '',
+	examples: ['', ''],
 	data: new SlashCommandBuilder()
 		.setName('logs')
 		.setDescription('Show the moderation logs.')
