@@ -3,8 +3,12 @@ const allowedRoles = ['938469752882479166'];
 const allowedUsers = ['764513584125444146'];
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('eval')
 		.setDescription('Evaluates JavaScript code.')

@@ -6,8 +6,12 @@ const {
 } = require('discord.js');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('deletechannel')
 		.setDescription('Deletes a specified channel.')

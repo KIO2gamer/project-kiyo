@@ -11,8 +11,12 @@ const RATE_LIMIT_DELAY = 60000 / REQUESTS_PER_MINUTE;
 let lastRequestTime = 0;
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('lyricwhiz')
 		.setDescription('Start a music lyric guessing game!'),

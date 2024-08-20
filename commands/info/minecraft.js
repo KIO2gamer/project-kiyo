@@ -6,8 +6,12 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 mi
 const MOJANG_API_BASE = 'https://api.mojang.com/users/profiles/minecraft/';
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('minecraft')
 		.setDescription('Gets info about a Minecraft player')
