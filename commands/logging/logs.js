@@ -18,6 +18,8 @@ const ACTION_CHOICES = [
 ];
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('logs')
 		.setDescription('Show the moderation logs.')

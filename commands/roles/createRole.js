@@ -76,6 +76,8 @@ permissionGroups.forEach(group => {
 });
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: commandBuilder,
 
 	async execute(interaction) {

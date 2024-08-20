@@ -3,6 +3,8 @@ const ModerationLog = require('../../bot_utils/ModerationLog');
 const ms = require('ms'); // Use ms library to parse duration strings
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('tempban')
 		.setDescription('Temporarily ban a member for a specified duration.')

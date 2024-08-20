@@ -3,6 +3,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('editreason')
 		.setDescription('Edit the reason for a specific log entry / a range of log entries.')

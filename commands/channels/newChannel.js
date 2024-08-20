@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('newchannel')
 		.setDescription('Creates a new channel.')
