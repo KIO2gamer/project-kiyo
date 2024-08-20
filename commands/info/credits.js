@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('credits')
 		.setDescription('Shows an embed of users who helped make this bot.'),

@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription("Checks the bot's latency and uptime"), // More descriptive

@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('lock')
 		.setDescription('Lock a channel')

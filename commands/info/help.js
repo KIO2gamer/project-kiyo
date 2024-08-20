@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
+    usage: ,
+    examples: ,
     data: new SlashCommandBuilder()
         .setName('help')
         .setDescription('Displays all available commands.'),

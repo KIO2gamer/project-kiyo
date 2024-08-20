@@ -5,6 +5,8 @@ const MAX_PURGE_PER_REQUEST = 100; // Max messages per bulkDelete
 const PURGE_COOLDOWN_MS = 5000; // Cooldown in milliseconds
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('purge')
 		.setDescription('Prune messages from a user (max 100 messages within 14 days)')

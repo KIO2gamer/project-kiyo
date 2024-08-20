@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('deleterole')
 		.setDescription('Deletes an existing role')

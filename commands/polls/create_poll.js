@@ -4,6 +4,8 @@ const MAX_POLL_DURATION_HOURS = 32;
 const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('create_poll')
 		.setDescription('Create a poll')

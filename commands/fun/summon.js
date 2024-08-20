@@ -2,6 +2,8 @@ const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const cooldowns = new Map();
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('summon')
 		.setDescription('Summons the user from the undead')

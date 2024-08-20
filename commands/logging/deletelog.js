@@ -3,6 +3,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('deletelog')
 		.setDescription('Delete a moderation log/logs by log number/range.')

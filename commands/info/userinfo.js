@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, ActivityType } = require('discord.js');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('userinfo')
 		.setDescription('Displays information about a user.')

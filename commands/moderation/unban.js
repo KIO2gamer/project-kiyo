@@ -2,6 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('unban')
 		.setDescription('Unban a member from the server.')

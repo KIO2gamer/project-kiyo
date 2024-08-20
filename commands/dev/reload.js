@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 module.exports = {
+    usage: ,
+    examples: ,
 	data: new SlashCommandBuilder()
 		.setName('reload')
 		.setDescription('Reloads a command.')
