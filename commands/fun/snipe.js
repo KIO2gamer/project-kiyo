@@ -2,8 +2,12 @@ const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const cooldowns = new Map();
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('snipe')
 		.setDescription('Snipes the user')

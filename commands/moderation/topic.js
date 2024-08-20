@@ -1,8 +1,12 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('topic')
 		.setDescription('Sends a message about changing the topic.')

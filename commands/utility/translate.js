@@ -2,8 +2,12 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const translate = require('@iamtraction/google-translate');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('translate')
 		.setDescription('Translates text into the desired output language.')

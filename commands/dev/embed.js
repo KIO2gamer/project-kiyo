@@ -1,8 +1,12 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('embed')
 		.setDescription('Posts a pre-formatted embed message.')

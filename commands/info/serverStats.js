@@ -2,8 +2,12 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const moment = require('moment');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('serverstats')
 		.setDescription('Displays various statistics about this server.')

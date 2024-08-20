@@ -1,8 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('give_role')
 		.setDescription('Gives a role to a user')

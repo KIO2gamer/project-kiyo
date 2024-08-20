@@ -1,8 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder()
 		.setName('fetch_poll_answers')
 		.setDescription('Fetches the answers of the poll.')

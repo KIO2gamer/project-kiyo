@@ -2,8 +2,12 @@ const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require('disc
 const os = require('os');
 
 module.exports = {
-    usage: ,
-    examples: ,
+    description_full: '',
+    usage: '',
+    examples: [
+        '',
+        '',
+    ],
 	data: new SlashCommandBuilder().setName('botinfo').setDescription('Get info about the bot.'),
 
 	async execute(interaction) {
