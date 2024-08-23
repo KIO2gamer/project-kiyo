@@ -1,10 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require('discord.js');
-const os = require('os');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Displays information about the bot itself, including its developer, uptime, ping, memory usage, and the number of commands it has.',
+	usage: '/botinfo',
+	examples: ['/botinfo'],
 	data: new SlashCommandBuilder().setName('botinfo').setDescription('Get info about the bot.'),
 
 	async execute(interaction) {

@@ -2,9 +2,9 @@ const { SlashCommandBuilder, EmbedBuilder, ApplicationCommandOptionType } = requ
 const moment = require('moment');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Displays statistics on reactions used in a specific channel or across the entire server. It shows the top 5 most used reactions and the top 5 users who react the most, within a specified timeframe or for the entire server history.',
+	usage: '/reactionstats [channel] [timeframe]',
+	examples: ['/reactionstats', '/reactionstats #general', '/reactionstats #general 7d', '/reactionstats 1M'],
 	data: new SlashCommandBuilder()
 		.setName('reactionstats')
 		.setDescription(
