@@ -1,9 +1,14 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'Posts a predefined image header to the channel. Useful for sending visual guides or announcements related to specific server sections (like welcome, rules, etc.).',
+	usage: '/image_headers <options> [caption]',
+	examples: [
+		"/image_headers welcome 'Welcome to our server!'",
+		'/image_headers rules',
+		"/image_headers forms 'Check out our new application form!'",
+	],
 	data: new SlashCommandBuilder()
 		.setName('image_headers')
 		.setDescription('Posts an image.')

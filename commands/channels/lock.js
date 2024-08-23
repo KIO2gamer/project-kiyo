@@ -6,9 +6,14 @@ const {
 } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'This command locks a specified text or announcement channel, preventing users from sending messages in it. If no channel is specified, it will lock the channel the command is used in.',
+	usage: '/lock <channel>',
+	examples: [
+		'/lock channel:text_channel', // Locks the "text_channel" channel
+		'/lock channel:announcement_channel', // Locks the "announcement_channel" channel
+		'/lock', // Locks the current channel where the command is used
+	],
 	data: new SlashCommandBuilder()
 		.setName('lock')
 		.setDescription('Lock a channel')

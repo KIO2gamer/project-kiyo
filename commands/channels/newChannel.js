@@ -6,11 +6,16 @@ const {
 } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'This command creates a new channel in the server. You can specify the channel name, type (text, voice, category, announcement, or forum), the category it should be placed under (optional), and an optional topic or description.',
+	usage: '/new_channel [name] [type] <category> <topic>',
+	examples: [
+		'/new_channel name:text_channel type:Text', // Creates a simple text channel named "text_channel"
+		'/new_channel name:VIP Room type:Text category:Chat', // Creates a text channel named "VIP Room" under the "Chat" category
+		'/new_channel name:News type:Announcement category:Main topic:Get all updates of the server!!!', // Creates an announcement channel with a topic
+	],
 	data: new SlashCommandBuilder()
-		.setName('newchannel')
+		.setName('new_channel')
 		.setDescription('Creates a new channel.')
 		.addStringOption(option =>
 			option.setName('name').setDescription('The name of the new channel').setRequired(true)
@@ -36,7 +41,9 @@ module.exports = {
 				.addChannelTypes(ChannelType.GuildCategory)
 		)
 		.addStringOption(option =>
-			option.setName('topic').setDescription('The topic for the channel (optional)')
+			option
+				.setName('topic')
+				.setDescription('The topic (description) for the channel (optional)')
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 

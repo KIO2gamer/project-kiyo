@@ -1,9 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: "Prepare for a cuteness overload! This command summons a delightful GIF of a quokka, guaranteed to brighten your day.",
+	usage: '/quokka',
+	examples: ['/quokka'],
 	data: new SlashCommandBuilder()
 		.setName('quokka')
 		.setDescription('Send a pic of a quokka because it is cute.'),
