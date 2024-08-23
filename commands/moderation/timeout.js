@@ -2,9 +2,12 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const ms = require('ms');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Timeouts a member for the specified duration and reason.',
+	usage: '/timeout target:@user amount:"duration" [reason:"timeout reason"]',
+	examples: [
+		'/timeout target:@user123 amount:"1h"', 
+		'/timeout target:@user123 amount:"30m" reason:"Being disruptive"' 
+	],
 	data: new SlashCommandBuilder()
 		.setName('timeout')
 		.setDescription('Select a member and timeout them.')

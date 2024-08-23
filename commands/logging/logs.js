@@ -18,9 +18,17 @@ const ACTION_CHOICES = [
 ];
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Displays the moderation logs with various filtering options.',
+	usage: '/logs [limit] [user] [lognumber] [logrange] [action] [moderator]',
+	examples: [
+		'/logs',
+		'/logs limit:10',
+		'/logs user:@user123',
+		'/logs lognumber:5',
+		'/logs logrange:1-5',
+		'/logs action:ban',
+		'/logs moderator:@mod456',
+	],
 	data: new SlashCommandBuilder()
 		.setName('logs')
 		.setDescription('Show the moderation logs.')

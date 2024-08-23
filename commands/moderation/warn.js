@@ -2,9 +2,12 @@ const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('disc
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Warns a member with the specified reason.',
+	usage: '/warn target:@user [reason:"warning reason"]',
+	examples: [
+		'/warn target:@user123', 
+		'/warn target:@user123 reason:"Spamming in chat"' 
+	],
 	data: new SlashCommandBuilder()
 		.setName('warn')
 		.setDescription('Warn a member.')
