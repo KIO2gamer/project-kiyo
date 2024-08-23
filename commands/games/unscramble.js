@@ -2,9 +2,10 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'The bot will shuffle the letters of a randomly chosen word. Users have 30 seconds to unscramble the word and guess correctly.',
+	usage: '/unscramble',
+	examples: ['/unscramble'],
 	data: new SlashCommandBuilder()
 		.setName('unscramble')
 		.setDescription('Unscramble the word and win!'),

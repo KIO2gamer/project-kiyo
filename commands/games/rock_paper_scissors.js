@@ -1,9 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'A classic game of Rock, Paper, Scissors against the bot.',
+	usage: '/rock_paper_scissors <choice>',
+	examples: [
+		'/rock_paper_scissors rock',
+		'/rock_paper_scissors paper',
+		'/rock_paper_scissors scissors',
+	],
 	data: new SlashCommandBuilder()
 		.setName('rock_paper_scissors')
 		.setDescription('Play Rock, Paper, Scissors!')
