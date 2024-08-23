@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
-	description_full: 'Displays all available commands.',
+	description_full: 'Displays a list of all available commands or provides detailed information about a specific command.',
 	usage: '/help [command name]',
 	examples: ['/help', '/help ban'],
 	data: new SlashCommandBuilder()

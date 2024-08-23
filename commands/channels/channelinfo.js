@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, ChannelType, PermissionsBitField } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Provides information about a specific channel, including its ID, type, creation date, topic, NSFW status, permissions, and category (if applicable).',
+	usage: '/channelinfo <channel>',
+	examples: ['/channelinfo #general', '/channelinfo 123456789012345678 (channel ID)'],
 	data: new SlashCommandBuilder()
 		.setName('channelinfo')
 		.setDescription('Provides information about a specific channel')

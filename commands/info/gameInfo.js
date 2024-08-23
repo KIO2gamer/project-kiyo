@@ -1,9 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Fetches information about a video game from the Giant Bomb API. This can include the game’s description, genres, release date, platforms, and a link to its page on Giant Bomb.',
+	usage: '/gameinfo <search>',
+	examples: ['/gameinfo The Witcher 3', '/gameinfo "Grand Theft Auto V"'],
 	data: new SlashCommandBuilder()
 		.setName('gameinfo')
 		.setDescription('Fetches game information')
