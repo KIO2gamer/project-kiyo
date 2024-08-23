@@ -2,9 +2,13 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const ms = require('ms');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'This command allows you to set a slowmode for a channel. Slowmode limits how often users can send messages in the specified channel. You can set the slowmode duration using common time units (e.g., 10s, 5m, 1h).',
+	usage: '/slowmode [duration] [channel]',
+	examples: [
+		'/slowmode 10s', // Set slowmode to 10 seconds in the current channel
+		'/slowmode 5m #general', // Set slowmode to 5 minutes in the #general channel
+	],
 	data: new SlashCommandBuilder()
 		.setName('slowmode')
 		.setDescription('Set a slowmode for a channel.')

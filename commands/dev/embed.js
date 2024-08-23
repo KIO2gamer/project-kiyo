@@ -1,9 +1,10 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'This command allows users with "Manage Messages" permissions to post pre-formatted embed messages for various purposes like welcoming new members, displaying level roles, server rules, or other important information.',
+	usage: '/embed <type>',
+	examples: ['/embed welcome', '/embed rules', '/embed all_roles'],
 	data: new SlashCommandBuilder()
 		.setName('embed')
 		.setDescription('Posts a pre-formatted embed message.')

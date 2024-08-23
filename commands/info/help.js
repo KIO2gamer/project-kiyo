@@ -26,29 +26,36 @@ module.exports = {
 		const commandName = interaction.options.getString('command')?.toLowerCase();
 
 		if (commandName) {
-			// Display help for a specific command
 			const command = getCommands().get(commandName);
 
 			if (!command) {
 				return interaction.reply({
 					content: `No command with the name \`${commandName}\` was found.`,
+					ephemeral: true, // Only visible to the user
 				});
 			}
 
+			// Improved embed for single command help
 			const embed = new EmbedBuilder()
 				.setColor('Blue')
 				.setTitle(`Command: \`${command.data.name}\``)
 				.setDescription(command.description_full || command.data.description)
 				.addFields(
-					{ name: 'Usage', value: `\`${command.usage}\``, inline: false },
+					{
+						name: 'Usage',
+						value: `\`/${command.data.name} ${command.usage || ''}\``,
+						inline: false,
+					},
 					{
 						name: 'Examples',
-						value: `\`\`\`${command.examples.join('\n')}\`\`\``,
+						value: command.examples
+							? `\`\`\`${command.examples.join('\n')}\`\`\``
+							: 'No examples provided.',
 						inline: false,
 					}
 				);
 
-			return interaction.reply({ embeds: [embed] });
+			return interaction.reply({ embeds: [embed], ephemeral: true }); // Ephemeral reply
 		} else {
 			// Pagination for all commands
 			const commandFolders = fs.readdirSync('./commands');
@@ -89,7 +96,9 @@ module.exports = {
 							.join('\n')
 					)
 					.setColor(0x00ae86)
-					.setFooter({ text: `Page ${index + 1} of ${categories.length}` });
+					.setFooter({
+						text: `Page ${index + 1} of ${categories.length}`,
+					});
 			};
 
 			const generateButtons = index => {
@@ -114,13 +123,17 @@ module.exports = {
 				embeds: [embed],
 				components: [buttons],
 				fetchReply: true,
+				ephemeral: true, // Pagination is also ephemeral
 			});
 
 			const collector = message.createMessageComponentCollector({ time: 60000 });
 
 			collector.on('collect', async i => {
 				if (i.user.id !== interaction.user.id) {
-					return i.reply({ content: "This button isn't for you!", ephemeral: true });
+					return i.reply({
+						content: "This button isn't for you!",
+						ephemeral: true,
+					});
 				}
 
 				if (i.customId === 'next' && currentIndex < categories.length - 1) {
@@ -138,7 +151,7 @@ module.exports = {
 			collector.on('end', () => {
 				if (message.editable) {
 					message
-						.edit({ components: [generateButtons(currentIndex, true)] })
+						.edit({ components: [] }) // Remove buttons after timeout
 						.catch(error => console.error('Error disabling buttons:', error));
 				}
 			});
@@ -149,7 +162,6 @@ module.exports = {
 function getCommands() {
 	const commands = new Collection();
 	const commandsPath = path.join(__dirname, '..'); // Base path
-	console.log(commandsPath);
 
 	const commandFolders = fs.readdirSync(commandsPath);
 

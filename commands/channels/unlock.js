@@ -6,9 +6,10 @@ const {
 } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'This command unlocks a specified channel or the current channel if no channel is specified.',
+	usage: '/unlock <channel?>',
+	examples: ['/unlock', '/unlock #general'],
 	data: new SlashCommandBuilder()
 		.setName('unlock')
 		.setDescription('Unlock a channel')
