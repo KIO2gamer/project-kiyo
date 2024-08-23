@@ -2,9 +2,9 @@ const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const cooldowns = new Map();
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Summons a user from the realm of the undead (with a 5-minute cooldown).',
+	usage: '/summon <user>',
+	examples: ['/summon @username', '/summon 123456789012345678 (user ID)'],
 	data: new SlashCommandBuilder()
 		.setName('summon')
 		.setDescription('Summons the user from the undead')

@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Tells the user they have been steeled.',
+	usage: '/steel',
+	examples: ['/steel'],
 	data: new SlashCommandBuilder().setName('steel').setDescription('steel'),
 
 	async execute(interaction) {

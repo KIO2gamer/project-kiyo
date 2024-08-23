@@ -1,9 +1,10 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: 'Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.',
+	description_full:
+		'Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.',
 	usage: '/8ball [question]',
-	examples: ['/8ball Will I win the lottery today?', '/8ball Is this the best day of my life?'], 
+	examples: ['/8ball Will I win the lottery today?', '/8ball Is this the best day of my life?'],
 	data: new SlashCommandBuilder()
 		.setName('8ball')
 		.setDescription('Ask the magic 8ball a question.')

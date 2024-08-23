@@ -1,7 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: 'Send a playfully threatening (but ultimately harmless) assassin message. Get ready to be "assassinated" with laughter!', 
+	description_full:
+		'Send a playfully threatening (but ultimately harmless) assassin message. Get ready to be "assassinated" with laughter!',
 	usage: '/kill',
 	examples: ['/kill'],
 	data: new SlashCommandBuilder()
