@@ -1,9 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Displays a random uwu GIF from Tenor.',
+	usage: '/uwu',
+	examples: ['/uwu'],
 	data: new SlashCommandBuilder().setName('uwu').setDescription('uwu'),
 
 	async execute(interaction) {

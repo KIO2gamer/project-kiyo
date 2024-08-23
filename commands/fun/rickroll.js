@@ -1,9 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: "Never gonna give you up, never gonna let you down... especially when you can rickroll your friends with this deviously delightful command!",
+	description_full:
+		'Never gonna give you up, never gonna let you down... especially when you can rickroll your friends with this deviously delightful command!',
 	usage: '/rickroll',
-	examples: ['/rickroll'], 
+	examples: ['/rickroll'],
 	data: new SlashCommandBuilder().setName('rickroll').setDescription('Rickroll someone'),
 
 	async execute(interaction) {

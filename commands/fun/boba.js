@@ -4,7 +4,7 @@ require('dotenv').config();
 module.exports = {
 	description_full: 'Satisfy your boba cravings with a delightful GIF of this delicious drink.',
 	usage: '/boba', // No additional parameters needed
-	examples: ['/boba'], // Only one example is sufficient 
+	examples: ['/boba'], // Only one example is sufficient
 	data: new SlashCommandBuilder()
 		.setName('boba')
 		.setDescription('Send a pic of boba because it is the best.'),

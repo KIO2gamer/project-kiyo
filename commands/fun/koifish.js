@@ -1,8 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-	description_full: 'Unleash a mesmerizing (and slightly nutty) koi fish GIF upon the unsuspecting populace of your Discord server.',
-	usage: '/koifish', 
+	description_full:
+		'Unleash a mesmerizing (and slightly nutty) koi fish GIF upon the unsuspecting populace of your Discord server.',
+	usage: '/koifish',
 	examples: ['/koifish'],
 	data: new SlashCommandBuilder().setName('koifish').setDescription('Fish'),
 

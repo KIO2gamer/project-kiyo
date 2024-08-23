@@ -2,9 +2,10 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 module.exports = {
-	description_full: 'Get ready to laugh! This command fetches and displays a random, SFW meme from the vast expanse of the internet.',
-	usage: '/meme', 
-	examples: ['/meme'], 
+	description_full:
+		'Get ready to laugh! This command fetches and displays a random, SFW meme from the vast expanse of the internet.',
+	usage: '/meme',
+	examples: ['/meme'],
 	data: new SlashCommandBuilder().setName('meme').setDescription('Send a random meme.'),
 
 	async execute(interaction) {
