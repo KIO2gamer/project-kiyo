@@ -11,9 +11,10 @@ const RATE_LIMIT_DELAY = 60000 / REQUESTS_PER_MINUTE;
 let lastRequestTime = 0;
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full:
+		'A music lyric guessing game! The bot will provide a snippet of lyrics and users have to guess the next line. The player with the most points at the end of 5 rounds wins.',
+	usage: '/lyricwhiz',
+	examples: ['/lyricwhiz'],
 	data: new SlashCommandBuilder()
 		.setName('lyricwhiz')
 		.setDescription('Start a music lyric guessing game!'),
