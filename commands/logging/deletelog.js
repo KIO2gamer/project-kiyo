@@ -1,4 +1,3 @@
-// commands/moderation/deletelog.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
