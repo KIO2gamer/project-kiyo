@@ -11,6 +11,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/KIO2gamer/discordbot)](https://github.com/KIO2gamer/discordbot/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/KIO2gamer/discordbot)](https://github.com/KIO2gamer/discordbot/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+[![Discord Server](https://img.shields.io/discord/935017969271054346?label=Discord&logo=discord)](https://discord.gg/3uDPm9NV4X)
 
 </div>
 
