@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Adds a role to the roles.json data file. Useful for managing roles that your bot might need to reference.',
+	usage: '/add_role_to_data <role:role>',
+	examples: ['/add_role_to_data role:Moderators'],
 	data: new SlashCommandBuilder()
 		.setName('add_role_to_data')
 		.setDescription('Adds a role to the json file data.')

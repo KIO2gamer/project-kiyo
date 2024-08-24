@@ -76,9 +76,12 @@ permissionGroups.forEach(group => {
 });
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Creates a new role with the specified name and optional color, hoist, mentionable settings, and a selection of permission groups. Available permission groups are: admin, manage, messages, voice, misc. Set a permission group to true to grant those permissions to the role.',
+	usage: '/createrole <name:role_name> [color:#hexcolor] [hoist:true/false] [mentionable:true/false] [admin:true/false] ... [misc:true/false]', 
+	examples: [
+	  '/createrole name:CoolKids color:#FF69B4 hoist:true',
+	  '/createrole name:Moderators manage:true messages:true' 
+	],
 	data: commandBuilder,
 
 	async execute(interaction) {

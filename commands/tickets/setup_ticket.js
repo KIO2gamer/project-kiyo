@@ -8,9 +8,9 @@ const {
 } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Sends a message with a button to a specified channel. Users can click the button to open a new ticket. Requires the "Manage Channels" permission.', 
+	usage: '/setup_ticket <channel:channel>',
+	examples: ['/setup_ticket channel:#support'],
 	data: new SlashCommandBuilder()
 		.setName('setup_ticket')
 		.setDescription('Sends the ticket opening message to a channel.')
