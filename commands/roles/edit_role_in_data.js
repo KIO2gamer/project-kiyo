@@ -2,9 +2,12 @@ const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Edits the name and/or color of a role stored in the roles.json data file. Provide either the name, color, or both to update.',
+	usage: '/edit_role_in_data <role:role> [name:new_name] [color:#hexcolor]',
+	examples: [
+	  '/edit_role_in_data role:Moderators name:"Senior Moderators"', 
+	  '/edit_role_in_data role:VIP color:#FFD700'
+	],
 	data: new SlashCommandBuilder()
 		.setName('edit_role_in_data')
 		.setDescription('Edits a role in the json file data.')

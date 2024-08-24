@@ -1,9 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.', 
+	usage: '/photo <query:search_term> [count:1-5] [orientation:landscape/portrait/square] [size:small/medium/large] [random:true/false]', 
+	examples: [
+	  '/photo query:cats count:3', 
+	  '/photo query:mountains orientation:landscape',
+	  '/photo query:flowers random:true' 
+	],
 	data: new SlashCommandBuilder()
 		.setName('photo')
 		.setDescription('Search for a photo.')

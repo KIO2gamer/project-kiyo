@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Removes the specified role from the specified user.',
+	usage: '/take_away_role <target:user> <role:role>',
+	examples: ['/take_away_role target:@username role:Muted'],
 	data: new SlashCommandBuilder()
 		.setName('take_away_role')
 		.setDescription('Takes away the role from a user')

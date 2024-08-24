@@ -7,9 +7,9 @@ const {
 const fs = require('fs');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Opens a new ticket channel for the user. The ticket category must be set up using the /set_ticket_category command first.',
+	usage: '/open_ticket',
+	examples: ['/open_ticket'],
 	data: new SlashCommandBuilder().setName('open_ticket').setDescription('Opens a new ticket.'),
 
 	async execute(interaction) {

@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
-	description_full: '',
-	usage: '',
-	examples: ['', ''],
+	description_full: 'Removes a role from the roles.json data file.',
+	usage: '/delete_role_from_data <role:role>',
+	examples: ['/delete_role_from_data role:Guests'],
 	data: new SlashCommandBuilder()
 		.setName('delete_role_from_data')
 		.setDescription('Deletes a role from the json file data.')
