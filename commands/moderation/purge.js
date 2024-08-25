@@ -7,10 +7,7 @@ const PURGE_COOLDOWN_MS = 5000; // Cooldown in milliseconds
 module.exports = {
 	description_full: 'Prunes (deletes) messages from the specified user within the last 14 days.',
 	usage: '/purge user:@user amount:number',
-	examples: [
-		'/purge user:@user123 amount:10', 
-		'/purge user:@user456 amount:50' 
-	],
+	examples: ['/purge user:@user123 amount:10', '/purge user:@user456 amount:50'],
 	data: new SlashCommandBuilder()
 		.setName('purge')
 		.setDescription('Prune messages from a user (max 100 messages within 14 days)')

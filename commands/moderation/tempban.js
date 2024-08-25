@@ -6,8 +6,8 @@ module.exports = {
 	description_full: 'Temporarily bans a member for the specified duration and reason.',
 	usage: '/tempban target:@user duration:"duration" [reason:"ban reason"]',
 	examples: [
-		'/tempban target:@user123 duration:"1d"', 
-		'/tempban target:@user123 duration:"2h" reason:"Spamming"' 
+		'/tempban target:@user123 duration:"1d"',
+		'/tempban target:@user123 duration:"2h" reason:"Spamming"',
 	],
 	data: new SlashCommandBuilder()
 		.setName('tempban')

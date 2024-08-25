@@ -4,10 +4,7 @@ const ModerationLog = require('../../bot_utils/ModerationLog');
 module.exports = {
 	description_full: 'Bans a member from the server with the specified reason.',
 	usage: '/ban target:@user [reason:"ban reason"]',
-	examples: [
-		'/ban target:@user123', 
-		'/ban target:@user123 reason:"Severe rule violation"' 
-	],
+	examples: ['/ban target:@user123', '/ban target:@user123 reason:"Severe rule violation"'],
 	data: new SlashCommandBuilder()
 		.setName('ban')
 		.setDescription('Select a member and ban them.')

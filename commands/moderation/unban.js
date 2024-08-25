@@ -5,8 +5,8 @@ module.exports = {
 	description_full: 'Unbans a member from the server with the specified reason.',
 	usage: '/unban userid:"user ID" [reason:"unban reason"]',
 	examples: [
-		'/unban userid:"123456789012345678"', 
-		'/unban userid:"123456789012345678" reason:"Ban was a mistake"' 
+		'/unban userid:"123456789012345678"',
+		'/unban userid:"123456789012345678" reason:"Ban was a mistake"',
 	],
 	data: new SlashCommandBuilder()
 		.setName('unban')
