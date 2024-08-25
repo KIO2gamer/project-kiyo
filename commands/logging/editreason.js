@@ -7,7 +7,7 @@ module.exports = {
 	usage: '/editreason reason:"new reason" [lognumber] [logrange]',
 	examples: [
 		'/editreason reason:"Spamming" lognumber:5',
-		'/editreason reason:"Inappropriate behavior" logrange:10-15'
+		'/editreason reason:"Inappropriate behavior" logrange:10-15',
 	],
 	data: new SlashCommandBuilder()
 		.setName('editreason')

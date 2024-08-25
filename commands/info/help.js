@@ -10,7 +10,8 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
-	description_full: 'Displays a list of all available commands or provides detailed information about a specific command.',
+	description_full:
+		'Displays a list of all available commands or provides detailed information about a specific command.',
 	usage: '/help [command name]',
 	examples: ['/help', '/help ban'],
 	data: new SlashCommandBuilder()
@@ -43,7 +44,7 @@ module.exports = {
 				.addFields(
 					{
 						name: 'Usage',
-						value: `\`/${command.data.name} ${command.usage || ''}\``,
+						value: `\`${command.usage ? `${command.usage.trim()}` : ''}\``,
 						inline: false,
 					},
 					{

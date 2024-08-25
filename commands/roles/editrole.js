@@ -1,11 +1,12 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
-	description_full: 'Edits the properties (name, color, hoist, mentionable) of an existing role. Requires the "Manage Roles" permission.',
+	description_full:
+		'Edits the properties (name, color, hoist, mentionable) of an existing role. Requires the "Manage Roles" permission.',
 	usage: '/editrole <role:role> [name:new_name] [color:#hexcolor] [hoist:true/false] [mentionable:true/false]',
 	examples: [
-	  '/editrole role:Members name:NewMembers color:#00FF00',
-	  '/editrole role:Announcements hoist:true'
+		'/editrole role:Members name:NewMembers color:#00FF00',
+		'/editrole role:Announcements hoist:true',
 	],
 	data: new SlashCommandBuilder()
 		.setName('editrole')

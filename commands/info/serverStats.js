@@ -2,7 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const moment = require('moment');
 
 module.exports = {
-	description_full: 'Provides various statistics about the server, including member count, channels, messages sent, reactions given, and more, within a specified timeframe or for the server’s entire history.',
+	description_full:
+		'Provides various statistics about the server, including member count, channels, messages sent, reactions given, and more, within a specified timeframe or for the server’s entire history.',
 	usage: '/serverstats [timeframe]',
 	examples: ['/serverstats', '/serverstats 7d', '/serverstats 1M'],
 	data: new SlashCommandBuilder()

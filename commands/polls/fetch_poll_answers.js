@@ -3,9 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
 	description_full: 'Fetches the current answers/votes for a poll from a specific message.',
 	usage: '/fetch_poll_answers message_id:"message ID" channel:#channel',
-	examples: [
-		'/fetch_poll_answers message_id:"123456789012345678" channel:#polls' 
-	],
+	examples: ['/fetch_poll_answers message_id:"123456789012345678" channel:#polls'],
 	data: new SlashCommandBuilder()
 		.setName('fetch_poll_answers')
 		.setDescription('Fetches the answers of the poll.')

@@ -1,7 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
 
 module.exports = {
-	description_full: 'Lists all the roles in the server, sorted by their position hierarchy, and shows the number of members who have each role.',
+	description_full:
+		'Lists all the roles in the server, sorted by their position hierarchy, and shows the number of members who have each role.',
 	usage: '/viewroles',
 	examples: ['/viewroles'],
 	data: new SlashCommandBuilder()

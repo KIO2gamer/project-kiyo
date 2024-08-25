@@ -1,7 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, ActivityType } = require('discord.js');
 
 module.exports = {
-	description_full: 'Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.',
+	description_full:
+		'Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.',
 	usage: '/userinfo [target]',
 	examples: ['/userinfo', '/userinfo @user'],
 	data: new SlashCommandBuilder()

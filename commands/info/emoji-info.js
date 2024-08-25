@@ -2,7 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: 'Shows details about a specific emoji from the server, including its name, ID, image URL, creation date, whether it’s animated, and whether it’s managed.',
+	description_full:
+		'Shows details about a specific emoji from the server, including its name, ID, image URL, creation date, whether it’s animated, and whether it’s managed.',
 	usage: '/emoji-info <emoji>',
 	examples: ['/emoji-info 😄', '/emoji-info MyCustomEmoji'],
 	data: new SlashCommandBuilder()
