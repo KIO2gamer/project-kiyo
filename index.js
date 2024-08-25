@@ -18,12 +18,29 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_IDS = process.env.GUILD_IDS ? process.env.GUILD_IDS.split(',') : [];
 
 // Initialize the client
-// Optimize Intents - Only include the ones your bot actually needs
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildModeration,
+		GatewayIntentBits.GuildEmojisAndStickers,
+		GatewayIntentBits.GuildIntegrations,
+		GatewayIntentBits.GuildWebhooks,
+		GatewayIntentBits.GuildInvites,
+		GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildPresences,
 		GatewayIntentBits.GuildMessages,
-		// ... add other necessary intents
+		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMessageTyping,
+		GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.DirectMessageReactions,
+		GatewayIntentBits.DirectMessageTyping,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildScheduledEvents,
+		GatewayIntentBits.AutoModerationConfiguration,
+		GatewayIntentBits.AutoModerationExecution,
+		GatewayIntentBits.GuildMessagePolls,
+		GatewayIntentBits.DirectMessagePolls,
 	],
 	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
@@ -31,61 +48,51 @@ const client = new Client({
 // Command collection
 client.commands = new Collection();
 
-// Function to recursively load commands from a directory (async)
-async function loadCommands(dir) {
-	try {
-		const files = await fs.promises.readdir(dir);
-		const loadPromises = files.map(async file => {
-			const filePath = path.join(dir, file);
-			const fileStat = await fs.promises.stat(filePath);
+// Function to recursively load commands from a directory
+function loadCommands(dir) {
+	const files = fs.readdirSync(dir);
 
-			if (fileStat.isDirectory()) {
-				await loadCommands(filePath);
-			} else if (file.endsWith('.js')) {
-				const command = require(filePath);
-				// Use hasOwnProperty() to check for properties
-				if (command.hasOwnProperty('data') && command.hasOwnProperty('execute')) {
-					client.commands.set(command.data.name, command);
+	for (const file of files) {
+		const filePath = path.join(dir, file);
+		const stat = fs.statSync(filePath);
 
-					if (command.data.aliases) {
-						for (const alias of command.data.aliases) {
-							client.commands.set(alias, command);
-						}
+		if (stat.isDirectory()) {
+			// Recursively load commands from subdirectories
+			loadCommands(filePath);
+		} else if (file.endsWith('.js')) {
+			const command = require(filePath);
+			// Use hasOwnProperty() to check for properties
+			if (command.hasOwnProperty('data') && command.hasOwnProperty('execute')) {
+				client.commands.set(command.data.name, command);
+
+				if (command.data.aliases) {
+					for (const alias of command.data.aliases) {
+						client.commands.set(alias, command);
 					}
-				} else {
-					console.warn(
-						`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-					);
 				}
+			} else {
+				console.warn(
+					`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+				);
 			}
-		});
-
-		await Promise.all(loadPromises);
-	} catch (err) {
-		console.error('Error loading commands:', err);
+		}
 	}
 }
 
 // Load commands from the 'commands' directory
 loadCommands(path.join(__dirname, 'commands'));
 
-// Event handling (async)
-const loadEvents = async dir => {
-	try {
-		const eventFiles = (await fs.promises.readdir(dir)).filter(file => file.endsWith('.js'));
+// Event handling
+const loadEvents = dir => {
+	const eventFiles = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
-		const eventPromises = eventFiles.map(async file => {
-			const event = require(path.join(dir, file));
-			if (event.once) {
-				client.once(event.name, (...args) => event.execute(...args));
-			} else {
-				client.on(event.name, (...args) => event.execute(...args));
-			}
-		});
-
-		await Promise.all(eventPromises);
-	} catch (err) {
-		console.error('Error loading events:', err);
+	for (const file of eventFiles) {
+		const event = require(path.join(dir, file));
+		if (event.once) {
+			client.once(event.name, (...args) => event.execute(...args));
+		} else {
+			client.on(event.name, (...args) => event.execute(...args));
+		}
 	}
 };
 
@@ -146,27 +153,21 @@ const deployCommands = async () => {
 	try {
 		console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-		// Deploy global commands
-		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
-		console.log('Successfully deployed global commands.');
+		// Reset global commands (if needed) - COMMENT OUT IF NOT NEEDED
+		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] });
+		console.log('Successfully reset global commands.');
 
-		// Handle guild-specific commands if needed (example using a loop)
-		// for (const guildId of GUILD_IDS) {
-		//   try {
-		//     const data = await rest.put(
-		//       Routes.applicationGuildCommands(CLIENT_ID, guildId),
-		//       { body: commands }
-		//     );
-		//     console.log(
-		//       `Successfully reloaded ${data.length} commands for guild ${guildId}.`
-		//     );
-		//   } catch (error) {
-		//     console.error(
-		//       `Failed to deploy commands for guild ${guildId}:`,
-		//       error
-		//     );
-		//   }
-		// }
+		// Deploy commands to specific guilds
+		for (const guildId of GUILD_IDS) {
+			try {
+				const data = await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
+					body: commands,
+				});
+				console.log(`Successfully reloaded ${data.length} commands for guild ${guildId}.`);
+			} catch (error) {
+				console.error(`Failed to deploy commands for guild ${guildId}:`, error);
+			}
+		}
 	} catch (error) {
 		console.error('Error deploying commands:', error);
 	}
