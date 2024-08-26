@@ -16,6 +16,13 @@ module.exports = {
 			option.setName('role').setDescription('The role to edit').setRequired(true)
 		)
 		.addStringOption(option =>
+			option.setName('file').setDescription('Which file you want to store role data into?').setRequired(true)
+				.addChoices(
+					{ name: 'Level Roles', value: './assets/json/levelRoles.json' },
+					{ name: 'Other Roles', value: './assets/json/roles.json' }
+				)
+		)
+		.addStringOption(option =>
 			option.setName('name').setDescription('The new name for the role').setRequired(false)
 		)
 		.addStringOption(option =>
@@ -28,8 +35,9 @@ module.exports = {
 		const role = interaction.options.getRole('role');
 		const newName = interaction.options.getString('name');
 		const newColor = interaction.options.getString('color');
+		const fileChoices = interaction.options.getString('file');
 
-		fs.readFile('./assets/json/roles.json', 'utf8', (err, data) => {
+		fs.readFile(fileChoices, 'utf8', (err, data) => {
 			if (err) {
 				console.error(err);
 				return interaction.reply('An error occurred while reading the file.');
@@ -62,7 +70,7 @@ module.exports = {
 				jsonData.roles[roleIndex].roleColor = newColor;
 			}
 
-			fs.writeFile('./assets/json/roles.json', JSON.stringify(jsonData, null, 2), err => {
+			fs.writeFile(fileChoices, JSON.stringify(jsonData, null, 2), err => {
 				if (err) {
 					console.error(err);
 					return interaction.reply('An error occurred while writing to the file.');

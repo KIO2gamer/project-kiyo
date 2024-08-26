@@ -10,11 +10,19 @@ module.exports = {
 		.setDescription('Deletes a role from the json file data.')
 		.addRoleOption(option =>
 			option.setName('role').setDescription('The role to delete').setRequired(true)
+		)
+		.addStringOption(option =>
+			option.setName('file').setDescription('Which file you want to store role data into?').setRequired(true)
+				.addChoices(
+					{ name: 'Level Roles', value: './assets/json/levelRoles.json' },
+					{ name: 'Other Roles', value: './assets/json/roles.json' }
+				)
 		),
 	async execute(interaction) {
 		const role = interaction.options.getRole('role');
+		const fileChoices = interaction.options.getString('file');
 
-		fs.readFile('./assets/json/roles.json', 'utf8', (err, data) => {
+		fs.readFile(fileChoices, 'utf8', (err, data) => {
 			if (err) {
 				console.error(err);
 				return interaction.reply('An error occurred while reading the file.');
@@ -42,7 +50,7 @@ module.exports = {
 
 			jsonData.roles.splice(roleIndex, 1);
 
-			fs.writeFile('./assets/json/roles.json', JSON.stringify(jsonData, null, 2), err => {
+			fs.writeFile(fileChoices, JSON.stringify(jsonData, null, 2), err => {
 				if (err) {
 					console.error(err);
 					return interaction.reply('An error occurred while writing to the file.');

@@ -7,9 +7,18 @@ module.exports = {
 	examples: ['/view_roles_from_data'],
 	data: new SlashCommandBuilder()
 		.setName('view_roles_from_data')
-		.setDescription('View the roles stored in the data.'),
+		.setDescription('View the roles stored in the data.')
+		.addStringOption(option =>
+			option.setName('file').setDescription('Which file you want to store role data into?').setRequired(true)
+				.addChoices(
+					{ name: 'Level Roles', value: './assets/json/levelRoles.json' },
+					{ name: 'Other Roles', value: './assets/json/roles.json' }
+				)
+		),
 	async execute(interaction) {
-		fs.readFile('./assets/json/roles.json', 'utf8', (err, data) => {
+		const fileChoices = interaction.options.getString('file');
+
+		fs.readFile(fileChoices, 'utf8', (err, data) => {
 			if (err) {
 				console.error(err);
 				return interaction.reply('An error occurred while reading the role data.');
