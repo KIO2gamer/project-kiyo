@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
+
 module.exports = {
 	description_full: 'Kicks a member from the server with the specified reason.',
 	usage: '/kick target:@user [reason:"kick reason"]',

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
+
 module.exports = {
 	description_full: 'Bans a member from the server with the specified reason.',
 	usage: '/ban target:@user [reason:"ban reason"]',

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const he = require('he');
 
+
 module.exports = {
 	description_full:
 		'The bot will provide a trivia question with four multiple-choice answers. Users can react to guess the correct answer.',

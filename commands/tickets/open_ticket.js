@@ -6,6 +6,7 @@ const {
 } = require('discord.js');
 const fs = require('fs');
 
+
 module.exports = {
 	description_full:
 		'Opens a new ticket channel for the user. The ticket category must be set up using the /set_ticket_category command first.',

@@ -7,6 +7,7 @@ const {
 	ButtonStyle,
 } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Sends a message with a button to a specified channel. Users can click the button to open a new ticket. Requires the "Manage Channels" permission.',

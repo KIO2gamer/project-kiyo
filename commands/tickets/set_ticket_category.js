@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs');
 
+
 module.exports = {
 	description_full:
 		'Sets the category where new ticket channels will be created. Requires the "Administrator" permission.',

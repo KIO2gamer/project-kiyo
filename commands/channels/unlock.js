@@ -5,6 +5,7 @@ const {
 	ChannelType,
 } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'This command unlocks a specified channel or the current channel if no channel is specified.',

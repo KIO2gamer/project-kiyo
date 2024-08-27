@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const ModerationLog = require('../../bot_utils/ModerationLog');
 const ms = require('ms'); // Use ms library to parse duration strings
 
+
 module.exports = {
 	description_full: 'Temporarily bans a member for the specified duration and reason.',
 	usage: '/tempban target:@user duration:"duration" [reason:"ban reason"]',

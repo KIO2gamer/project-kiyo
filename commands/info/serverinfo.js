@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.',

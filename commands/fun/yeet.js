@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'Displays a GIF of Simba being yeeted.',
 	usage: '/yeet',

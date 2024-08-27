@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModerationLog = require('../../bot_utils/ModerationLog');
 
+
 module.exports = {
 	description_full: 'Warns a member with the specified reason.',
 	usage: '/warn target:@user [reason:"warning reason"]',

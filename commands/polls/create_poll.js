@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PollLayoutType, EmbedBuilder } = require('discord.js');
 
+
 const MAX_POLL_DURATION_HOURS = 32;
 const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
 

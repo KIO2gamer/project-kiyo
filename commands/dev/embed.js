@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs');
 
+
 module.exports = {
   description_full: 'This command sends a pre-saved embed from a JSON file.',
   usage: '/sendembed <embed_name>',

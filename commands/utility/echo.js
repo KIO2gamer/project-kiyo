@@ -5,6 +5,7 @@ const {
 	PermissionFlagsBits,
 } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the "Manage Channels" permission to prevent misuse.',

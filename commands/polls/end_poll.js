@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
+
 module.exports = {
 	description_full: 'Ends a poll from a specific message, preventing further voting.',
 	usage: '/end_poll message_id:"message ID" channel:#channel',

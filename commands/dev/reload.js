@@ -2,6 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 
+
 module.exports = {
 	description_full: 'Reloads a specific command, or all commands if no command is specified.',
 	usage: '/reload [command name]',

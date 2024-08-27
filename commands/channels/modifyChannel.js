@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField, ChannelType } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'This command allows you to modify the properties of an existing text or voice channel. You can change the channel name and manage channel permissions for specific roles or everyone.  Choose either the "text" or "voice" subcommand to specify the channel type.',

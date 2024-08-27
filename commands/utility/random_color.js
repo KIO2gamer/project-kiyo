@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'Generates a random color and displays it along with its hexadecimal code.',
 	usage: '/random_color',

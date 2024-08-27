@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 
+
 // Define grouped permissions
 const permissionGroups = [
 	{

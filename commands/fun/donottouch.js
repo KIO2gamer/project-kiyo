@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		"Click the button... if you dare. Will you defuse the bomb or face the explosive consequences? Don't worry, it's all in good fun (or is it?).",

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Displays information about the bot itself, including its developer, uptime, ping, memory usage, and the number of commands it has.',
