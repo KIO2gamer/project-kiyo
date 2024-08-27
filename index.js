@@ -79,7 +79,7 @@ function loadCommands(dir) {
         }
       } else {
         console.warn(
-          `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+          `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
         );
       }
     }
@@ -115,7 +115,7 @@ async function connectToMongoDB(retries = 5) {
     console.error(`Failed to connect to MongoDB: ${error.message}`);
     if (retries > 0) {
       console.log(
-        `Retrying to connect to MongoDB (${retries} attempts left)...`
+        `Retrying to connect to MongoDB (${retries} attempts left)...`,
       );
       setTimeout(() => connectToMongoDB(retries - 1), 5000);
     } else {
@@ -147,7 +147,7 @@ const deployCommands = async () => {
           commands.push(command.data.toJSON());
         } else {
           console.warn(
-            `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+            `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
           );
         }
       }
@@ -161,7 +161,7 @@ const deployCommands = async () => {
 
   try {
     console.log(
-      `Started refreshing ${commands.length} application (/) commands.`
+      `Started refreshing ${commands.length} application (/) commands.`,
     );
 
     // Reset global commands (if needed) - COMMENT OUT IF NOT NEEDED
@@ -175,10 +175,10 @@ const deployCommands = async () => {
           Routes.applicationGuildCommands(CLIENT_ID, guildId),
           {
             body: commands,
-          }
+          },
         );
         console.log(
-          `Successfully reloaded ${data.length} commands for guild ${guildId}.`
+          `Successfully reloaded ${data.length} commands for guild ${guildId}.`,
         );
       } catch (error) {
         console.error(`Failed to deploy commands for guild ${guildId}:`, error);
