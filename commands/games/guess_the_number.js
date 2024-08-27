@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'The bot chooses a random number between 1 and 100. The user has 7 tries to guess it.',

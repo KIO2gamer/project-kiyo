@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 
+
 // Wikimedia URLs for hangman images
 const hangmanImages = [
 	'https://upload.wikimedia.org/wikipedia/commons/8/8b/Hangman-0.png',

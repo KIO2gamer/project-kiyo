@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ApplicationCommandOptionType } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		"Displays the user's avatar (profile picture). You can get the avatar of another user by mentioning them.  Customize the size and format (PNG, JPEG, WebP) of the avatar.",

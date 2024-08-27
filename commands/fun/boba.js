@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 
+
 module.exports = {
 	description_full: 'Satisfy your boba cravings with a delightful GIF of this delicious drink.',
 	usage: '/boba', // No additional parameters needed

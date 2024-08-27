@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
+
 // Rate limiting (adjust as needed)
 const MAX_PURGE_PER_REQUEST = 100; // Max messages per bulkDelete
 const PURGE_COOLDOWN_MS = 5000; // Cooldown in milliseconds

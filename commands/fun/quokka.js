@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Prepare for a cuteness overload! This command summons a delightful GIF of a quokka, guaranteed to brighten your day.',

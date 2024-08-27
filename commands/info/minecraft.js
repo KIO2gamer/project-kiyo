@@ -5,6 +5,7 @@ const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 minutes
 const MOJANG_API_BASE = 'https://api.mojang.com/users/profiles/minecraft/';
 
+
 module.exports = {
 	description_full:
 		'Retrieves information about a Minecraft player from the Mojang API, including their username, UUID, and a profile picture from Crafatar.',

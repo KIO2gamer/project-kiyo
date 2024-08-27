@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 
+
 module.exports = {
 	description_full:
 		'Edits the name and/or color of a role stored in the roles.json data file. Provide either the name, color, or both to update.',

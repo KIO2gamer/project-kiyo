@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'Tells the user they have been steeled.',
 	usage: '/steel',

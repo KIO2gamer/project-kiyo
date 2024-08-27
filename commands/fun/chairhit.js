@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Express your frustration or excitement (or just cause some chaos) by yeeting a chair across the digital room.',

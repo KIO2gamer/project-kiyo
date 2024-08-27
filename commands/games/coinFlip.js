@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'The bot virtually flips a coin and reveals the result (Heads or Tails).',
 	usage: '/coinflip',

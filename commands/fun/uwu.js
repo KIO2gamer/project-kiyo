@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'Displays a random uwu GIF from Tenor.',
 	usage: '/uwu',

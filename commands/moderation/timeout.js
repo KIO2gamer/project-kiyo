@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const ms = require('ms');
 
+
 module.exports = {
 	description_full: 'Timeouts a member for the specified duration and reason.',
 	usage: '/timeout target:@user amount:"duration" [reason:"timeout reason"]',

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs');
 
+
 module.exports = {
 	description_full:
 		'Deletes a specified ticket channel or the current channel if no channel is specified. Requires the "Manage Channels" permission.',

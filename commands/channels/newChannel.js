@@ -5,6 +5,7 @@ const {
 	EmbedBuilder,
 } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'This command creates a new channel in the server. You can specify the channel name, type (text, voice, category, announcement, or forum), the category it should be placed under (optional), and an optional topic or description.',

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'This command playfully grants "Skibidi powers" to users who have watched Skibidi Toilet, while denying those who haven\'t. It reacts based on the user\'s response to a simple question.',

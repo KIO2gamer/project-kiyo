@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full:
 		'Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.',

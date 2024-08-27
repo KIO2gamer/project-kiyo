@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+
 module.exports = {
 	description_full: 'Deletes the specified role from the server.',
 	usage: '/deleterole <role:role>',
