@@ -39,39 +39,39 @@ module.exports = {
         .setDescription("The number of logs per page")
         .setMinValue(1)
         .setMaxValue(25)
-        .setRequired(false)
+        .setRequired(false),
     )
     .addUserOption((option) =>
       option
         .setName("user")
         .setDescription("The user to filter logs by")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addIntegerOption((option) =>
       option
         .setName("lognumber")
         .setDescription("The log number to search for")
         .setMinValue(1)
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("logrange")
         .setDescription("The range of log numbers to search for (e.g., 1-5)")
-        .setRequired(false)
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName("action")
         .setDescription("The action to filter logs by")
         .setRequired(false)
-        .addChoices(...ACTION_CHOICES)
+        .addChoices(...ACTION_CHOICES),
     )
     .addUserOption((option) =>
       option
         .setName("moderator")
         .setDescription("The moderator to filter logs by")
-        .setRequired(false)
+        .setRequired(false),
     ),
 
   async execute(interaction) {
@@ -159,7 +159,7 @@ module.exports = {
             new ButtonBuilder()
               .setCustomId("prevPage")
               .setLabel("Previous")
-              .setStyle(ButtonStyle.Primary)
+              .setStyle(ButtonStyle.Primary),
           );
         }
 
@@ -168,7 +168,7 @@ module.exports = {
             new ButtonBuilder()
               .setCustomId("nextPage")
               .setLabel("Next")
-              .setStyle(ButtonStyle.Primary)
+              .setStyle(ButtonStyle.Primary),
           );
         }
 
