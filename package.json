@@ -1,12 +1,17 @@
 {
-	"name": "nodejs",
+	"name": "Discord Bot",
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"test": "index-workflow.js"
+		"test": "test-settings.js"
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": ["discord"],
+	"author": "KIO2gamer (https://kio2gamer.carrd.co/)",
+	"contributors": [{
+"name": "Neon",
+"email": "neon@saahild.com",
+"url": "https://saahild.com"
+}],
 	"license": "ISC",
 	"nodemonConfig": {
 		"ignore": [
@@ -36,5 +41,5 @@
 	"devDependencies": {
 		"prettier": "3.2.5"
 	},
-	"description": ""
+	"description": "A discord bot"
 }
