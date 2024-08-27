@@ -24,7 +24,7 @@ module.exports = {
       const ticketChannelName = `ticket-${member.user.username}-${member.id}`;
 
       const existingTicketChannel = guild.channels.cache.find(
-        (channel) => channel.name === ticketChannelName
+        (channel) => channel.name === ticketChannelName,
       );
 
       if (existingTicketChannel) {
@@ -84,7 +84,7 @@ module.exports = {
           .setColor("#0099ff")
           .setTitle(`Ticket - ${member.user.username}`)
           .setDescription(
-            "Please describe your issue. A staff member will assist you shortly."
+            "Please describe your issue. A staff member will assist you shortly.",
           )
           .setTimestamp();
         await ticketChannel.send({ embeds: [ticketEmbed] });
@@ -106,7 +106,7 @@ module.exports = {
 
       if (!command) {
         console.error(
-          `No command matching ${interaction.commandName} was found.`
+          `No command matching ${interaction.commandName} was found.`,
         );
         return;
       }
