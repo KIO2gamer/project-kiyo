@@ -23,7 +23,7 @@ require('dotenv').config()
 
 const youtube = google.youtube({
     version: 'v3',
-    auth: process.env.YOUTUBE_API,
+    auth: process.env.YOUTUBE_API_KEY,
 })
 
 const pageSize = 3 // Number of results per page
