@@ -83,9 +83,6 @@ module.exports = {
                         .setTitle(`Photo by ${photo.photographer}`)
                         .setImage(photo.src.original)
                         .setURL(photo.url)
-                        .setFooter({
-                            text: `Photo by ${photo.photographer} on Pexels`,
-                        })
                 })
 
                 await interaction.editReply({ embeds })
