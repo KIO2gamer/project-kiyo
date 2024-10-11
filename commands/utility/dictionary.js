@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
 const axios = require('axios')
 const { handleError } = require('../../bot_utils/errorHandler') // Import errorHandler
 
@@ -25,9 +25,19 @@ module.exports = {
                 const definition = data.meanings[0].definitions[0].definition
                 const partOfSpeech = data.meanings[0].partOfSpeech
 
-                await interaction.reply(
-                    `**${word}** (${partOfSpeech}): ${definition}`
-                )
+                const embed = new EmbedBuilder()
+                .setTitle(word)
+                .setDescription(definition)
+                .addFields({
+                    name: 'Part of Speech',
+                    value: partOfSpeech,
+                })
+                .setFooter({
+                    text: 'Powered by DictionaryAPI',
+                    iconURL: 'https://i.imgur.com/AfFp7pu.png',
+                })
+                .setTimestamp()
+                await interaction.reply({embeds: [embed]})
             } else {
                 await interaction.reply(
                     `Sorry, I couldn't find a definition for "${word}".`
