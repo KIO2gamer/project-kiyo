@@ -68,12 +68,14 @@ module.exports = {
                     content: 'I cannot send messages to that user as their DMs are turned off.',
                     ephemeral: true,
                 })
+                return
             }
             else {
                 interaction.reply({
                     content: 'An error occurred while closing the ticket.',
                     ephemeral: true,
                 })
+                return
             }
         }
     },
