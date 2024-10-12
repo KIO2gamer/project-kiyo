@@ -3,8 +3,8 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
     ChannelType,
-} = require('discord.js')
-const { handleError } = require('../../bot_utils/errorHandler')
+} = require('discord.js');
+const { handleError } = require('../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
@@ -12,7 +12,7 @@ module.exports = {
     usage: '/unlock <channel?>',
     examples: ['/unlock', '/unlock #general'],
     category: 'channels',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('unlock')
         .setDescription('Unlock a channel')
         .setDMPermission(false)
@@ -23,15 +23,15 @@ data: new SlashCommandBuilder()
                 .setDescription('The channel you want to unlock')
                 .addChannelTypes(
                     ChannelType.GuildText,
-                    ChannelType.GuildAnnouncement
+                    ChannelType.GuildAnnouncement,
                 )
-                .setRequired(false)
+                .setRequired(false),
         ),
 
     async execute(interaction) {
         const channel =
-            interaction.options.getChannel('channel') || interaction.channel
-        await interaction.deferReply({ ephemeral: true })
+            interaction.options.getChannel('channel') || interaction.channel;
+        await interaction.deferReply({ ephemeral: true });
 
         // Check if the bot has the required permissions
         if (
@@ -43,10 +43,10 @@ data: new SlashCommandBuilder()
                 .setTitle('ERROR')
                 .setColor('Red')
                 .setDescription(
-                    'I do not have the required permissions to unlock the channel.'
-                )
-            await interaction.editReply({ embeds: [noPermissionEmbed] })
-            return
+                    'I do not have the required permissions to unlock the channel.',
+                );
+            await interaction.editReply({ embeds: [noPermissionEmbed] });
+            return;
         }
 
         const embed = new EmbedBuilder()
@@ -55,12 +55,12 @@ data: new SlashCommandBuilder()
             .setFooter({
                 text: `Done by: ${interaction.user.username}`,
                 iconURL: `${interaction.user.avatarURL()}`,
-            })
+            });
 
         const errorEmbed = new EmbedBuilder()
             .setTitle('ERROR')
             .setColor('Red')
-            .setDescription(`${channel} is already unlocked`)
+            .setDescription(`${channel} is already unlocked`);
 
         // Check if the channel is already unlocked
         if (
@@ -70,30 +70,30 @@ data: new SlashCommandBuilder()
         ) {
             await interaction.editReply({
                 embeds: [errorEmbed],
-            })
-            return
+            });
+            return;
         }
 
         try {
             // Unlock the channel
             await channel.permissionOverwrites.create(interaction.guild.id, {
                 SendMessages: null,
-            })
+            });
 
             if (channel === interaction.channel) {
                 await interaction.editReply({
                     embeds: [embed],
-                })
+                });
             } else {
                 await interaction.editReply({
                     content: '**Unlocked Successfully**',
-                })
+                });
                 await channel.send({
                     embeds: [embed],
-                })
+                });
             }
         } catch (error) {
-            handleError(interaction, error)
+            handleError(interaction, error);
         }
     },
-}
+};

@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
-const fs = require('node:fs')
-const path = require('node:path')
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
 
 module.exports = {
     description_full:
@@ -8,7 +8,7 @@ module.exports = {
     usage: '/reload [command name]',
     examples: ['/reload', '/reload ban'],
     category: 'dev',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('reload')
         .setDescription('Reloads a command.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
@@ -16,13 +16,13 @@ data: new SlashCommandBuilder()
             option
                 .setName('command')
                 .setDescription('The command to reload.')
-                .setRequired(false)
+                .setRequired(false),
         ),
     async execute(interaction) {
-        const commandName = interaction.options.getString('command')
+        const commandName = interaction.options.getString('command');
 
-        const foldersPath = path.join(__dirname, '..')
-        const commandFolders = fs.readdirSync(foldersPath)
+        const foldersPath = path.join(__dirname, '..');
+        const commandFolders = fs.readdirSync(foldersPath);
 
         if (commandName) {
             const commandPath = commandFolders
@@ -30,83 +30,83 @@ data: new SlashCommandBuilder()
                     const commandsPath = path.join(
                         foldersPath,
                         folder,
-                        'commands'
-                    )
+                        'commands',
+                    );
                     if (fs.existsSync(commandsPath)) {
                         const commandFiles = fs
                             .readdirSync(commandsPath)
-                            .filter((file) => file.endsWith('.js'))
+                            .filter((file) => file.endsWith('.js'));
                         const commandFile = commandFiles.find(
-                            (file) => file === `${commandName}.js`
-                        )
+                            (file) => file === `${commandName}.js`,
+                        );
                         if (commandFile) {
-                            return path.join(commandsPath, commandFile)
+                            return path.join(commandsPath, commandFile);
                         }
                     }
                 })
-                .find((path) => path !== undefined)
+                .find((path) => path !== undefined);
 
             if (!commandPath) {
                 return interaction.reply({
                     content: `There is no command with name \`${commandName}\`!`,
                     ephemeral: true,
-                })
+                });
             }
 
-            delete require.cache[require.resolve(commandPath)]
+            delete require.cache[require.resolve(commandPath)];
 
             try {
-                interaction.client.commands.delete(commandName)
-                const newCommand = require(commandPath)
+                interaction.client.commands.delete(commandName);
+                const newCommand = require(commandPath);
                 interaction.client.commands.set(
                     newCommand.data.name,
-                    newCommand
-                )
+                    newCommand,
+                );
                 await interaction.reply({
                     content: `Command \`${commandName}\` was reloaded!`,
                     ephemeral: true,
-                })
+                });
             } catch (error) {
-                console.error(error)
+                console.error(error);
                 await interaction.reply({
                     content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
                     ephemeral: true,
-                })
+                });
             }
         } else {
             commandFolders.forEach((folder) => {
-                const commandsPath = path.join(foldersPath, folder, 'commands')
+                const commandsPath = path.join(foldersPath, folder, 'commands');
                 if (fs.existsSync(commandsPath)) {
                     const commandFiles = fs
                         .readdirSync(commandsPath)
-                        .filter((file) => file.endsWith('.js'))
+                        .filter((file) => file.endsWith('.js'));
                     for (const file of commandFiles) {
-                        const filePath = path.join(commandsPath, file)
-                        delete require.cache[require.resolve(filePath)]
+                        const filePath = path.join(commandsPath, file);
+                        delete require.cache[require.resolve(filePath)];
 
                         try {
-                            const command = require(filePath)
+                            const command = require(filePath);
                             if ('data' in command && 'execute' in command) {
                                 interaction.client.commands.set(
                                     command.data.name,
-                                    command
-                                )
+                                    command,
+                                );
                             } else {
                                 console.log(
-                                    `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-                                )
+                                    `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
+                                );
                             }
                         } catch (error) {
-                            console.error(error)
+                            console.error(error);
                         }
                     }
                 }
-            })
+            });
 
             await interaction.reply({
                 content: 'All commands reloaded!',
                 ephemeral: true,
-            })
+            });
         }
     },
-}
+};

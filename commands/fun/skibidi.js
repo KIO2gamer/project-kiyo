@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
-const { EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -7,7 +7,7 @@ module.exports = {
     usage: '/skibidi',
     examples: ['/skibidi', '/skibidi option:Yes'],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('skibidi')
         .setDescription('Gives you skibidi powers')
         .addStringOption((option) =>
@@ -17,22 +17,22 @@ data: new SlashCommandBuilder()
                 .setRequired(true)
                 .addChoices(
                     { name: 'Yes', value: 'yes' },
-                    { name: 'No', value: 'no' }
-                )
+                    { name: 'No', value: 'no' },
+                ),
         ),
 
     async execute(interaction) {
-        const option = interaction.options.getString('option')
+        const option = interaction.options.getString('option');
 
         if (option === 'yes') {
-            await interaction.reply('Skibidi powers activated successfully ✅')
+            await interaction.reply('Skibidi powers activated successfully ✅');
             await interaction.channel.send(
-                'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344'
-            )
+                'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344',
+            );
         } else {
             await interaction.reply(
-                '***You are not worthy enough to wield the powers, mortal***'
-            )
+                '***You are not worthy enough to wield the powers, mortal***',
+            );
         }
     },
-}
+};

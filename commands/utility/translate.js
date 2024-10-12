@@ -5,8 +5,8 @@
  * @param {string} targetLang - The target language code (e.g., 'en', 'es', 'fr', 'de', 'ja').
  * @returns {Promise<{ text: string }>} - The translated text.
  */
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
-const translate = require('@iamtraction/google-translate')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const translate = require('@iamtraction/google-translate');
 
 module.exports = {
     description_full:
@@ -14,32 +14,32 @@ module.exports = {
     usage: '/translate <input:text_to_translate> <target_lang:language_code>',
     examples: ['/translate input:"Hello, world!" target_lang:es'],
     category: 'utility',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('translate')
         .setDescription('Translates text into the desired output language.')
         .addStringOption((option) =>
             option
                 .setName('input')
                 .setDescription('The text to translate')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('target_lang')
                 .setDescription(
-                    'The target language (e.g., en, es, fr, de, ja)'
+                    'The target language (e.g., en, es, fr, de, ja)',
                 )
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
-        await interaction.deferReply()
+        await interaction.deferReply();
 
-        const input = interaction.options.getString('input')
-        const targetLang = interaction.options.getString('target_lang')
+        const input = interaction.options.getString('input');
+        const targetLang = interaction.options.getString('target_lang');
 
         try {
-            const result = await translate(input, { to: targetLang })
+            const result = await translate(input, { to: targetLang });
 
             const embed = new EmbedBuilder()
                 .setTitle('Translation Result')
@@ -47,20 +47,24 @@ data: new SlashCommandBuilder()
                 .addFields(
                     { name: 'Input Text', value: input },
                     { name: 'Translated Text', value: result.text },
-                    { name: 'Target Language', value: targetLang, inline: true }
+                    {
+                        name: 'Target Language',
+                        value: targetLang,
+                        inline: true,
+                    },
                 )
                 .setFooter({
                     text: `Requested by ${interaction.user.tag}`,
                     iconURL: interaction.user.displayAvatarURL(),
                 })
-                .setTimestamp()
+                .setTimestamp();
 
-            await interaction.editReply({ embeds: [embed] })
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            console.error('Error executing translate command:', error)
+            console.error('Error executing translate command:', error);
             await interaction.editReply(
-                'There was an error while executing this command. Please try again later.'
-            )
+                'There was an error while executing this command. Please try again later.',
+            );
         }
     },
-}
+};

@@ -8,7 +8,7 @@
  * @param {import('discord.js').Interaction} interaction - The Discord interaction object.
  * @returns {Promise<void>} - A Promise that resolves when the command has completed.
  */
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -16,22 +16,22 @@ module.exports = {
     usage: '/random_color',
     examples: ['/random_color'],
     category: 'utility',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('random_color')
         .setDescription('Get a random color'),
     async execute(interaction) {
         const randomHex = Math.floor(Math.random() * 16777215)
             .toString(16)
-            .padStart(6, '0')
+            .padStart(6, '0');
 
         // Build embed message
         const embed = new EmbedBuilder()
             .setColor(`#${randomHex}`)
             .setTitle('Random Color!')
             .setDescription(
-                `**Here is your random hex color code:** \n \`#${randomHex}\``
+                `**Here is your random hex color code:** \n \`#${randomHex}\``,
             )
-            .setThumbnail(`https://www.colorhexa.com/${randomHex}.png`)
-        await interaction.reply({ embeds: [embed], ephemeral: true })
+            .setThumbnail(`https://www.colorhexa.com/${randomHex}.png`);
+        await interaction.reply({ embeds: [embed], ephemeral: true });
     },
-}
+};

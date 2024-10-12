@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
-const moment = require('moment')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const moment = require('moment');
 
 module.exports = {
     description_full:
@@ -7,14 +7,14 @@ module.exports = {
     usage: '/serverstats [timeframe]',
     examples: ['/serverstats', '/serverstats 7d', '/serverstats 1M'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('serverstats')
         .setDescription('Displays various statistics about this server.')
         .addStringOption((option) =>
             option
                 .setName('timeframe')
                 .setDescription(
-                    'The timeframe to calculate stats for (e.g., "7d", "1M"). Defaults to all-time.'
+                    'The timeframe to calculate stats for (e.g., "7d", "1M"). Defaults to all-time.',
                 )
                 .setRequired(false)
                 .addChoices(
@@ -22,53 +22,53 @@ data: new SlashCommandBuilder()
                     { name: 'Last 7 Days', value: '7d' },
                     { name: 'Last 30 Days', value: '30d' },
                     { name: 'Last Month', value: '1M' },
-                    { name: 'All Time', value: 'all' }
-                )
+                    { name: 'All Time', value: 'all' },
+                ),
         ),
     async execute(interaction) {
         try {
             // Acknowledge the interaction immediately:
-            await interaction.deferReply()
+            await interaction.deferReply();
 
             const timeframe =
-                interaction.options.getString('timeframe') || 'all'
-            let startDate
+                interaction.options.getString('timeframe') || 'all';
+            let startDate;
 
             switch (timeframe) {
                 case '24h':
-                    startDate = moment().subtract(1, 'day').toDate()
-                    break
+                    startDate = moment().subtract(1, 'day').toDate();
+                    break;
                 case '7d':
-                    startDate = moment().subtract(7, 'days').toDate()
-                    break
+                    startDate = moment().subtract(7, 'days').toDate();
+                    break;
                 case '30d':
-                    startDate = moment().subtract(30, 'days').toDate()
-                    break
+                    startDate = moment().subtract(30, 'days').toDate();
+                    break;
                 case '1M':
-                    startDate = moment().subtract(1, 'month').toDate()
-                    break
+                    startDate = moment().subtract(1, 'month').toDate();
+                    break;
                 case 'all':
-                    startDate = new Date(0) // Beginning of time
-                    break
+                    startDate = new Date(0); // Beginning of time
+                    break;
                 default:
-                    startDate = new Date(0) // Default to all time
+                    startDate = new Date(0); // Default to all time
             }
 
-            const guild = interaction.guild
-            const members = await guild.members.fetch()
+            const guild = interaction.guild;
+            const members = await guild.members.fetch();
 
             // Filter functions for timeframe:
-            const messageFilter = (msg) => msg.createdAt >= startDate
-            const memberFilter = (member) => member.joinedAt >= startDate
+            const messageFilter = (msg) => msg.createdAt >= startDate;
+            const memberFilter = (member) => member.joinedAt >= startDate;
 
-            let totalMessages = 0
-            let totalReactions = 0
+            let totalMessages = 0;
+            let totalReactions = 0;
 
             const channelStatsPromises = guild.channels.cache.map(
                 async (channel) => {
                     if (channel.isTextBased()) {
-                        let messages = []
-                        let lastMessage = null
+                        let messages = [];
+                        let lastMessage = null;
 
                         // Fetch messages in batches of 100:
                         do {
@@ -76,30 +76,30 @@ data: new SlashCommandBuilder()
                                 await channel.messages.fetch({
                                     limit: 100,
                                     before: lastMessage?.id,
-                                })
-                            messages = messages.concat(fetchedMessages)
-                            lastMessage = fetchedMessages.last()
+                                });
+                            messages = messages.concat(fetchedMessages);
+                            lastMessage = fetchedMessages.last();
                         } while (
                             lastMessage &&
                             lastMessage.createdAt > startDate
-                        )
+                        );
 
-                        const filteredMessages = messages.filter(messageFilter)
-                        totalMessages += filteredMessages.size
+                        const filteredMessages = messages.filter(messageFilter);
+                        totalMessages += filteredMessages.size;
 
                         filteredMessages.forEach((msg) => {
-                            totalReactions += msg.reactions.cache.size
-                        })
+                            totalReactions += msg.reactions.cache.size;
+                        });
                     }
-                }
-            )
+                },
+            );
 
-            await Promise.all(channelStatsPromises)
+            await Promise.all(channelStatsPromises);
 
             const embed = new EmbedBuilder()
                 .setTitle(`Server Stats for ${guild.name}`)
                 .setDescription(
-                    `Statistics from ${timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`}`
+                    `Statistics from ${timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`}`,
                 )
                 .addFields(
                     {
@@ -145,25 +145,25 @@ data: new SlashCommandBuilder()
                         value: `${totalReactions}`,
                         inline: true,
                     },
-                    { name: '\u200B', value: '\u200B', inline: true } // Empty field for formatting
+                    { name: '\u200B', value: '\u200B', inline: true }, // Empty field for formatting
                 )
-                .setTimestamp()
+                .setTimestamp();
 
             // Edit the deferred reply with the embed:
-            await interaction.editReply({ embeds: [embed] })
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            console.error('Error executing serverstats:', error)
+            console.error('Error executing serverstats:', error);
 
             // Handle errors gracefully:
             if (interaction.deferred) {
                 await interaction.editReply(
-                    'An error occurred while fetching server stats.'
-                )
+                    'An error occurred while fetching server stats.',
+                );
             } else {
                 await interaction.reply(
-                    'An error occurred while fetching server stats.'
-                )
+                    'An error occurred while fetching server stats.',
+                );
             }
         }
     },
-}
+};

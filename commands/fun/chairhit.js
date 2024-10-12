@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js')
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,14 +6,14 @@ module.exports = {
     usage: '/chairhit', // No parameters needed
     examples: ['/chairhit'],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('chairhit')
         .setDescription('yeet the chair fr'),
 
     async execute(interaction) {
         await interaction.reply(
-            'https://tenor.com/view/chair-hit-throw-rigby-gif-17178150'
-        )
-        console.log(interaction.channel.type)
+            'https://tenor.com/view/chair-hit-throw-rigby-gif-17178150',
+        );
+        console.log(interaction.channel.type);
     },
-}
+};

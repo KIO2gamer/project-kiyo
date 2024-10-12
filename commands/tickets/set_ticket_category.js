@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js')
+const {
+    SlashCommandBuilder,
+    PermissionFlagsBits,
+    ChannelType,
+} = require('discord.js');
 const TicketConfig = require('./../../bot_utils/ticketConfig');
 
 module.exports = {
@@ -7,7 +11,7 @@ module.exports = {
     usage: '/set_ticket_category <category:category>',
     examples: ['/set_ticket_category category:Tickets'],
     category: 'tickets',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('set_ticket_category')
         .setDescription('Sets the category where tickets will be created.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
@@ -16,24 +20,26 @@ data: new SlashCommandBuilder()
                 .setName('category')
                 .setDescription('The category to use for new tickets.')
                 .setRequired(true)
-                .addChannelTypes(ChannelType.GuildCategory)
+                .addChannelTypes(ChannelType.GuildCategory),
         ),
     async execute(interaction) {
-        const category = interaction.options.getChannel('category')
-        const guildId = interaction.guild.id
+        const category = interaction.options.getChannel('category');
+        const guildId = interaction.guild.id;
 
         try {
             // Find and update the document, or create a new one if it doesn't exist
             await TicketConfig.findOneAndUpdate(
                 { guildId: guildId },
                 { ticketCategoryId: category.id },
-                { upsert: true, new: true }
-            )
+                { upsert: true, new: true },
+            );
 
-            await interaction.reply(`Ticket category set to: ${category}`)
+            await interaction.reply(`Ticket category set to: ${category}`);
         } catch (error) {
-            console.error('Error updating ticket category:', error)
-            await interaction.reply('An error occurred while setting the ticket category.')
+            console.error('Error updating ticket category:', error);
+            await interaction.reply(
+                'An error occurred while setting the ticket category.',
+            );
         }
     },
-}
+};

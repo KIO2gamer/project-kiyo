@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -10,7 +10,7 @@ module.exports = {
         '/rock_paper_scissors scissors',
     ],
     category: 'games',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('rock_paper_scissors')
         .setDescription('Play Rock, Paper, Scissors!')
         .addStringOption((option) =>
@@ -21,32 +21,32 @@ data: new SlashCommandBuilder()
                 .addChoices(
                     { name: 'Rock', value: 'rock' },
                     { name: 'Paper', value: 'paper' },
-                    { name: 'Scissors', value: 'scissors' }
-                )
+                    { name: 'Scissors', value: 'scissors' },
+                ),
         ),
     async execute(interaction) {
-        const userChoice = interaction.options.getString('choice')
-        const choices = ['rock', 'paper', 'scissors']
-        const botChoice = choices[Math.floor(Math.random() * 3)]
+        const userChoice = interaction.options.getString('choice');
+        const choices = ['rock', 'paper', 'scissors'];
+        const botChoice = choices[Math.floor(Math.random() * 3)];
 
-        let result = ''
+        let result = '';
         if (userChoice === botChoice) {
-            result = "It's a tie!"
+            result = "It's a tie!";
         } else if (
             (userChoice === 'rock' && botChoice === 'scissors') ||
             (userChoice === 'paper' && botChoice === 'rock') ||
             (userChoice === 'scissors' && botChoice === 'paper')
         ) {
-            result = `You win! I chose ${botChoice}.`
+            result = `You win! I chose ${botChoice}.`;
         } else {
-            result = `You lose! I chose ${botChoice}.`
+            result = `You lose! I chose ${botChoice}.`;
         }
 
         const embed = new EmbedBuilder()
             .setColor('#0099ff')
             .setTitle('Rock, Paper, Scissors')
-            .setDescription(`You chose ${userChoice}. ${result}`)
+            .setDescription(`You chose ${userChoice}. ${result}`);
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

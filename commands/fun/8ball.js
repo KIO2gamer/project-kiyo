@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -9,18 +9,18 @@ module.exports = {
         '/8ball Is this the best day of my life?',
     ],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('8ball')
         .setDescription('Ask the magic 8ball a question.')
         .addStringOption((option) =>
             option
                 .setName('question')
                 .setDescription('The question to ask')
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
-        const question = interaction.options.getString('question')
+        const question = interaction.options.getString('question');
         const responses = [
             'Yes.',
             'No.',
@@ -32,19 +32,19 @@ data: new SlashCommandBuilder()
             'Nay',
             'Yessirrrrr',
             'Nuh uh',
-        ]
+        ];
 
         const embed = new EmbedBuilder()
             .setDescription(
-                `## **Question:** ${question}\n**Answer:** ${responses[Math.floor(Math.random() * responses.length)]}`
+                `## **Question:** ${question}\n**Answer:** ${responses[Math.floor(Math.random() * responses.length)]}`,
             )
             .setColor('#00ff00')
             .setFooter({
                 text: `Executed by ${interaction.user.tag}`,
                 iconURL: interaction.user.displayAvatarURL(),
             })
-            .setTimestamp()
+            .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

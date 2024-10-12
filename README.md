@@ -98,30 +98,30 @@ Before getting started, ensure you have the following:
 -   Create a `.env` file in the project's root directory.
 -   Add the following to your `.env` file, replacing the placeholders (`<your_credentials>`) with your actual credentials:
 
-  ```bash
-        DISCORD_TOKEN=<your_discord_bot_token>
-        MONGODB_URL=<your_mongodb_connection_string>
-        GEMINI_API_KEY=<your_gemini_api_key>
-        CLIENT_ID=<your_discord_client_id>
-        GUILD_IDS=<your_discord_server_id>
-        TENOR_API_KEY=<your_tenor_api_key>
-        PEXELS_API_KEY=<your_pexels_api_key>
-        WEATHER_API_KEY=<your_weather_api_key>
-        GIPHY_API_KEY=<your_giphy_api_key>
-        GIANT_BOMB_API_KEY=<your_giant_bomb_api_key>
-  ```
+```bash
+      DISCORD_TOKEN=<your_discord_bot_token>
+      MONGODB_URL=<your_mongodb_connection_string>
+      GEMINI_API_KEY=<your_gemini_api_key>
+      CLIENT_ID=<your_discord_client_id>
+      GUILD_IDS=<your_discord_server_id>
+      TENOR_API_KEY=<your_tenor_api_key>
+      PEXELS_API_KEY=<your_pexels_api_key>
+      WEATHER_API_KEY=<your_weather_api_key>
+      GIPHY_API_KEY=<your_giphy_api_key>
+      GIANT_BOMB_API_KEY=<your_giant_bomb_api_key>
+```
 
 -   For `GUILD_IDS`, you can add either a single server ID or multiple server IDs as an array:
 
-  ```bash
-        # Single server ID:
+```bash
+      # Single server ID:
 
-        GUILD_IDS=<your_discord_server_id>
+      GUILD_IDS=<your_discord_server_id>
 
-        # Multiple server IDs:
+      # Multiple server IDs:
 
-        GUILD_IDS=[<server_id_1>, <server_id_2>, ...]
-  ```
+      GUILD_IDS=[<server_id_1>, <server_id_2>, ...]
+```
 
 4. **Start the bot:**
     ```bash

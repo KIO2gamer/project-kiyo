@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,13 +6,13 @@ module.exports = {
     usage: '/roll',
     examples: ['/roll'],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('roll')
         .setDescription('Roll a dice.'),
 
     async execute(interaction) {
-        const sides = 6 // You can customize the number of sides
-        const roll = Math.floor(Math.random() * sides) + 1
+        const sides = 6; // You can customize the number of sides
+        const roll = Math.floor(Math.random() * sides) + 1;
 
         // URLs for dice images
         const diceImages = {
@@ -22,7 +22,7 @@ data: new SlashCommandBuilder()
             4: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Dice-4-b.svg/1200px-Dice-4-b.svg.png',
             5: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Dice-5-b.svg/1200px-Dice-5-b.svg.png',
             6: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Dice-6-b.svg/1200px-Dice-6-b.svg.png',
-        }
+        };
 
         const rollEmbed = new EmbedBuilder()
             .setTitle(`You rolled a ${roll}!`)
@@ -32,8 +32,8 @@ data: new SlashCommandBuilder()
                 text: `Executed by ${interaction.user.tag}`,
                 iconURL: interaction.user.displayAvatarURL(),
             })
-            .setTimestamp()
+            .setTimestamp();
 
-        await interaction.reply({ embeds: [rollEmbed] })
+        await interaction.reply({ embeds: [rollEmbed] });
     },
-}
+};

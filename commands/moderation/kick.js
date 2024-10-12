@@ -2,8 +2,8 @@ const {
     SlashCommandBuilder,
     PermissionFlagsBits,
     EmbedBuilder,
-} = require('discord.js')
-const ModerationLog = require('../../bot_utils/ModerationLog')
+} = require('discord.js');
+const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
     description_full:
@@ -14,27 +14,27 @@ module.exports = {
         '/kick target:@user123 reason:"Violating server rules"',
     ],
     category: 'moderation',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('kick')
         .setDescription('Select a member and kick them.')
         .addUserOption((option) =>
             option
                 .setName('target')
                 .setDescription('The member to kick')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for the kick')
+            option.setName('reason').setDescription('The reason for the kick'),
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
         ),
 
     async execute(interaction) {
-        const targetUser = interaction.options.getMember('target')
+        const targetUser = interaction.options.getMember('target');
         const reason =
-            interaction.options.getString('reason') ?? 'No reason provided'
-        await interaction.deferReply()
+            interaction.options.getString('reason') ?? 'No reason provided';
+        await interaction.deferReply();
 
         if (!targetUser) {
             await interaction.editReply({
@@ -48,8 +48,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         if (targetUser.id === interaction.guild.ownerId) {
@@ -58,7 +58,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot kick the owner of the server'
+                            'You cannot kick the owner of the server',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -66,14 +66,14 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
-        const targetUserRolePosition = targetUser.roles.highest.position
+        const targetUserRolePosition = targetUser.roles.highest.position;
         const requestUserRolePosition =
-            interaction.member.roles.highest.position
+            interaction.member.roles.highest.position;
         const botRolePosition =
-            interaction.guild.members.me.roles.highest.position
+            interaction.guild.members.me.roles.highest.position;
 
         if (targetUserRolePosition >= requestUserRolePosition) {
             await interaction.editReply({
@@ -81,7 +81,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot kick someone with a higher or equal role than you'
+                            'You cannot kick someone with a higher or equal role than you',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -89,8 +89,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         if (targetUserRolePosition >= botRolePosition) {
@@ -99,7 +99,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot kick someone with a higher or equal role than myself'
+                            'I cannot kick someone with a higher or equal role than myself',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -107,8 +107,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         try {
@@ -117,17 +117,17 @@ data: new SlashCommandBuilder()
                 moderator: interaction.user.id,
                 user: targetUser.id,
                 reason: reason,
-            })
+            });
 
-            await logEntry.save()
+            await logEntry.save();
 
-            await targetUser.kick(reason)
+            await targetUser.kick(reason);
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('KICKED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been kicked for reason: \`${reason}\``
+                            `<@${targetUser.id}> has been kicked for reason: \`${reason}\``,
                         )
                         .setColor('Green')
                         .setFooter({
@@ -135,14 +135,14 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
+            });
         } catch (error) {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to kick the user'
+                            'An error occurred while trying to kick the user',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -150,7 +150,7 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
+            });
         }
     },
-}
+};

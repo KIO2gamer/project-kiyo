@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,17 +6,17 @@ module.exports = {
     usage: '/serverinfo',
     examples: ['/serverinfo'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('serverinfo')
         .setDescription('Get info about a server!'),
 
     async execute(interaction) {
-        await sendServerInfo(interaction)
+        await sendServerInfo(interaction);
     },
-}
+};
 
 async function sendServerInfo(interaction) {
-    const { guild } = interaction
+    const { guild } = interaction;
 
     const serverInfoEmbed = new EmbedBuilder()
         .setTitle('__Server Information__')
@@ -88,34 +88,34 @@ async function sendServerInfo(interaction) {
                 name: '🔗 Vanity URL',
                 value: guild.vanityURLCode || 'None',
                 inline: true,
-            }
+            },
         )
         .setColor(0x00ae86)
         .setFooter({
             text: `Requested by ${interaction.user.tag}`,
             iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-        })
+        });
 
-    await interaction.reply({ embeds: [serverInfoEmbed] })
+    await interaction.reply({ embeds: [serverInfoEmbed] });
 }
 
 function getVerificationLevelText(level) {
     switch (level) {
         case 0:
-            return 'None'
+            return 'None';
         case 1:
-            return 'Low'
+            return 'Low';
         case 2:
-            return 'Medium'
+            return 'Medium';
         case 3:
-            return 'High'
+            return 'High';
         case 4:
-            return 'Very High'
+            return 'Very High';
         default:
-            return 'Unknown'
+            return 'Unknown';
     }
 }
 
 function getMfaLevelText(level) {
-    return level === 0 ? 'None' : 'Elevated'
+    return level === 0 ? 'None' : 'Elevated';
 }

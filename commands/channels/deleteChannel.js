@@ -2,9 +2,9 @@ const {
     SlashCommandBuilder,
     PermissionFlagsBits,
     EmbedBuilder,
-} = require('discord.js')
-const { handleError } = require('../../bot_utils/errorHandler')
-const { getChannelType } = require('../../bot_utils/channelTypes')
+} = require('discord.js');
+const { handleError } = require('../../bot_utils/errorHandler');
+const { getChannelType } = require('../../bot_utils/channelTypes');
 
 module.exports = {
     description_full:
@@ -16,7 +16,7 @@ module.exports = {
         '/delete_channel channel:voice', // Deletes a channel named "voice"
     ],
     category: 'channels',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('delete_channel')
         .setDescription('Deletes a specified channel.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
@@ -24,25 +24,25 @@ data: new SlashCommandBuilder()
             option
                 .setName('channel')
                 .setDescription('The channel to delete')
-                .setRequired(true)
+                .setRequired(true),
         ),
     async execute(interaction) {
-        const channel = interaction.options.getChannel('channel')
+        const channel = interaction.options.getChannel('channel');
 
         try {
-            await channel.delete()
+            await channel.delete();
 
             const embed = new EmbedBuilder()
                 .setTitle('Channel Deleted!')
                 .setColor('Red')
                 .setDescription(
-                    `The ${getChannelType(channel)} ${channel.id} has been successfully deleted.`
+                    `The ${getChannelType(channel)} ${channel.id} has been successfully deleted.`,
                 )
-                .setTimestamp()
+                .setTimestamp();
 
-            await interaction.reply({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            await handleError(interaction, error)
+            await handleError(interaction, error);
         }
     },
-}
+};

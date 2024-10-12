@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,7 +6,7 @@ module.exports = {
     usage: '/coinflip [bet]',
     examples: ['/coinflip', '/coinflip heads', '/coinflip tails'],
     category: 'games',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('coinflip')
         .setDescription('Flip a coin and bet on the outcome!')
         .addStringOption((option) =>
@@ -16,26 +16,26 @@ data: new SlashCommandBuilder()
                 .setRequired(false)
                 .addChoices(
                     { name: 'Heads', value: 'heads' },
-                    { name: 'Tails', value: 'tails' }
-                )
+                    { name: 'Tails', value: 'tails' },
+                ),
         ),
     async execute(interaction) {
-        const bet = interaction.options.getString('bet')?.toLowerCase()
-        const result = Math.random() < 0.5 ? 'heads' : 'tails'
-        let imageMedia = ''
+        const bet = interaction.options.getString('bet')?.toLowerCase();
+        const result = Math.random() < 0.5 ? 'heads' : 'tails';
+        let imageMedia = '';
         if (result === 'heads') {
-            imageMedia = 'https://i.imgur.com/HavOS7J.png'
+            imageMedia = 'https://i.imgur.com/HavOS7J.png';
         } else {
-            imageMedia = 'https://i.imgur.com/u1pmQMV.png'
+            imageMedia = 'https://i.imgur.com/u1pmQMV.png';
         }
 
-        let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)}**!`
+        let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)}**!`;
 
         if (bet) {
             if (bet === result) {
-                description += '\n\nCongratulations! You guessed correctly! 🎉'
+                description += '\n\nCongratulations! You guessed correctly! 🎉';
             } else {
-                description += '\n\nSorry, better luck next time! 😔'
+                description += '\n\nSorry, better luck next time! 😔';
             }
         }
 
@@ -43,8 +43,8 @@ data: new SlashCommandBuilder()
             .setColor('#0099ff')
             .setTitle('Coin Flip')
             .setDescription(description)
-            .setThumbnail(imageMedia)
+            .setThumbnail(imageMedia);
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

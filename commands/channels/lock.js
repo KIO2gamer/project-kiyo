@@ -3,8 +3,8 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
     ChannelType,
-} = require('discord.js')
-const { handleError } = require('../../bot_utils/errorHandler')
+} = require('discord.js');
+const { handleError } = require('../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
@@ -16,7 +16,7 @@ module.exports = {
         '/lock', // Locks the current channel where the command is used
     ],
     category: 'channels',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('lock')
         .setDescription('Lock a channel')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
@@ -26,15 +26,15 @@ data: new SlashCommandBuilder()
                 .setDescription('The channel you want to lock')
                 .addChannelTypes(
                     ChannelType.GuildText,
-                    ChannelType.GuildAnnouncement
+                    ChannelType.GuildAnnouncement,
                 )
-                .setRequired(false)
+                .setRequired(false),
         ),
 
     async execute(interaction) {
         const channel =
-            interaction.options.getChannel('channel') || interaction.channel
-        const sent = await interaction.deferReply({ ephemeral: true })
+            interaction.options.getChannel('channel') || interaction.channel;
+        const sent = await interaction.deferReply({ ephemeral: true });
 
         // Check if the bot has the required permissions
         if (
@@ -46,10 +46,10 @@ data: new SlashCommandBuilder()
                 .setTitle('ERROR')
                 .setColor('Red')
                 .setDescription(
-                    'I do not have the required permissions to lock the channel.'
-                )
-            await interaction.editReply({ embeds: [noPermissionEmbed] })
-            return
+                    'I do not have the required permissions to lock the channel.',
+                );
+            await interaction.editReply({ embeds: [noPermissionEmbed] });
+            return;
         }
 
         // Check if the channel is already locked
@@ -61,16 +61,16 @@ data: new SlashCommandBuilder()
             const alreadyLockedEmbed = new EmbedBuilder()
                 .setTitle('ERROR')
                 .setColor('Red')
-                .setDescription(`${channel} is already locked.`)
-            await interaction.editReply({ embeds: [alreadyLockedEmbed] })
-            return
+                .setDescription(`${channel} is already locked.`);
+            await interaction.editReply({ embeds: [alreadyLockedEmbed] });
+            return;
         }
 
         try {
             // Lock the channel
             await channel.permissionOverwrites.create(interaction.guild.id, {
                 SendMessages: false,
-            })
+            });
 
             const lockEmbed = new EmbedBuilder()
                 .setTitle(`<#${channel.id}> has been locked`)
@@ -79,22 +79,22 @@ data: new SlashCommandBuilder()
                     text: `Done by: ${interaction.user.username}`,
                     iconURL: `${interaction.user.avatarURL()}`,
                 })
-                .setTimestamp()
+                .setTimestamp();
 
             if (channel === interaction.channel) {
                 await interaction.editReply({
                     embeds: [lockEmbed],
-                })
+                });
             } else {
                 await interaction.editReply({
                     content: '**Locked Successfully**',
-                })
+                });
                 await channel.send({
                     embeds: [lockEmbed],
-                })
+                });
             }
         } catch (error) {
-            await handleError(interaction, error, sent)
+            await handleError(interaction, error, sent);
         }
     },
-}
+};

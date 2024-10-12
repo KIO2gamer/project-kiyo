@@ -2,7 +2,7 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     PermissionsBitField,
-} = require('discord.js')
+} = require('discord.js');
 
 module.exports = {
     description_full:
@@ -10,7 +10,7 @@ module.exports = {
     usage: '/viewroles',
     examples: ['/viewroles'],
     category: 'roles',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('viewroles')
         .setDescription('Shows all the roles in the server.')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),
@@ -19,7 +19,7 @@ data: new SlashCommandBuilder()
         const roles = interaction.guild.roles.cache
             .sort((a, b) => b.position - a.position)
             .map((role) => `${role}: ${role.members.size} members`)
-            .join('\n')
+            .join('\n');
 
         const embed = new EmbedBuilder()
             .setTitle('Server Roles')
@@ -29,8 +29,8 @@ data: new SlashCommandBuilder()
                 text: `Requested by: ${interaction.user.username}`,
                 iconURL: interaction.user.avatarURL(),
             })
-            .setTimestamp()
+            .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

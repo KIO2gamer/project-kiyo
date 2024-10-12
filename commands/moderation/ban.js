@@ -2,8 +2,8 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     PermissionFlagsBits,
-} = require('discord.js')
-const ModerationLog = require('../../bot_utils/ModerationLog')
+} = require('discord.js');
+const ModerationLog = require('../../bot_utils/ModerationLog');
 
 module.exports = {
     description_full:
@@ -14,30 +14,30 @@ module.exports = {
         '/ban target:@user123 reason:"Severe rule violation"',
     ],
     category: 'moderation',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('ban')
         .setDescription('Select a member and ban them.')
         .addUserOption((option) =>
             option
                 .setName('target')
                 .setDescription('The member to ban')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for banning')
+            option.setName('reason').setDescription('The reason for banning'),
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
         )
         .setDMPermission(false),
 
     async execute(interaction) {
-        const targetUser = interaction.options.getMember('target')
+        const targetUser = interaction.options.getMember('target');
         const reason =
-            interaction.options.getString('reason') ?? 'No reason provided'
+            interaction.options.getString('reason') ?? 'No reason provided';
 
         // Defer the reply to allow time for the operation
-        await interaction.deferReply()
+        await interaction.deferReply();
 
         // Check if the target user exists
         if (!targetUser) {
@@ -52,8 +52,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         // Check if the target user is the server owner
@@ -63,7 +63,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban the owner of the server'
+                            'You cannot ban the owner of the server',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -71,16 +71,16 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         // Get role positions
-        const targetUserRolePosition = targetUser.roles.highest.position
+        const targetUserRolePosition = targetUser.roles.highest.position;
         const requestUserRolePosition =
-            interaction.member.roles.highest.position
+            interaction.member.roles.highest.position;
         const botRolePosition =
-            interaction.guild.members.me.roles.highest.position
+            interaction.guild.members.me.roles.highest.position;
 
         // Check if the user trying to ban has a higher role than the target
         if (targetUserRolePosition >= requestUserRolePosition) {
@@ -89,7 +89,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban someone with a higher or equal role than you'
+                            'You cannot ban someone with a higher or equal role than you',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -97,8 +97,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         // Check if the bot has a higher role than the target
@@ -108,7 +108,7 @@ data: new SlashCommandBuilder()
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot ban someone with a higher or equal role than myself'
+                            'I cannot ban someone with a higher or equal role than myself',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -116,8 +116,8 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         // Attempt to ban the user
@@ -127,17 +127,17 @@ data: new SlashCommandBuilder()
                 moderator: interaction.user.id,
                 user: targetUser.id,
                 reason: reason,
-            })
+            });
 
-            await logEntry.save()
+            await logEntry.save();
 
-            await targetUser.ban({ reason: reason })
+            await targetUser.ban({ reason: reason });
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('BANNED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been banned for reason: \`${reason}\``
+                            `<@${targetUser.id}> has been banned for reason: \`${reason}\``,
                         )
                         .setColor('Green')
                         .setFooter({
@@ -145,15 +145,15 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
+            });
         } catch (error) {
-            console.error('Error banning user:', error)
+            console.error('Error banning user:', error);
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to ban the user'
+                            'An error occurred while trying to ban the user',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -161,7 +161,7 @@ data: new SlashCommandBuilder()
                             iconURL: `${interaction.user.displayAvatarURL()}`,
                         }),
                 ],
-            })
+            });
         }
     },
-}
+};

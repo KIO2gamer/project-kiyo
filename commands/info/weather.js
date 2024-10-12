@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
-const { EmbedBuilder } = require('discord.js')
-const axios = require('axios')
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
+const axios = require('axios');
 
 module.exports = {
     description_full:
@@ -8,19 +8,19 @@ module.exports = {
     usage: '/weather <city>',
     examples: ['/weather London', '/weather "New York"'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('weather')
         .setDescription('Gets the current weather for a specified city')
         .addStringOption((option) =>
             option
                 .setName('location')
                 .setDescription('The location to get the weather for')
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
-        const city = interaction.options.getString('city')
-        const apiKey = process.env.WEATHER_API_KEY // Replace with your WeatherAPI key
+        const city = interaction.options.getString('city');
+        const apiKey = process.env.WEATHER_API_KEY; // Replace with your WeatherAPI key
 
         try {
             const response = await axios.get(
@@ -30,10 +30,10 @@ data: new SlashCommandBuilder()
                         key: apiKey,
                         q: city,
                     },
-                }
-            )
+                },
+            );
 
-            const weather = response.data
+            const weather = response.data;
             const {
                 temp_c,
                 temp_f,
@@ -50,10 +50,10 @@ data: new SlashCommandBuilder()
                 uv,
                 vis_km,
                 vis_miles,
-            } = weather.current
+            } = weather.current;
 
-            const { name, region, country, localtime } = weather.location
-            const { text: condition, icon } = weather.current.condition
+            const { name, region, country, localtime } = weather.location;
+            const { text: condition, icon } = weather.current.condition;
 
             const embed = new EmbedBuilder()
                 .setTitle(`Weather in ${name}, ${region}, ${country}`)
@@ -98,20 +98,20 @@ data: new SlashCommandBuilder()
                         value: `${vis_km} km / ${vis_miles} miles`,
                         inline: true,
                     },
-                    { name: 'Local Time', value: `${localtime}`, inline: true }
+                    { name: 'Local Time', value: `${localtime}`, inline: true },
                 )
                 .setFooter({
                     text: 'Powered by WeatherAPI',
                     iconURL: 'https://www.weatherapi.com/favicon.ico',
                 })
-                .setColor('#00aaff')
+                .setColor('#00aaff');
 
-            await interaction.reply({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            console.error(error)
+            console.error(error);
             await interaction.reply(
-                'Could not fetch the weather. Please make sure the city name is correct.'
-            )
+                'Could not fetch the weather. Please make sure the city name is correct.',
+            );
         }
     },
-}
+};

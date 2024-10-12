@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js')
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -9,7 +9,7 @@ module.exports = {
         '/editrole role:Announcements hoist:true',
     ],
     category: 'roles',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('editrole')
         .setDescription("Edits a role's properties.")
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
@@ -17,36 +17,36 @@ data: new SlashCommandBuilder()
             option
                 .setName('role')
                 .setDescription('The role to edit')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName('name').setDescription('The new name for the role')
+            option.setName('name').setDescription('The new name for the role'),
         )
         .addStringOption((option) =>
             option
                 .setName('color')
                 .setDescription(
-                    'The new color for the role in hex format (#000000)'
-                )
+                    'The new color for the role in hex format (#000000)',
+                ),
         )
         .addBooleanOption((option) =>
             option
                 .setName('hoist')
                 .setDescription(
-                    'Whether the role should be displayed separately'
-                )
+                    'Whether the role should be displayed separately',
+                ),
         )
         .addBooleanOption((option) =>
             option
                 .setName('mentionable')
-                .setDescription('Whether the role should be mentionable')
+                .setDescription('Whether the role should be mentionable'),
         ),
     async execute(interaction) {
-        const role = interaction.options.getRole('role')
-        const newName = interaction.options.getString('name')
-        const newColor = interaction.options.getString('color')
-        const hoist = interaction.options.getBoolean('hoist')
-        const mentionable = interaction.options.getBoolean('mentionable')
+        const role = interaction.options.getRole('role');
+        const newName = interaction.options.getString('name');
+        const newColor = interaction.options.getString('color');
+        const hoist = interaction.options.getBoolean('hoist');
+        const mentionable = interaction.options.getBoolean('mentionable');
 
         try {
             await role.edit({
@@ -55,14 +55,14 @@ data: new SlashCommandBuilder()
                 hoist: hoist !== undefined ? hoist : role.hoist,
                 mentionable:
                     mentionable !== undefined ? mentionable : role.mentionable,
-            })
+            });
 
-            return interaction.reply(`Role ${role} updated successfully!`)
+            return interaction.reply(`Role ${role} updated successfully!`);
         } catch (error) {
-            console.error('Error editing role:', error)
+            console.error('Error editing role:', error);
             return interaction.reply(
-                'An error occurred while updating the role.'
-            )
+                'An error occurred while updating the role.',
+            );
         }
     },
-}
+};

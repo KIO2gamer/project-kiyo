@@ -1,12 +1,12 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ComponentType,
-} = require('discord.js')
-const ModerationLog = require('../../bot_utils/ModerationLog')
+} = require('discord.js');
+const ModerationLog = require('../../bot_utils/ModerationLog');
 
 const ACTION_CHOICES = [
     { name: 'Warn', value: 'warn' },
@@ -15,7 +15,7 @@ const ACTION_CHOICES = [
     { name: 'Kick', value: 'kick' },
     { name: 'Tempban', value: 'tempban' },
     { name: 'Unban', value: 'unban' },
-]
+];
 
 module.exports = {
     description_full:
@@ -31,7 +31,7 @@ module.exports = {
         '/logs moderator:@mod456',
     ],
     category: 'mod_logging',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('logs')
         .setDescription('Show the moderation logs.')
         .addIntegerOption((option) =>
@@ -40,132 +40,134 @@ data: new SlashCommandBuilder()
                 .setDescription('The number of logs per page')
                 .setMinValue(1)
                 .setMaxValue(25)
-                .setRequired(false)
+                .setRequired(false),
         )
         .addUserOption((option) =>
             option
                 .setName('user')
                 .setDescription('The user to filter logs by')
-                .setRequired(false)
+                .setRequired(false),
         )
         .addIntegerOption((option) =>
             option
                 .setName('lognumber')
                 .setDescription('The log number to search for')
                 .setMinValue(1)
-                .setRequired(false)
+                .setRequired(false),
         )
         .addStringOption((option) =>
             option
                 .setName('logrange')
                 .setDescription(
-                    'The range of log numbers to search for (e.g., 1-5)'
+                    'The range of log numbers to search for (e.g., 1-5)',
                 )
-                .setRequired(false)
+                .setRequired(false),
         )
         .addStringOption((option) =>
             option
                 .setName('action')
                 .setDescription('The action to filter logs by')
                 .setRequired(false)
-                .addChoices(...ACTION_CHOICES)
+                .addChoices(...ACTION_CHOICES),
         )
         .addUserOption((option) =>
             option
                 .setName('moderator')
                 .setDescription('The moderator to filter logs by')
-                .setRequired(false)
+                .setRequired(false),
         ),
 
     async execute(interaction) {
-        const limit = interaction.options.getInteger('limit') || 5
-        const user = interaction.options.getUser('user')
-        const logNumber = interaction.options.getInteger('lognumber')
-        const logRange = interaction.options.getString('logrange')
-        const action = interaction.options.getString('action')
-        const moderator = interaction.options.getUser('moderator')
+        const limit = interaction.options.getInteger('limit') || 5;
+        const user = interaction.options.getUser('user');
+        const logNumber = interaction.options.getInteger('lognumber');
+        const logRange = interaction.options.getString('logrange');
+        const action = interaction.options.getString('action');
+        const moderator = interaction.options.getUser('moderator');
 
         try {
-            const query = {}
+            const query = {};
 
             if (logNumber) {
-                query.logNumber = logNumber
+                query.logNumber = logNumber;
             }
 
             if (logRange) {
                 const [start, end] = logRange
                     .split('-')
-                    .map((num) => parseInt(num.trim()))
+                    .map((num) => parseInt(num.trim()));
                 if (!isNaN(start) && !isNaN(end) && start <= end) {
-                    query.logNumber = { $gte: start, $lte: end }
+                    query.logNumber = { $gte: start, $lte: end };
                 } else {
                     return interaction.reply({
                         content:
                             'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
                         ephemeral: true,
-                    })
+                    });
                 }
             }
 
             if (user) {
-                query.user = user.id
+                query.user = user.id;
             }
             if (action) {
-                query.action = action
+                query.action = action;
             }
             if (moderator) {
-                query.moderator = moderator.id
+                query.moderator = moderator.id;
             }
 
-            const logs = await ModerationLog.find(query).sort({ logNumber: -1 })
+            const logs = await ModerationLog.find(query).sort({
+                logNumber: -1,
+            });
 
             if (logs.length === 0) {
                 return interaction.reply({
                     content: 'No moderation logs found.',
                     ephemeral: true,
-                })
+                });
             }
 
-            let currentPage = 1
-            const totalPages = Math.ceil(logs.length / limit)
+            let currentPage = 1;
+            const totalPages = Math.ceil(logs.length / limit);
 
             const createEmbed = (page = 1) => {
-                const startIndex = (page - 1) * limit
-                const endIndex = Math.min(page * limit, logs.length)
+                const startIndex = (page - 1) * limit;
+                const endIndex = Math.min(page * limit, logs.length);
 
                 const embed = new EmbedBuilder()
                     .setTitle('Moderation Logs')
                     .setColor('#FF0000')
                     .setTimestamp()
-                    .setFooter({ text: `Page ${page} of ${totalPages}` })
+                    .setFooter({ text: `Page ${page} of ${totalPages}` });
 
                 const logDescriptions = logs
                     .slice(startIndex, endIndex)
                     .map((log) => {
-                        const moderatorMention = `<@${log.moderator}>`
-                        const userMention = `<@${log.user}>`
+                        const moderatorMention = `<@${log.moderator}>`;
+                        const userMention = `<@${log.user}>`;
                         const timestamp = new Date(
-                            log.timestamp
-                        ).toLocaleString()
+                            log.timestamp,
+                        ).toLocaleString();
 
-                        return `**Log #${log.logNumber}**\n**Action:** ${log.action}\n**Moderator:** ${moderatorMention}\n**User:** ${userMention}\n**Reason:** ${log.reason}\n**Timestamp:** ${timestamp}`
+                        return `**Log #${log.logNumber}**\n**Action:** ${log.action}\n**Moderator:** ${moderatorMention}\n**User:** ${userMention}\n**Reason:** ${log.reason}\n**Timestamp:** ${timestamp}`;
                     })
-                    .join('\n\n')
+                    .join('\n\n');
 
-                embed.setDescription(logDescriptions)
-                return embed
-            }
+                embed.setDescription(logDescriptions);
+                return embed;
+            };
 
             const createButtons = (page) => {
-                const row = new ActionRowBuilder()
+                const row = new ActionRowBuilder();
 
                 if (page > 1) {
                     row.addComponents(
                         new ButtonBuilder()
                             .setCustomId('prevPage')
                             .setLabel('Previous')
-                            .setStyle(ButtonStyle.Primary)
-                    )
+                            .setStyle(ButtonStyle.Primary),
+                    );
                 }
 
                 if (page < totalPages) {
@@ -173,50 +175,50 @@ data: new SlashCommandBuilder()
                         new ButtonBuilder()
                             .setCustomId('nextPage')
                             .setLabel('Next')
-                            .setStyle(ButtonStyle.Primary)
-                    )
+                            .setStyle(ButtonStyle.Primary),
+                    );
                 }
 
-                return row.components.length > 0 ? [row] : []
-            }
+                return row.components.length > 0 ? [row] : [];
+            };
 
-            const initialEmbed = createEmbed(currentPage)
-            const initialButtons = createButtons(currentPage)
+            const initialEmbed = createEmbed(currentPage);
+            const initialButtons = createButtons(currentPage);
 
             const message = await interaction.reply({
                 embeds: [initialEmbed],
                 components: initialButtons,
                 fetchReply: true,
-            })
+            });
 
             const collector = message.createMessageComponentCollector({
                 componentType: ComponentType.Button, // Listen for button interactions
                 filter: (i) => i.user.id === interaction.user.id,
                 time: 60000,
-            })
+            });
 
             collector.on('collect', async (i) => {
                 if (i.customId === 'prevPage') {
-                    currentPage--
+                    currentPage--;
                 } else if (i.customId === 'nextPage') {
-                    currentPage++
+                    currentPage++;
                 }
-                const newEmbed = createEmbed(currentPage)
-                const newButtons = createButtons(currentPage)
+                const newEmbed = createEmbed(currentPage);
+                const newButtons = createButtons(currentPage);
 
-                await i.update({ embeds: [newEmbed], components: newButtons })
-            })
+                await i.update({ embeds: [newEmbed], components: newButtons });
+            });
 
             collector.on('end', () => {
-                message.edit({ components: [] }) // Update, not reply
-            })
+                message.edit({ components: [] }); // Update, not reply
+            });
         } catch (error) {
-            console.error('Error retrieving logs:', error)
+            console.error('Error retrieving logs:', error);
             // Only one reply if an error occurs:
             await interaction.reply({
                 content: 'Failed to retrieve logs.',
                 ephemeral: true,
-            })
+            });
         }
     },
-}
+};

@@ -2,7 +2,7 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     ActivityType,
-} = require('discord.js')
+} = require('discord.js');
 
 module.exports = {
     description_full:
@@ -10,45 +10,45 @@ module.exports = {
     usage: '/userinfo [target]',
     examples: ['/userinfo', '/userinfo @user'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('userinfo')
         .setDescription('Displays information about a user.')
         .addUserOption((option) =>
             option
                 .setName('target')
                 .setDescription('The user to get information about')
-                .setRequired(false)
+                .setRequired(false),
         ),
     async execute(interaction) {
-        const user = interaction.options.getUser('target') || interaction.user
-        const member = await interaction.guild.members.fetch(user.id)
-        console.log(member)
+        const user = interaction.options.getUser('target') || interaction.user;
+        const member = await interaction.guild.members.fetch(user.id);
+        console.log(member);
         // Early return if member is not found (e.g., left the server)
         if (!member) {
             return interaction.reply({
                 content: 'That user is not a member of this server.',
                 ephemeral: true,
-            })
+            });
         }
 
         function getActivityName(activity) {
             switch (activity.type) {
                 case ActivityType.Playing:
-                    return `Playing ${activity.name}`
+                    return `Playing ${activity.name}`;
                 case ActivityType.Streaming:
-                    return `Streaming ${activity.name}`
+                    return `Streaming ${activity.name}`;
                 case ActivityType.Listening:
-                    return `Listening to ${activity.name}`
+                    return `Listening to ${activity.name}`;
                 case ActivityType.Watching:
-                    return `Watching ${activity.name}`
+                    return `Watching ${activity.name}`;
                 case ActivityType.Competing:
-                    return `Competing in ${activity.name}`
+                    return `Competing in ${activity.name}`;
                 case ActivityType.Custom:
                     return activity.state
                         ? `${activity.emoji} ${activity.state}`
-                        : 'Custom Status'
+                        : 'Custom Status';
                 default:
-                    return 'Unknown Activity'
+                    return 'Unknown Activity';
             }
         }
 
@@ -83,7 +83,7 @@ data: new SlashCommandBuilder()
                     member.roles.cache.size > 1 // Show roles only if there's more than @everyone
                         ? member.roles.cache
                               .filter(
-                                  (role) => role.id !== interaction.guild.id
+                                  (role) => role.id !== interaction.guild.id,
                               )
                               .sort((a, b) => b.position - a.position)
                               .map((role) => role.toString())
@@ -118,14 +118,14 @@ data: new SlashCommandBuilder()
                         : member.displayHexColor,
                 inline: true,
             },
-        ]
+        ];
 
         const userInfoEmbed = new EmbedBuilder()
             .setTitle(`User Information - ${user.username}`)
             .setThumbnail(user.displayAvatarURL({ dynamic: true }))
             .setColor(member.displayHexColor) // Use member's display color
-            .addFields(fields)
+            .addFields(fields);
 
-        await interaction.reply({ embeds: [userInfoEmbed] })
+        await interaction.reply({ embeds: [userInfoEmbed] });
     },
-}
+};
