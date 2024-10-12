@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,16 +6,16 @@ module.exports = {
     usage: '/ping',
     examples: ['/ping'],
     category: 'utility',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription("Checks the bot's response time"),
 
     async execute(interaction) {
-        const startTime = Date.now()
-        await interaction.deferReply()
+        const startTime = Date.now();
+        await interaction.deferReply();
 
-        const endTime = Date.now()
-        const responseTime = endTime - startTime
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
 
         const embed = new EmbedBuilder()
             .setColor('#00FF00')
@@ -24,16 +24,16 @@ data: new SlashCommandBuilder()
                 {
                     name: 'Response Time',
                     value: `${responseTime}ms`,
-                    inline: true
+                    inline: true,
                 },
                 {
                     name: 'WebSocket Ping',
                     value: `${interaction.client.ws.ping}ms`,
-                    inline: true
-                }
+                    inline: true,
+                },
             )
-            .setTimestamp()
+            .setTimestamp();
 
-        await interaction.editReply({ embeds: [embed] })
-    }
-}
+        await interaction.editReply({ embeds: [embed] });
+    },
+};

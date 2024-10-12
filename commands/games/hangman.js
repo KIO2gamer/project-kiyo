@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
-const fs = require('fs')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const fs = require('fs');
 
 // Wikimedia URLs for hangman images
 const hangmanImages = [
@@ -10,15 +10,15 @@ const hangmanImages = [
     'https://upload.wikimedia.org/wikipedia/commons/2/27/Hangman-4.png',
     'https://upload.wikimedia.org/wikipedia/commons/6/6b/Hangman-5.png',
     'https://upload.wikimedia.org/wikipedia/commons/d/d6/Hangman-6.png',
-]
+];
 
 module.exports = {
     description_full:
-        "A classic game of hangman! The bot will choose a random word, and users have to guess the letters!",
+        'A classic game of hangman! The bot will choose a random word, and users have to guess the letters!',
     usage: '/hangman',
     examples: ['/hangman'],
     category: 'games',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('hangman')
         .setDescription('Start a game of hangman!'),
     async execute(interaction) {
@@ -27,27 +27,27 @@ data: new SlashCommandBuilder()
             'utf-8',
             async (err, data) => {
                 if (err) {
-                    console.error('Failed to read the word list:', err)
+                    console.error('Failed to read the word list:', err);
                     interaction.reply(
-                        'An error occurred while loading the words.'
-                    )
-                    return
+                        'An error occurred while loading the words.',
+                    );
+                    return;
                 }
 
                 const words = data
                     .split('\n')
                     .map((word) => word.trim())
-                    .filter((word) => word)
+                    .filter((word) => word);
 
                 if (words.length === 0) {
-                    interaction.reply('The word list is empty!')
-                    return
+                    interaction.reply('The word list is empty!');
+                    return;
                 }
 
-                const word = words[Math.floor(Math.random() * words.length)]
-                const guessedLetters = []
-                let remainingGuesses = 6
-                let wordState = '_ '.repeat(word.length).trim()
+                const word = words[Math.floor(Math.random() * words.length)];
+                const guessedLetters = [];
+                let remainingGuesses = 6;
+                let wordState = '_ '.repeat(word.length).trim();
 
                 const gameEmbed = new EmbedBuilder()
                     .setColor(0x0099ff)
@@ -64,31 +64,31 @@ data: new SlashCommandBuilder()
                             name: 'Guessed Letters',
                             value: guessedLetters.join(', ') || 'None',
                             inline: true,
-                        }
-                    )
+                        },
+                    );
 
-                const msg = await interaction.reply({ embeds: [gameEmbed] })
+                const msg = await interaction.reply({ embeds: [gameEmbed] });
 
-                const filter = (m) => m.author.id === interaction.user.id
+                const filter = (m) => m.author.id === interaction.user.id;
                 const collector = interaction.channel.createMessageCollector({
                     filter,
                     time: 60000,
-                })
+                });
 
                 collector.on('collect', async (guess) => {
-                    const content = guess.content.toLowerCase()
+                    const content = guess.content.toLowerCase();
 
                     if (/^[a-zA-Z]$/.test(content)) {
-                        const letter = content
+                        const letter = content;
 
                         if (guessedLetters.includes(letter)) {
                             await guess.reply(
-                                'You already guessed that letter!'
-                            )
-                            return
+                                'You already guessed that letter!',
+                            );
+                            return;
                         }
 
-                        guessedLetters.push(letter)
+                        guessedLetters.push(letter);
 
                         if (word.includes(letter)) {
                             for (let i = 0; i < word.length; i++) {
@@ -96,17 +96,15 @@ data: new SlashCommandBuilder()
                                     wordState =
                                         wordState.substring(0, i * 2) +
                                         letter +
-                                        wordState.substring(i * 2 + 1)
+                                        wordState.substring(i * 2 + 1);
                                 }
                             }
                         } else {
-                            remainingGuesses--
+                            remainingGuesses--;
                         }
                     } else {
-                        await guess.reply(
-                            'Please enter a single letter.'
-                        )
-                        return
+                        await guess.reply('Please enter a single letter.');
+                        return;
                     }
 
                     gameEmbed
@@ -122,39 +120,39 @@ data: new SlashCommandBuilder()
                                 name: 'Guessed Letters',
                                 value: guessedLetters.join(', '),
                                 inline: true,
-                            }
-                        )
+                            },
+                        );
 
                     if (remainingGuesses === 0) {
                         gameEmbed
                             .setColor(0xff0000)
                             .setTitle('You Lose!')
-                            .setDescription(`The word was **${word}**`)
-                        await msg.edit({ embeds: [gameEmbed] })
-                        collector.stop()
-                        return
+                            .setDescription(`The word was **${word}**`);
+                        await msg.edit({ embeds: [gameEmbed] });
+                        collector.stop();
+                        return;
                     }
 
                     if (wordState.replace(/ /g, '') === word) {
-                        gameEmbed.setColor(0x00ff00).setTitle('You Win!')
-                        await msg.edit({ embeds: [gameEmbed] })
-                        collector.stop()
-                        return
+                        gameEmbed.setColor(0x00ff00).setTitle('You Win!');
+                        await msg.edit({ embeds: [gameEmbed] });
+                        collector.stop();
+                        return;
                     }
 
-                    await msg.edit({ embeds: [gameEmbed] })
-                })
+                    await msg.edit({ embeds: [gameEmbed] });
+                });
 
                 collector.on('end', (collected, reason) => {
                     if (reason === 'time') {
                         gameEmbed
                             .setColor(0xff0000)
                             .setTitle('Time Up!')
-                            .setDescription(`The word was **${word}**`)
-                        msg.edit({ embeds: [gameEmbed] })
+                            .setDescription(`The word was **${word}**`);
+                        msg.edit({ embeds: [gameEmbed] });
                     }
-                })
-            }
-        )
+                });
+            },
+        );
     },
-}
+};

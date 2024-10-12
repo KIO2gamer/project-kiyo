@@ -8,7 +8,7 @@ const channelTypes = {
     12: 'Private Thread',
     13: 'Stage',
     15: 'Forum',
-}
+};
 
 /**
  * Returns the human-readable name for the given Discord channel type.
@@ -17,10 +17,10 @@ const channelTypes = {
  * @returns {string} The human-readable name for the channel type, or 'Unknown' if the type is not recognized.
  */
 function getChannelType(channel) {
-    return channelTypes[channel.type] || 'Unknown'
+    return channelTypes[channel.type] || 'Unknown';
 }
 
 module.exports = {
     getChannelType,
-    channelTypes
-}
+    channelTypes,
+};

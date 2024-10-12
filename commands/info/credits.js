@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,7 +6,7 @@ module.exports = {
     usage: '/credits',
     examples: ['/credits'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('credits')
         .setDescription('Shows an embed of users who helped make this bot.'),
 
@@ -40,16 +40,16 @@ data: new SlashCommandBuilder()
             { command: 'uwu', name: 'rizzwan.', id: '1271082993427021828' },
             { command: 'boba', name: 'pepsi_pro', id: '1271082992453816412' },
             { command: 'lyricwhiz', name: 'vipraz', id: '1271391276155011072' },
-        ]
+        ];
 
         const embed = new EmbedBuilder()
             .setTitle('✨ Credits ✨')
             .setColor('#0099ff')
             .setDescription(
-                'A big thank you to all the amazing contributors who helped make this bot possible!'
+                'A big thank you to all the amazing contributors who helped make this bot possible!',
             )
             .setTimestamp()
-            .setFooter({ text: 'Thanks to all the contributors!' })
+            .setFooter({ text: 'Thanks to all the contributors!' });
 
         contributors.forEach((contributor) => {
             embed.addFields([
@@ -58,9 +58,9 @@ data: new SlashCommandBuilder()
                     value: `</${contributor.command}:${contributor.id}>`,
                     inline: true,
                 },
-            ])
-        })
+            ]);
+        });
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

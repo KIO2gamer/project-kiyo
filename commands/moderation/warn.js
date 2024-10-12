@@ -2,34 +2,34 @@ const {
     SlashCommandBuilder,
     PermissionFlagsBits,
     EmbedBuilder,
-} = require('discord.js')
-const ModerationLog = require('../../bot_utils/ModerationLog')
+} = require('discord.js');
+const ModerationLog = require('../../bot_utils/ModerationLog');
 
 function createErrorEmbed(title, description, interaction) {
     return new EmbedBuilder()
         .setTitle(title)
         .setDescription(description)
-        .setColor("Red")
+        .setColor('Red')
         .setFooter({
             text: `Done by: ${interaction.user.username}`,
             iconURL: `${interaction.user.avatarURL()}`,
-        })
+        });
 }
 
 function checkRolePermissions(interaction, targetUser) {
-    const targetRolePosition = targetUser.roles.highest.position
-    const requestUserRolePosition = interaction.member.roles.highest.position
-    const botRolePosition = interaction.guild.members.me.roles.highest.position
+    const targetRolePosition = targetUser.roles.highest.position;
+    const requestUserRolePosition = interaction.member.roles.highest.position;
+    const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
     if (targetRolePosition >= requestUserRolePosition) {
-        return 'You cannot warn someone with a higher or equal role than you'
+        return 'You cannot warn someone with a higher or equal role than you';
     }
 
     if (targetRolePosition >= botRolePosition) {
-        return 'I cannot warn someone with a higher or equal role than myself'
+        return 'I cannot warn someone with a higher or equal role than myself';
     }
 
-    return null
+    return null;
 }
 
 module.exports = {
@@ -40,38 +40,38 @@ module.exports = {
         '/warn target:@user123 reason:"Spamming in chat"',
     ],
     category: 'moderation',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('warn')
         .setDescription('Warn a member.')
         .addUserOption((option) =>
             option
                 .setName('target')
                 .setDescription('The member to warn')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('reason')
-                .setDescription('The reason for the warning')
+                .setDescription('The reason for the warning'),
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
         ),
 
     async execute(interaction) {
-        await interaction.deferReply().catch(console.error)
+        await interaction.deferReply().catch(console.error);
 
-        const targetUser = interaction.options.getMember('target')
+        const targetUser = interaction.options.getMember('target');
         const reason =
-            interaction.options.getString('reason') ?? 'No reason provided'
+            interaction.options.getString('reason') ?? 'No reason provided';
 
         if (!targetUser) {
             await interaction.editReply({
                 embeds: [
                     createErrorEmbed('ERROR', 'User not found', interaction),
                 ],
-            })
-            return
+            });
+            return;
         }
 
         if (targetUser.id === interaction.guild.ownerId) {
@@ -80,19 +80,19 @@ data: new SlashCommandBuilder()
                     createErrorEmbed(
                         'ERROR',
                         'You cannot warn the owner of the server',
-                        interaction
+                        interaction,
                     ),
                 ],
-            })
-            return
+            });
+            return;
         }
 
-        const roleError = checkRolePermissions(interaction, targetUser)
+        const roleError = checkRolePermissions(interaction, targetUser);
         if (roleError) {
             await interaction.editReply({
                 embeds: [createErrorEmbed('ERROR', roleError, interaction)],
-            })
-            return
+            });
+            return;
         }
 
         try {
@@ -101,38 +101,38 @@ data: new SlashCommandBuilder()
                 moderator: interaction.user.id,
                 user: targetUser.id,
                 reason: reason,
-            })
+            });
 
-            await logEntry.save()
+            await logEntry.save();
 
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('WARNED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been warned for reason: \`${reason}\``
+                            `<@${targetUser.id}> has been warned for reason: \`${reason}\``,
                         )
-                        .setColor("Orange")
+                        .setColor('Orange')
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
                         }),
                 ],
-            })
+            });
         } catch (error) {
             console.error(
                 'An error occurred while trying to warn the user:',
-                error
-            )
+                error,
+            );
             await interaction.editReply({
                 embeds: [
                     createErrorEmbed(
                         'ERROR',
                         'An error occurred while trying to warn the user',
-                        interaction
+                        interaction,
                     ),
                 ],
-            })
+            });
         }
     },
-}
+};

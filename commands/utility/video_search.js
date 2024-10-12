@@ -17,33 +17,33 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-} = require('discord.js')
-const { google } = require('googleapis')
-require('dotenv').config()
+} = require('discord.js');
+const { google } = require('googleapis');
+require('dotenv').config();
 
 const youtube = google.youtube({
     version: 'v3',
     auth: process.env.YOUTUBE_API_KEY,
-})
+});
 
-const pageSize = 3 // Number of results per page
+const pageSize = 3; // Number of results per page
 
 module.exports = {
     category: 'utility',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('youtube-search')
         .setDescription('Search for YouTube videos')
         .addStringOption((option) =>
             option
                 .setName('query')
                 .setDescription('The search query')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('channel')
                 .setDescription('Filter by channel name')
-                .setRequired(false)
+                .setRequired(false),
         )
         .addStringOption((option) =>
             option
@@ -54,8 +54,8 @@ data: new SlashCommandBuilder()
                     { name: 'Any', value: 'any' },
                     { name: 'Short (< 4 minutes)', value: 'short' },
                     { name: 'Medium (4-20 minutes)', value: 'medium' },
-                    { name: 'Long (> 20 minutes)', value: 'long' }
-                )
+                    { name: 'Long (> 20 minutes)', value: 'long' },
+                ),
         )
         .addStringOption((option) =>
             option
@@ -66,8 +66,8 @@ data: new SlashCommandBuilder()
                     { name: 'Relevance', value: 'relevance' },
                     { name: 'Date', value: 'date' },
                     { name: 'View Count', value: 'viewCount' },
-                    { name: 'Rating', value: 'rating' }
-                )
+                    { name: 'Rating', value: 'rating' },
+                ),
         )
         .addIntegerOption((option) =>
             option
@@ -75,7 +75,7 @@ data: new SlashCommandBuilder()
                 .setDescription('Maximum number of results per page (1-10)')
                 .setRequired(false)
                 .setMinValue(1)
-                .setMaxValue(10)
+                .setMaxValue(10),
         ),
     description_full:
         'Search for YouTube videos with optional filters for channel, duration, order, type, and max results. Results are displayed in an embedded message with pagination.',
@@ -87,33 +87,33 @@ data: new SlashCommandBuilder()
     ],
 
     async execute(interaction) {
-        await interaction.deferReply({ content: 'Searching YouTube...' })
-        const query = interaction.options.getString('query')
-        const channelFilter = interaction.options.getString('channel')
+        await interaction.deferReply({ content: 'Searching YouTube...' });
+        const query = interaction.options.getString('query');
+        const channelFilter = interaction.options.getString('channel');
         const durationFilter =
-            interaction.options.getString('duration') || 'any'
+            interaction.options.getString('duration') || 'any';
         const orderFilter =
-            interaction.options.getString('order') || 'relevance'
+            interaction.options.getString('order') || 'relevance';
         const maxResults =
-            interaction.options.getInteger('max_results') || pageSize
-        let currentPage = 1
-        let nextPageToken = ''
-        let prevPageToken = ''
+            interaction.options.getInteger('max_results') || pageSize;
+        let currentPage = 1;
+        let nextPageToken = '';
+        let prevPageToken = '';
 
         // Function to convert ISO 8601 duration to human-readable format
         function formatDuration(duration) {
-            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/)
+            const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
             if (match) {
-                let formattedDuration = ''
+                let formattedDuration = '';
                 if (match[1])
-                    formattedDuration += `${parseInt(match[1])} hour${parseInt(match[1]) > 1 ? 's' : ''} `
+                    formattedDuration += `${parseInt(match[1])} hour${parseInt(match[1]) > 1 ? 's' : ''} `;
                 if (match[2])
-                    formattedDuration += `${parseInt(match[2])} minute${parseInt(match[2]) > 1 ? 's' : ''} `
+                    formattedDuration += `${parseInt(match[2])} minute${parseInt(match[2]) > 1 ? 's' : ''} `;
                 if (match[3])
-                    formattedDuration += `${parseInt(match[3])} second${parseInt(match[3]) > 1 ? 's' : ''} `
-                return formattedDuration.trim()
+                    formattedDuration += `${parseInt(match[3])} second${parseInt(match[3]) > 1 ? 's' : ''} `;
+                return formattedDuration.trim();
             } else {
-                return 'N/A'
+                return 'N/A';
             }
         }
 
@@ -127,70 +127,70 @@ data: new SlashCommandBuilder()
                     maxResults: maxResults,
                     pageToken: nextPageToken || prevPageToken || '',
                     order: orderFilter,
-                }
+                };
 
                 if (channelFilter) {
-                    searchParams.channelId = await getChannelId(channelFilter)
+                    searchParams.channelId = await getChannelId(channelFilter);
                 }
 
                 if (durationFilter !== 'any') {
-                    searchParams.videoDuration = durationFilter
+                    searchParams.videoDuration = durationFilter;
                 }
 
-                const searchResponse = await youtube.search.list(searchParams)
+                const searchResponse = await youtube.search.list(searchParams);
                 const videoIds = searchResponse.data.items
                     .map((item) => item.id.videoId)
-                    .join(',')
+                    .join(',');
 
                 const videoResponse = await youtube.videos.list({
                     part: 'contentDetails,statistics',
                     id: videoIds,
-                })
+                });
 
                 const videoDetails = videoResponse.data.items.reduce(
                     (acc, item) => {
                         acc[item.id] = {
                             contentDetails: item.contentDetails,
                             statistics: item.statistics,
-                        }
-                        return acc
+                        };
+                        return acc;
                     },
-                    {}
-                )
+                    {},
+                );
 
-                const results = searchResponse.data
-                nextPageToken = results.nextPageToken || ''
+                const results = searchResponse.data;
+                nextPageToken = results.nextPageToken || '';
                 prevPageToken =
-                    currentPage > 1 ? results.prevPageToken || '' : ''
+                    currentPage > 1 ? results.prevPageToken || '' : '';
 
                 // Handle case when there are no results
                 if (results.items.length === 0) {
                     return {
                         content: `No results found for "${query}".`,
                         embeds: [],
-                    }
+                    };
                 }
 
                 const embed = new EmbedBuilder()
                     .setColor('#FF0000')
                     .setTitle(`YouTube Search Results for "${query}"`)
-                    .setDescription(`Page ${currentPage}`)
+                    .setDescription(`Page ${currentPage}`);
 
                 results.items.forEach((item, index) => {
-                    const details = videoDetails[item.id.videoId]
+                    const details = videoDetails[item.id.videoId];
                     const duration = details
                         ? formatDuration(details.contentDetails.duration)
-                        : 'N/A'
+                        : 'N/A';
                     const views = details
                         ? parseInt(
-                              details.statistics.viewCount
+                              details.statistics.viewCount,
                           ).toLocaleString()
-                        : 'N/A'
+                        : 'N/A';
                     const likes = details
                         ? parseInt(
-                              details.statistics.likeCount
+                              details.statistics.likeCount,
                           ).toLocaleString()
-                        : 'N/A'
+                        : 'N/A';
 
                     // Combine information into a single field
                     const videoInfo =
@@ -198,52 +198,52 @@ data: new SlashCommandBuilder()
                         `**Published:** ${new Date(item.snippet.publishedAt).toLocaleDateString()}\n` +
                         `**Duration:** ${duration}\n` +
                         `**Views:** ${views}\n` +
-                        `**Likes:** ${likes}`
+                        `**Likes:** ${likes}`;
 
                     embed.addFields({
                         name: `${(currentPage - 1) * maxResults + index + 1}. ${item.snippet.title}`,
                         value: `[Watch Video](https://www.youtube.com/watch?v=${item.id.videoId})\n\n${videoInfo}`,
-                    })
-                })
+                    });
+                });
 
                 // Create buttons based on available page tokens
-                const buttons = []
+                const buttons = [];
                 if (prevPageToken) {
                     buttons.push(
                         new ButtonBuilder()
                             .setCustomId('prev')
                             .setLabel('Previous')
                             .setStyle(ButtonStyle.Primary)
-                            .setDisabled(currentPage === 1) // Disable 'Previous' on first page
-                    )
+                            .setDisabled(currentPage === 1), // Disable 'Previous' on first page
+                    );
                 }
                 if (nextPageToken) {
                     buttons.push(
                         new ButtonBuilder()
                             .setCustomId('next')
                             .setLabel('Next')
-                            .setStyle(ButtonStyle.Primary)
-                    )
+                            .setStyle(ButtonStyle.Primary),
+                    );
                 }
 
                 const row =
                     buttons.length > 0
                         ? new ActionRowBuilder().addComponents(buttons)
-                        : null
+                        : null;
 
                 return {
                     embeds: [embed],
                     components: row ? [row] : [],
-                }
+                };
             } catch (error) {
-                console.error('Error fetching YouTube results:', error)
+                console.error('Error fetching YouTube results:', error);
                 return {
                     content: 'An error occurred while searching YouTube.',
                     embeds: [],
                     components: [],
-                }
+                };
             }
-        }
+        };
         // Function to get channel ID from channel name
         const getChannelId = async (channelName) => {
             try {
@@ -252,25 +252,25 @@ data: new SlashCommandBuilder()
                     type: 'channel',
                     q: channelName,
                     maxResults: 1,
-                })
+                });
 
                 if (response.data.items.length > 0) {
-                    return response.data.items[0].id.channelId
+                    return response.data.items[0].id.channelId;
                 }
-                return null
+                return null;
             } catch (error) {
-                console.error('Error fetching channel ID:', error)
-                return null
+                console.error('Error fetching channel ID:', error);
+                return null;
             }
-        }
+        };
 
         // Send initial message with the first page of results
-        const message = await interaction.editReply(await displayResults())
+        const message = await interaction.editReply(await displayResults());
 
         // Create button collector for pagination
         const collector = message.createMessageComponentCollector({
             time: 60000, // Collector lasts for 60 seconds
-        })
+        });
 
         collector.on('collect', async (i) => {
             // Ensure the user interacting with the buttons is the original one
@@ -279,22 +279,22 @@ data: new SlashCommandBuilder()
                     content:
                         'You are not allowed to interact with these buttons.',
                     ephemeral: true,
-                })
+                });
             }
 
             // Update the page and refresh the results
             if (i.customId === 'prev') {
-                currentPage--
+                currentPage--;
             } else if (i.customId === 'next') {
-                currentPage++
+                currentPage++;
             }
 
             // Update the message with the new page of results
-            await i.update(await displayResults())
-        })
+            await i.update(await displayResults());
+        });
 
         collector.on('end', () => {
-            message.edit({ components: [] }).catch(console.error) // Remove buttons after the collector ends
-        })
+            message.edit({ components: [] }).catch(console.error); // Remove buttons after the collector ends
+        });
     },
-}
+};

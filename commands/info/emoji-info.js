@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders')
-const { EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -7,22 +7,22 @@ module.exports = {
     usage: '/emoji-info <emoji>',
     examples: ['/emoji-info 😄', '/emoji-info MyCustomEmoji'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('emoji-info')
         .setDescription('Provides information about a specific emoji')
         .addStringOption((option) =>
             option
                 .setName('emoji')
                 .setDescription('The emoji to get information about')
-                .setRequired(true)
+                .setRequired(true),
         ),
     async execute(interaction) {
         const emoji = interaction.guild.emojis.cache.find(
-            (e) => e.name === interaction.options.getString('emoji')
-        )
+            (e) => e.name === interaction.options.getString('emoji'),
+        );
 
         if (!emoji) {
-            return interaction.reply('Emoji not found.')
+            return interaction.reply('Emoji not found.');
         }
 
         const embed = new EmbedBuilder()
@@ -46,9 +46,9 @@ data: new SlashCommandBuilder()
                     name: 'Emoji Managed',
                     value: emoji.managed ? 'Yes' : 'No',
                     inline: true,
-                }
-            )
+                },
+            );
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

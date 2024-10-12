@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js')
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 
 // Define grouped permissions
 const permissionGroups = [
@@ -49,7 +49,7 @@ const permissionGroups = [
             PermissionsBitField.Flags.ViewGuildInsights,
         ],
     },
-]
+];
 
 const commandBuilder = new SlashCommandBuilder()
     .setName('createrole')
@@ -58,26 +58,26 @@ const commandBuilder = new SlashCommandBuilder()
         option
             .setName('name')
             .setDescription('The name of the role')
-            .setRequired(true)
+            .setRequired(true),
     )
     .addStringOption((option) =>
         option
             .setName('color')
             .setDescription('The color of the role')
-            .setRequired(false)
+            .setRequired(false),
     )
     .addBooleanOption((option) =>
         option
             .setName('hoist')
             .setDescription('Display role members separately')
-            .setRequired(false)
+            .setRequired(false),
     )
     .addBooleanOption((option) =>
         option
             .setName('mentionable')
             .setDescription('Allow the role to be mentionable')
-            .setRequired(false)
-    )
+            .setRequired(false),
+    );
 
 // Add grouped permission options dynamically
 permissionGroups.forEach((group) => {
@@ -85,9 +85,9 @@ permissionGroups.forEach((group) => {
         option
             .setName(group.name)
             .setDescription(group.description)
-            .setRequired(false)
-    )
-})
+            .setRequired(false),
+    );
+});
 
 module.exports = {
     description_full:
@@ -100,19 +100,19 @@ module.exports = {
     data: commandBuilder,
 
     async execute(interaction) {
-        const name = interaction.options.getString('name')
-        const color = interaction.options.getString('color')
-        const hoist = interaction.options.getBoolean('hoist')
-        const mentionable = interaction.options.getBoolean('mentionable')
+        const name = interaction.options.getString('name');
+        const color = interaction.options.getString('color');
+        const hoist = interaction.options.getBoolean('hoist');
+        const mentionable = interaction.options.getBoolean('mentionable');
 
-        const permissions = new PermissionsBitField()
+        const permissions = new PermissionsBitField();
 
         // Dynamically assign permissions based on grouped options
         permissionGroups.forEach((group) => {
             if (interaction.options.getBoolean(group.name)) {
-                group.flags.forEach((flag) => permissions.add(flag))
+                group.flags.forEach((flag) => permissions.add(flag));
             }
-        })
+        });
 
         const role = await interaction.guild.roles.create({
             name: name,
@@ -120,8 +120,8 @@ module.exports = {
             hoist: hoist || false,
             mentionable: mentionable || false,
             permissions: permissions,
-        })
+        });
 
-        return interaction.reply(`Created new role: ${role}`)
+        return interaction.reply(`Created new role: ${role}`);
     },
-}
+};

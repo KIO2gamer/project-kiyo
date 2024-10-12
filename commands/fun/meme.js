@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
-const axios = require('axios')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const axios = require('axios');
 
 module.exports = {
     description_full:
@@ -7,26 +7,26 @@ module.exports = {
     usage: '/meme',
     examples: ['/meme'],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('meme')
         .setDescription('Send a random meme.'),
 
     async execute(interaction) {
-        let attempts = 0
-        let meme
+        let attempts = 0;
+        let meme;
 
         while (attempts < 5) {
             try {
-                const response = await axios.get('https://meme-api.com/gimme')
-                meme = response.data
+                const response = await axios.get('https://meme-api.com/gimme');
+                meme = response.data;
 
                 if (meme && !meme.nsfw && meme.title && meme.url) {
-                    break
+                    break;
                 }
             } catch (error) {
-                console.error('Error fetching meme:', error)
+                console.error('Error fetching meme:', error);
             }
-            attempts++
+            attempts++;
         }
 
         if (meme && !meme.nsfw && meme.title && meme.url) {
@@ -38,13 +38,13 @@ data: new SlashCommandBuilder()
                     text: `Executed by ${interaction.user.tag}`,
                     iconURL: interaction.user.displayAvatarURL(),
                 })
-                .setTimestamp()
+                .setTimestamp();
 
-            await interaction.reply({ embeds: [memeEmbed] })
+            await interaction.reply({ embeds: [memeEmbed] });
         } else {
             await interaction.reply(
-                'Could not fetch a non-NSFW meme at this time. Please try again later.'
-            )
+                'Could not fetch a non-NSFW meme at this time. Please try again later.',
+            );
         }
     },
-}
+};

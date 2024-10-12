@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -6,7 +6,7 @@ module.exports = {
     usage: '/kill',
     examples: ['/kill'],
     category: 'fun',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('kill')
         .setDescription('Sends a humorous assassin message to the user.'),
 
@@ -18,12 +18,12 @@ data: new SlashCommandBuilder()
             'A secret agent is en route... to prank you with a water balloon!',
             'Beware! A spy is nearby... to tell you a funny joke!',
             `i got yr home address\nalso get rekt bozo coz im sending a hitman to yeet ya`,
-        ]
+        ];
 
         const randomMessage =
             assassinMessages[
                 Math.floor(Math.random() * assassinMessages.length)
-            ]
+            ];
 
         const embed = new EmbedBuilder()
             .setColor('#FF0000')
@@ -35,8 +35,8 @@ data: new SlashCommandBuilder()
                     dynamic: true,
                 }),
             })
-            .setTimestamp()
+            .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     },
-}
+};

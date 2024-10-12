@@ -2,10 +2,10 @@ const {
     SlashCommandBuilder,
     ChannelType,
     PermissionFlagsBits,
-    EmbedBuilder
-} = require('discord.js')
-const { handleError } = require('../../bot_utils/errorHandler')
-const { getChannelType } = require('../../bot_utils/channelTypes')
+    EmbedBuilder,
+} = require('discord.js');
+const { handleError } = require('../../bot_utils/errorHandler');
+const { getChannelType } = require('../../bot_utils/channelTypes');
 
 module.exports = {
     description_full:
@@ -14,17 +14,17 @@ module.exports = {
     examples: [
         '/new_channel name:text_channel type:Text', // Creates a simple text channel named "text_channel"
         '/new_channel name:VIP Room type:Text category:Chat', // Creates a text channel named "VIP Room" under the "Chat" category
-        '/new_channel name:News type:Announcement category:Main topic:Get all updates of the server!!!' // Creates an announcement channel with a topic
+        '/new_channel name:News type:Announcement category:Main topic:Get all updates of the server!!!', // Creates an announcement channel with a topic
     ],
     category: 'channels',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('new_channel')
         .setDescription('Creates a new channel.')
         .addStringOption((option) =>
             option
                 .setName('name')
                 .setDescription('The name of the new channel')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addIntegerOption((option) =>
             option
@@ -37,39 +37,39 @@ data: new SlashCommandBuilder()
                     { name: 'Category', value: 4 },
                     { name: 'Announcement', value: 5 },
                     { name: 'Announcement', value: 5 },
-                    { name: 'Forum', value: 15 }
-                )
+                    { name: 'Forum', value: 15 },
+                ),
         )
         .addChannelOption((option) =>
             option
                 .setName('category')
                 .setDescription(
-                    'The category to create the channel in (optional)'
+                    'The category to create the channel in (optional)',
                 )
-                .addChannelTypes(ChannelType.GuildCategory)
+                .addChannelTypes(ChannelType.GuildCategory),
         )
         .addStringOption((option) =>
             option
                 .setName('topic')
                 .setDescription(
-                    'The topic (description) for the channel (optional)'
-                )
+                    'The topic (description) for the channel (optional)',
+                ),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
     async execute(interaction) {
-        const name = interaction.options.getString('name')
-        const type = interaction.options.getInteger('type')
-        const category = interaction.options.getChannel('category')
-        const topic = interaction.options.getString('topic')
+        const name = interaction.options.getString('name');
+        const type = interaction.options.getInteger('type');
+        const category = interaction.options.getChannel('category');
+        const topic = interaction.options.getString('topic');
 
         try {
             const newChannel = await interaction.guild.channels.create({
                 name: name,
                 type: type,
                 parent: category,
-                topic: topic
-            })
+                topic: topic,
+            });
 
             const embed = new EmbedBuilder()
                 .setTitle('Channel Created!')
@@ -77,19 +77,20 @@ data: new SlashCommandBuilder()
                 .setDescription(
                     `The ${getChannelType(newChannel)} channel <#${
                         newChannel.id
-                    }> has been successfully created.`
+                    }> has been successfully created.`,
                 )
-                .setTimestamp()
+                .setTimestamp();
 
-            await interaction.reply({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
             handleError(
-                interaction, error,
+                interaction,
+                error,
                 await interaction.reply({
                     content: 'An error occurred while creating the channel.',
-                    ephemeral: true
-                })
-            )
+                    ephemeral: true,
+                }),
+            );
         }
-    }
-}
+    },
+};

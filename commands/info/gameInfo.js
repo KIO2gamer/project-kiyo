@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
-const axios = require('axios')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const axios = require('axios');
 
 module.exports = {
     description_full:
@@ -7,20 +7,20 @@ module.exports = {
     usage: '/gameinfo <search>',
     examples: ['/gameinfo The Witcher 3', '/gameinfo "Grand Theft Auto V"'],
     category: 'info',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('gameinfo')
         .setDescription('Fetches game information')
         .addStringOption((option) =>
             option
                 .setName('search')
                 .setDescription('Name of the game')
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
-        const gameName = interaction.options.getString('search')
-        const clientId = process.env.IGDB_CLIENT_ID
-        const accessToken = process.env.IGDB_ACCESS_TOKEN
+        const gameName = interaction.options.getString('search');
+        const clientId = process.env.IGDB_CLIENT_ID;
+        const accessToken = process.env.IGDB_ACCESS_TOKEN;
 
         try {
             // Search for the game using IGDB API
@@ -32,11 +32,11 @@ data: new SlashCommandBuilder()
                         'Client-ID': clientId,
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }
-            )
+                },
+            );
 
             if (searchResponse.data.length > 0) {
-                const gameSlug = searchResponse.data[0].slug
+                const gameSlug = searchResponse.data[0].slug;
 
                 // Fetch game details using the game slug
                 const gameResponse = await axios.post(
@@ -47,10 +47,10 @@ data: new SlashCommandBuilder()
                             'Client-ID': clientId,
                             Authorization: `Bearer ${accessToken}`,
                         },
-                    }
-                )
+                    },
+                );
 
-                const game = gameResponse.data[0]
+                const game = gameResponse.data[0];
 
                 // Create and send the embed message
                 const embed = new EmbedBuilder()
@@ -69,7 +69,7 @@ data: new SlashCommandBuilder()
                             name: 'Release Date',
                             value: game.first_release_date
                                 ? new Date(
-                                      game.first_release_date * 1000
+                                      game.first_release_date * 1000,
                                   ).toLocaleDateString()
                                 : 'Unknown',
                             inline: true,
@@ -92,7 +92,7 @@ data: new SlashCommandBuilder()
                             name: 'IGDB Page',
                             value: `[Link](${game.url})`,
                             inline: true,
-                        }
+                        },
                     )
                     .setFooter({
                         text: `Requested by ${interaction.user.tag}`,
@@ -100,17 +100,17 @@ data: new SlashCommandBuilder()
                             dynamic: true,
                         }),
                     })
-                    .setTimestamp()
+                    .setTimestamp();
 
-                await interaction.reply({ embeds: [embed] })
+                await interaction.reply({ embeds: [embed] });
             } else {
-                await interaction.reply('No game found with that name.')
+                await interaction.reply('No game found with that name.');
             }
         } catch (error) {
-            console.error(error)
+            console.error(error);
             await interaction.reply(
-                'An error occurred while fetching game info.'
-            )
+                'An error occurred while fetching game info.',
+            );
         }
     },
-}
+};

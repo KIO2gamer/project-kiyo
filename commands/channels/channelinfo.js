@@ -2,10 +2,10 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     ChannelType,
-    PermissionsBitField
-} = require('discord.js')
-const { handleError } = require('../../bot_utils/errorHandler')
-const { getChannelType } = require('../../bot_utils/channelTypes')
+    PermissionsBitField,
+} = require('discord.js');
+const { handleError } = require('../../bot_utils/errorHandler');
+const { getChannelType } = require('../../bot_utils/channelTypes');
 
 module.exports = {
     description_full:
@@ -13,27 +13,29 @@ module.exports = {
     usage: '/channelinfo <channel>',
     examples: [
         '/channelinfo #general',
-        '/channelinfo 123456789012345678 (channel ID)'
+        '/channelinfo 123456789012345678 (channel ID)',
     ],
     category: 'channels',
-data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('channelinfo')
         .setDescription('Provides information about a specific channel')
         .addChannelOption((option) =>
             option
                 .setName('channel')
                 .setDescription('The channel to get information about')
-                .setRequired(true)
+                .setRequired(true),
         ),
     async execute(interaction) {
-        const channel = interaction.options.getChannel('channel')
+        const channel = interaction.options.getChannel('channel');
 
         try {
             const getPermissions = (channel, guild) => {
-                const permissions = channel.permissionsFor(guild.roles.everyone)
-                if (!permissions) return 'No permissions'
+                const permissions = channel.permissionsFor(
+                    guild.roles.everyone,
+                );
+                if (!permissions) return 'No permissions';
 
-                const permsArray = permissions.toArray()
+                const permsArray = permissions.toArray();
 
                 return permsArray.length > 0
                     ? permsArray
@@ -43,14 +45,14 @@ data: new SlashCommandBuilder()
                                       .find(
                                           (key) =>
                                               PermissionsBitField.Flags[key] ===
-                                              perm
+                                              perm,
                                       )
                                       ?.replace(/_/g, ' ')
-                                      .toLowerCase() || perm
+                                      .toLowerCase() || perm,
                           )
                           .join(', ')
-                    : 'No permissions'
-            }
+                    : 'No permissions';
+            };
 
             const embed = new EmbedBuilder()
                 .setTitle(`Channel Info: ${channel.name}`)
@@ -61,42 +63,42 @@ data: new SlashCommandBuilder()
                     {
                         name: 'Type',
                         value: getChannelType(channel),
-                        inline: true
+                        inline: true,
                     },
                     {
                         name: 'Created At',
                         value: `<t:${Math.floor(
-                            channel.createdAt.getTime() / 1000
+                            channel.createdAt.getTime() / 1000,
                         )}>`,
-                        inline: true
+                        inline: true,
                     },
                     {
                         name: 'Topic',
                         value: channel.topic || 'No topic set',
-                        inline: false
+                        inline: false,
                     },
                     {
                         name: 'NSFW',
                         value: channel.nsfw ? 'Yes' : 'No',
-                        inline: true
+                        inline: true,
                     },
                     {
                         name: 'Permissions',
                         value: getPermissions(channel, interaction.guild),
-                        inline: false
-                    }
-                )
+                        inline: false,
+                    },
+                );
             if (channel.parent) {
                 embed.addFields({
                     name: 'Category',
                     value: channel.parent.name,
-                    inline: true
-                })
+                    inline: true,
+                });
             }
 
-            await interaction.reply({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            await handleError(interaction, error)
+            await handleError(interaction, error);
         }
-    }
-}
+    },
+};
