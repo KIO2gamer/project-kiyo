@@ -4,11 +4,11 @@ const axios = require('axios');
 module.exports = {
     description_full:
         'Fetches information about a video game from the IGDB API. This can include the game’s description, genres, release date, platforms, and a link to its page on IGDB.',
-    usage: '/gameinfo <search>',
-    examples: ['/gameinfo The Witcher 3', '/gameinfo "Grand Theft Auto V"'],
+    usage: '/game_info <search>',
+    examples: ['/game_info The Witcher 3', '/game_info "Grand Theft Auto V"'],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('gameinfo')
+        .setName('game_info')
         .setDescription('Fetches game information')
         .addStringOption((option) =>
             option

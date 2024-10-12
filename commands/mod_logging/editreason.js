@@ -5,14 +5,14 @@ const ModerationLog = require('../../bot_utils/ModerationLog');
 module.exports = {
     description_full:
         'Edits the reason for a specific log entry or a range of log entries.',
-    usage: '/editreason reason:"new reason" [lognumber] [logrange]',
+    usage: '/edit_reason reason:"new reason" [lognumber] [logrange]',
     examples: [
-        '/editreason reason:"Spamming" lognumber:5',
-        '/editreason reason:"Inappropriate behavior" logrange:10-15',
+        '/edit_reason reason:"Spamming" lognumber:5',
+        '/edit_reason reason:"Inappropriate behavior" logrange:10-15',
     ],
     category: 'mod_logging',
     data: new SlashCommandBuilder()
-        .setName('editreason')
+        .setName('edit_reason')
         .setDescription(
             'Edit the reason for a specific log entry / a range of log entries.',
         )

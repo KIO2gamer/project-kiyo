@@ -4,11 +4,11 @@ const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 module.exports = {
     description_full:
         'Provides detailed information about a specific role in the server, such as its ID, color, permissions, creation date, and the number of members who have it.',
-    usage: '/roleinfo <role>',
-    examples: ['/roleinfo @Member', '/roleinfo "Moderator"'],
+    usage: '/role_info <role>',
+    examples: ['/role_info @Member', '/role_info "Moderator"'],
     category: 'roles',
     data: new SlashCommandBuilder()
-        .setName('roleinfo')
+        .setName('role_info')
         .setDescription('Provides information about a specific role')
         .addRoleOption((option) =>
             option

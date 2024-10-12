@@ -7,11 +7,11 @@ const {
 module.exports = {
     description_full:
         'Displays information about the bot itself, including its developer, uptime, ping, memory usage, and the number of commands it has.',
-    usage: '/botinfo',
-    examples: ['/botinfo'],
+    usage: '/bot_info',
+    examples: ['/bot_info'],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('botinfo')
+        .setName('bot_info')
         .setDescription('Get info about the bot.'),
 
     async execute(interaction) {

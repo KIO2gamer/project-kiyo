@@ -9,14 +9,14 @@ const ms = require('ms'); // Use ms library to parse duration strings
 module.exports = {
     description_full:
         'Temporarily bans a member for the specified duration and reason.',
-    usage: '/tempban target:@user duration:"duration" [reason:"ban reason"]',
+    usage: '/temp_ban target:@user duration:"duration" [reason:"ban reason"]',
     examples: [
-        '/tempban target:@user123 duration:"1d"',
-        '/tempban target:@user123 duration:"2h" reason:"Spamming"',
+        '/temp_ban target:@user123 duration:"1d"',
+        '/temp_ban target:@user123 duration:"2h" reason:"Spamming"',
     ],
     category: 'moderation',
     data: new SlashCommandBuilder()
-        .setName('tempban')
+        .setName('temp_ban')
         .setDescription('Temporarily ban a member for a specified duration.')
         .addUserOption((option) =>
             option
@@ -151,7 +151,7 @@ module.exports = {
         // Attempt to ban the user
         try {
             const logEntry = new ModerationLog({
-                action: 'tempban',
+                action: 'temp_ban',
                 moderator: interaction.user.id,
                 user: targetUser.id,
                 reason: reason,

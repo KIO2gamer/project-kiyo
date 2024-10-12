@@ -3,11 +3,11 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 module.exports = {
     description_full:
         'Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.',
-    usage: '/serverinfo',
-    examples: ['/serverinfo'],
+    usage: '/server_info',
+    examples: ['/server_info'],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('serverinfo')
+        .setName('server_info')
         .setDescription('Get info about a server!'),
 
     async execute(interaction) {
