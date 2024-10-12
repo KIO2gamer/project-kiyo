@@ -8,11 +8,11 @@ const {
 module.exports = {
     description_full:
         "Click the button... if you dare. Will you defuse the bomb or face the explosive consequences? Don't worry, it's all in good fun (or is it?).",
-    usage: '/donottouch',
-    examples: ['/donottouch'],
+    usage: '/do_not_touch',
+    examples: ['/do_not_touch'],
     category: 'fun',
     data: new SlashCommandBuilder()
-        .setName('donottouch')
+        .setName('do_not_touch')
         .setDescription('YOUR PC WILL GO BOOM-BOOM.'),
 
     async execute(interaction) {

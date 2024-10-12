@@ -10,14 +10,14 @@ const { getChannelType } = require('../../bot_utils/channelTypes');
 module.exports = {
     description_full:
         'Provides information about a specific channel, including its ID, type, creation date, topic, NSFW status, permissions, and category (if applicable).',
-    usage: '/channelinfo <channel>',
+    usage: '/channel_info <channel>',
     examples: [
-        '/channelinfo #general',
-        '/channelinfo 123456789012345678 (channel ID)',
+        '/channel_info #general',
+        '/channel_info 123456789012345678 (channel ID)',
     ],
     category: 'channels',
     data: new SlashCommandBuilder()
-        .setName('channelinfo')
+        .setName('channel_info')
         .setDescription('Provides information about a specific channel')
         .addChannelOption((option) =>
             option

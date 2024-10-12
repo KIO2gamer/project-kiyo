@@ -2,11 +2,11 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     description_full: 'Deletes the specified role from the server.',
-    usage: '/deleterole <role:role>',
-    examples: ['/deleterole role:Members'],
+    usage: '/delete_role <role:role>',
+    examples: ['/delete_role role:Members'],
     category: 'roles',
     data: new SlashCommandBuilder()
-        .setName('deleterole')
+        .setName('delete_role')
         .setDescription('Deletes an existing role')
         .addRoleOption((option) =>
             option

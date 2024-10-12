@@ -7,9 +7,9 @@
  *
  * @module commands/utility/video_search
  * @example
- * /youtube-search query:cats
- * /youtube-search query:"funny videos" channel:PewDiePie
- * /youtube-search query:tutorials duration:long order:viewCount type:episode max_results:10
+ * /youtube_search query:cats
+ * /youtube_search query:"funny videos" channel:PewDiePie
+ * /youtube_search query:tutorials duration:long order:viewCount type:episode max_results:10
  */
 const {
     SlashCommandBuilder,
@@ -31,7 +31,7 @@ const pageSize = 3; // Number of results per page
 module.exports = {
     category: 'utility',
     data: new SlashCommandBuilder()
-        .setName('youtube-search')
+        .setName('youtube_search')
         .setDescription('Search for YouTube videos')
         .addStringOption((option) =>
             option
@@ -79,11 +79,11 @@ module.exports = {
         ),
     description_full:
         'Search for YouTube videos with optional filters for channel, duration, order, type, and max results. Results are displayed in an embedded message with pagination.',
-    usage: '/youtube-search <query> [channel] [duration] [order] [type] [max_results]',
+    usage: '/youtube_search <query> [channel] [duration] [order] [type] [max_results]',
     examples: [
-        '/youtube-search query:cats',
-        '/youtube-search query:"funny videos" channel:PewDiePie',
-        '/youtube-search query:tutorials duration:long order:viewCount type:episode max_results:10',
+        '/youtube_search query:cats',
+        '/youtube_search query:"funny videos" channel:PewDiePie',
+        '/youtube_search query:tutorials duration:long order:viewCount type:episode max_results:10',
     ],
 
     async execute(interaction) {

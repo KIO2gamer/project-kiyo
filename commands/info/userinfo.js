@@ -7,11 +7,11 @@ const {
 module.exports = {
     description_full:
         'Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.',
-    usage: '/userinfo [target]',
-    examples: ['/userinfo', '/userinfo @user'],
+    usage: '/user_info [target]',
+    examples: ['/user_info', '/user_info @user'],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('userinfo')
+        .setName('user_info')
         .setDescription('Displays information about a user.')
         .addUserOption((option) =>
             option
@@ -120,12 +120,12 @@ module.exports = {
             },
         ];
 
-        const userInfoEmbed = new EmbedBuilder()
+        const user_InfoEmbed = new EmbedBuilder()
             .setTitle(`User Information - ${user.username}`)
             .setThumbnail(user.displayAvatarURL({ dynamic: true }))
             .setColor(member.displayHexColor) // Use member's display color
             .addFields(fields);
 
-        await interaction.reply({ embeds: [userInfoEmbed] });
+        await interaction.reply({ embeds: [user_InfoEmbed] });
     },
 };

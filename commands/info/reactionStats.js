@@ -4,16 +4,16 @@ const moment = require('moment');
 module.exports = {
     description_full:
         'Displays statistics on reactions used in a specific channel or across the entire server. It shows the top 5 most used reactions and the top 5 users who react the most, within a specified timeframe or for the entire server history.',
-    usage: '/reactionstats [channel] [timeframe]',
+    usage: '/reaction_stats [channel] [timeframe]',
     examples: [
-        '/reactionstats',
-        '/reactionstats #general',
-        '/reactionstats #general 7d',
-        '/reactionstats 1M',
+        '/reaction_stats',
+        '/reaction_stats #general',
+        '/reaction_stats #general 7d',
+        '/reaction_stats 1M',
     ],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('reactionstats')
+        .setName('reaction_stats')
         .setDescription(
             'Displays statistics on reactions given in a specific channel or server-wide.',
         )

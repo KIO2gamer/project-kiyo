@@ -7,11 +7,11 @@ const {
 module.exports = {
     description_full:
         'Lists all the roles in the server, sorted by their position hierarchy, and shows the number of members who have each role.',
-    usage: '/viewroles',
-    examples: ['/viewroles'],
+    usage: '/view_roles',
+    examples: ['/view_roles'],
     category: 'roles',
     data: new SlashCommandBuilder()
-        .setName('viewroles')
+        .setName('view_roles')
         .setDescription('Shows all the roles in the server.')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),
 

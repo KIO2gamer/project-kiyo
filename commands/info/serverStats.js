@@ -4,11 +4,11 @@ const moment = require('moment');
 module.exports = {
     description_full:
         'Provides various statistics about the server, including member count, channels, messages sent, reactions given, and more, within a specified timeframe or for the server’s entire history.',
-    usage: '/serverstats [timeframe]',
-    examples: ['/serverstats', '/serverstats 7d', '/serverstats 1M'],
+    usage: '/server_stats [timeframe]',
+    examples: ['/server_stats', '/server_stats 7d', '/server_stats 1M'],
     category: 'info',
     data: new SlashCommandBuilder()
-        .setName('serverstats')
+        .setName('server_stats')
         .setDescription('Displays various statistics about this server.')
         .addStringOption((option) =>
             option
