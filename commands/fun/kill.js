@@ -5,7 +5,8 @@ module.exports = {
         'Send a playfully threatening (but ultimately harmless) assassin message. Get ready to be "assassinated" with laughter!',
     usage: '/kill',
     examples: ['/kill'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('kill')
         .setDescription('Sends a humorous assassin message to the user.'),
 

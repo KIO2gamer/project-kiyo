@@ -13,7 +13,8 @@ module.exports = {
         '/timeout target:@user123 amount:"1h"',
         '/timeout target:@user123 amount:"30m" reason:"Being disruptive"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('timeout')
         .setDescription('Select a member and timeout them.')
         .addUserOption((option) =>

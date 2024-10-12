@@ -14,10 +14,11 @@ const hangmanImages = [
 
 module.exports = {
     description_full:
-        "A classic game of hangman! The bot will choose a random word, and users have to guess the letters.  You can use '!hint' to get a hint, but be careful, you only have 3 hints!",
+        "A classic game of hangman! The bot will choose a random word, and users have to guess the letters!",
     usage: '/hangman',
     examples: ['/hangman'],
-    data: new SlashCommandBuilder()
+    category: 'games',
+data: new SlashCommandBuilder()
         .setName('hangman')
         .setDescription('Start a game of hangman!'),
     async execute(interaction) {
@@ -47,7 +48,6 @@ module.exports = {
                 const guessedLetters = []
                 let remainingGuesses = 6
                 let wordState = '_ '.repeat(word.length).trim()
-                let hintsUsed = 0
 
                 const gameEmbed = new EmbedBuilder()
                     .setColor(0x0099ff)
@@ -64,11 +64,6 @@ module.exports = {
                             name: 'Guessed Letters',
                             value: guessedLetters.join(', ') || 'None',
                             inline: true,
-                        },
-                        {
-                            name: 'Hints Used',
-                            value: hintsUsed.toString(),
-                            inline: true,
                         }
                     )
 
@@ -83,11 +78,7 @@ module.exports = {
                 collector.on('collect', async (guess) => {
                     const content = guess.content.toLowerCase()
 
-                    if (content.startsWith('!hint') && hintsUsed < 3) {
-                        hintsUsed++
-                        // Implement hint logic here
-                        // ... provide a hint based on the word ...
-                    } else if (/^[a-zA-Z]$/.test(content)) {
+                    if (/^[a-zA-Z]$/.test(content)) {
                         const letter = content
 
                         if (guessedLetters.includes(letter)) {
@@ -113,7 +104,7 @@ module.exports = {
                         }
                     } else {
                         await guess.reply(
-                            'Please enter a single letter or use "!hint" for a hint.'
+                            'Please enter a single letter.'
                         )
                         return
                     }
@@ -130,11 +121,6 @@ module.exports = {
                             {
                                 name: 'Guessed Letters',
                                 value: guessedLetters.join(', '),
-                                inline: true,
-                            },
-                            {
-                                name: 'Hints Used',
-                                value: hintsUsed.toString(),
                                 inline: true,
                             }
                         )

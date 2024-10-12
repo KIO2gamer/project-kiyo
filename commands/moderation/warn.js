@@ -39,7 +39,8 @@ module.exports = {
         '/warn target:@user123',
         '/warn target:@user123 reason:"Spamming in chat"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('warn')
         .setDescription('Warn a member.')
         .addUserOption((option) =>

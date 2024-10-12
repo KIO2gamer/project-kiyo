@@ -7,7 +7,8 @@ module.exports = {
         'Reloads a specific command, or all commands if no command is specified.',
     usage: '/reload [command name]',
     examples: ['/reload', '/reload ban'],
-    data: new SlashCommandBuilder()
+    category: 'dev',
+data: new SlashCommandBuilder()
         .setName('reload')
         .setDescription('Reloads a command.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)

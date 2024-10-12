@@ -1,7 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    category: 'games',
+data: new SlashCommandBuilder()
         .setName('lyricwhiz')
         .setDescription('Play a lyric guessing game!'),
 

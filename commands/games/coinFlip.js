@@ -5,7 +5,8 @@ module.exports = {
         'The bot virtually flips a coin and reveals the result (Heads or Tails). You can also bet on the outcome!',
     usage: '/coinflip [bet]',
     examples: ['/coinflip', '/coinflip heads', '/coinflip tails'],
-    data: new SlashCommandBuilder()
+    category: 'games',
+data: new SlashCommandBuilder()
         .setName('coinflip')
         .setDescription('Flip a coin and bet on the outcome!')
         .addStringOption((option) =>

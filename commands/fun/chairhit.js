@@ -5,7 +5,8 @@ module.exports = {
         'Express your frustration or excitement (or just cause some chaos) by yeeting a chair across the digital room.',
     usage: '/chairhit', // No parameters needed
     examples: ['/chairhit'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('chairhit')
         .setDescription('yeet the chair fr'),
 

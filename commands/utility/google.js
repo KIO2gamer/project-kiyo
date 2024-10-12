@@ -9,7 +9,8 @@ module.exports = {
         '/google discord bot tutorial',
         '/google best restaurants near me',
     ],
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('google')
         .setDescription('Search Google for a query')
         .addStringOption((option) =>

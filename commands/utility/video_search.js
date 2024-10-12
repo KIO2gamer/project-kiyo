@@ -29,7 +29,8 @@ const youtube = google.youtube({
 const pageSize = 3 // Number of results per page
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('youtube-search')
         .setDescription('Search for YouTube videos')
         .addStringOption((option) =>

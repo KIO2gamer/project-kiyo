@@ -6,7 +6,8 @@ module.exports = {
         'This command simulates a "sniping" action on a mentioned user, sending a GIF and an embed message to the channel. It includes a 5-minute cooldown to prevent spamming.',
     usage: '/snipe <user>',
     examples: ['/snipe @username', '/snipe @anotherUser'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('snipe')
         .setDescription('Snipes the user')
         .addUserOption((option) =>

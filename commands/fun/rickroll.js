@@ -5,7 +5,8 @@ module.exports = {
         'Never gonna give you up, never gonna let you down... especially when you can rickroll your friends with this deviously delightful command!',
     usage: '/rickroll',
     examples: ['/rickroll'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('rickroll')
         .setDescription('Rickroll someone'),
 

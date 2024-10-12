@@ -4,7 +4,8 @@ module.exports = {
     description_full: 'Displays a GIF of Simba being yeeted.',
     usage: '/yeet',
     examples: ['/yeet'],
-    data: new SlashCommandBuilder().setName('yeet').setDescription('yeet'),
+    category: 'fun',
+data: new SlashCommandBuilder().setName('yeet').setDescription('yeet'),
 
     async execute(interaction) {
         await interaction.reply(

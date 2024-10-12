@@ -10,7 +10,8 @@ module.exports = {
         "Click the button... if you dare. Will you defuse the bomb or face the explosive consequences? Don't worry, it's all in good fun (or is it?).",
     usage: '/donottouch',
     examples: ['/donottouch'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('donottouch')
         .setDescription('YOUR PC WILL GO BOOM-BOOM.'),
 

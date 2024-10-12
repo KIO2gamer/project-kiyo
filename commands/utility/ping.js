@@ -5,7 +5,8 @@ module.exports = {
         "Measures the bot's response time (latency) and displays its uptime (how long it's been running).",
     usage: '/ping',
     examples: ['/ping'],
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription("Checks the bot's response time"),
 

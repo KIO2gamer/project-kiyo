@@ -8,7 +8,8 @@ module.exports = {
         '/editrole role:Members name:NewMembers color:#00FF00',
         '/editrole role:Announcements hoist:true',
     ],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('editrole')
         .setDescription("Edits a role's properties.")
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)

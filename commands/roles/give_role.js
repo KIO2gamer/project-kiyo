@@ -4,7 +4,8 @@ module.exports = {
     description_full: 'Assigns the specified role to the specified user.',
     usage: '/give_role <target:user> <role:role>',
     examples: ['/give_role target:@username role:VIP'],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('give_role')
         .setDescription('Gives a role to a user')
         .addUserOption((option) =>

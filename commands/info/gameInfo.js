@@ -6,7 +6,8 @@ module.exports = {
         'Fetches information about a video game from the IGDB API. This can include the game’s description, genres, release date, platforms, and a link to its page on IGDB.',
     usage: '/gameinfo <search>',
     examples: ['/gameinfo The Witcher 3', '/gameinfo "Grand Theft Auto V"'],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('gameinfo')
         .setDescription('Fetches game information')
         .addStringOption((option) =>

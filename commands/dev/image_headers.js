@@ -9,7 +9,8 @@ module.exports = {
         '/image_headers rules',
         "/image_headers forms 'Check out our new application form!'",
     ],
-    data: new SlashCommandBuilder()
+    category: 'dev',
+data: new SlashCommandBuilder()
         .setName('image_headers')
         .setDescription('Posts an image.')
         .setDefaultMemberPermissions(

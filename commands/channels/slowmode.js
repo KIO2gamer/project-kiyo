@@ -14,7 +14,8 @@ module.exports = {
         '/slowmode 10s', // Set slowmode to 10 seconds in the current channel
         '/slowmode 5m #general', // Set slowmode to 5 minutes in the #general channel
     ],
-    data: new SlashCommandBuilder()
+    category: 'channels',
+data: new SlashCommandBuilder()
         .setName('slowmode')
         .setDescription('Set a slowmode for a channel.')
         .addStringOption((option) =>

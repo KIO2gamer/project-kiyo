@@ -9,7 +9,8 @@ module.exports = {
         'Deletes a specified number of messages from the channel.',
     usage: '/purge amount:number',
     examples: ['/purge amount:5', '/purge amount:100'],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('purge')
         .setDescription('Deletes messages from the current channel.')
         .addIntegerOption((option) =>

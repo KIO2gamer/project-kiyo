@@ -6,7 +6,8 @@ module.exports = {
         'Provides various statistics about the server, including member count, channels, messages sent, reactions given, and more, within a specified timeframe or for the server’s entire history.',
     usage: '/serverstats [timeframe]',
     examples: ['/serverstats', '/serverstats 7d', '/serverstats 1M'],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('serverstats')
         .setDescription('Displays various statistics about this server.')
         .addStringOption((option) =>

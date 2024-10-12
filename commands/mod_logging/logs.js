@@ -30,7 +30,8 @@ module.exports = {
         '/logs action:ban',
         '/logs moderator:@mod456',
     ],
-    data: new SlashCommandBuilder()
+    category: 'mod_logging',
+data: new SlashCommandBuilder()
         .setName('logs')
         .setDescription('Show the moderation logs.')
         .addIntegerOption((option) =>

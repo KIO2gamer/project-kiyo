@@ -21,7 +21,8 @@ module.exports = {
         '/modifychannel voice channel:text_old newname:text_new permissions:Manage Messages toggle:Off role:@everyone', // Disables "Manage Messages" for everyone in a text channel
         '\n'
     ],
-    data: new SlashCommandBuilder()
+    category: 'channels',
+data: new SlashCommandBuilder()
         .setName('modifychannel')
         .setDescription('Modify a text or voice channel.')
         .addSubcommand((subcommand) =>
