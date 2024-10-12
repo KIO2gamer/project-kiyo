@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const ModerationLog = require('../../bot_utils/ModerationLog');
+const moderation_logs = require('../../bot_utils/moderation_logs');
 
 module.exports = {
     description_full:
@@ -122,7 +122,7 @@ module.exports = {
 
         // Attempt to ban the user
         try {
-            const logEntry = new ModerationLog({
+            const logEntry = new moderation_logs({
                 action: 'ban',
                 moderator: interaction.user.id,
                 user: targetUser.id,

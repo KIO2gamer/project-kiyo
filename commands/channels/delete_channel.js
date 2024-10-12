@@ -3,8 +3,8 @@ const {
     PermissionFlagsBits,
     EmbedBuilder,
 } = require('discord.js');
-const { handleError } = require('../../bot_utils/errorHandler');
-const { getChannelType } = require('../../bot_utils/channelTypes');
+const { handleError } = require('../../bot_utils/error_handler');
+const { getChannelType } = require('../../bot_utils/channel_types');
 
 module.exports = {
     description_full:

@@ -1,6 +1,6 @@
 // commands/moderation/editlog.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const ModerationLog = require('../../bot_utils/moderation_logs');
+const moderation_logs = require('../../bot_utils/moderation_logs');
 
 module.exports = {
     description_full:
@@ -49,7 +49,7 @@ module.exports = {
 
         try {
             if (logNumber) {
-                const log = await ModerationLog.findOne({
+                const log = await moderation_logs.findOne({
                     logNumber: logNumber,
                 });
 
@@ -76,12 +76,12 @@ module.exports = {
                     return;
                 }
 
-                const logs = await ModerationLog.find({
+                const logs = await moderation_logs.find({
                     logNumber: { $gte: start, $lte: end },
                 });
 
                 if (logs.length > 0) {
-                    await ModerationLog.updateMany(
+                    await moderation_logs.updateMany(
                         { logNumber: { $gte: start, $lte: end } },
                         { $set: { reason: newReason } },
                     );

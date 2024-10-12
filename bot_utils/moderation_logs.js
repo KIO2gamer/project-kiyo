@@ -21,4 +21,4 @@ moderationLogSchema.pre('save', async function (next) {
     next();
 });
 
-module.exports = mongoose.model('ModerationLog', moderationLogSchema);
+module.exports = mongoose.model('moderation_logs', moderationLogSchema);
