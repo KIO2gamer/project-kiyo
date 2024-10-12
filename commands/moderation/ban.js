@@ -13,7 +13,8 @@ module.exports = {
         '/ban target:@user123',
         '/ban target:@user123 reason:"Severe rule violation"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('ban')
         .setDescription('Select a member and ban them.')
         .addUserOption((option) =>

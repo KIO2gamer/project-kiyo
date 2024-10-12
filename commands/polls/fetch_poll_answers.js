@@ -7,7 +7,8 @@ module.exports = {
     examples: [
         '/fetch_poll_answers message_id:"123456789012345678" channel:#polls',
     ],
-    data: new SlashCommandBuilder()
+    category: 'polls',
+data: new SlashCommandBuilder()
         .setName('fetch_poll_answers')
         .setDescription('Fetches the answers of the poll.')
         .addStringOption((option) =>

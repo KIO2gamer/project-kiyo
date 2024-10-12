@@ -4,7 +4,8 @@ module.exports = {
     description_full: 'Displays a random uwu GIF from Tenor.',
     usage: '/uwu',
     examples: ['/uwu'],
-    data: new SlashCommandBuilder().setName('uwu').setDescription('uwu'),
+    category: 'fun',
+data: new SlashCommandBuilder().setName('uwu').setDescription('uwu'),
 
     async execute(interaction) {
         // Defer the reply to give more time for processing

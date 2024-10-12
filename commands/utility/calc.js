@@ -12,7 +12,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
 const math = require('mathjs') // Import mathjs
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('calculate')
         .setDescription('Perform a calculation using mathjs.')
         .addStringOption((option) =>

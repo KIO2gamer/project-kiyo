@@ -6,7 +6,8 @@ module.exports = {
     description_full: 'Removes a role from the database.',
     usage: '/delete_role_from_data <role:role>',
     examples: ['/delete_role_from_data role:Guests'],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('delete_role_from_data')
         .setDescription('Deletes a role from the database.')
         .addRoleOption((option) =>

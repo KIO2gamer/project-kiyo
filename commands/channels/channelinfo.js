@@ -15,7 +15,8 @@ module.exports = {
         '/channelinfo #general',
         '/channelinfo 123456789012345678 (channel ID)'
     ],
-    data: new SlashCommandBuilder()
+    category: 'channels',
+data: new SlashCommandBuilder()
         .setName('channelinfo')
         .setDescription('Provides information about a specific channel')
         .addChannelOption((option) =>

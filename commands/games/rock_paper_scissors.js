@@ -9,7 +9,8 @@ module.exports = {
         '/rock_paper_scissors paper',
         '/rock_paper_scissors scissors',
     ],
-    data: new SlashCommandBuilder()
+    category: 'games',
+data: new SlashCommandBuilder()
         .setName('rock_paper_scissors')
         .setDescription('Play Rock, Paper, Scissors!')
         .addStringOption((option) =>

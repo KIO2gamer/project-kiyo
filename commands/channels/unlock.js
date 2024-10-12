@@ -11,7 +11,8 @@ module.exports = {
         'This command unlocks a specified channel or the current channel if no channel is specified.',
     usage: '/unlock <channel?>',
     examples: ['/unlock', '/unlock #general'],
-    data: new SlashCommandBuilder()
+    category: 'channels',
+data: new SlashCommandBuilder()
         .setName('unlock')
         .setDescription('Unlock a channel')
         .setDMPermission(false)

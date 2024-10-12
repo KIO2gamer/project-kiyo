@@ -6,7 +6,8 @@ module.exports = {
         'The bot will shuffle the letters of a randomly chosen word. Users have 30 seconds to unscramble the word and guess correctly.',
     usage: '/unscramble',
     examples: ['/unscramble'],
-    data: new SlashCommandBuilder()
+    category: 'games',
+data: new SlashCommandBuilder()
         .setName('unscramble')
         .setDescription('Unscramble the word and win!'),
     async execute(interaction) {

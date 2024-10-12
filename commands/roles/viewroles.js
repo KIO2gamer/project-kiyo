@@ -9,7 +9,8 @@ module.exports = {
         'Lists all the roles in the server, sorted by their position hierarchy, and shows the number of members who have each role.',
     usage: '/viewroles',
     examples: ['/viewroles'],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('viewroles')
         .setDescription('Shows all the roles in the server.')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),

@@ -5,7 +5,8 @@ module.exports = {
         'Displays a specific rule from the server’s rules list. The number of the rule to be displayed is specified as an argument.',
     usage: '/rule <number>',
     examples: ['/rule 1', '/rule 5'],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('rule')
         .setDescription(
             'Shows the rules of the server in snippets (selection).'

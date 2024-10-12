@@ -6,7 +6,8 @@ module.exports = {
         'Provides detailed information about a specific role in the server, such as its ID, color, permissions, creation date, and the number of members who have it.',
     usage: '/roleinfo <role>',
     examples: ['/roleinfo @Member', '/roleinfo "Moderator"'],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('roleinfo')
         .setDescription('Provides information about a specific role')
         .addRoleOption((option) =>

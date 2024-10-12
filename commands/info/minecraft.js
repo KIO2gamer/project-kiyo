@@ -10,7 +10,8 @@ module.exports = {
         'Retrieves information about a Minecraft player from the Mojang API, including their username, UUID, and a profile picture from Crafatar.',
     usage: '/minecraft <username>',
     examples: ['/minecraft Notch', '/minecraft Dinnerbone'],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('minecraft')
         .setDescription('Gets info about a Minecraft player')
         .addStringOption((option) =>

@@ -6,7 +6,8 @@ module.exports = {
         'This command playfully grants "Skibidi powers" to users who have watched Skibidi Toilet, while denying those who haven\'t. It reacts based on the user\'s response to a simple question.',
     usage: '/skibidi',
     examples: ['/skibidi', '/skibidi option:Yes'],
-    data: new SlashCommandBuilder()
+    category: 'fun',
+data: new SlashCommandBuilder()
         .setName('skibidi')
         .setDescription('Gives you skibidi powers')
         .addStringOption((option) =>

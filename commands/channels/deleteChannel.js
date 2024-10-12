@@ -15,7 +15,8 @@ module.exports = {
         '/delete_channel channel:text', // Deletes a channel named "text"
         '/delete_channel channel:voice', // Deletes a channel named "voice"
     ],
-    data: new SlashCommandBuilder()
+    category: 'channels',
+data: new SlashCommandBuilder()
         .setName('delete_channel')
         .setDescription('Deletes a specified channel.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)

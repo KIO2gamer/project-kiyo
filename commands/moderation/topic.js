@@ -8,7 +8,8 @@ module.exports = {
         '/topic user1:@user123',
         '/topic user1:@user123 user2:@user456 user3:@user789',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('topic')
         .setDescription('Sends a message about changing the topic.')
         .setDefaultMemberPermissions(

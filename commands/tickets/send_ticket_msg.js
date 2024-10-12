@@ -15,7 +15,8 @@ module.exports = {
         '/send_ticket_msg channel:#support',
         '/send_ticket_msg channel:#help-desk title:"Need Assistance?" description:"Click below to get help!" button_label:"Get Help"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'tickets',
+data: new SlashCommandBuilder()
         .setName('send_ticket_msg')
         .setDescription('Sends the ticket opening message to a channel.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)

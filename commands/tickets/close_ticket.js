@@ -15,7 +15,8 @@ module.exports = {
         'Closes the current ticket channel. Requires the "Manage Channels" permission.',
     usage: '/close_ticket [reason:"close reason"]',
     examples: ['/close_ticket', '/close_ticket reason:"Issue resolved"'],
-    data: new SlashCommandBuilder()
+    category: 'tickets',
+data: new SlashCommandBuilder()
         .setName('close_ticket')
         .setDescription('Closes the current ticket channel.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)

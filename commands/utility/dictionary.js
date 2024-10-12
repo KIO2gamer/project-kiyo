@@ -3,7 +3,8 @@ const axios = require('axios')
 const { handleError } = require('../../bot_utils/errorHandler') // Import errorHandler
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('dictionary')
         .setDescription('Look up the definition of a word')
         .addStringOption((option) =>

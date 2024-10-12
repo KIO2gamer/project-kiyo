@@ -11,8 +11,8 @@ const {
 } = require('discord.js')
 require('dotenv').config()
 
-const { CLIENT_ID, DISCORD_TOKEN, MONGODB_URI } = process.env
-const GUILD_IDS = process.env.GUILD_IDS ? process.env.GUILD_IDS.split(',') : []
+const { DISCORD_CLIENT_ID, DISCORD_TOKEN, MONGODB_URI } = process.env
+const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS ? process.env.DISCORD_GUILD_IDS.split(',') : []
 
 console.log('Starting bot...') // Log the start of the bot
 
@@ -96,10 +96,10 @@ const deployCommands = async () => {
 
     const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN)
     try {
-        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: [] })
-        for (const guildId of GUILD_IDS) {
+        await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: [] })
+        for (const guildId of DISCORD_GUILD_IDS) {
             await rest.put(
-                Routes.applicationGuildCommands(CLIENT_ID, guildId),
+                Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
                 { body: commands }
             )
             console.log(`Commands deployed to guild: ${guildId}`) // Log guild command deployment

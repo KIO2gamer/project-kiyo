@@ -5,7 +5,8 @@ module.exports = {
         'Unleash a mesmerizing (and slightly nutty) koi fish GIF upon the unsuspecting populace of your Discord server.',
     usage: '/koifish',
     examples: ['/koifish'],
-    data: new SlashCommandBuilder().setName('koifish').setDescription('Fish'),
+    category: 'fun',
+data: new SlashCommandBuilder().setName('koifish').setDescription('Fish'),
 
     async execute(interaction) {
         interaction.reply(

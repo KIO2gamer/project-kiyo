@@ -14,7 +14,8 @@ module.exports = {
         '/reactionstats #general 7d',
         '/reactionstats 1M',
     ],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('reactionstats')
         .setDescription(
             'Displays statistics on reactions given in a specific channel or server-wide.'

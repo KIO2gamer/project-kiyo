@@ -13,7 +13,8 @@ module.exports = {
         '/unban userid:"123456789012345678"',
         '/unban userid:"123456789012345678" reason:"Ban was a mistake"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('unban')
         .setDescription('Unban a member from the server.')
         .addStringOption((option) =>

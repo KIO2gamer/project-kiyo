@@ -13,7 +13,8 @@ module.exports = {
         '/kick target:@user123',
         '/kick target:@user123 reason:"Violating server rules"',
     ],
-    data: new SlashCommandBuilder()
+    category: 'moderation',
+data: new SlashCommandBuilder()
         .setName('kick')
         .setDescription('Select a member and kick them.')
         .addUserOption((option) =>

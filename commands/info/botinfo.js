@@ -9,7 +9,8 @@ module.exports = {
         'Displays information about the bot itself, including its developer, uptime, ping, memory usage, and the number of commands it has.',
     usage: '/botinfo',
     examples: ['/botinfo'],
-    data: new SlashCommandBuilder()
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('botinfo')
         .setDescription('Get info about the bot.'),
 

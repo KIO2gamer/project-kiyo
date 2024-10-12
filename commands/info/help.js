@@ -1,127 +1,61 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    StringSelectMenuBuilder,
-    ButtonBuilder,
-    ButtonStyle
-} = require('discord.js')
-const fs = require('fs')
-const path = require('path')
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    description_full:
+        'Displays a list of available commands and their descriptions.',
+    usage: '/help',
+    examples: ['/help'],
+    category: 'info',
+data: new SlashCommandBuilder()
         .setName('help')
-        .setDescription('Get help with bot commands')
-        .addStringOption((option) =>
+        .setDescription('Display a list of available commands')
+        .addStringOption(option =>
             option
-                .setName('command')
-                .setDescription('Get info about a specific command')
-                .setRequired(false)
+            .setName('command')
+            .setDescription('The command to get help for')
+            .setRequired(false)
         )
-        .addStringOption((option) =>
+        .addStringOption(option =>
             option
-                .setName('search')
-                .setDescription('Search for commands')
-                .setRequired(false)
+            .setName('category')
+            .setDescription('The category of commands to display')
+            .setRequired(false)
+        )
+        .addStringOption(option =>
+            option
+            .setName('search')
+            .setDescription('The search term to filter commands by')
+            .setRequired(false)
         ),
-
     async execute(interaction) {
         const commandName = interaction.options.getString('command')
-        const searchQuery = interaction.options.getString('search')
-
+        const category = interaction.options.getString('category')
+        const search = interaction.options.getString('search')
+        
         if (commandName) {
-            return await showCommandInfo(interaction, commandName)
-        } else if (searchQuery) {
-            return await searchCommands(interaction, searchQuery)
-        } else {
-            return await showCommandCategories(interaction)
+            const command = interaction.client.commands.get(commandName)
+            if (!command) {
+                return interaction.reply(`Command \`${commandName}\` not found.`)
+            }
+            const embed = new EmbedBuilder()
+                .setTitle(`Help for \`${commandName}\``)
+                .setDescription(command.description_full || command.description || 'No description provided.')
+                .addFields(
+                    { name: 'Usage', value: command.usage || 'No usage provided.' },
+                    ...(command.usage !== command.examples.join('\n') ? [{ name: 'Examples', value: command.examples.join('\n') || 'No examples provided.' }] : [])
+                )
+            return interaction.reply({ embeds: [embed] })
+        }
+        else if (category) {
+            const commands = interaction.client.commands.filter(command => command.category === category)
+            console.log(commands)
+            if (commands.size === 0) {
+                return interaction.reply(`No commands found in category \`${category}\`.`)
+            }
+            const embed = new EmbedBuilder()
+                .setTitle(`Commands in category \`${category}\``)
+                .setDescription(commands.map(command => `\`${command.data.name}\``).join(', '))
+            return interaction.reply({ embeds: [embed] })
         }
     }
-}
-
-async function showCommandCategories(interaction) {
-    const categories = fs
-        .readdirSync('./commands')
-        .filter((file) =>
-            fs.statSync(path.join('./commands', file)).isDirectory()
-        )
-
-    const embed = new EmbedBuilder()
-        .setTitle('All Commands')
-        .setColor('#0099ff')
-
-    for (const category of categories) {
-        const categoryCommands = fs
-            .readdirSync(`./commands/${category}`)
-            .filter((file) => file.endsWith('.js'))
-
-        const commandList = categoryCommands
-            .map((command) => `</${command.slice(0, -3)}:${command.id}>`)
-            .join(', ')
-
-        embed.addFields({
-            name: category.charAt(0).toUpperCase() + category.slice(1),
-            value: commandList || 'No commands in this category',
-            inline: false
-        })
-    }
-
-    await interaction.reply({ embeds: [embed] })
-}
-
-async function showCommandInfo(interaction, commandName) {
-    const command = interaction.client.commands.get(commandName)
-
-    if (!command) {
-        return interaction.reply({
-            content: 'That command does not exist.',
-            ephemeral: true
-        })
-    }
-
-    const embed = new EmbedBuilder()
-        .setTitle(`Command: ${command.data.name}`)
-        .setDescription(
-            command.data.description_full || command.data.description
-        )
-        .setColor('#0099ff')
-
-    if (command.data.usage) {
-        embed.addFields({ name: 'Usage', value: command.data.usage })
-    }
-
-    if (command.data.examples && command.data.examples !== command.data.usage) {
-        embed.addFields({ name: 'Examples', value: command.data.examples })
-    }
-
-    return interaction.reply({ embeds: [embed] })
-}
-async function searchCommands(interaction, searchQuery) {
-    const commands = interaction.client.commands
-    const results = commands.filter(
-        (cmd) =>
-            cmd.data.name.includes(searchQuery) ||
-            cmd.data.description.includes(searchQuery) ||
-            (cmd.data.description_full &&
-                cmd.data.description_full.includes(searchQuery))
-    )
-
-    if (results.size === 0) {
-        return interaction.reply({
-            content: 'No commands found matching your search.',
-            ephemeral: true
-        })
-    }
-
-    const embed = new EmbedBuilder()
-        .setTitle(`Search Results for "${searchQuery}"`)
-        .setDescription(
-            results
-                .map((cmd) => `\`/${cmd.data.name}\` - ${cmd.data.description}`)
-                .join('\n')
-        )
-        .setColor('#0099ff')
-
-    return interaction.reply({ embeds: [embed] })
 }

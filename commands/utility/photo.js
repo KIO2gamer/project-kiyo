@@ -9,7 +9,8 @@ module.exports = {
         '/photo query:mountains orientation:landscape',
         '/photo query:flowers random:true',
     ],
-    data: new SlashCommandBuilder()
+    category: 'utility',
+data: new SlashCommandBuilder()
         .setName('photo')
         .setDescription('Search for a photo.')
         .addStringOption((option) =>

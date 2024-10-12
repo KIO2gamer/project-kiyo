@@ -4,7 +4,8 @@ module.exports = {
     description_full: 'Deletes the specified role from the server.',
     usage: '/deleterole <role:role>',
     examples: ['/deleterole role:Members'],
-    data: new SlashCommandBuilder()
+    category: 'roles',
+data: new SlashCommandBuilder()
         .setName('deleterole')
         .setDescription('Deletes an existing role')
         .addRoleOption((option) =>
