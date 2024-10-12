@@ -3,7 +3,7 @@ const {
     PermissionFlagsBits,
     EmbedBuilder,
 } = require('discord.js');
-const moderation_logs = require('../../bot_utils/moderation_logs');
+const moderationLogs = require('../../bot_utils/moderationLogs');
 
 function createErrorEmbed(title, description, interaction) {
     return new EmbedBuilder()
@@ -96,7 +96,7 @@ module.exports = {
         }
 
         try {
-            const logEntry = new moderation_logs({
+            const logEntry = new moderationLogs({
                 action: 'warn',
                 moderator: interaction.user.id,
                 user: targetUser.id,

@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const TicketConfig = require('../bot_utils/ticket_config');
+const TicketConfig = require('../bot_utils/ticketConfig');
 
 module.exports = {
     name: Events.InteractionCreate,

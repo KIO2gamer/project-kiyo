@@ -1,50 +1,63 @@
+// commands/moderation/editlog.js
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const moderation_logs = require('../../bot_utils/moderation_logs');
+const moderationLogs = require('../../bot_utils/moderationLogs');
 
 module.exports = {
     description_full:
-        'Deletes a moderation log or a range of logs by log number or range.',
-    usage: '/delete_log [lognumber] [logrange]',
-    examples: ['/delete_log lognumber:5', '/delete_log logrange:1-5'],
+        'Edits the reason for a specific log entry or a range of log entries.',
+    usage: '/edit_reason reason:"new reason" [lognumber] [logrange]',
+    examples: [
+        '/edit_reason reason:"Spamming" lognumber:5',
+        '/edit_reason reason:"Inappropriate behavior" logrange:10-15',
+    ],
     category: 'mod_logging',
     data: new SlashCommandBuilder()
-        .setName('delete_log')
-        .setDescription('Delete a moderation log/logs by log number/range.')
+        .setName('edit_reason')
+        .setDescription(
+            'Edit the reason for a specific log entry / a range of log entries.',
+        )
+        .addStringOption((option) =>
+            option
+                .setName('reason')
+                .setDescription('The new reason for the log entry or entries')
+                .setRequired(true),
+        )
         .addIntegerOption((option) =>
             option
                 .setName('lognumber')
-                .setDescription('The log number to delete')
+                .setDescription('The log number to edit')
                 .setRequired(false),
         )
         .addStringOption((option) =>
             option
                 .setName('logrange')
-                .setDescription(
-                    'The range of log numbers to delete (e.g., 1-5)',
-                )
+                .setDescription('The range of log numbers to edit (e.g., 1-5)')
                 .setRequired(false),
         ),
 
     async execute(interaction) {
         const logNumber = interaction.options.getInteger('lognumber');
         const logRange = interaction.options.getString('logrange');
+        const newReason = interaction.options.getString('reason');
 
         if (!logNumber && !logRange) {
             await interaction.reply(
-                'Please provide either a log number or a range of log numbers to delete.',
+                'Please provide either a log number or a range of log numbers to edit.',
             );
             return;
         }
 
         try {
             if (logNumber) {
-                const log = await moderation_logs.findOneAndDelete({
+                const log = await moderationLogs.findOne({
                     logNumber: logNumber,
                 });
 
                 if (log) {
+                    log.reason = newReason;
+                    await log.save();
                     await interaction.reply(
-                        `Successfully deleted log #${logNumber}.`,
+                        `Successfully updated reason for log #${logNumber} to: ${newReason}`,
                     );
                 } else {
                     await interaction.reply(
@@ -63,13 +76,17 @@ module.exports = {
                     return;
                 }
 
-                const deletedLogs = await moderation_logs.deleteMany({
+                const logs = await moderationLogs.find({
                     logNumber: { $gte: start, $lte: end },
                 });
 
-                if (deletedLogs.deletedCount > 0) {
+                if (logs.length > 0) {
+                    await moderationLogs.updateMany(
+                        { logNumber: { $gte: start, $lte: end } },
+                        { $set: { reason: newReason } },
+                    );
                     await interaction.reply(
-                        `Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,
+                        `Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`,
                     );
                 } else {
                     await interaction.reply(
@@ -80,7 +97,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'Failed to delete the log(s). Please try again later.',
+                'Failed to update the log(s). Please try again later.',
             );
         }
     },

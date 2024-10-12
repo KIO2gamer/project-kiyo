@@ -3,8 +3,8 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const { handleError } = require('../../bot_utils/error_handler');
-const { description_full } = require('./image_headers');
+const { handleError } = require('../../bot_utils/errorHandler');
+const { description_full } = require('./imageHeaders');
 
 /**
  *

@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const moderation_logs = require('../../bot_utils/moderation_logs');
+const moderationLogs = require('../../bot_utils/moderationLogs');
 const ms = require('ms'); // Use ms library to parse duration strings
 
 module.exports = {
@@ -150,7 +150,7 @@ module.exports = {
 
         // Attempt to ban the user
         try {
-            const logEntry = new moderation_logs({
+            const logEntry = new moderationLogs({
                 action: 'temp_ban',
                 moderator: interaction.user.id,
                 user: targetUser.id,

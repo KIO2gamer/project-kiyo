@@ -182,7 +182,7 @@ module.exports = {
                     ],
                 });
             } else {
-                const logEntry = new moderation_logs({
+                const logEntry = new moderationLogs({
                     action: 'timeout',
                     duration: newTimeoutDuration,
                     moderator: moderator.id,
