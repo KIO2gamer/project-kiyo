@@ -3,7 +3,7 @@ const {
     PermissionsBitField,
     ChannelType,
 } = require('discord.js');
-const { handleError } = require('../../bot_utils/error_handler.js');
+const { handleError } = require('../../bot_utils/errorHandler.js');
 
 module.exports = {
     description_full:

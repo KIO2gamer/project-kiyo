@@ -4,7 +4,7 @@ const {
     PermissionFlagsBits,
 } = require('discord.js');
 const ms = require('ms');
-const { handleError } = require('../../bot_utils/error_handler');
+const { handleError } = require('../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:

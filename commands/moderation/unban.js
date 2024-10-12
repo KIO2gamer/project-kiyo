@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const moderation_logs = require('../../bot_utils/moderation_logs');
+const moderationLogs = require('../../bot_utils/moderationLogs');
 
 module.exports = {
     description_full:
@@ -57,7 +57,7 @@ module.exports = {
                 return;
             }
 
-            const logEntry = new moderation_logs({
+            const logEntry = new moderationLogs({
                 action: 'unban',
                 moderator: interaction.user.id,
                 user: userId,

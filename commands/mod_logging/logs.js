@@ -6,7 +6,7 @@ const {
     ButtonStyle,
     ComponentType,
 } = require('discord.js');
-const moderation_logs = require('../../bot_utils/moderation_logs');
+const moderationLogs = require('../../bot_utils/moderationLogs');
 
 const ACTION_CHOICES = [
     { name: 'Warn', value: 'warn' },
@@ -117,7 +117,7 @@ module.exports = {
                 query.moderator = moderator.id;
             }
 
-            const logs = await moderation_logs.find(query).sort({
+            const logs = await moderationLogs.find(query).sort({
                 logNumber: -1,
             });
 

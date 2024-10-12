@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
-const { handleError } = require('../../bot_utils/error_handler'); // Import error_handler
+const { handleError } = require('../../bot_utils/errorHandler'); // Import errorHandler
 
 module.exports = {
     category: 'utility',
@@ -45,7 +45,7 @@ module.exports = {
                 );
             }
         } catch (error) {
-            // Use the error_handler to handle and log the error
+            // Use the errorHandler to handle and log the error
             await handleError(interaction, error);
         }
     },
