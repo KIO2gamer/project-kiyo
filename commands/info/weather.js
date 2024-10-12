@@ -13,8 +13,8 @@ data: new SlashCommandBuilder()
         .setDescription('Gets the current weather for a specified city')
         .addStringOption((option) =>
             option
-                .setName('city')
-                .setDescription('The city you want to get the weather for')
+                .setName('location')
+                .setDescription('The location to get the weather for')
                 .setRequired(true)
         ),
 
