@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const ModerationLog = require('../../bot_utils/moderation_logs');
+const moderation_logs = require('../../bot_utils/moderation_logs');
 
 module.exports = {
     description_full:
@@ -38,7 +38,7 @@ module.exports = {
 
         try {
             if (logNumber) {
-                const log = await ModerationLog.findOneAndDelete({
+                const log = await moderation_logs.findOneAndDelete({
                     logNumber: logNumber,
                 });
 
@@ -63,7 +63,7 @@ module.exports = {
                     return;
                 }
 
-                const deletedLogs = await ModerationLog.deleteMany({
+                const deletedLogs = await moderation_logs.deleteMany({
                     logNumber: { $gte: start, $lte: end },
                 });
 

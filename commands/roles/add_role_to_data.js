@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { handleError } = require('../../bot_utils/errorHandler.js');
-const Role = require('../../bot_utils/roleStorage.js');
+const { handleError } = require('../../bot_utils/error_handler.js');
+const Role = require('../../bot_utils/role_storage.js');
 
 module.exports = {
     description_full:

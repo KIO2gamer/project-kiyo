@@ -4,7 +4,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const { handleError } = require('../../bot_utils/errorHandler');
+const { handleError } = require('../../bot_utils/error_handler');
 
 module.exports = {
     description_full:
