@@ -102,11 +102,20 @@ const deployCommands = async () => {
             body: [],
         });
         for (const guildId of DISCORD_GUILD_IDS) {
-            await rest.put(
-                Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-                { body: commands },
-            );
-            console.log(`Commands deployed to guild: ${guildId}`); // Log guild command deployment
+            try {
+                const result = await rest.put(
+                    Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
+                    { body: commands },
+                );
+                console.log(
+                    `Successfully deployed ${result.length} commands to guild ${guildId}`,
+                );
+            } catch (error) {
+                console.error(
+                    `Failed to deploy commands to guild ${guildId}:`,
+                    error,
+                );
+            }
         }
     } catch (error) {
         console.error('Command deployment failed:', error);
