@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const ModerationLog = require('../../bot_utils/ModerationLog');
+const ModerationLog = require('../../bot_utils/moderation_logs');
 const ms = require('ms'); // Use ms library to parse duration strings
 
 module.exports = {
