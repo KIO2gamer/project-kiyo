@@ -58,11 +58,11 @@ module.exports = {
                 !oauthData.youtubeConnections ||
                 oauthData.youtubeConnections.length === 0
             ) {
-
                 const errorEmbed = {
                     color: 0xff0000,
                     title: '❌ No YouTube Connections Found',
-                    description: 'We couldn\'t find any YouTube connections associated with your account.',
+                    description:
+                        "We couldn't find any YouTube connections associated with your account.",
                     fields: [
                         {
                             name: '🔄 What to do next',
@@ -220,12 +220,26 @@ async function getYouTubeSubscriberCount(youtubeChannelId) {
 async function assignSubscriberRole(member, subscriberCount) {
     let roleName;
 
-    if (subscriberCount < 1000) {
-        roleName = 'Less than 1K';
+    if (subscriberCount < 100) {
+        roleName = 'Less than 100 Subs';
+    } else if (subscriberCount < 500) {
+        roleName = '100 - 499 Subs';
+    } else if (subscriberCount < 1000) {
+        roleName = '500 - 999 Subs';
+    } else if (subscriberCount < 5000) {
+        roleName = '1K - 4.9K Subs';
     } else if (subscriberCount < 10000) {
-        roleName = 'Less than 10K';
+        roleName = '5K - 9.9K Subs';
+    } else if (subscriberCount < 50000) {
+        roleName = '10K - 49.9K Subs';
+    } else if (subscriberCount < 100000) {
+        roleName = '50K - 99.9K Subs';
+    } else if (subscriberCount < 500000) {
+        roleName = '100K - 499.9K Subs';
+    } else if (subscriberCount < 1000000) {
+        roleName = '500K - 999.9K Subs';
     } else {
-        roleName = '10K or more';
+        roleName = '1M+ Subs'; // For 1 million and above
     }
 
     try {
@@ -243,5 +257,4 @@ async function assignSubscriberRole(member, subscriberCount) {
         console.error('Failed to assign role:', error.message);
         throw new Error('Failed to assign subscriber role.');
     }
-
 }
