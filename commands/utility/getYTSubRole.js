@@ -152,7 +152,7 @@ module.exports = {
                 timestamp: new Date(),
             };
 
-            await interaction.followUp({
+            await interaction.reply({
                 embeds: [errorEmbed],
                 ephemeral: true,
             });
