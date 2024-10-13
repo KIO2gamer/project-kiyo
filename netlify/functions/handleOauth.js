@@ -1,4 +1,24 @@
-const OAuthCode = require('./../../bot_utils/OauthCode')
+const mongoose = require('mongoose');
+const OAuthCode = require('./../../bot_utils/OauthCode');
+
+// MongoDB connection URI from environment variables
+const mongoUri = process.env.MONGODB_URI
+
+// Initialize Mongoose connection (ensure only one connection is made)
+let isConnected = false; // Keep track of connection status
+
+async function connectToDatabase() {
+    if (!isConnected) {
+        try {
+            await mongoose.connect(mongoUri);
+            isConnected = true;
+            console.log('MongoDB connected');
+        } catch (error) {
+            console.error('MongoDB connection error:', error);
+            throw error; // Re-throw to handle it in the function
+        }
+    }
+}
 
 exports.handler = async function (event, context) {
     const urlParams = new URLSearchParams(event.queryStringParameters);
@@ -15,7 +35,7 @@ exports.handler = async function (event, context) {
     try {
         // Save the authorization code and interaction ID in MongoDB
         const oauthRecord = new OAuthCode({ interactionId, code });
-        await oauthRecord.save({ timeout: 30000 });
+        await oauthRecord.save();
 
         return {
             statusCode: 200,
