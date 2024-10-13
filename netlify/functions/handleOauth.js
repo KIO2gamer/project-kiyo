@@ -92,7 +92,7 @@ exports.handler = async function (event, context) {
         // Step 5: Return the YouTube channel ID
         return {
             statusCode: 200,
-            message: 'Authorization successful. Please return to discord.'
+            body: 'Authorization successful. Please return to discord.'
         };
     } catch (error) {
         console.error(
