@@ -11,9 +11,9 @@ async function connectToDatabase() {
         try {
             await mongoose.connect(mongoUri, { bufferCommands: false });
             isConnected = true;
-            console.log('MongoDB connected');
+            console.log('✅ MongoDB connection established successfully');
         } catch (error) {
-            console.error('MongoDB connection error:', error);
+            console.error('❌ MongoDB connection error:', error);
             throw error;
         }
     }
@@ -28,7 +28,12 @@ exports.handler = async function (event, context) {
     if (!code || !state) {
         return {
             statusCode: 400,
-            body: 'Missing authorization code or state.',
+            body: JSON.stringify({
+                error: 'Bad Request',
+                message: 'Missing authorization code or state parameter.',
+                details:
+                    'Please ensure both code and state are provided in the request.',
+            }),
         };
     }
 
@@ -70,7 +75,16 @@ exports.handler = async function (event, context) {
         );
 
         if (youtubeConnections.length === 0) {
-            return { statusCode: 404, body: 'No YouTube connections found.' };
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    error: 'Not Found',
+                    message:
+                        'No YouTube connections found for this Discord account.',
+                    details:
+                        'Please make sure you have linked your YouTube account to your Discord profile.',
+                }),
+            };
         }
 
         // Step 4: Save the authorization code, interaction ID, and YouTube connection IDs in MongoDB
@@ -86,13 +100,28 @@ exports.handler = async function (event, context) {
 
         return {
             statusCode: 200,
-            body: 'Authorization successful. Please return to Discord.',
+            body: JSON.stringify({
+                success: true,
+                message: 'Authorization successful! 🎉',
+                details:
+                    'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
+                connections: youtubeConnections.length,
+            }),
         };
     } catch (error) {
         console.error(
-            'Error fetching Discord connections or saving to MongoDB:',
+            '❌ Error fetching Discord connections or saving to MongoDB:',
             error,
         );
-        return { statusCode: 500, body: 'Error processing OAuth2 flow.' };
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: 'Internal Server Error',
+                message:
+                    'An unexpected error occurred while processing your request.',
+                details:
+                    'Please try again later or contact support if the problem persists.',
+            }),
+        };
     }
 };
