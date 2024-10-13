@@ -1,57 +1,31 @@
-var ytid;
+const OAuthCode = require('./../../bot_utils/OauthCode')
 
 exports.handler = async function (event, context) {
     const urlParams = new URLSearchParams(event.queryStringParameters);
     const code = urlParams.get('code');
+    const interactionId = urlParams.get('state'); // Use the state parameter as interaction ID
 
-    if (!code) {
+    if (!code || !interactionId) {
         return {
             statusCode: 400,
-            body: 'No authorization code provided.',
+            body: 'Missing authorization code or interaction ID (state).',
         };
     }
 
-    // Exchange code for access token
-    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            client_id: process.env.DISCORD_CLIENT_ID,
-            client_secret: process.env.DISCORD_CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: process.env.DISCORD_REDIRECT_URI,
-        }),
-    });
+    try {
+        // Save the authorization code and interaction ID in MongoDB
+        const oauthRecord = new OAuthCode({ interactionId, code });
+        await oauthRecord.save();
 
-    const tokenData = await tokenResponse.json();
-    const accessToken = tokenData.access_token;
-
-    // Fetch user connections
-    const connectionsResponse = await fetch(
-        'https://discord.com/api/users/@me/connections',
-        {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        },
-    );
-
-    const connectionsData = await connectionsResponse.json();
-    const youtubeConnection = Array.isArray(connectionsData)
-        ? connectionsData.find((conn) => conn.type === 'youtube')
-        : null;
-
-    if (youtubeConnection) {
-        const youtubeUrl = `https://www.youtube.com/channel/${youtubeConnection.id}`;
-        ytid = youtubeConnection.id;
         return {
             statusCode: 200,
-            body: `Your YouTube URL is: ${youtubeUrl}`,
+            body: 'Authorization successful. You can return to Discord.',
         };
-        
-    } else {
+    } catch (error) {
+        console.error('Error saving to MongoDB:', error);
         return {
-            statusCode: 200,
-            body: 'No YouTube connection found in your Discord account.',
+            statusCode: 500,
+            body: 'Error saving the OAuth code.',
         };
     }
 };
