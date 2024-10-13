@@ -9,6 +9,10 @@ const youtube = google.youtube({
 });
 
 module.exports = {
+    description_full: 'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count.',
+    usage: '/verify_youtube',
+    examples: ['/verify_youtube'],
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('verify_youtube')
         .setDescription('Verify your YouTube channel using Discord OAuth2.'),
