@@ -34,9 +34,9 @@ exports.handler = async function (event, context) {
     );
 
     const connectionsData = await connectionsResponse.json();
-    const youtubeConnection = connectionsData.find(
-        (conn) => conn.type === 'youtube',
-    );
+    const youtubeConnection = Array.isArray(connectionsData)
+        ? connectionsData.find((conn) => conn.type === 'youtube')
+        : null;
 
     if (youtubeConnection) {
         const youtubeUrl = `https://www.youtube.com/channel/${youtubeConnection.id}`;
