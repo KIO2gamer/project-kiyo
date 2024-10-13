@@ -73,9 +73,9 @@ exports.handler = async function (event, context) {
         const connectionsData = await connectionsResponse.json();
 
         // Step 3: Find the YouTube connection (or other relevant connections)
-        const youtubeConnection = connectionsData.find(
+        const youtubeConnection = Array.isArray(connectionsData) ? connectionsData.find(
             (connection) => connection.type === 'youtube',
-        );
+        ) : null;
 
         if (!youtubeConnection) {
             return {
