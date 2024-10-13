@@ -25,8 +25,30 @@ module.exports = {
             const interactionId = interaction.id; // Use the interaction ID as state
             const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${interactionId}`;
 
+            const embed = {
+                color: 0x0099ff,
+                title: '🎥 YouTube Subscriber Role Verification',
+                description:
+                    "Let's get you verified and assign you a special role based on your YouTube subscriber count!",
+                fields: [
+                    {
+                        name: '📋 What to do:',
+                        value: '1. Click the link below\n2. Authorize the app\n3. Connect your YouTube account\n4. Wait for confirmation',
+                        inline: false,
+                    },
+                    {
+                        name: '🔗 Authorization Link',
+                        value: `[Click here to start the verification process](${discordOAuthUrl})`,
+                        inline: false,
+                    },
+                ],
+                footer: {
+                    text: 'This process is safe and secure. We only access your public YouTube data.',
+                },
+            };
+
             await interaction.reply({
-                content: `Please click [here](${discordOAuthUrl}) to authorize and fetch your YouTube connections.`,
+                embeds: [embed],
                 ephemeral: true,
             });
 
@@ -36,7 +58,29 @@ module.exports = {
                 !oauthData.youtubeConnections ||
                 oauthData.youtubeConnections.length === 0
             ) {
-                throw new Error('No YouTube connections found.');
+
+                const errorEmbed = {
+                    color: 0xff0000,
+                    title: '❌ No YouTube Connections Found',
+                    description: 'We couldn\'t find any YouTube connections associated with your account.',
+                    fields: [
+                        {
+                            name: '🔄 What to do next',
+                            value: 'Please make sure you have connected your YouTube account to Discord and try again.',
+                            inline: false,
+                        },
+                    ],
+                    footer: {
+                        text: 'If the problem persists, please contact a server administrator.',
+                    },
+                    timestamp: new Date(),
+                };
+
+                await interaction.followUp({
+                    embeds: [errorEmbed],
+                    ephemeral: true,
+                });
+                return;
             }
 
             // Fetch subscriber counts for all YouTube connections and find the one with the highest count
@@ -53,8 +97,29 @@ module.exports = {
                 const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
                 const embed = {
                     color: 0x0099ff,
-                    title: 'YouTube Channel Verified',
-                    description: `Your YouTube channel has been verified and you have got the following subscriber role: ${assignedRole}.\nSubscriber Count: **${subscriberCount.toLocaleString()}**\n[Visit Channel](${youtubeUrl})`,
+                    title: '🎉 YouTube Channel Verified Successfully! 🎉',
+                    description: `Great news! We've successfully verified your YouTube channel. Here's what you need to know:`,
+                    fields: [
+                        {
+                            name: '🏆 Your New Role',
+                            value: `You've been awarded the **${assignedRole}** role!`,
+                            inline: false,
+                        },
+                        {
+                            name: '👥 Your Subscriber Count',
+                            value: `You have an impressive **${subscriberCount.toLocaleString()}** subscribers!`,
+                            inline: false,
+                        },
+                        {
+                            name: '🔗 Your Channel',
+                            value: `[Click here to visit your channel](${youtubeUrl})`,
+                            inline: false,
+                        },
+                    ],
+                    footer: {
+                        text: 'Thank you for verifying your YouTube channel with us!',
+                    },
+                    timestamp: new Date(),
                 };
                 await interaction.followUp({
                     embeds: [embed],
@@ -64,8 +129,31 @@ module.exports = {
                 throw new Error('Failed to retrieve YouTube subscriber count.');
             }
         } catch (error) {
+            const errorEmbed = {
+                color: 0xff0000,
+                title: '❌ Oops! Something went wrong',
+                description:
+                    'We encountered an error while processing your request.',
+                fields: [
+                    {
+                        name: '📝 Error Details',
+                        value: error.message,
+                        inline: false,
+                    },
+                    {
+                        name: '🔄 What to do next',
+                        value: 'Please try again later or contact a server administrator if the problem persists.',
+                        inline: false,
+                    },
+                ],
+                footer: {
+                    text: 'We apologize for the inconvenience.',
+                },
+                timestamp: new Date(),
+            };
+
             await interaction.followUp({
-                content: `Error: ${error.message}`,
+                embeds: [errorEmbed],
                 ephemeral: true,
             });
         }
@@ -155,4 +243,5 @@ async function assignSubscriberRole(member, subscriberCount) {
         console.error('Failed to assign role:', error.message);
         throw new Error('Failed to assign subscriber role.');
     }
+
 }
