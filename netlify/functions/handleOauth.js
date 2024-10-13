@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fetch = require('node-fetch');
 const OAuthCode = require('./../../bot_utils/OauthCode');
 
 // MongoDB connection URI from environment variables
@@ -38,22 +39,74 @@ exports.handler = async function (event, context) {
     }
 
     try {
-        // Save the authorization code and interaction ID in MongoDB
+        // Step 1: Exchange the authorization code for an access token
+        const tokenResponse = await fetch(
+            'https://discord.com/api/oauth2/token',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: process.env.DISCORD_CLIENT_ID,
+                    client_secret: process.env.DISCORD_CLIENT_SECRET,
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: process.env.DISCORD_REDIRECT_URI, // Should match the one you used for the OAuth2 URL
+                }),
+            },
+        );
+
+        const tokenData = await tokenResponse.json();
+        const accessToken = tokenData.access_token;
+
+        // Step 2: Fetch the user's Discord connections using the access token
+        const connectionsResponse = await fetch(
+            'https://discord.com/api/users/@me/connections',
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            },
+        );
+
+        const connectionsData = await connectionsResponse.json();
+
+        // Step 3: Find the YouTube connection (or other relevant connections)
+        const youtubeConnection = connectionsData.find(
+            (connection) => connection.type === 'youtube',
+        );
+
+        if (!youtubeConnection) {
+            return {
+                statusCode: 404,
+                body: 'YouTube connection not found.',
+            };
+        }
+
+        // Optional: Save the authorization code and interaction ID in MongoDB (if needed for tracking)
         const oauthRecord = new OAuthCode({
             interactionId: state,
             code: code,
         });
         await oauthRecord.save();
 
+        // Step 4: Return the YouTube connection info (YouTube channel ID)
         return {
             statusCode: 200,
-            body: 'Authorization successful. You can return to Discord.',
+            body: JSON.stringify({
+                message: 'Authorization successful.',
+                youtubeChannelId: youtubeConnection.id, // Return the YouTube channel ID
+            }),
         };
     } catch (error) {
-        console.error('Error saving to MongoDB:', error);
+        console.error(
+            'Error fetching Discord connections or saving to MongoDB:',
+            error,
+        );
         return {
             statusCode: 500,
-            body: 'Error saving the OAuth code.',
+            body: 'Error processing OAuth2 flow.',
         };
     }
 };
