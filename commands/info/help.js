@@ -100,7 +100,6 @@ module.exports = {
                         .join(', '),
                 });
             });
-            console.log(category);
             return interaction.reply({ embeds: [embed] });
         }
     },

@@ -97,6 +97,7 @@ module.exports = {
         '/create_role name:CoolKids color:#FF69B4 hoist:true',
         '/create_role name:Moderators hoist:true mentionable:false',
     ],
+    category: 'roles',
     data: commandBuilder,
 
     async execute(interaction) {
