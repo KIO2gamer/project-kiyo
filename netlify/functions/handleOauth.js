@@ -40,10 +40,12 @@ exports.handler = async function (event, context) {
 
     if (youtubeConnection) {
         const youtubeUrl = `https://www.youtube.com/channel/${youtubeConnection.id}`;
+        console.log(youtubeUrl);
         return {
             statusCode: 200,
             body: `Your YouTube URL is: ${youtubeUrl}`,
         };
+        
     } else {
         return {
             statusCode: 200,
