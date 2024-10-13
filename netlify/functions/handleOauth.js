@@ -7,19 +7,6 @@ const mongoUri = process.env.MONGODB_URI;
 // Initialize Mongoose connection (ensure only one connection is made)
 let isConnected = false; // Keep track of connection status
 
-function generateRandomString() {
-    let randomString = '';
-    const randomNumber = Math.floor(Math.random() * 10);
-
-    for (let i = 0; i < 20 + randomNumber; i++) {
-        randomString += String.fromCharCode(
-            33 + Math.floor(Math.random() * 94),
-        );
-    }
-
-    return randomString;
-}
-
 async function connectToDatabase() {
     if (!isConnected) {
         try {

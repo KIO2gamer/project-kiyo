@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const handleOauth = require('./../../netlify/functions/handleOauth')
-const OAuthCode = require('./../../bot_utils/OauthCode')
+const fetch = require('node-fetch'); // Required to make HTTP requests in node.js
+const OAuthCode = require('./../../bot_utils/OauthCode');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,20 +21,30 @@ module.exports = {
             });
 
             // Poll MongoDB for the OAuth2 authorization code
-            const oauthCode =
-                await getAuthorizationCodeFromMongoDB(interactionId);
+            const oauthCode = await getAuthorizationCodeFromMongoDB(interactionId);
 
-            // Use the OAuth2 code to fetch the YouTube connection
-            const youtubeUrl = await handleOauth(oauthCode); // Implement this in the same way as in the Netlify function
+            // Once the code is obtained, make an HTTP request to the deployed Netlify function
+            const netlifyUrl = `${process.env.DISCORD_REDIRECT_URI}?code=${oauthCode}&state=${interactionId}`;
 
-            // Send an embed with the YouTube channel info after authorization
-            const embed = {
-                color: 0x0099ff,
-                title: 'YouTube Channel Verified',
-                description: `Your YouTube channel has been verified.\n[Visit Channel](${youtubeUrl})`,
-            };
-
-            await interaction.followUp({ embeds: [embed], ephemeral: true });
+            // Fetch response from Netlify function (handleOauth)
+            const response = await fetch(netlifyUrl);
+            const result = await response.json();
+            console.log('Response from Netlify function:', result);
+            // Check the result for a success message or YouTube URL
+            // if (result.includes('Authorization successful')) {
+            //     const youtubeUrl = `https://www.youtube.com/channel/${oauthCode}`; // You will adjust this based on the response
+            //     const embed = {
+            //         color: 0x0099ff,
+            //         title: 'YouTube Channel Verified',
+            //         description: `Your YouTube channel has been verified.\n[Visit Channel](${youtubeUrl})`,
+            //     };
+            //     await interaction.followUp({
+            //         embeds: [embed],
+            //         ephemeral: true,
+            //     });
+            // } else {
+            //     throw new Error('Failed to verify YouTube channel.');
+            // }
         } catch (error) {
             // Handle any errors
             await interaction.followUp({
