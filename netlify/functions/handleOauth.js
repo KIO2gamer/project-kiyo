@@ -1,3 +1,5 @@
+var ytid;
+
 exports.handler = async function (event, context) {
     const urlParams = new URLSearchParams(event.queryStringParameters);
     const code = urlParams.get('code');
@@ -40,7 +42,7 @@ exports.handler = async function (event, context) {
 
     if (youtubeConnection) {
         const youtubeUrl = `https://www.youtube.com/channel/${youtubeConnection.id}`;
-        console.log(youtubeUrl);
+        ytid = youtubeConnection.id;
         return {
             statusCode: 200,
             body: `Your YouTube URL is: ${youtubeUrl}`,

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js')
+const oash = require('./../../netlify/functions/handleOauth')
 
 module.exports = {
     description_full: '',
@@ -17,5 +18,8 @@ module.exports = {
             content: `Please click [here](${discordOAuthUrl}) to authorize and fetch your YouTube connection.`,
             ephemeral: true,
         });
+
+        const ytid = await oash.ytid
+        console.log(ytid)
     }
 }
