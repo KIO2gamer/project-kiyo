@@ -10,14 +10,14 @@ const youtube = google.youtube({
 
 module.exports = {
     description_full:
-        'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count.',
+        'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count. If the user has multiple channels, the role will be assigned to the channel with the highest subscriber count.',
     usage: '/get_yt_sub_role',
     examples: ['/get_yt_sub_role'],
     category: 'utility',
     data: new SlashCommandBuilder()
         .setName('get_yt_sub_role')
         .setDescription(
-            'Automatically assign a role based on your subscriber count on your YT Channel.',
+            'Automatically assign a role based on your channel with the highest subscriber count.',
         ),
 
     async execute(interaction) {
