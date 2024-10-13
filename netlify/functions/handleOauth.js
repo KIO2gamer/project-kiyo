@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const fetch = require('node-fetch');
 const OAuthCode = require('./../../bot_utils/OauthCode');
 
 // MongoDB connection URI from environment variables
@@ -73,9 +72,9 @@ exports.handler = async function (event, context) {
         const connectionsData = await connectionsResponse.json();
 
         // Step 3: Find the YouTube connection (or other relevant connections)
-        const youtubeConnection = Array.isArray(connectionsData) ? connectionsData.find(
+        const youtubeConnection = connectionsData.find(
             (connection) => connection.type === 'youtube',
-        ) : null;
+        );
 
         if (!youtubeConnection) {
             return {
@@ -84,14 +83,15 @@ exports.handler = async function (event, context) {
             };
         }
 
-        // Optional: Save the authorization code and interaction ID in MongoDB (if needed for tracking)
+        // Step 4: Save the authorization code, interaction ID, and YouTube channel ID in MongoDB
         const oauthRecord = new OAuthCode({
             interactionId: state,
             code: code,
+            youtubeChannelId: youtubeConnection.id, // Save YouTube channel ID for future use
         });
         await oauthRecord.save();
 
-        // Step 4: Return the YouTube connection info (YouTube channel ID)
+        // Step 5: Return the YouTube channel ID
         return {
             statusCode: 200,
             body: JSON.stringify({

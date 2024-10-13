@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-const fetch = require('node-fetch'); // Required to make HTTP requests in node.js
 const OAuthCode = require('./../../bot_utils/OauthCode');
 
 module.exports = {
@@ -20,31 +19,25 @@ module.exports = {
                 ephemeral: true,
             });
 
-            // Poll MongoDB for the OAuth2 authorization code
-            const oauthCode = await getAuthorizationCodeFromMongoDB(interactionId);
+            // Poll MongoDB for the OAuth2 authorization code and YouTube channel ID
+            const oauthData =
+                await getAuthorizationDataFromMongoDB(interactionId);
 
-            // Once the code is obtained, make an HTTP request to the deployed Netlify function
-            const netlifyUrl = `${process.env.DISCORD_REDIRECT_URI}?code=${oauthCode}&state=${interactionId}`;
-
-            // Fetch response from Netlify function (handleOauth)
-            const response = await fetch(netlifyUrl);
-            const result = await response.json();
-            console.log('Response from Netlify function:', result);
-            // Check the result for a success message or YouTube URL
-            // if (result.includes('Authorization successful')) {
-            //     const youtubeUrl = `https://www.youtube.com/channel/${oauthCode}`; // You will adjust this based on the response
-            //     const embed = {
-            //         color: 0x0099ff,
-            //         title: 'YouTube Channel Verified',
-            //         description: `Your YouTube channel has been verified.\n[Visit Channel](${youtubeUrl})`,
-            //     };
-            //     await interaction.followUp({
-            //         embeds: [embed],
-            //         ephemeral: true,
-            //     });
-            // } else {
-            //     throw new Error('Failed to verify YouTube channel.');
-            // }
+            // Check if YouTube channel ID was returned
+            if (oauthData.youtubeChannelId) {
+                const youtubeUrl = `https://www.youtube.com/channel/${oauthData.youtubeChannelId}`;
+                const embed = {
+                    color: 0x0099ff,
+                    title: 'YouTube Channel Verified',
+                    description: `Your YouTube channel has been verified.\n[Visit Channel](${youtubeUrl})`,
+                };
+                await interaction.followUp({
+                    embeds: [embed],
+                    ephemeral: true,
+                });
+            } else {
+                throw new Error('Failed to verify YouTube channel.');
+            }
         } catch (error) {
             // Handle any errors
             await interaction.followUp({
@@ -55,8 +48,8 @@ module.exports = {
     },
 };
 
-// Function to poll MongoDB for the OAuth2 code
-async function getAuthorizationCodeFromMongoDB(interactionId) {
+// Function to poll MongoDB for the OAuth2 code and YouTube channel ID
+async function getAuthorizationDataFromMongoDB(interactionId) {
     const fetchTimeout = 60000; // 60 seconds timeout
     const pollingInterval = 3000; // Poll every 3 seconds
 
@@ -65,7 +58,10 @@ async function getAuthorizationCodeFromMongoDB(interactionId) {
         const oauthRecord = await OAuthCode.findOne({ interactionId });
 
         if (oauthRecord) {
-            return oauthRecord.code; // Return the OAuth2 code
+            return {
+                code: oauthRecord.code,
+                youtubeChannelId: oauthRecord.youtubeChannelId, // Return the YouTube channel ID
+            };
         }
 
         await new Promise((resolve) => setTimeout(resolve, pollingInterval));
