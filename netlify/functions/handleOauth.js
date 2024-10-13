@@ -42,7 +42,7 @@ exports.handler = async function (event, context) {
     const urlParams = new URLSearchParams(event.queryStringParameters);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
-    
+
     if (!code || !state) {
         return {
             statusCode: 400,
@@ -53,7 +53,7 @@ exports.handler = async function (event, context) {
     try {
         // Save the authorization code and interaction ID in MongoDB
         const oauthRecord = new OAuthCode({
-            interactionId: generateRandomString(),
+            interactionId: state,
             code: code,
         });
         await oauthRecord.save();
