@@ -15,7 +15,7 @@ exports.handler = async function (event, context) {
     try {
         // Save the authorization code and interaction ID in MongoDB
         const oauthRecord = new OAuthCode({ interactionId, code });
-        await oauthRecord.save();
+        await oauthRecord.save({ timeout: 30000 });
 
         return {
             statusCode: 200,
