@@ -7,6 +7,19 @@ const mongoUri = process.env.MONGODB_URI;
 // Initialize Mongoose connection (ensure only one connection is made)
 let isConnected = false; // Keep track of connection status
 
+function generateRandomString() {
+    let randomString = '';
+    const randomNumber = Math.floor(Math.random() * 10);
+
+    for (let i = 0; i < 20 + randomNumber; i++) {
+        randomString += String.fromCharCode(
+            33 + Math.floor(Math.random() * 94),
+        );
+    }
+
+    return randomString;
+}
+
 async function connectToDatabase() {
     if (!isConnected) {
         try {
@@ -25,21 +38,22 @@ async function connectToDatabase() {
 }
 
 exports.handler = async function (event, context) {
+    await connectToDatabase();
     const urlParams = new URLSearchParams(event.queryStringParameters);
     const code = urlParams.get('code');
-    const interactionId = urlParams.get('state'); // Use the state parameter as interaction ID
-
-    if (!code || !interactionId) {
+    const state = urlParams.get('state');
+    
+    if (!code || !state) {
         return {
             statusCode: 400,
-            body: 'Missing authorization code or interaction ID (state).',
+            body: 'Missing authorization code or state.',
         };
     }
 
     try {
         // Save the authorization code and interaction ID in MongoDB
         const oauthRecord = new OAuthCode({
-            interactionId: interactionId,
+            interactionId: generateRandomString(),
             code: code,
         });
         await oauthRecord.save();
