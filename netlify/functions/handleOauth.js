@@ -11,8 +11,6 @@ async function connectToDatabase() {
     if (!isConnected) {
         try {
             await mongoose.connect(mongoUri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
                 bufferCommands: false, // Disable Mongoose buffering
             });
             isConnected = true;
@@ -94,10 +92,7 @@ exports.handler = async function (event, context) {
         // Step 5: Return the YouTube channel ID
         return {
             statusCode: 200,
-            body: JSON.stringify({
-                message: 'Authorization successful.',
-                youtubeChannelId: youtubeConnection.id, // Return the YouTube channel ID
-            }),
+            message: 'Authorization successful. Please return to discord.'
         };
     } catch (error) {
         console.error(
