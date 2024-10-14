@@ -16,7 +16,7 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
     ? process.env.DISCORD_GUILD_IDS.split(',')
     : [];
 
-console.log('Starting bot...'); // Log the start of the bot
+console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...'); // Cyan color for starting message
 
 const client = new Client({
     intents: [
@@ -46,7 +46,7 @@ const loadFiles = (dir, fileAction) => {
 };
 
 const loadCommands = (dir) => {
-    console.log('Loading commands...'); // Log command loading
+    console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...'); // Yellow color for command loading
     loadFiles(dir, (filePath) => {
         const command = require(filePath);
         if (command?.data && command?.execute) {
@@ -58,11 +58,11 @@ const loadCommands = (dir) => {
             }
         }
     });
-    console.log('All Commands Loaded Successfully!!!');
+    console.log('\x1b[32m%s\x1b[0m', '[COMMANDS] All Commands Loaded Successfully!!!'); // Green color for success
 };
 
 const loadEvents = (dir) => {
-    console.log('Loading events...'); // Log event loading
+    console.log('\x1b[33m%s\x1b[0m', '[EVENTS] Loading events...'); // Yellow color for event loading
     loadFiles(dir, (filePath) => {
         const event = require(filePath);
         const execute = (...args) => event.execute(...args);
@@ -70,26 +70,26 @@ const loadEvents = (dir) => {
             ? client.once(event.name, execute)
             : client.on(event.name, execute);
     });
-    console.log('Events loaded successfully!!!');
+    console.log('\x1b[32m%s\x1b[0m', '[EVENTS] Events loaded successfully!!!'); // Green color for success
 };
 
 loadCommands(path.join(__dirname, 'commands'));
 loadEvents(path.join(__dirname, 'events'));
 
 const connectToMongoDB = async () => {
-    console.log('Connecting to MongoDB...'); // Log MongoDB connection attempt
+    console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...'); // Yellow color for connection attempt
     try {
         mongoose.set('strictQuery', false);
         await mongoose.connect(MONGODB_URI);
-        console.log('Connected to MongoDB'); // Log successful connection
+        console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB'); // Green color for successful connection
     } catch (error) {
-        console.error(`MongoDB connection failed: ${error.message}`);
+        console.error('\x1b[31m%s\x1b[0m', `[DATABASE] MongoDB connection failed: ${error.message}`); // Red color for error
         process.exit(1);
     }
 };
 
 const deployCommands = async () => {
-    console.log('Deploying commands...'); // Log command deployment
+    console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
     const commands = [];
     loadFiles(path.join(__dirname, 'commands'), (filePath) => {
         const command = require(filePath);
@@ -108,34 +108,37 @@ const deployCommands = async () => {
                     { body: commands },
                 );
                 console.log(
-                    `Successfully deployed ${result.length} commands to guild ${guildId}`,
-                );
+                    '\x1b[32m%s\x1b[0m',
+                    `[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`,
+                ); // Green color for success
             } catch (error) {
                 console.error(
-                    `Failed to deploy commands to guild ${guildId}:`,
+                    '\x1b[31m%s\x1b[0m',
+                    `[DEPLOY] Failed to deploy commands to guild ${guildId}:`,
                     error,
-                );
+                ); // Red color for error
             }
         }
     } catch (error) {
-        console.error('Command deployment failed:', error);
+        console.error('\x1b[31m%s\x1b[0m', '[DEPLOY] Command deployment failed:', error); // Red color for error
     }
 };
 
 process.on('SIGINT', async () => {
-    console.log('Shutting down gracefully...');
+    console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...'); // Cyan color for shutdown message
     await mongoose.connection.close();
     client.destroy();
     process.exit(0);
 });
+
 (async () => {
     try {
         await connectToMongoDB();
         await deployCommands();
         await client.login(DISCORD_TOKEN);
-        console.log('Bot is running!'); // Log when the bot is up and running
+        console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!'); // Green color for success
     } catch (error) {
-        console.error(`Failed to start the bot: ${error.message}`);
+        console.error('\x1b[31m%s\x1b[0m', `[BOT] Failed to start the bot: ${error.message}`); // Red color for error
         process.exit(1);
     }
 })();
