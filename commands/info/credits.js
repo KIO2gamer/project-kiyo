@@ -12,34 +12,18 @@ module.exports = {
 
     async execute(interaction) {
         const contributors = [
-            { command: 'steel', name: 'steeles.0', id: '1271082993427021825' },
-            {
-                command: 'koifish',
-                name: 'hallow_spice',
-                id: '1271082992953069570',
-            },
-            {
-                command: 'donottouch',
-                name: 'umbree_on_toast',
-                id: '1271082992953069576',
-            },
-            {
-                command: 'rickroll',
-                name: 'flashxdfx',
-                id: '1271082992953069573',
-            },
-            { command: 'summon', name: 'eesmal', id: '1271082993427021826' },
-            { command: 'snipe', name: 'na51f', id: '1271082993427021824' },
-            { command: 'photo', name: 'spheroidon', id: '1271082994102440083' },
-            { command: 'skibidi', name: 'zenoz231', id: '1271082992953069577' },
-            {
-                command: 'quokka',
-                name: 'wickiwacka2',
-                id: '1271082992953069572',
-            },
-            { command: 'uwu', name: 'rizzwan.', id: '1271082993427021828' },
-            { command: 'boba', name: 'pepsi_pro', id: '1271082992453816412' },
-            { command: 'lyricwhiz', name: 'vipraz', id: '1271391276155011072' },
+            { command: 'steel', name: 'steeles.0' },
+            { command: 'koifish', name: 'hallow_spice' },
+            { command: 'do_not_touch', name: 'umbree_on_toast' },
+            { command: 'rickroll', name: 'flashxdfx' },
+            { command: 'summon', name: 'eesmal' },
+            { command: 'snipe', name: 'na51f' },
+            { command: 'photo', name: 'spheroidon' },
+            { command: 'skibidi', name: 'zenoz231' },
+            { command: 'quokka', name: 'wickiwacka2' },
+            { command: 'uwu', name: 'rizzwan.' },
+            { command: 'boba', name: 'pepsi_pro' },
+            { command: 'lyricwhiz', name: 'vipraz' },
         ];
 
         const embed = new EmbedBuilder()
@@ -51,14 +35,21 @@ module.exports = {
             .setTimestamp()
             .setFooter({ text: 'Thanks to all the contributors!' });
 
+        const guildCommands = await interaction.guild.commands.fetch();
+
         contributors.forEach((contributor) => {
-            embed.addFields([
-                {
-                    name: `**${contributor.name}**`,
-                    value: `</${contributor.command}:${contributor.id}>`,
-                    inline: true,
-                },
-            ]);
+            const command = guildCommands.find(
+                (cmd) => cmd.name === contributor.command,
+            );
+            if (command) {
+                embed.addFields([
+                    {
+                        name: `**${contributor.name}**`,
+                        value: `</${contributor.command}:${command.id}>`,
+                        inline: true,
+                    },
+                ]);
+            }
         });
 
         await interaction.reply({ embeds: [embed] });

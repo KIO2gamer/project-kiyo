@@ -6,13 +6,13 @@ const {
 
 module.exports = {
     description_full:
-        'Displays information about the bot itself, including its developer, uptime, ping, memory usage, and the number of commands it has.',
+        'Displays comprehensive information about the bot, including developer details, operational metrics, and system specifications.',
     usage: '/bot_info',
     examples: ['/bot_info'],
     category: 'info',
     data: new SlashCommandBuilder()
         .setName('bot_info')
-        .setDescription('Get info about the bot.'),
+        .setDescription('Retrieve detailed information about the bot.'),
 
     async execute(interaction) {
         await sendBotInfo(interaction);
@@ -21,34 +21,56 @@ module.exports = {
 
 async function sendBotInfo(interaction) {
     try {
-        // Defer the reply to give the bot more time to gather info
         const sent = await interaction.deferReply({ fetchReply: true });
         const uptime = formatUptime(interaction.client.uptime);
 
-        // Define the description and fields for the embed
-        const description = `\`\`\`fix\nDeveloper:   kio2gamer\nStatus:      Under Development\nLanguage:    JavaScript\nCreated on:  ${interaction.client.user.createdAt.toUTCString()}\`\`\``;
-        const pingField = `\`\`\`fix\nPing:   ${sent.createdTimestamp - interaction.createdTimestamp} ms\nWS:     ${interaction.client.ws.ping} ms\nUptime: ${uptime}\nNode:   ${process.version}\nDJS:    v${djsVersion}\`\`\``;
-        const statsField = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommands: ${interaction.client.commands.size}\nCommands Type: Slash Commands\nMemory: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB\`\`\``;
+        const description = `**Developer:** kio2gamer
+**Status:** In Development
+**Language:** JavaScript
+**Creation Date:** ${interaction.client.user.createdAt.toUTCString()}`;
 
-        // Create the embed
+        const performanceMetrics = `**Latency:** ${sent.createdTimestamp - interaction.createdTimestamp}ms
+**WebSocket:** ${interaction.client.ws.ping}ms
+**Uptime:** ${uptime}
+**Node.js Version:** ${process.version}
+**Discord.js Version:** v${djsVersion}`;
+
+        const systemSpecs = `**Bot ID:** ${interaction.client.user.id}
+**Type:** Private
+**Command Count:** ${interaction.client.commands.size}
+**Command Type:** Slash Commands
+**Memory Usage:** ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`;
+
         const embed = new EmbedBuilder()
-            .setTitle('Bot Info [Click to invite (Owner only!!!)]')
+            .setTitle('Bot Information')
             .setURL(
                 `https://discord.com/oauth2/authorize?client_id=1155222493079015545&permissions=8&integration_type=0&scope=bot`,
             )
-            .setColor('Purple')
+            .setColor('#8A2BE2')
             .setDescription(description)
             .addFields(
-                { name: 'Ping', value: pingField, inline: true },
-                { name: 'Stats', value: statsField, inline: true },
-            );
+                {
+                    name: 'Performance Metrics',
+                    value: performanceMetrics,
+                    inline: false,
+                },
+                {
+                    name: 'System Specifications',
+                    value: systemSpecs,
+                    inline: false,
+                },
+            )
+            .setFooter({
+                text: 'Note: Invite link is restricted to bot owner only.',
+            })
+            .setTimestamp();
 
-        // Edit the deferred reply with the embed
         await interaction.editReply({ embeds: [embed] });
     } catch (error) {
-        console.error('Error fetching bot info:', error);
+        console.error('Error retrieving bot information:', error);
         await interaction.editReply({
-            content: 'Oops! There was an error.',
+            content:
+                'An unexpected error occurred while fetching bot information. Please try again later.',
             ephemeral: true,
         });
     }
