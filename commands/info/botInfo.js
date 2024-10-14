@@ -52,12 +52,12 @@ async function sendBotInfo(interaction) {
                 {
                     name: 'Performance Metrics',
                     value: performanceMetrics,
-                    inline: false,
+                    inline: true,
                 },
                 {
                     name: 'System Specifications',
                     value: systemSpecs,
-                    inline: false,
+                    inline: true,
                 },
             )
             .setFooter({
