@@ -3,7 +3,7 @@ const axios = require('axios');
 
 module.exports = {
     description_full:
-        'Fetches information about a video game from the IGDB API. This can include the game’s description, genres, release date, platforms, and a link to its page on IGDB.',
+        'Fetches game info from IGDB API including description, genres, release date, platforms, and IGDB link.',
     usage: '/game_info <search>',
     examples: ['/game_info The Witcher 3', '/game_info "Grand Theft Auto V"'],
     category: 'info',
@@ -18,12 +18,29 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        if (!interaction.isCommand()) return;
+
+        await interaction.deferReply();
+
         const gameName = interaction.options.getString('search');
         const clientId = process.env.IGDB_CLIENT_ID;
-        const accessToken = process.env.IGDB_ACCESS_TOKEN;
+        const clientSecret = process.env.IGDB_CLIENT_SECRET;
 
         try {
-            // Search for the game using IGDB API
+            const tokenResponse = await axios.post(
+                'https://id.twitch.tv/oauth2/token',
+                null,
+                {
+                    params: {
+                        client_id: clientId,
+                        client_secret: clientSecret,
+                        grant_type: 'client_credentials',
+                    },
+                },
+            );
+
+            const accessToken = tokenResponse.data.access_token;
+
             const searchResponse = await axios.post(
                 'https://api.igdb.com/v4/games',
                 `search "${gameName}"; fields name, slug; limit 1;`,
@@ -38,7 +55,6 @@ module.exports = {
             if (searchResponse.data.length > 0) {
                 const gameSlug = searchResponse.data[0].slug;
 
-                // Fetch game details using the game slug
                 const gameResponse = await axios.post(
                     'https://api.igdb.com/v4/games',
                     `fields name, summary, genres.name, first_release_date, platforms.name, rating, url; where slug = "${gameSlug}";`,
@@ -52,7 +68,6 @@ module.exports = {
 
                 const game = gameResponse.data[0];
 
-                // Create and send the embed message
                 const embed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle(game.name)
@@ -60,9 +75,9 @@ module.exports = {
                     .addFields(
                         {
                             name: 'Genres',
-                            value: game.genres
-                                ? game.genres.map((g) => g.name).join(', ')
-                                : 'N/A',
+                            value:
+                                game.genres?.map((g) => g.name).join(', ') ||
+                                'N/A',
                             inline: true,
                         },
                         {
@@ -76,20 +91,18 @@ module.exports = {
                         },
                         {
                             name: 'Rating',
-                            value: game.rating
-                                ? game.rating.toFixed(2)
-                                : 'No rating available',
+                            value: game.rating ? game.rating.toFixed(2) : 'N/A',
                             inline: true,
                         },
                         {
                             name: 'Platforms',
-                            value: game.platforms
-                                ? game.platforms.map((p) => p.name).join(', ')
-                                : 'N/A',
+                            value:
+                                game.platforms?.map((p) => p.name).join(', ') ||
+                                'N/A',
                             inline: true,
                         },
                         {
-                            name: 'IGDB Page',
+                            name: 'IGDB',
                             value: `[Link](${game.url})`,
                             inline: true,
                         },
@@ -102,15 +115,13 @@ module.exports = {
                     })
                     .setTimestamp();
 
-                await interaction.reply({ embeds: [embed] });
+                await interaction.editReply({ embeds: [embed] });
             } else {
-                await interaction.reply('No game found with that name.');
+                await interaction.editReply('Game not found.');
             }
         } catch (error) {
             console.error(error);
-            await interaction.reply(
-                'An error occurred while fetching game info.',
-            );
+            await interaction.editReply('Error fetching game info.');
         }
     },
 };

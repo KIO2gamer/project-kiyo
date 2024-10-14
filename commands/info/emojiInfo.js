@@ -27,7 +27,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle(`Emoji Info`)
-            .setThumbnail(emoji.url)
+            .setThumbnail(emoji.imageURL())
             .addFields(
                 { name: 'Emoji Name', value: emoji.name, inline: true },
                 { name: 'Emoji ID', value: emoji.id, inline: true },
@@ -41,12 +41,7 @@ module.exports = {
                     name: 'Emoji Animated',
                     value: emoji.animated ? 'Yes' : 'No',
                     inline: true,
-                },
-                {
-                    name: 'Emoji Managed',
-                    value: emoji.managed ? 'Yes' : 'No',
-                    inline: true,
-                },
+                }
             );
 
         await interaction.reply({ embeds: [embed] });
