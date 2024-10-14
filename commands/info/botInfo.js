@@ -24,22 +24,28 @@ async function sendBotInfo(interaction) {
         const sent = await interaction.deferReply({ fetchReply: true });
         const uptime = formatUptime(interaction.client.uptime);
 
-        const description = `**Developer:** kio2gamer
-**Status:** In Development
-**Language:** JavaScript
-**Creation Date:** ${interaction.client.user.createdAt.toUTCString()}`;
+        const description = `\`\`\`fix
+Developer: kio2gamer
+Status: In Development
+Language: JavaScript
+Creation Date: ${interaction.client.user.createdAt.toUTCString()}
+\`\`\``;
 
-        const performanceMetrics = `**Latency:** ${sent.createdTimestamp - interaction.createdTimestamp}ms
-**WebSocket:** ${interaction.client.ws.ping}ms
-**Uptime:** ${uptime}
-**Node.js Version:** ${process.version}
-**Discord.js Version:** v${djsVersion}`;
+        const performanceMetrics = `\`\`\`fix
+Latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms
+WebSocket: ${interaction.client.ws.ping}ms
+Uptime: ${uptime}
+Node.js Version: ${process.version}
+Discord.js Version: v${djsVersion}
+\`\`\``;
 
-        const systemSpecs = `**Bot ID:** ${interaction.client.user.id}
-**Type:** Private
-**Command Count:** ${interaction.client.commands.size}
-**Command Type:** Slash Commands
-**Memory Usage:** ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`;
+        const systemSpecs = `\`\`\`fix
+Bot ID: ${interaction.client.user.id}
+Type: Private
+Command Count: ${interaction.client.commands.size}
+Command Type: Slash Commands
+Memory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
+\`\`\``;
 
         const embed = new EmbedBuilder()
             .setTitle('Bot Information')
