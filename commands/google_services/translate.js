@@ -13,7 +13,7 @@ module.exports = {
         'Translates the provided text into the specified target language. Use language codes like "en" (English), "es" (Spanish), "fr" (French), etc.',
     usage: '/translate <input:text_to_translate> <target_lang:language_code>',
     examples: ['/translate input:"Hello, world!" target_lang:es'],
-    category: 'utility',
+    category: 'google_services',
     data: new SlashCommandBuilder()
         .setName('translate')
         .setDescription('Translates text into the desired output language.')

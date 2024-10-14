@@ -13,7 +13,7 @@ module.exports = {
         'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count. If the user has multiple channels, the role will be assigned to the channel with the highest subscriber count.',
     usage: '/get_yt_sub_role',
     examples: ['/get_yt_sub_role'],
-    category: 'utility',
+    category: 'google_services',
     data: new SlashCommandBuilder()
         .setName('get_yt_sub_role')
         .setDescription(
@@ -220,27 +220,20 @@ async function getYouTubeSubscriberCount(youtubeChannelId) {
 async function assignSubscriberRole(member, subscriberCount) {
     let roleName;
 
-    if (subscriberCount < 100) {
-        roleName = 'Less than 100 Subs';
-    } else if (subscriberCount < 500) {
-        roleName = '100 - 499 Subs';
-    } else if (subscriberCount < 1000) {
-        roleName = '500 - 999 Subs';
-    } else if (subscriberCount < 5000) {
-        roleName = '1K - 4.9K Subs';
-    } else if (subscriberCount < 10000) {
-        roleName = '5K - 9.9K Subs';
-    } else if (subscriberCount < 50000) {
-        roleName = '10K - 49.9K Subs';
-    } else if (subscriberCount < 100000) {
-        roleName = '50K - 99.9K Subs';
-    } else if (subscriberCount < 500000) {
-        roleName = '100K - 499.9K Subs';
-    } else if (subscriberCount < 1000000) {
-        roleName = '500K - 999.9K Subs';
-    } else {
-        roleName = '1M+ Subs'; // For 1 million and above
-    }
+    const roleRanges = [
+        { max: 100, name: 'Less than 100 Subs' },
+        { max: 500, name: '100 - 499 Subs' },
+        { max: 1000, name: '500 - 999 Subs' },
+        { max: 5000, name: '1K - 4.9K Subs' },
+        { max: 10000, name: '5K - 9.9K Subs' },
+        { max: 50000, name: '10K - 49.9K Subs' },
+        { max: 100000, name: '50K - 99.9K Subs' },
+        { max: 500000, name: '100K - 499.9K Subs' },
+        { max: 1000000, name: '500K - 999.9K Subs' },
+        { max: Infinity, name: '1M+ Subs' }
+    ];
+
+    roleName = roleRanges.find(range => subscriberCount < range.max).name;
 
     try {
         const subscriberRoleData = await RoleSchema.findOne({ roleName });
