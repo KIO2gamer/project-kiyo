@@ -1,104 +1,139 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+} = require('discord.js');
 const he = require('he');
 
 module.exports = {
     description_full:
-        'The bot will provide a trivia question with four multiple-choice answers. Users can react to guess the correct answer.',
+        'The bot will provide a trivia question with four multiple-choice answers. Users can click buttons to guess the correct answer.',
     usage: '/trivia',
     examples: ['/trivia'],
     category: 'games',
     data: new SlashCommandBuilder()
         .setName('trivia')
-        .setDescription('Answer a trivia question! (Only 1 try!!!)'),
+        .setDescription(
+            'Answer a fun trivia question and test your knowledge!',
+        ),
     async execute(interaction) {
         try {
             const response = await fetch(
                 'https://opentdb.com/api.php?amount=1&type=multiple',
             );
             const data = await response.json();
-
             const questionData = data.results[0];
 
-            // Decode HTML entities
             const decodedQuestion = he.decode(questionData.question);
             const decodedAnswers = questionData.incorrect_answers.map(
                 (answer) => he.decode(answer),
             );
             decodedAnswers.push(he.decode(questionData.correct_answer));
 
-            // Shuffle answers
             const answers = [...decodedAnswers].sort(() => Math.random() - 0.5);
-            const correctIndex = answers.indexOf(questionData.correct_answer);
-
-            // Create trivia embed (no timer here)
-            const embed = new EmbedBuilder()
-                .setColor('#0099ff')
-                .setTitle('Trivia Time!')
-                .setDescription(decodedQuestion)
-                .addFields(
-                    { name: 'A', value: answers[0], inline: true },
-                    { name: 'B', value: answers[1], inline: true },
-                    { name: 'C', value: answers[2], inline: true },
-                    { name: 'D', value: answers[3], inline: true },
-                );
-
-            await interaction.reply({ embeds: [embed] });
-
-            // Timer message
-            let timeLeft = 15;
-            const timerMessage = await interaction.followUp(
-                `Time Remaining: ${timeLeft} seconds`,
+            const correctIndex = answers.indexOf(
+                he.decode(questionData.correct_answer),
             );
-            let winnerFound = false; // Flag to track if a winner is found
 
-            const countdown = setInterval(async () => {
-                if (!winnerFound) {
-                    // Only decrement timer if a winner hasn't been found
-                    timeLeft--;
-                    if (timeLeft >= 0) {
-                        await timerMessage.edit(
-                            `Time Remaining: ${timeLeft} seconds`,
-                        );
-                    }
-                }
+            const embed = new EmbedBuilder()
+                .setColor('#FF69B4')
+                .setTitle('🎲 Epic Trivia Challenge! 🎲')
+                .setDescription(
+                    `**${decodedQuestion}**\n\n*Choose wisely, you have 20 seconds!*`,
+                )
+                .setFooter({
+                    text: `Category: ${questionData.category} | Difficulty: ${questionData.difficulty.charAt(0).toUpperCase() + questionData.difficulty.slice(1)}`,
+                });
 
-                if (timeLeft <= 0 && !winnerFound) {
-                    clearInterval(countdown);
-                    await timerMessage.edit("Time's up!");
-                    const correctAnswer = ['a', 'b', 'c', 'd'][correctIndex];
-                    interaction.followUp(
-                        `The correct answer was ${correctAnswer.toUpperCase()}: ${questionData.correct_answer}`,
-                    );
-                }
-            }, 1000);
+            const row = new ActionRowBuilder().addComponents(
+                ['A', 'B', 'C', 'D'].map((letter, index) =>
+                    new ButtonBuilder()
+                        .setCustomId(letter)
+                        .setLabel(letter)
+                        .setStyle(ButtonStyle.Primary),
+                ),
+            );
 
-            // Answer collection
-            const filter = (m) =>
-                ['a', 'b', 'c', 'd'].includes(m.content.toLowerCase()) &&
-                m.author.id === interaction.user.id;
-            const collector = interaction.channel.createMessageCollector({
-                filter,
-                max: 1,
-                time: 15000,
+            const answerFields = answers.map((answer, index) => ({
+                name: `Option ${['A', 'B', 'C', 'D'][index]}`,
+                value: answer,
+                inline: true,
+            }));
+            embed.addFields(answerFields);
+
+            await interaction.reply({ embeds: [embed], components: [row] });
+
+            const filter = (i) =>
+                ['A', 'B', 'C', 'D'].includes(i.customId) &&
+                i.user.id === interaction.user.id;
+            const collector =
+                interaction.channel.createMessageComponentCollector({
+                    filter,
+                    time: 20000,
+                });
+
+            let answered = false;
+
+            collector.on('collect', async (i) => {
+                answered = true;
+                const userAnswer = ['A', 'B', 'C', 'D'].indexOf(i.customId);
+                const correct = userAnswer === correctIndex;
+
+                const resultEmbed = new EmbedBuilder()
+                    .setColor(correct ? '#00FF00' : '#FF0000')
+                    .setTitle(
+                        correct
+                            ? "🎉 Correct! You're a Trivia Master! 🎉"
+                            : '😢 Oops! Not Quite Right 😢',
+                    )
+                    .setDescription(
+                        `The correct answer was: **${answers[correctIndex]}**`,
+                    )
+                    .addFields(
+                        {
+                            name: 'Your Answer',
+                            value: answers[userAnswer],
+                            inline: true,
+                        },
+                        {
+                            name: 'Correct Answer',
+                            value: answers[correctIndex],
+                            inline: true,
+                        },
+                    )
+                    .setFooter({
+                        text: `You answered in ${((i.createdTimestamp - interaction.createdTimestamp) / 1000).toFixed(2)} seconds!`,
+                    });
+
+                await i.update({ embeds: [resultEmbed], components: [] });
+                collector.stop();
             });
 
-            collector.on('collect', async (msg) => {
-                const userAnswer = msg.content.toLowerCase();
-                const correctAnswer = ['a', 'b', 'c', 'd'][correctIndex];
+            collector.on('end', async (collected) => {
+                if (!answered) {
+                    const timeoutEmbed = new EmbedBuilder()
+                        .setColor('#FFA500')
+                        .setTitle("⏰ Time's Up! ⏰")
+                        .setDescription(
+                            `The correct answer was: **${answers[correctIndex]}**`,
+                        )
+                        .setFooter({ text: 'Better luck next time!' });
 
-                if (userAnswer === correctAnswer) {
-                    winnerFound = true; // Set the flag to stop the timer
-                    clearInterval(countdown); // Stop the timer
-                    await timerMessage.edit(
-                        `<@${msg.author.id}> got the correct answer!`,
-                    ); // Announce the winner
-                } else {
-                    interaction.followUp(`Incorrect, <@${msg.author.id}>!`);
+                    await interaction.editReply({
+                        embeds: [timeoutEmbed],
+                        components: [],
+                    });
                 }
             });
         } catch (error) {
             console.error('Error fetching trivia:', error);
-            interaction.reply('An error occurred. Please try again later.');
+            await interaction.reply({
+                content:
+                    "Oops! The trivia machine broke. Let's try again later!",
+                ephemeral: true,
+            });
         }
     },
 };
