@@ -21,7 +21,7 @@ jobs:
                   cache: 'npm'
             - run: npm ci
             - name: Run file
-              run: node ./../../test-settings.js
+              run: node ./test-settings.js
               env:
                   DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
                   MONGODB_URI: ${{ secrets.MONGODB_URI }}
