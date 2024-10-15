@@ -20,6 +20,16 @@ module.exports = {
                 .setRequired(true),
         ),
 
+    description_full:
+        'Set a reminder that will be sent after a specified time. The bot will mention you with your reminder message when the time is up.',
+    usage: '/reminder <time> <message>',
+    examples: [
+        '/reminder 3600 Take the cake out of the oven',
+        '/reminder 300 Check on the laundry',
+        '/reminder 86400 Happy birthday to me!',
+    ],
+    category: 'utility',
+
     async execute(interaction) {
         const time = interaction.options.getInteger('time'); // Time in seconds
         const reminderMessage = interaction.options.getString('message');
