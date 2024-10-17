@@ -34,7 +34,7 @@ module.exports = {
                 .setRequired(true)
                 .addChoices(
                     { name: 'Welcome', value: 'welcome' },
-                    { name: 'Level Roles', value: 'level_roles' },
+                    // { name: 'Level Roles', value: 'level_roles' },
                     { name: 'Server Booster Perks', value: 'booster_perks' },
                     { name: 'Other Roles', value: 'other_roles' },
                     { name: 'All Role Information', value: 'all_roles_info' },
@@ -47,8 +47,6 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
-
         const embedType = interaction.options.getString('type');
 
         //const roles = this.getRoles(interaction)

@@ -71,7 +71,7 @@ module.exports = {
                 )
                 .setFooter({ text: 'Type a letter to make a guess!' });
 
-            const msg = await interaction.reply({
+            const msg = await interaction.editReply({
                 embeds: [gameEmbed],
                 fetchReply: true,
             });
@@ -88,9 +88,11 @@ module.exports = {
             collector.on('collect', async (m) => {
                 const letter = m.content.toLowerCase();
                 if (guessedLetters.includes(letter)) {
-                    await m.reply(
+                    const reply = await m.reply(
                         "You've already guessed that letter! Try another one.",
                     );
+                    setTimeout(() => reply.delete(), 3000);
+                    m.delete();
                     return;
                 }
 
@@ -105,17 +107,21 @@ module.exports = {
                                 wordState.substring(j * 2 + 1);
                         }
                     }
-                    await m.reply(
+                    const reply = await m.reply(
                         `🎉 Great guess! '${letter.toUpperCase()}' is in the word!`,
                     );
+                    setTimeout(() => reply.delete(), 3000);
                 } else {
                     remainingGuesses--;
                     const funnyMessage =
                         funnyMessages[
                             Math.floor(Math.random() * funnyMessages.length)
                         ];
-                    await m.reply(`😅 ${funnyMessage}`);
+                    const reply = await m.reply(`😅 ${funnyMessage}`);
+                    setTimeout(() => reply.delete(), 3000);
                 }
+
+                m.delete();
 
                 gameEmbed
                     .setDescription(
@@ -125,14 +131,18 @@ module.exports = {
                     .setFields([
                         {
                             name: '💪 Guesses Left',
-                            value: '❤️'.repeat(remainingGuesses),
+                            value:
+                                remainingGuesses > 0
+                                    ? '❤️'.repeat(remainingGuesses)
+                                    : 'None left!',
                             inline: true,
                         },
                         {
                             name: '🔤 Guessed Letters',
                             value:
-                                guessedLetters.join(', ').toUpperCase() ||
-                                'None yet!',
+                                guessedLetters.length > 0
+                                    ? guessedLetters.join(', ').toUpperCase()
+                                    : 'None yet!',
                             inline: true,
                         },
                     ]);

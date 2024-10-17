@@ -18,10 +18,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        if (!interaction.isCommand()) return;
-
-        await interaction.deferReply();
-
         const gameName = interaction.options.getString('search');
         const clientId = process.env.IGDB_CLIENT_ID;
         const clientSecret = process.env.IGDB_CLIENT_SECRET;

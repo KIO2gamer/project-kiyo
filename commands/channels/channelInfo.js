@@ -1,7 +1,6 @@
 const {
     SlashCommandBuilder,
     EmbedBuilder,
-    ChannelType,
     PermissionsBitField,
 } = require('discord.js');
 const { handleError } = require('../../bot_utils/errorHandler');
@@ -96,7 +95,7 @@ module.exports = {
                 });
             }
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             await handleError(interaction, error);
         }

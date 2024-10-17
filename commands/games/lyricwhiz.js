@@ -22,8 +22,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply();
-
         const rounds = interaction.options.getInteger('rounds');
         let score = 0;
         let currentRound = 0;
@@ -31,34 +29,52 @@ module.exports = {
         const playRound = async () => {
             currentRound++;
             try {
-                const response = await axios.get(
-                    'https://api.musixmatch.com/ws/1.1/track.search',
-                    {
-                        params: {
-                            apikey: process.env.MUSIXMATCH_API_KEY,
-                            f_has_lyrics: 1,
-                            page_size: 100,
-                            page: 1,
+                let lyrics = '';
+                let randomTrack;
+                let attempts = 0;
+                const maxAttempts = 5;
+
+                while (!lyrics && attempts < maxAttempts) {
+                    const response = await axios.get(
+                        'https://api.musixmatch.com/ws/1.1/track.search',
+                        {
+                            params: {
+                                apikey: process.env.MUSIXMATCH_API_KEY,
+                                f_has_lyrics: 1,
+                                page_size: 100,
+                                page: 1,
+                            },
                         },
-                    },
-                );
+                    );
 
-                const tracks = response.data.message.body.track_list;
-                const randomTrack =
-                    tracks[Math.floor(Math.random() * tracks.length)].track;
+                    const tracks = response.data.message.body.track_list;
+                    randomTrack =
+                        tracks[Math.floor(Math.random() * tracks.length)].track;
 
-                const lyricsResponse = await axios.get(
-                    'https://api.musixmatch.com/ws/1.1/track.lyrics.get',
-                    {
-                        params: {
-                            apikey: process.env.MUSIXMATCH_API_KEY,
-                            track_id: randomTrack.track_id,
+                    const lyricsResponse = await axios.get(
+                        'https://api.musixmatch.com/ws/1.1/track.lyrics.get',
+                        {
+                            params: {
+                                apikey: process.env.MUSIXMATCH_API_KEY,
+                                track_id: randomTrack.track_id,
+                            },
                         },
-                    },
-                );
+                    );
 
-                const lyrics =
-                    lyricsResponse.data.message.body.lyrics.lyrics_body;
+                    lyrics =
+                        lyricsResponse.data.message.body.lyrics.lyrics_body;
+
+                    if (!lyrics) {
+                        attempts++;
+                    }
+                }
+
+                if (!lyrics) {
+                    throw new Error(
+                        'Unable to find a song with lyrics after multiple attempts',
+                    );
+                }
+
                 const artist = randomTrack.artist_name;
                 const title = randomTrack.track_name;
 

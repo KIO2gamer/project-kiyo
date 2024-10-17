@@ -13,8 +13,6 @@ module.exports = {
         .setDescription('View the roles stored in the database.'),
     async execute(interaction) {
         try {
-            const sent = await interaction.deferReply({ ephemeral: true });
-
             // Fetch all roles from the database
             const roles = await Role.find();
 

@@ -28,16 +28,12 @@ module.exports = {
         )
         .setDefaultMemberPermissions(
             PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
-        )
-        .setDMPermission(false),
+        ),
 
     async execute(interaction) {
         const targetUser = interaction.options.getMember('target');
         const reason =
             interaction.options.getString('reason') ?? 'No reason provided';
-
-        // Defer the reply to allow time for the operation
-        await interaction.deferReply();
 
         // Check if the target user exists
         if (!targetUser) {

@@ -63,7 +63,7 @@ module.exports = {
             }));
             embed.addFields(answerFields);
 
-            await interaction.reply({ embeds: [embed], components: [row] });
+            await interaction.editReply({ embeds: [embed], components: [row] });
 
             const filter = (i) =>
                 ['A', 'B', 'C', 'D'].includes(i.customId) &&
@@ -121,7 +121,7 @@ module.exports = {
                         )
                         .setFooter({ text: 'Better luck next time!' });
 
-                    await interaction.editReply({
+                    await interaction.reply({
                         embeds: [timeoutEmbed],
                         components: [],
                     });
@@ -129,7 +129,7 @@ module.exports = {
             });
         } catch (error) {
             console.error('Error fetching trivia:', error);
-            await interaction.reply({
+            await interaction.editReply({
                 content:
                     "Oops! The trivia machine broke. Let's try again later!",
                 ephemeral: true,

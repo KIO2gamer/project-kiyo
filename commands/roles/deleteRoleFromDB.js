@@ -20,8 +20,6 @@ module.exports = {
         const role = interaction.options.getRole('role');
 
         try {
-            const sent = await interaction.deferReply({ ephemeral: true });
-
             // Check if role exists in the database
             const existingRole = await Role.findOne({ roleID: role.id });
             if (!existingRole) {
