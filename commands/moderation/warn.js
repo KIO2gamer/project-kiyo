@@ -59,8 +59,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply().catch(console.error);
-
         const targetUser = interaction.options.getMember('target');
         const reason =
             interaction.options.getString('reason') ?? 'No reason provided';

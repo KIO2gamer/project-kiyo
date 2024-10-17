@@ -7,7 +7,7 @@ const { EmbedBuilder } = require('discord.js');
  * @param {Error} error - The error that occurred.
  * @param {import('discord.js').Message} sent - The initial message sent by the command.
  */
-async function handleError(interaction, error, sent) {
+async function handleError(interaction, error) {
     const chalk = (await import('chalk')).default; // Dynamic import
     const boxen = (await import('boxen')).default; // Dynamic import
 
@@ -30,7 +30,7 @@ async function handleError(interaction, error, sent) {
         .setColor('Red')
         .setTimestamp();
 
-    await interaction.reply({ embeds: [errorEmbed], ephemeral: true }); // Edit the initial message
+    await interaction.editReply({ embeds: [errorEmbed], ephemeral: true }); // Edit the initial message
 }
 
 module.exports = {

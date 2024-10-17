@@ -21,6 +21,7 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
         try {
             const interactionId = interaction.id; // Use the interaction ID as state
             const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${interactionId}`;
@@ -47,7 +48,7 @@ module.exports = {
                 },
             };
 
-            await interaction.reply({
+            await interaction.editReply({
                 embeds: [embed],
                 ephemeral: true,
             });
@@ -121,7 +122,7 @@ module.exports = {
                     },
                     timestamp: new Date(),
                 };
-                await interaction.followUp({
+                await interaction.editReply({
                     embeds: [embed],
                     ephemeral: true,
                 });
@@ -129,6 +130,7 @@ module.exports = {
                 throw new Error('Failed to retrieve YouTube subscriber count.');
             }
         } catch (error) {
+            console.log(error)
             const errorEmbed = {
                 color: 0xff0000,
                 title: '❌ Oops! Something went wrong',
@@ -152,7 +154,7 @@ module.exports = {
                 timestamp: new Date(),
             };
 
-            await interaction.reply({
+            await interaction.editReply({
                 embeds: [errorEmbed],
                 ephemeral: true,
             });
@@ -230,10 +232,10 @@ async function assignSubscriberRole(member, subscriberCount) {
         { max: 100000, name: '50K - 99.9K Subs' },
         { max: 500000, name: '100K - 499.9K Subs' },
         { max: 1000000, name: '500K - 999.9K Subs' },
-        { max: Infinity, name: '1M+ Subs' }
+        { max: Infinity, name: '1M+ Subs' },
     ];
 
-    roleName = roleRanges.find(range => subscriberCount < range.max).name;
+    roleName = roleRanges.find((range) => subscriberCount < range.max).name;
 
     try {
         const subscriberRoleData = await RoleSchema.findOne({ roleName });
@@ -248,6 +250,6 @@ async function assignSubscriberRole(member, subscriberCount) {
         return roleName;
     } catch (error) {
         console.error('Failed to assign role:', error.message);
-        throw new Error('Failed to assign subscriber role.');
+        throw new Error(`Failed to assign subscriber role: ${error.message}`);
     }
 }

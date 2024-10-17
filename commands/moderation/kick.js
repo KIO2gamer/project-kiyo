@@ -34,7 +34,6 @@ module.exports = {
         const targetUser = interaction.options.getMember('target');
         const reason =
             interaction.options.getString('reason') ?? 'No reason provided';
-        await interaction.deferReply();
 
         if (!targetUser) {
             await interaction.editReply({

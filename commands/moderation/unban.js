@@ -8,10 +8,10 @@ const moderationLogs = require('../../bot_utils/moderationLogs');
 module.exports = {
     description_full:
         'Unbans a member from the server with the specified reason.',
-    usage: '/unban userid:"user ID" [reason:"unban reason"]',
+    usage: '/unban user:"user ID or unique username" [reason:"unban reason"]',
     examples: [
-        '/unban userid:"123456789012345678"',
-        '/unban userid:"123456789012345678" reason:"Ban was a mistake"',
+        '/unban user:"123456789012345678"',
+        '/unban user:"yoo_12345" reason:"Ban was a mistake"',
     ],
     category: 'moderation',
     data: new SlashCommandBuilder()
@@ -19,66 +19,76 @@ module.exports = {
         .setDescription('Unban a member from the server.')
         .addStringOption((option) =>
             option
-                .setName('userid')
-                .setDescription('The ID of the member to unban')
+                .setName('user')
+                .setDescription('The ID or unique username of the member to unban')
                 .setRequired(true),
         )
         .addStringOption((option) =>
             option.setName('reason').setDescription('The reason for unbanning'),
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
-        .setDMPermission(false),
+        .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
     async execute(interaction) {
-        const userId = interaction.options.getString('userid');
+        const userInput = interaction.options.getString('user');
         const reason =
             interaction.options.getString('reason') ?? 'No reason provided';
 
-        // Defer the reply to allow time for the operation
-        await interaction.deferReply();
-
         try {
-            // Fetch the ban to ensure the user is banned
-            const ban = await interaction.guild.bans.fetch(userId);
+            const bans = await interaction.guild.bans.fetch();
+            const bannedUser = bans.find(
+                (ban) =>
+                    ban.user.id === userInput ||
+                    ban.user.tag.toLowerCase() === userInput.toLowerCase(),
+            );
 
-            if (!ban) {
+            if (!bannedUser) {
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
-                            .setTitle('ERROR')
+                            .setTitle('Error')
                             .setDescription('User is not banned or not found')
                             .setColor('Red')
+                            .setTimestamp()
                             .setFooter({
-                                text: `Done by: ${interaction.user.username}`,
-                                iconURL: `${interaction.user.displayAvatarURL()}`,
+                                text: `Requested by ${interaction.user.tag}`,
+                                iconURL: interaction.user.displayAvatarURL(),
                             }),
                     ],
                 });
                 return;
             }
 
+            await interaction.guild.members.unban(bannedUser.user.id, reason);
+
             const logEntry = new moderationLogs({
                 action: 'unban',
                 moderator: interaction.user.id,
-                user: userId,
+                user: bannedUser.user.id,
                 reason: reason,
             });
 
             await logEntry.save();
 
-            // Attempt to unban the user
-            await interaction.guild.members.unban(userId, reason);
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('UNBANNED!!!')
+                        .setTitle('User Unbanned')
                         .setDescription(
-                            `<@${userId}> has been unbanned for reason: \`${reason}\``,
+                            `Successfully unbanned ${bannedUser.user.tag}`,
+                        )
+                        .addFields(
+                            {
+                                name: 'User ID',
+                                value: bannedUser.user.id,
+                                inline: true,
+                            },
+                            { name: 'Reason', value: reason, inline: true },
                         )
                         .setColor('Green')
+                        .setTimestamp()
                         .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.displayAvatarURL()}`,
+                            text: `Unbanned by ${interaction.user.tag}`,
+                            iconURL: interaction.user.displayAvatarURL(),
                         }),
                 ],
             });
@@ -87,14 +97,15 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle('Error')
                         .setDescription(
                             'An error occurred while trying to unban the user',
                         )
                         .setColor('Red')
+                        .setTimestamp()
                         .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.displayAvatarURL()}`,
+                            text: `Requested by ${interaction.user.tag}`,
+                            iconURL: interaction.user.displayAvatarURL(),
                         }),
                 ],
             });

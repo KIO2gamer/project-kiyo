@@ -16,12 +16,12 @@ module.exports = {
             const { chosenWord, shuffledWord } = selectAndShuffleWord(words);
             const embed = createEmbed(shuffledWord);
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
             const result = await handleGuessing(interaction, chosenWord);
             await updateEmbed(interaction, embed, result, chosenWord);
         } catch (error) {
             console.error('Error in unscramble command:', error);
-            await interaction.reply(
+            await interaction.editReply(
                 'An error occurred while running the game.',
             );
         }
@@ -97,12 +97,13 @@ async function updateEmbed(interaction, embed, result, chosenWord) {
             .setDescription(
                 `You got it right! The word was **${chosenWord}**. 🎉`,
             )
-            .setFooter({ text: '' });
+            .setFooter({ text: `You completed in ${interaction.createdTimestamp - interaction.createdTimestamp}ms!` });
     } else {
         embed
             .setColor(0xff0000)
             .setTitle('Time Up!')
-            .setDescription(`The word was **${chosenWord}**.`);
+            .setDescription(`The word was **${chosenWord}**.`)
+            .setFooter({ text: 'You had 30 seconds to guess!' });
     }
     await interaction.editReply({ embeds: [embed] });
 }

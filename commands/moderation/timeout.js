@@ -34,8 +34,7 @@ module.exports = {
         .addStringOption((option) =>
             option.setName('reason').setDescription('The reason for timeout'),
         )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
-        .setDMPermission(false),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
 
     async execute(interaction) {
         const targetUser = interaction.options.getMember('target');
@@ -43,8 +42,6 @@ module.exports = {
             interaction.options.getString('reason') ?? 'No reason provided';
         const duration = interaction.options.getString('amount');
         const durationMs = ms(duration);
-
-        await interaction.deferReply();
 
         if (!targetUser) {
             await interaction.editReply({

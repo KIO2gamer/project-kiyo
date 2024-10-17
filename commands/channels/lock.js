@@ -34,7 +34,6 @@ module.exports = {
     async execute(interaction) {
         const channel =
             interaction.options.getChannel('channel') || interaction.channel;
-        const sent = await interaction.deferReply({ ephemeral: true });
 
         // Check if the bot has the required permissions
         if (
@@ -94,7 +93,7 @@ module.exports = {
                 });
             }
         } catch (error) {
-            await handleError(interaction, error, sent);
+            await handleError(interaction, error);
         }
     },
 };

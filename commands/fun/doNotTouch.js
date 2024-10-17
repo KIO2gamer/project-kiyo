@@ -27,7 +27,7 @@ module.exports = {
                 .setStyle(ButtonStyle.Danger),
         );
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `Oh? So you found the secret? Well well well, it's time for your PC to blow up.\nAnd also your Discord account is being reported for finding it illegally ||joke btw||\n||or maybe for real?||`,
             components: [row],
         });

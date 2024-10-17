@@ -12,8 +12,6 @@ module.exports = {
 
     async execute(interaction) {
         const startTime = Date.now();
-        await interaction.deferReply();
-
         const endTime = Date.now();
         const responseTime = endTime - startTime;
 

@@ -67,9 +67,6 @@ module.exports = {
             url += `&size=${size}`;
         }
 
-        // Defer the reply to give more time for processing
-        await interaction.deferReply();
-
         try {
             const response = await fetch(url, {
                 headers: {

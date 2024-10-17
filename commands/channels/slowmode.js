@@ -40,9 +40,6 @@ module.exports = {
         const durationInput = interaction.options.getString('duration');
         const duration = ms(durationInput) / 1000;
 
-        // Defer the reply to allow time for the operation
-        await interaction.deferReply();
-
         if (isNaN(duration) || duration < 0 || duration > 21600) {
             await interaction.editReply({
                 embeds: [

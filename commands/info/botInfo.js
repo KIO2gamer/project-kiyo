@@ -15,15 +15,14 @@ module.exports = {
         .setDescription('Retrieve detailed information about the bot.'),
 
     async execute(interaction) {
-        await sendBotInfo(interaction);
+        const sent = await interaction.editReply({ content: "Pinging..." });
+        await sendBotInfo(sent, interaction);
     },
 };
 
-async function sendBotInfo(interaction) {
+async function sendBotInfo(sent, interaction) {
     try {
-        const sent = await interaction.deferReply({ fetchReply: true });
         const uptime = formatUptime(interaction.client.uptime);
-
         const description = `\`\`\`fix
 Developer: kio2gamer
 Status: In Development
@@ -36,7 +35,7 @@ Latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms
 WebSocket: ${interaction.client.ws.ping}ms
 Uptime: ${uptime}
 Node.js Version: ${process.version}
-Discord.js Version: v${djsVersion}
+discord.js Version: v${djsVersion}
 \`\`\``;
 
         const systemSpecs = `\`\`\`fix
@@ -71,7 +70,7 @@ Memory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
             })
             .setTimestamp();
 
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.editReply({ content: " ", embeds: [embed] });
     } catch (error) {
         console.error('Error retrieving bot information:', error);
         await interaction.editReply({

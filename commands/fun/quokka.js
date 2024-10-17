@@ -11,9 +11,6 @@ module.exports = {
         .setDescription('Send a pic of a quokka because it is cute.'),
 
     async execute(interaction) {
-        // Defer the reply to give more time for processing
-        await interaction.deferReply();
-
         try {
             const response = await fetch(
                 `https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=quokka&limit=10`,
