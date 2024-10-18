@@ -34,14 +34,16 @@ module.exports = {
                 replyMessage += `Content Type: ${contentType || 'Not specified'}\n`;
                 replyMessage += `Server: ${serverInfo || 'Not specified'}`;
 
-                await interaction.reply(replyMessage);
+                await interaction.editReply(replyMessage);
             } else {
-                await interaction.reply(
+                await interaction.editReply(
                     `The service at ${url} is offline (status code: ${response.status}).`,
                 );
             }
         } catch (error) {
-            await interaction.reply(`Error checking ${url}: ${error.message}`);
+            await interaction.editReply(
+                `Error checking ${url}: ${error.message}`,
+            );
         }
     },
 };
