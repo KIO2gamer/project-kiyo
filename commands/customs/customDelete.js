@@ -26,7 +26,7 @@ module.exports = {
             });
 
             if (!cc_record) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Custom command or alias "${name}" not found!`,
                     ephemeral: true,
                 });
@@ -39,7 +39,7 @@ module.exports = {
                 ? `The name you provided is an alias. The main command name is "${cc_record.name}". Do you want to delete this command?`
                 : `Are you sure you want to delete the custom command "${name}"?`;
 
-            const confirmationResponse = await interaction.reply({
+            const confirmationResponse = await interaction.editReply({
                 content: confirmMessage,
                 ephemeral: true,
                 components: [
