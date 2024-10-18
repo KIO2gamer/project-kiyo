@@ -18,26 +18,30 @@ module.exports = {
     usage: '/custom_delete <name:command_name_or_alias>',
     examples: ['/custom_delete name:hello', '/custom_delete name:greet'],
     async execute(interaction) {
-        const name = interaction.options.getString('name');
-
         try {
-            const cc_record = await cc.findOne({
-                $or: [{ name: name }, { aliases: name }],
-            });
+            const commandNameOrAlias = interaction.options.getString('name');
+            let cc_record = await cc.findOne({ name: commandNameOrAlias });
+
+            if (!cc_record) {
+                cc_record = await cc.findOne({
+                    alias_name: commandNameOrAlias,
+                });
+            }
 
             if (!cc_record) {
                 await interaction.editReply({
-                    content: `Custom command or alias "${name}" not found!`,
+                    content: `Custom command or alias "${commandNameOrAlias}" not found!`,
                     ephemeral: true,
                 });
                 return;
             }
 
-            const isAlias = cc_record.name !== name;
-            const alias_name = isAlias ? name : null;
+            const isAlias = cc_record.name !== commandNameOrAlias;
+            const alias_name = isAlias ? commandNameOrAlias : null;
+            const command_name = cc_record.name;
             const confirmMessage = isAlias
-                ? `The name you provided is an alias. The main command name is "${cc_record.name}". Do you want to delete this command?`
-                : `Are you sure you want to delete the custom command "${name}"?`;
+                ? `The name you provided is an alias. The main command name is "${command_name}". Do you want to delete this command?`
+                : `Are you sure you want to delete the custom command "${command_name}"?`;
 
             const confirmationResponse = await interaction.editReply({
                 content: confirmMessage,
@@ -81,7 +85,7 @@ module.exports = {
             if (confirmation.customId === 'delete_confirm') {
                 await cc.deleteOne({ _id: cc_record._id });
                 await interaction.editReply({
-                    content: `Custom command "${cc_record.name}"${alias_name ? ` (alias: ${alias_name})` : ''} deleted successfully!`,
+                    content: `Custom command "${command_name}"${alias_name ? ` (alias: ${alias_name})` : ''} deleted successfully!`,
                     components: [],
                 });
             } else {
