@@ -18,6 +18,17 @@ module.exports = {
                     { name: 'All Time', value: 'all' },
                 ),
         ),
+    description_full:
+        'Displays various statistics about this server, including member count, channel count, message activity, and more. You can specify a timeframe to view stats for a specific period.',
+    category: 'info',
+    usage: '/server_stats [timeframe]',
+    examples: [
+        '/server_stats',
+        '/server_stats timeframe: Last 24 Hours',
+        '/server_stats timeframe: Last 7 Days',
+        '/server_stats timeframe: Last Month',
+        '/server_stats timeframe: All Time',
+    ],
     async execute(interaction) {
         const timeframe = interaction.options.getString('timeframe') || 'all';
         const guild = interaction.guild;

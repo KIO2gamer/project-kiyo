@@ -10,6 +10,15 @@ module.exports = {
                 .setDescription('URL to check')
                 .setRequired(true),
         ),
+    category: 'dev',
+    description_full:
+        'Check the status of a server or service by providing a URL. This command will return information such as the status code, content type, and server details if available.',
+    usage: '/status <url>',
+    examples: [
+        '/status https://www.example.com',
+        '/status https://api.github.com',
+        '/status https://discord.com',
+    ],
     async execute(interaction) {
         const url = interaction.options.getString('url');
 
