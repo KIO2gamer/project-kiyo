@@ -15,7 +15,7 @@ module.exports = {
             const customCommands = await cc.find({});
 
             if (customCommands.length === 0) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'There are no custom commands.',
                     ephemeral: true,
                 });
@@ -31,7 +31,7 @@ module.exports = {
                 })
                 .join('\n');
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: `## Custom Commands:\n${commandList}`,
                 ephemeral: true,
             });
