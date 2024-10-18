@@ -37,24 +37,26 @@ module.exports = {
         const newAlias = interaction.options.getString('new_alias');
 
         try {
-            const cc_record = await cc.findOne({
-                $or: [{ name: name }, { aliases: name }],
-            });
+            let customCommand = await cc.findOne({ name: name });
 
-            if (!cc_record) {
-                await interaction.reply({
+            if (!customCommand) {
+                customCommand = await cc.findOne({ alias_name: name });
+            }
+
+            if (!customCommand) {
+                await interaction.editReply({
                     content: `Custom command or alias "${name}" not found!`,
                     ephemeral: true,
                 });
                 return;
             }
 
-            const isAlias = cc_record.name !== name;
+            const isAlias = customCommand.name !== name;
             const confirmMessage = isAlias
-                ? `The name you provided is an alias. The main command name is "${cc_record.name}". Do you want to edit this command?`
+                ? `The name you provided is an alias. The main command name is "${customCommand.name}". Do you want to edit this command?`
                 : `Are you sure you want to edit the custom command "${name}"?`;
 
-            const confirmationResponse = await interaction.reply({
+            const confirmationResponse = await interaction.editReply({
                 content: confirmMessage,
                 ephemeral: true,
                 components: [
@@ -94,16 +96,13 @@ module.exports = {
             }
 
             if (confirmation.customId === 'edit_confirm') {
-                cc_record.message = newMessage;
+                customCommand.message = newMessage;
                 if (newAlias) {
-                    if (!cc_record.aliases) {
-                        cc_record.aliases = [];
-                    }
-                    cc_record.aliases.push(newAlias);
+                    customCommand.alias_name = newAlias;
                 }
-                await cc_record.save();
+                await customCommand.save();
                 await interaction.editReply({
-                    content: `Custom command "${cc_record.name}" edited successfully!`,
+                    content: `Custom command "${customCommand.name}" edited successfully!`,
                     components: [],
                 });
             } else {

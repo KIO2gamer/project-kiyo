@@ -34,6 +34,7 @@ module.exports = {
             }
 
             const isAlias = cc_record.name !== name;
+            const alias_name = isAlias ? name : null;
             const confirmMessage = isAlias
                 ? `The name you provided is an alias. The main command name is "${cc_record.name}". Do you want to delete this command?`
                 : `Are you sure you want to delete the custom command "${name}"?`;
@@ -80,7 +81,7 @@ module.exports = {
             if (confirmation.customId === 'delete_confirm') {
                 await cc.deleteOne({ _id: cc_record._id });
                 await interaction.editReply({
-                    content: `Custom command "${cc_record.name}" deleted successfully!`,
+                    content: `Custom command "${cc_record.name}"${alias_name ? ` (alias: ${alias_name})` : ''} deleted successfully!`,
                     components: [],
                 });
             } else {

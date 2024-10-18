@@ -1,24 +1,23 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const cc = require('./../../bot_utils/customCommands');
 const { handleError } = require('./../../bot_utils/errorHandler');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('custom_run')
-        .setDescription('Run a custom command')
+        .setName('custom_preview')
+        .setDescription('Previews a custom command')
         .addStringOption((option) =>
             option
                 .setName('name')
                 .setDescription(
-                    'The name or alias of the custom command to run',
+                    'The name or alias of the custom command to preview',
                 )
                 .setRequired(true),
         ),
     category: 'customs',
-    description_full:
-        "Runs a specified custom command stored in the bot's database.",
-    usage: '/custom_run <name_or_alias>',
-    examples: ['/custom_run greet', '/custom_run hello'],
+    description_full: "Previews a custom command stored in the bot's database.",
+    usage: '/custom_preview <name_or_alias>',
+    examples: ['/custom_preview hello'],
     async execute(interaction) {
         try {
             const commandNameOrAlias = interaction.options.getString('name');
@@ -38,9 +37,21 @@ module.exports = {
                 return;
             }
 
+            const embed = new EmbedBuilder()
+                .setColor('#0099ff')
+                .setTitle(`Custom Command: ${customCommand.name}`)
+                .addFields(
+                    { name: 'Content', value: customCommand.message },
+                    {
+                        name: 'Aliases',
+                        value: customCommand.alias_name || 'None',
+                    },
+                )
+                .setTimestamp();
+
             await interaction.editReply({
-                content: customCommand.message,
-                ephemeral: false,
+                embeds: [embed],
+                ephemeral: true,
             });
         } catch (error) {
             handleError(interaction, error);
