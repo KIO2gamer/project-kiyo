@@ -23,14 +23,14 @@ module.exports = {
             const customCommand = await cc.findOne({ name: commandName });
 
             if (!customCommand) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Custom command "${commandName}" not found.`,
                     ephemeral: true,
                 });
                 return;
             }
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: customCommand.message,
                 ephemeral: false,
             });
