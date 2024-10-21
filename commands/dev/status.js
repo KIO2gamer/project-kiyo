@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,7 +13,7 @@ module.exports = {
         ),
     category: 'dev',
     description_full:
-        'Check the status of a server or service by providing a URL. This command will return information such as the status code, content type, and server details if available.',
+        'Check the status of a server or service by providing a URL. This command will return detailed information such as the status code, content type, server details, response time, and more.',
     usage: '/status <url>',
     examples: [
         '/status https://www.example.com',
@@ -21,29 +22,72 @@ module.exports = {
     ],
     async execute(interaction) {
         const url = interaction.options.getString('url');
-
         try {
+            const startTime = Date.now();
             const response = await fetch(url);
-            if (response.ok) {
-                const statusCode = response.status;
-                const contentType = response.headers.get('content-type');
-                const serverInfo = response.headers.get('server');
+            const endTime = Date.now();
+            const responseTime = endTime - startTime;
 
-                let replyMessage = `The service at <${url}> is online!\n`;
-                replyMessage += `Status Code: ${statusCode}\n`;
-                replyMessage += `Content Type: ${contentType || 'Not specified'}\n`;
-                replyMessage += `Server: ${serverInfo || 'Not specified'}`;
+            const statusCode = response.status;
+            const contentType = response.headers.get('content-type');
+            const serverInfo = response.headers.get('server');
+            const lastModified = response.headers.get('last-modified');
+            const contentLength = response.headers.get('content-length');
 
-                await interaction.editReply(replyMessage);
-            } else {
-                await interaction.editReply(
-                    `The service at ${url} is offline (status code: ${response.status}).`,
-                );
-            }
+            const embed = new EmbedBuilder()
+                .setColor(response.ok ? 0x00ff00 : 0xff0000)
+                .setTitle(`Status Check: ${url}`)
+                .setDescription(
+                    response.ok ? 'Service is online' : 'Service is offline',
+                )
+                .addFields(
+                    {
+                        name: 'Status Code',
+                        value: statusCode.toString(),
+                        inline: true,
+                    },
+                    {
+                        name: 'Response Time',
+                        value: `${responseTime}ms`,
+                        inline: true,
+                    },
+                    {
+                        name: 'Content Type',
+                        value: contentType || 'Not specified',
+                        inline: true,
+                    },
+                    {
+                        name: 'Server',
+                        value: serverInfo || 'Not specified',
+                        inline: true,
+                    },
+                    {
+                        name: 'Last Modified',
+                        value: lastModified || 'Not specified',
+                        inline: true,
+                    },
+                    {
+                        name: 'Content Length',
+                        value: contentLength
+                            ? `${contentLength} bytes`
+                            : 'Not specified',
+                        inline: true,
+                    },
+                )
+                .setFooter({ text: 'Status check performed at' })
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            await interaction.editReply(
-                `Error checking ${url}: ${error.message}`,
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(0xff0000)
+                .setTitle('Error')
+                .setDescription(`Failed to check status for ${url}`)
+                .addFields({ name: 'Error Message', value: error.message })
+                .setFooter({ text: 'Error occurred at' })
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [errorEmbed] });
         }
     },
 };
