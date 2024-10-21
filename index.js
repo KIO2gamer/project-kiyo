@@ -8,6 +8,7 @@ const {
     Partials,
     REST,
     Routes,
+    ActivityType,
 } = require('discord.js');
 require('dotenv').config();
 
@@ -58,7 +59,10 @@ const loadCommands = (dir) => {
             }
         }
     });
-    console.log('\x1b[32m%s\x1b[0m', '[COMMANDS] All Commands Loaded Successfully!!!'); // Green color for success
+    console.log(
+        '\x1b[32m%s\x1b[0m',
+        '[COMMANDS] All Commands Loaded Successfully!!!',
+    ); // Green color for success
 };
 
 const loadEvents = (dir) => {
@@ -83,7 +87,10 @@ const connectToMongoDB = async () => {
         await mongoose.connect(MONGODB_URI);
         console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB'); // Green color for successful connection
     } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', `[DATABASE] MongoDB connection failed: ${error.message}`); // Red color for error
+        console.error(
+            '\x1b[31m%s\x1b[0m',
+            `[DATABASE] MongoDB connection failed: ${error.message}`,
+        ); // Red color for error
         process.exit(1);
     }
 };
@@ -120,8 +127,37 @@ const deployCommands = async () => {
             }
         }
     } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', '[DEPLOY] Command deployment failed:', error); // Red color for error
+        console.error(
+            '\x1b[31m%s\x1b[0m',
+            '[DEPLOY] Command deployment failed:',
+            error,
+        ); // Red color for error
     }
+};
+
+const setRichPresence = () => {
+    client.user.setPresence({
+        activities: [
+            {
+                name: 'with Discord.js',
+                type: ActivityType.Playing,
+                details: 'Managing server tasks',
+                state: 'Active and ready',
+                buttons: [
+                    {
+                        label: 'Visit Website',
+                        url: 'https://example.com',
+                    },
+                    {
+                        label: 'Join Server',
+                        url: 'https://discord.gg/example',
+                    },
+                ],
+            },
+        ],
+        status: 'online',
+    });
+    console.log('\x1b[32m%s\x1b[0m', '[BOT] Rich Presence set successfully'); // Green color for success
 };
 
 process.on('SIGINT', async () => {
@@ -136,9 +172,13 @@ process.on('SIGINT', async () => {
         await connectToMongoDB();
         await deployCommands();
         await client.login(DISCORD_TOKEN);
+        setRichPresence();
         console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!'); // Green color for success
     } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', `[BOT] Failed to start the bot: ${error.message}`); // Red color for error
+        console.error(
+            '\x1b[31m%s\x1b[0m',
+            `[BOT] Failed to start the bot: ${error.message}`,
+        ); // Red color for error
         process.exit(1);
     }
 })();
