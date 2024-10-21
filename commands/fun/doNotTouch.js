@@ -7,49 +7,49 @@ const {
 
 module.exports = {
     description_full:
-        "Click the button... if you dare. Will you defuse the bomb or face the explosive consequences? Don't worry, it's all in good fun (or is it?).",
-    usage: '/do_not_touch',
-    examples: ['/do_not_touch'],
-    category: 'fun',
+        'WARNING: This command initiates a critical system override. Proceed with extreme caution. Improper handling may result in irreversible consequences.',
+    usage: '/system_override',
+    examples: ['/system_override'],
+    category: 'system',
     data: new SlashCommandBuilder()
-        .setName('do_not_touch')
-        .setDescription('YOUR PC WILL GO BOOM-BOOM.'),
+        .setName('system_override')
+        .setDescription('CRITICAL: Initiate system override protocol.'),
 
     async execute(interaction) {
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
-                .setCustomId('defuse')
-                .setLabel('Defuse')
+                .setCustomId('abort')
+                .setLabel('Abort Override')
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
-                .setCustomId('detonate')
-                .setLabel('Detonate')
+                .setCustomId('confirm')
+                .setLabel('Confirm Override')
                 .setStyle(ButtonStyle.Danger),
         );
 
         await interaction.editReply({
-            content: `Oh? So you found the secret? Well well well, it's time for your PC to blow up.\nAnd also your Discord account is being reported for finding it illegally ||joke btw||\n||or maybe for real?||`,
+            content: `ALERT: Unauthorized system override detected. Your device and account have been flagged for immediate termination. Proceed with caution. /j`,
             components: [row],
         });
 
         const filter = (i) =>
-            i.customId === 'defuse' || i.customId === 'detonate';
+            i.customId === 'abort' || i.customId === 'confirm';
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
             time: 15000,
         });
 
         collector.on('collect', async (i) => {
-            if (i.customId === 'defuse') {
+            if (i.customId === 'abort') {
                 await i.update({
                     content:
-                        'Phew! You defused the bomb. Your PC is safe... for now.',
+                        'Override aborted. Security protocols re-engaged. Your system remains intact, but further attempts may result in permanent lockout.',
                     components: [],
                 });
             } else {
                 await i.update({
                     content:
-                        'BOOM! Your PC just exploded! 💥 Just kidding... or maybe not? 😜',
+                        'WARNING: System override confirmed. Initiating complete data wipe and hardware deactivation. This process cannot be reversed. /j',
                     components: [],
                 });
             }
@@ -59,7 +59,7 @@ module.exports = {
             if (!collected.size) {
                 interaction.editReply({
                     content:
-                        'Time is up! The bomb has been defused automatically. Your PC is safe... for now.',
+                        'ALERT: Override timeout detected. Initiating emergency shutdown. All systems will be locked for security audit. /j',
                     components: [],
                 });
             }
