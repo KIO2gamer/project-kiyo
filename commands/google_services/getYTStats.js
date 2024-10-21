@@ -37,7 +37,7 @@ module.exports = {
             });
 
             const response = await youtube.channels.list({
-                part: 'snippet,statistics',
+                part: 'snippet,statistics,brandingSettings',
                 id: channelId,
             });
 
@@ -48,24 +48,40 @@ module.exports = {
             }
 
             const channel = response.data.items[0];
-            const { title, description, thumbnails } = channel.snippet;
-            const { viewCount, subscriberCount, videoCount } =
-                channel.statistics;
+            const { title, description, thumbnails, publishedAt, country } =
+                channel.snippet;
+            const {
+                viewCount,
+                subscriberCount,
+                videoCount,
+                hiddenSubscriberCount,
+            } = channel.statistics;
+            const {
+                keywords,
+                channel: { featuredChannelsUrls },
+            } = channel.brandingSettings;
 
-            // Fetch the latest video to get like and dislike counts
+            // Fetch the latest video
             const videosResponse = await youtube.search.list({
-                part: 'id',
+                part: 'id,snippet',
                 channelId: channelId,
                 type: 'video',
                 order: 'date',
                 maxResults: 1,
             });
 
-            let likeCount = 'N/A';
-            let dislikeCount = 'N/A';
+            let latestVideoTitle = 'N/A';
+            let latestVideoPublishedAt = 'N/A';
+            let latestVideoViews = 'N/A';
+            let latestVideoLikes = 'N/A';
+            let latestVideoComments = 'N/A';
 
             if (videosResponse.data.items.length > 0) {
                 const videoId = videosResponse.data.items[0].id.videoId;
+                latestVideoTitle = videosResponse.data.items[0].snippet.title;
+                latestVideoPublishedAt =
+                    videosResponse.data.items[0].snippet.publishedAt;
+
                 const videoResponse = await youtube.videos.list({
                     part: 'statistics',
                     id: videoId,
@@ -73,7 +89,9 @@ module.exports = {
 
                 if (videoResponse.data.items.length > 0) {
                     const videoStats = videoResponse.data.items[0].statistics;
-                    likeCount = videoStats.likeCount || 'N/A';
+                    latestVideoViews = videoStats.viewCount || 'N/A';
+                    latestVideoLikes = videoStats.likeCount || 'N/A';
+                    latestVideoComments = videoStats.commentCount || 'N/A';
                 }
             }
 
@@ -86,15 +104,43 @@ module.exports = {
                 },
                 fields: [
                     {
+                        name: 'Channel Created',
+                        value: new Date(publishedAt).toDateString(),
+                        inline: true,
+                    },
+                    { name: 'Country', value: country || 'N/A', inline: true },
+                    {
                         name: 'Subscribers',
-                        value: subscriberCount,
+                        value: hiddenSubscriberCount
+                            ? 'Hidden'
+                            : subscriberCount,
                         inline: true,
                     },
                     { name: 'Total Views', value: viewCount, inline: true },
                     { name: 'Video Count', value: videoCount, inline: true },
                     {
-                        name: 'Latest Video Likes',
-                        value: likeCount,
+                        name: 'Keywords',
+                        value: keywords
+                            ? keywords.join(', ').substring(0, 1024)
+                            : 'N/A',
+                    },
+                    {
+                        name: 'Featured Channels',
+                        value: featuredChannelsUrls
+                            ? featuredChannelsUrls.join(', ')
+                            : 'None',
+                    },
+                    { name: 'Latest Video', value: latestVideoTitle },
+                    {
+                        name: 'Published',
+                        value: new Date(latestVideoPublishedAt).toDateString(),
+                        inline: true,
+                    },
+                    { name: 'Views', value: latestVideoViews, inline: true },
+                    { name: 'Likes', value: latestVideoLikes, inline: true },
+                    {
+                        name: 'Comments',
+                        value: latestVideoComments,
                         inline: true,
                     },
                 ],
