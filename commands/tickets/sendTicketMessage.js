@@ -74,7 +74,6 @@ module.exports = {
             .setDescription(description);
 
         try {
-            await interaction.deferReply({ ephemeral: true }); // For responsiveness
             await channel.send({ embeds: [embed], components: [ticketRow] });
             await interaction.followUp({
                 content: 'Ticket message sent!',

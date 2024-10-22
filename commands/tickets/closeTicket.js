@@ -30,7 +30,7 @@ module.exports = {
             interaction.options.getString('reason') ?? 'No reason provided';
 
         if (!interaction.channel.name.startsWith('ticket-')) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'This command can only be used in ticket channels.',
                 ephemeral: true,
             });
@@ -57,7 +57,7 @@ module.exports = {
                 });
             }
 
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Ticket closed successfully.`,
                 ephemeral: true,
             });
@@ -65,14 +65,14 @@ module.exports = {
         } catch (error) {
             console.error('Error closing ticket channel:', error.message);
             if (error.message.includes('Cannot send messages')) {
-                interaction.reply({
+                interaction.editReply({
                     content:
                         'I cannot send messages to that user as their DMs are turned off.',
                     ephemeral: true,
                 });
                 return;
             } else {
-                interaction.reply({
+                interaction.editReply({
                     content: 'An error occurred while closing the ticket.',
                     ephemeral: true,
                 });
