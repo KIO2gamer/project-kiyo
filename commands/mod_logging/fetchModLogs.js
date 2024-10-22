@@ -20,19 +20,19 @@ const ACTION_CHOICES = [
 module.exports = {
     description_full:
         'Displays the moderation logs with various filtering options.',
-    usage: '/logs [limit] [user] [lognumber] [logrange] [action] [moderator]',
+    usage: '/mod_logs [limit] [user] [lognumber] [logrange] [action] [moderator]',
     examples: [
-        '/logs',
-        '/logs limit:10',
-        '/logs user:@user123',
-        '/logs lognumber:5',
-        '/logs logrange:1-5',
-        '/logs action:ban',
-        '/logs moderator:@mod456',
+        '/mod_logs',
+        '/mod_logs limit:10',
+        '/mod_logs user:@user123',
+        '/mod_logs lognumber:5',
+        '/mod_logs logrange:1-5',
+        '/mod_logs action:ban',
+        '/mod_logs moderator:@mod456',
     ],
     category: 'mod_logging',
     data: new SlashCommandBuilder()
-        .setName('logs')
+        .setName('mod_logs')
         .setDescription('Show the moderation logs.')
         .addIntegerOption((option) =>
             option
