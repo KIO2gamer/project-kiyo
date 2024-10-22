@@ -6,6 +6,11 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear_history')
         .setDescription('Clears your AI chat history'),
+    description_full:
+        'Deletes all your previous chat interactions with the AI assistant, giving you a fresh start. This action cannot be undone.',
+    category: 'AI_Services',
+    usage: '/clear_history',
+    examples: ['/clear_history'],
 
     async execute(interaction) {
         try {

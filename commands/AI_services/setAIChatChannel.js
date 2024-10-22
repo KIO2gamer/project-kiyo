@@ -12,6 +12,15 @@ module.exports = {
                 .setDescription('The channel to set for AI chat')
                 .setRequired(true),
         ),
+    description_full:
+        'Sets a specific channel where users can interact with the AI chatbot. This helps keep AI conversations organized in a dedicated channel.',
+    category: 'AI_services',
+    usage: '/set_ai_chat_channel #channel',
+    examples: [
+        '/set_ai_chat_channel #ai-chat',
+        '/set_ai_chat_channel #bot-commands',
+        '/set_ai_chat_channel #chatbot',
+    ],
 
     async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
