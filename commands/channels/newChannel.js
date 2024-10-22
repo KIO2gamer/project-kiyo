@@ -81,12 +81,12 @@ module.exports = {
                 )
                 .setTimestamp();
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
             handleError(
                 interaction,
                 error,
-                await interaction.reply({
+                await interaction.editReply({
                     content: 'An error occurred while creating the channel.',
                     ephemeral: true,
                 }),
