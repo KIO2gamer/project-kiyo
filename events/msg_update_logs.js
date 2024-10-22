@@ -7,27 +7,51 @@ module.exports = {
         console.log('Event triggered: MessageUpdate');
         if (newMessage.author.bot) return;
 
+        // Handle partial messages
+        if (oldMessage.partial || newMessage.partial) {
+            console.error(
+                'One or both messages are partial, unable to fetch content.',
+            );
+            try {
+                await oldMessage.fetch();
+                await newMessage.fetch();
+                console.log('Fetched full messages after partial detection.');
+            } catch (err) {
+                console.error('Error fetching partial messages:', err);
+                return;
+            }
+        }
+
         try {
             // Fetch the log channel ID from the database
             const config = await MsgLogsConfig.findOne();
-            console.log('Config fetched:', config);
-            const logChannelId = config ? config.channelId : null;
-
-            // Check if the log channel ID is set
+            if (!config) {
+                console.error('No configuration found in the database.');
+                return;
+            }
+            const logChannelId = config.channelId;
             if (!logChannelId) {
-                console.error('Log channel not set.');
+                console.error('Log channel ID is not set.');
                 return;
             }
 
-            console.log('Fetching log channel with ID:', logChannelId);
             const logChannel =
                 await newMessage.guild.channels.fetch(logChannelId);
             if (!logChannel) {
-                console.error('Log channel not found.');
+                console.error(`Log channel with ID ${logChannelId} not found.`);
                 return;
             }
-            console.log('Log channel fetched successfully');
+            const botMember = await newMessage.guild.members.fetch(
+                newMessage.client.user.id,
+            );
+            if (!botMember.permissionsIn(logChannel).has('SEND_MESSAGES')) {
+                console.error(
+                    `Bot doesn't have permission to send messages to the channel: ${logChannelId}`,
+                );
+                return;
+            }
 
+            // Log Embed creation
             const logEmbed = {
                 color: 0x0099ff,
                 title: 'Message Updated',
@@ -57,6 +81,7 @@ module.exports = {
                 },
             );
 
+            // Handle attachments
             if (newMessage.attachments.size > 0) {
                 console.log('Attachments found:', newMessage.attachments.size);
                 logEmbed.fields.push({
@@ -65,8 +90,7 @@ module.exports = {
                 });
             }
 
-            // Fetch audit logs
-            console.log('Fetching audit logs');
+            // Fetch audit logs to determine who updated the message
             const auditLogs = await newMessage.guild.fetchAuditLogs({
                 type: AuditLogEvent.MessageUpdate,
                 limit: 1,
@@ -74,16 +98,20 @@ module.exports = {
 
             const auditEntry = auditLogs.entries.first();
             if (auditEntry && auditEntry.target.id === newMessage.author.id) {
-                console.log('Audit log entry found:', auditEntry.executor.tag);
-                logEmbed.fields.push({
-                    name: 'Audit Log',
-                    value: `Executor: ${auditEntry.executor.tag} (${auditEntry.executor.id})`,
-                });
+                const timeDifference = Date.now() - auditEntry.createdTimestamp;
+                if (timeDifference < 5000) {
+                    logEmbed.fields.push({
+                        name: 'Audit Log',
+                        value: `Executor: ${auditEntry.executor.tag} (${auditEntry.executor.id})`,
+                    });
+                } else {
+                    console.log('Audit log entry is too old.');
+                }
             } else {
-                console.log('No matching audit log entry found');
+                console.log('No matching audit log entry found.');
             }
 
-            console.log('Sending log embed to channel');
+            // Send the log to the log channel
             await logChannel.send({ embeds: [logEmbed] });
             console.log('Log embed sent successfully');
         } catch (error) {
