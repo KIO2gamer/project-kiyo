@@ -12,6 +12,17 @@ module.exports = {
                 .setRequired(true),
         ),
 
+    description_full:
+        "Ask any question to Google's Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.",
+    category: 'AI_Services',
+    usage: '/ask_gemini <question>',
+    examples: [
+        '/ask_gemini What is quantum computing?',
+        '/ask_gemini How do I make chocolate chip cookies?',
+        '/ask_gemini Explain the theory of relativity',
+        '/ask_gemini Write a poem about spring',
+    ],
+
     async execute(interaction) {
         const question = interaction.options.getString('question');
 
