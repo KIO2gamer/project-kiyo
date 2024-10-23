@@ -4,7 +4,6 @@ const {
     HarmBlockThreshold,
     HarmCategory,
 } = require('@google/generative-ai');
-const fetch = require('node-fetch');
 const ChatHistory = require('./../bot_utils/ChatHistory');
 const { handleError } = require('../bot_utils/errorHandler');
 const AIChatChannel = require('./../bot_utils/AIChatChannel');

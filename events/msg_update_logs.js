@@ -4,7 +4,6 @@ const MsgLogsConfig = require('../bot_utils/msgLogsConfig');
 module.exports = {
     name: Events.MessageUpdate,
     async execute(oldMessage, newMessage) {
-        console.log('Event triggered: MessageUpdate');
         if (newMessage.author.bot) return;
 
         // Handle partial messages
@@ -15,7 +14,6 @@ module.exports = {
             try {
                 await oldMessage.fetch();
                 await newMessage.fetch();
-                console.log('Fetched full messages after partial detection.');
             } catch (err) {
                 console.error('Error fetching partial messages:', err);
                 return;
@@ -68,8 +66,6 @@ module.exports = {
                 timestamp: new Date(),
             };
 
-            console.log('Message updated. Old content:', oldMessage.content);
-            console.log('New content:', newMessage.content);
             logEmbed.fields.push(
                 {
                     name: 'Old Content',
@@ -83,7 +79,6 @@ module.exports = {
 
             // Handle attachments
             if (newMessage.attachments.size > 0) {
-                console.log('Attachments found:', newMessage.attachments.size);
                 logEmbed.fields.push({
                     name: 'Attachments',
                     value: newMessage.attachments.map((a) => a.url).join('\n'),
@@ -104,16 +99,11 @@ module.exports = {
                         name: 'Audit Log',
                         value: `Executor: ${auditEntry.executor.tag} (${auditEntry.executor.id})`,
                     });
-                } else {
-                    console.log('Audit log entry is too old.');
                 }
-            } else {
-                console.log('No matching audit log entry found.');
             }
 
             // Send the log to the log channel
             await logChannel.send({ embeds: [logEmbed] });
-            console.log('Log embed sent successfully');
         } catch (error) {
             console.error('Error in MessageUpdate event:', error);
         }

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
@@ -14,9 +14,9 @@ module.exports = {
             option
                 .setName('emoji')
                 .setDescription(
-                    'The name of the emoji (must be in the server/guild) to get information about',
+                    'The name of the emoji (must be in the server/guild) to get information about'
                 )
-                .setRequired(false),
+                .setRequired(false)
         ),
     async execute(interaction) {
         const emojiName = interaction.options.getString('emoji');
@@ -34,7 +34,7 @@ module.exports = {
         }
 
         const emoji = interaction.guild.emojis.cache.find(
-            (e) => e.name === emojiName,
+            (e) => e.name === emojiName
         );
 
         if (!emoji) {
@@ -57,7 +57,7 @@ module.exports = {
                     name: 'Emoji Animated',
                     value: emoji.animated ? 'Yes' : 'No',
                     inline: true,
-                },
+                }
             );
 
         await interaction.reply({ embeds: [embed] });

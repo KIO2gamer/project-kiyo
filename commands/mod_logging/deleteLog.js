@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const moderationLogs = require('../../bot_utils/moderationLogs');
 
 module.exports = {
@@ -14,15 +14,15 @@ module.exports = {
             option
                 .setName('lognumber')
                 .setDescription('The log number to delete')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addStringOption((option) =>
             option
                 .setName('logrange')
                 .setDescription(
-                    'The range of log numbers to delete (e.g., 1-5)',
+                    'The range of log numbers to delete (e.g., 1-5)'
                 )
-                .setRequired(false),
+                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -31,7 +31,7 @@ module.exports = {
 
         if (!logNumber && !logRange) {
             await interaction.reply(
-                'Please provide either a log number or a range of log numbers to delete.',
+                'Please provide either a log number or a range of log numbers to delete.'
             );
             return;
         }
@@ -44,11 +44,11 @@ module.exports = {
 
                 if (log) {
                     await interaction.reply(
-                        `Successfully deleted log #${logNumber}.`,
+                        `Successfully deleted log #${logNumber}.`
                     );
                 } else {
                     await interaction.reply(
-                        `No log found with log number ${logNumber}.`,
+                        `No log found with log number ${logNumber}.`
                     );
                 }
             } else if (logRange) {
@@ -58,7 +58,7 @@ module.exports = {
 
                 if (isNaN(start) || isNaN(end)) {
                     await interaction.reply(
-                        'Invalid log range. Please provide a valid range (e.g., 1-5).',
+                        'Invalid log range. Please provide a valid range (e.g., 1-5).'
                     );
                     return;
                 }
@@ -69,18 +69,18 @@ module.exports = {
 
                 if (deletedLogs.deletedCount > 0) {
                     await interaction.reply(
-                        `Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,
+                        `Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`
                     );
                 } else {
                     await interaction.reply(
-                        `No logs found in the range #${start}-#${end}.`,
+                        `No logs found in the range #${start}-#${end}.`
                     );
                 }
             }
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'Failed to delete the log(s). Please try again later.',
+                'Failed to delete the log(s). Please try again later.'
             );
         }
     },
