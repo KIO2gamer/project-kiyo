@@ -34,18 +34,20 @@ const client = new Client({
 
 client.commands = new Collection();
 
+// Function to recursively load files in sub-categories as well
 const loadFiles = (dir, fileAction) => {
     fs.readdirSync(dir).forEach((file) => {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
         if (stat.isDirectory()) {
-            loadFiles(filePath, fileAction);
+            loadFiles(filePath, fileAction); // Recursively go into subfolders
         } else if (file.endsWith('.js')) {
             fileAction(filePath);
         }
     });
 };
 
+// Function to load commands from all sub-categories
 const loadCommands = (dir) => {
     console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...'); // Yellow color for command loading
     loadFiles(dir, (filePath) => {
@@ -61,10 +63,11 @@ const loadCommands = (dir) => {
     });
     console.log(
         '\x1b[32m%s\x1b[0m',
-        '[COMMANDS] All Commands Loaded Successfully!!!',
+        '[COMMANDS] All Commands Loaded Successfully!!!'
     ); // Green color for success
 };
 
+// Function to load events
 const loadEvents = (dir) => {
     console.log('\x1b[33m%s\x1b[0m', '[EVENTS] Loading events...'); // Yellow color for event loading
     loadFiles(dir, (filePath) => {
@@ -77,9 +80,11 @@ const loadEvents = (dir) => {
     console.log('\x1b[32m%s\x1b[0m', '[EVENTS] Events loaded successfully!!!'); // Green color for success
 };
 
-loadCommands(path.join(__dirname, 'commands'));
-loadEvents(path.join(__dirname, 'events'));
+// Load commands and events from their respective directories
+loadCommands(path.join(__dirname, 'commands')); // Recursively loads commands from all sub-categories
+loadEvents(path.join(__dirname, 'events')); // Loads all events
 
+// Function to connect to MongoDB
 const connectToMongoDB = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...'); // Yellow color for connection attempt
     try {
@@ -89,12 +94,13 @@ const connectToMongoDB = async () => {
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[DATABASE] MongoDB connection failed: ${error.message}`,
+            `[DATABASE] MongoDB connection failed: ${error.message}`
         ); // Red color for error
         process.exit(1);
     }
 };
 
+// Deploy commands to Discord API
 const deployCommands = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
     const commands = [];
@@ -112,17 +118,17 @@ const deployCommands = async () => {
             try {
                 const result = await rest.put(
                     Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-                    { body: commands },
+                    { body: commands }
                 );
                 console.log(
                     '\x1b[32m%s\x1b[0m',
-                    `[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`,
+                    `[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`
                 ); // Green color for success
             } catch (error) {
                 console.error(
                     '\x1b[31m%s\x1b[0m',
                     `[DEPLOY] Failed to deploy commands to guild ${guildId}:`,
-                    error,
+                    error
                 ); // Red color for error
             }
         }
@@ -130,11 +136,12 @@ const deployCommands = async () => {
         console.error(
             '\x1b[31m%s\x1b[0m',
             '[DEPLOY] Command deployment failed:',
-            error,
+            error
         ); // Red color for error
     }
 };
 
+// Set bot's Rich Presence
 const setRichPresence = () => {
     client.user.setPresence({
         activities: [
@@ -160,6 +167,7 @@ const setRichPresence = () => {
     console.log('\x1b[32m%s\x1b[0m', '[BOT] Rich Presence set successfully'); // Green color for success
 };
 
+// Graceful shutdown
 process.on('SIGINT', async () => {
     console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...'); // Cyan color for shutdown message
     await mongoose.connection.close();
@@ -167,6 +175,7 @@ process.on('SIGINT', async () => {
     process.exit(0);
 });
 
+// Initialize the bot
 (async () => {
     try {
         await connectToMongoDB();
@@ -177,7 +186,7 @@ process.on('SIGINT', async () => {
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[BOT] Failed to start the bot: ${error.message}`,
+            `[BOT] Failed to start the bot: ${error.message}`
         ); // Red color for error
         process.exit(1);
     }
