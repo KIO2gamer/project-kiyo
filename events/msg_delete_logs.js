@@ -4,8 +4,6 @@ const MsgLogsConfig = require('../bot_utils/msgLogsConfig');
 module.exports = {
     name: Events.MessageDelete,
     async execute(message) {
-        console.log('Event triggered: MessageDelete');
-
         // Check if the message author exists and it's not a bot
         if (!message.author && message.partial) {
             console.error(
@@ -84,16 +82,11 @@ module.exports = {
                         name: 'Audit Log',
                         value: `Executor: ${auditEntry.executor.tag} (${auditEntry.executor.id})`,
                     });
-                } else {
-                    console.log('Audit log entry is too old.');
                 }
-            } else {
-                console.log('No matching audit log entry found.');
             }
 
             // Send the log to the log channel
             await logChannel.send({ embeds: [logEmbed] });
-            console.log('Log embed sent successfully');
         } catch (error) {
             console.error('Error in MessageDelete event:', error);
         }

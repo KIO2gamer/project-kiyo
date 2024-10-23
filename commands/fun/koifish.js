@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     description_full:
@@ -10,7 +10,7 @@ module.exports = {
 
     async execute(interaction) {
         interaction.reply(
-            `https://tenor.com/view/schizoaz-lil-koi-big-nuts-lil-gif-18596477`,
+            `https://tenor.com/view/schizoaz-lil-koi-big-nuts-lil-gif-18596477`
         );
     },
 };
