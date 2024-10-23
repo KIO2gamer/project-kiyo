@@ -28,7 +28,11 @@ module.exports = {
 
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-1.5-flash',
+                systemInstruction:
+                    'You are a helpful assistant and your answers are concise and to the point.',
+            });
 
             const result = await model.generateContent(question);
             const response = await result.response;
