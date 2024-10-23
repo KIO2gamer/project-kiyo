@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const cc = require('../bot_utils/customCommands');
-const { handleError } = require('../bot_utils/errorHandler');
+const cc = require('../../bot_utils/customCommands');
+const { handleError } = require('../../bot_utils/errorHandler');
 
 module.exports = {
     data: new SlashCommandBuilder()
