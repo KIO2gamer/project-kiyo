@@ -1,6 +1,6 @@
 // commands/moderation/editlog.js
 const { SlashCommandBuilder } = require('discord.js');
-const moderationLogs = require('../bot_utils/moderationLogs');
+const moderationLogs = require('./../../bot_utils/moderationLogs');
 
 module.exports = {
     description_full:
@@ -10,7 +10,7 @@ module.exports = {
         '/edit_reason reason:"Spamming" lognumber:5',
         '/edit_reason reason:"Inappropriate behavior" logrange:10-15',
     ],
-    category: 'mod_logging',
+    category: 'moderation',
     data: new SlashCommandBuilder()
         .setName('edit_reason')
         .setDescription(

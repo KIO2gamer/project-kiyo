@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
-const AIChatChannel = require('../bot_utils/AIChatChannel');
+const { handleError } = require('./../../bot_utils/errorHandler');
+const AIChatChannel = require('./../../bot_utils/AIChatChannel');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,7 +14,7 @@ module.exports = {
         ),
     description_full:
         'Sets a specific channel where users can interact with the AI chatbot. This helps keep AI conversations organized in a dedicated channel.',
-    category: 'AI_services',
+    category: 'setup',
     usage: '/set_ai_chat_channel #channel',
     examples: [
         '/set_ai_chat_channel #ai-chat',

@@ -4,7 +4,7 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
+const { handleError } = require('./../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
@@ -15,7 +15,7 @@ module.exports = {
         '/lock channel:announcement_channel', // Locks the "announcement_channel" channel
         '/lock', // Locks the current channel where the command is used
     ],
-    category: 'channels',
+    category: 'moderation',
     data: new SlashCommandBuilder()
         .setName('lock')
         .setDescription('Lock a channel')

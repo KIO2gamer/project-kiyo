@@ -7,7 +7,7 @@ module.exports = {
         'Fetches and displays the current weather for a given city using the WeatherAPI. Information includes temperature, feels like temperature, humidity, wind, pressure, UV index, and more.',
     usage: '/weather <city>',
     examples: ['/weather London', '/weather "New York"'],
-    category: 'info',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('weather')
         .setDescription('Gets the current weather for a specified city')

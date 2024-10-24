@@ -6,7 +6,7 @@ module.exports = {
         'Provides detailed information about a specific role in the server, such as its ID, color, permissions, creation date, and the number of members who have it.',
     usage: '/role_info <role>',
     examples: ['/role_info @Member', '/role_info "Moderator"'],
-    category: 'roles',
+    category: 'info',
     data: new SlashCommandBuilder()
         .setName('role_info')
         .setDescription('Provides information about a specific role')
@@ -14,14 +14,14 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to get information about')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const role = interaction.options.getRole('role');
 
         const permissions = role.permissions.toArray().map((perm) => {
             const permName = Object.keys(PermissionsBitField.Flags).find(
-                (key) => PermissionsBitField.Flags[key] === perm,
+                (key) => PermissionsBitField.Flags[key] === perm
             );
             return permName ? permName.replace(/_/g, ' ').toLowerCase() : perm;
         });
@@ -48,7 +48,7 @@ module.exports = {
                     name: 'Number of Members with Role',
                     value: role.members.size.toString(),
                     inline: true,
-                },
+                }
             );
 
         await interaction.reply({ embeds: [embed] });

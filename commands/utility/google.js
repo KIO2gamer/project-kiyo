@@ -9,7 +9,7 @@ module.exports = {
         '/google discord bot tutorial',
         '/google best restaurants near me',
     ],
-    category: 'google_services',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('google')
         .setDescription('Search Google for a query')
@@ -17,7 +17,7 @@ module.exports = {
             option
                 .setName('query')
                 .setDescription('The search query')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -43,7 +43,7 @@ module.exports = {
                         cx: searchEngineId,
                         q: query,
                     },
-                },
+                }
             );
 
             const results = response.data.items.slice(0, 5); // Show top 3 results
@@ -62,7 +62,10 @@ module.exports = {
             results.forEach((item, index) => {
                 embed.addFields({
                     name: `${index + 1}. ${item.title}`,
-                    value: `${item.link}\n${item.snippet.replace(/(\r\n|\n|\r)/gm, '')}`, // Remove line breaks from snippet
+                    value: `${item.link}\n${item.snippet.replace(
+                        /(\r\n|\n|\r)/gm,
+                        ''
+                    )}`, // Remove line breaks from snippet
                 });
             });
 

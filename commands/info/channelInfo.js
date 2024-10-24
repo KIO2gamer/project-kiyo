@@ -3,8 +3,8 @@ const {
     EmbedBuilder,
     PermissionsBitField,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
-const { getChannelType } = require('../bot_utils/channelTypes');
+const { handleError } = require('./../../bot_utils/errorHandler');
+const { getChannelType } = require('./../../bot_utils/channelTypes');
 
 module.exports = {
     description_full:
@@ -14,7 +14,7 @@ module.exports = {
         '/channel_info #general',
         '/channel_info 123456789012345678 (channel ID)',
     ],
-    category: 'channels',
+    category: 'info',
     data: new SlashCommandBuilder()
         .setName('channel_info')
         .setDescription('Provides information about a specific channel')

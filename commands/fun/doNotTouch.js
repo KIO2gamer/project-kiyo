@@ -10,7 +10,7 @@ module.exports = {
         'WARNING: This command initiates a critical system override. Proceed with extreme caution. Improper handling may result in irreversible consequences.',
     usage: '/system_override',
     examples: ['/system_override'],
-    category: 'system',
+    category: 'fun',
     data: new SlashCommandBuilder()
         .setName('system_override')
         .setDescription('CRITICAL: Initiate system override protocol.'),
@@ -24,7 +24,7 @@ module.exports = {
             new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel('Confirm Override')
-                .setStyle(ButtonStyle.Danger),
+                .setStyle(ButtonStyle.Danger)
         );
 
         await interaction.editReply({

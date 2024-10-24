@@ -5,7 +5,7 @@ module.exports = {
         "Measures the bot's response time (latency) and displays its uptime (how long it's been running).",
     usage: '/ping',
     examples: ['/ping'],
-    category: 'utility',
+    category: 'info',
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription("Checks the bot's response time"),
@@ -28,7 +28,7 @@ module.exports = {
                     name: 'WebSocket Ping',
                     value: `${interaction.client.ws.ping}ms`,
                     inline: true,
-                },
+                }
             )
             .setTimestamp();
 

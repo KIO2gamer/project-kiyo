@@ -3,14 +3,14 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const TicketConfig = require('../bot_utils/ticketConfig');
+const TicketConfig = require('./../../bot_utils/ticketConfig');
 
 module.exports = {
     description_full:
         'Sets the category where new ticket channels will be created. Requires the "Administrator" permission.',
     usage: '/set_ticket_category <category:category>',
     examples: ['/set_ticket_category category:Tickets'],
-    category: 'tickets',
+    category: 'setup',
     data: new SlashCommandBuilder()
         .setName('set_ticket_category')
         .setDescription('Sets the category where tickets will be created.')

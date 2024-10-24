@@ -3,14 +3,14 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const MsgLogsConfig = require('../bot_utils/msgLogsConfig');
+const MsgLogsConfig = require('./../../bot_utils/msgLogsConfig');
 
 module.exports = {
     description_full:
         'Sets the channel where message logs will be sent. Requires the "Administrator" permission.',
     usage: '/set_msg_logs_channel <channel:channel>',
     examples: ['/set_msg_logs_channel channel:#message-logs'],
-    category: 'configuration',
+    category: 'setup',
     data: new SlashCommandBuilder()
         .setName('set_msg_logs_channel')
         .setDescription(

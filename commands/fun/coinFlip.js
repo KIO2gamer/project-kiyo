@@ -5,7 +5,7 @@ module.exports = {
         'The bot virtually flips a coin and reveals the result (Heads or Tails). You can also bet on the outcome!',
     usage: '/coin_flip [bet]',
     examples: ['/coin_flip', '/coin_flip heads', '/coin_flip tails'],
-    category: 'games',
+    category: 'fun',
     data: new SlashCommandBuilder()
         .setName('coin_flip')
         .setDescription('Flip a coin and bet on the outcome!')
@@ -16,8 +16,8 @@ module.exports = {
                 .setRequired(false)
                 .addChoices(
                     { name: 'Heads', value: 'heads' },
-                    { name: 'Tails', value: 'tails' },
-                ),
+                    { name: 'Tails', value: 'tails' }
+                )
         ),
     async execute(interaction) {
         const bet = interaction.options.getString('bet')?.toLowerCase();
@@ -29,7 +29,9 @@ module.exports = {
             imageMedia = 'https://i.imgur.com/u1pmQMV.png';
         }
 
-        let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)}**!`;
+        let description = `The coin landed on **${
+            result.charAt(0).toUpperCase() + result.slice(1)
+        }**!`;
 
         if (bet) {
             if (bet === result) {

@@ -3,7 +3,7 @@ const {
     PermissionFlagsBits,
     EmbedBuilder,
 } = require('discord.js');
-const moderationLogs = require('../bot_utils/moderationLogs');
+const moderationLogs = require('./../../bot_utils/moderationLogs');
 
 function createErrorEmbed(title, description, interaction) {
     return new EmbedBuilder()

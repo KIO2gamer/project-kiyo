@@ -8,7 +8,7 @@ module.exports = {
         .setDescription('Clears your AI chat history'),
     description_full:
         'Deletes all your previous chat interactions with the AI assistant, giving you a fresh start. This action cannot be undone.',
-    category: 'AI_Services',
+    category: 'admin',
     usage: '/clear_history',
     examples: ['/clear_history'],
 
@@ -18,7 +18,7 @@ module.exports = {
             await ChatHistory.findOneAndDelete({ userId: interaction.user.id });
 
             await interaction.editReply(
-                'Your AI chat history has been cleared.',
+                'Your AI chat history has been cleared.'
             );
         } catch (error) {
             await handleError(interaction, error);

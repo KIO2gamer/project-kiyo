@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
-const { handleError } = require('../bot_utils/errorHandler'); // Import errorHandler
+const { handleError } = require('./../../bot_utils/errorHandler'); // Import errorHandler
 
 module.exports = {
     category: 'utility',
@@ -11,7 +11,7 @@ module.exports = {
             option
                 .setName('word')
                 .setDescription('The word to look up')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -41,7 +41,7 @@ module.exports = {
                 await interaction.reply({ embeds: [embed] });
             } else {
                 await interaction.reply(
-                    `Sorry, I couldn't find a definition for "${word}".`,
+                    `Sorry, I couldn't find a definition for "${word}".`
                 );
             }
         } catch (error) {

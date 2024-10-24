@@ -9,12 +9,12 @@ module.exports = {
             option
                 .setName('question')
                 .setDescription('The question you want to ask Gemini AI')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     description_full:
         "Ask any question to Google's Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.",
-    category: 'AI_Services',
+    category: 'utility',
     usage: '/ask_gemini <question>',
     examples: [
         '/ask_gemini What is quantum computing?',
@@ -42,7 +42,7 @@ module.exports = {
         } catch (error) {
             console.error('Error in ask-gemini command:', error);
             await interaction.editReply(
-                'Sorry, there was an error processing your request.',
+                'Sorry, there was an error processing your request.'
             );
         }
     },

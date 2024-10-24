@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const OAuthCode = require('../bot_utils/OauthCode');
-const RoleSchema = require('../bot_utils/roleStorage');
+const OAuthCode = require('./../../bot_utils/OauthCode');
+const RoleSchema = require('./../../bot_utils/roleStorage');
 const { google } = require('googleapis');
 
 const youtube = google.youtube({
@@ -13,18 +13,22 @@ module.exports = {
         'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count. If the user has multiple channels, the role will be assigned to the channel with the highest subscriber count.',
     usage: '/get_yt_sub_role',
     examples: ['/get_yt_sub_role'],
-    category: 'google_services',
+    category: 'roles',
     data: new SlashCommandBuilder()
         .setName('get_yt_sub_role')
         .setDescription(
-            'Automatically assign a role based on your channel with the highest subscriber count.',
+            'Automatically assign a role based on your channel with the highest subscriber count.'
         ),
 
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
         try {
             const interactionId = interaction.id; // Use the interaction ID as state
-            const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${interactionId}`;
+            const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${
+                process.env.DISCORD_CLIENT_ID
+            }&redirect_uri=${encodeURIComponent(
+                process.env.DISCORD_REDIRECT_URI
+            )}&response_type=code&scope=identify%20connections&state=${interactionId}`;
 
             const embed = {
                 color: 0x0099ff,
@@ -53,8 +57,9 @@ module.exports = {
                 ephemeral: true,
             });
 
-            const oauthData =
-                await getAuthorizationDataFromMongoDB(interactionId);
+            const oauthData = await getAuthorizationDataFromMongoDB(
+                interactionId
+            );
             if (
                 !oauthData.youtubeConnections ||
                 oauthData.youtubeConnections.length === 0
@@ -86,14 +91,14 @@ module.exports = {
 
             // Fetch subscriber counts for all YouTube connections and find the one with the highest count
             const highestSubscriberData = await getHighestSubscriberCount(
-                oauthData.youtubeConnections,
+                oauthData.youtubeConnections
             );
             const { youtubeChannelId, subscriberCount } = highestSubscriberData;
 
             if (subscriberCount !== null) {
                 const assignedRole = await assignSubscriberRole(
                     interaction.member,
-                    subscriberCount,
+                    subscriberCount
                 );
                 const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
                 const embed = {
@@ -130,7 +135,7 @@ module.exports = {
                 throw new Error('Failed to retrieve YouTube subscriber count.');
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
             const errorEmbed = {
                 color: 0xff0000,
                 title: '❌ Oops! Something went wrong',
