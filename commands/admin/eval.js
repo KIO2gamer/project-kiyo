@@ -17,7 +17,7 @@ module.exports = {
         'Evaluates provided JavaScript code. WARNING: This command is extremely dangerous and should only be used for debugging in a controlled environment. Never use it in a production bot.',
     usage: '/eval <code>',
     examples: ['/eval 2 + 2', '/eval interaction.guild.name'],
-    category: 'dev',
+    category: 'admin',
     data: new SlashCommandBuilder()
         .setName('eval')
         .setDescription('Evaluates JavaScript code.')
@@ -25,17 +25,17 @@ module.exports = {
             option
                 .setName('code')
                 .setDescription('The code to evaluate')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         // Check if the user has permission to use this command
         if (
             !allowedUsers.includes(interaction.user.id) &&
             !interaction.member.roles.cache.some((role) =>
-                allowedRoles.includes(role.id),
+                allowedRoles.includes(role.id)
             )
         ) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'You do not have permission to use this command.',
                 ephemeral: true,
             });
@@ -48,9 +48,9 @@ module.exports = {
             if (typeof result !== 'string') {
                 output = require('util').inspect(result);
             }
-            await interaction.reply(`\`\`\`js\n${output}\n\`\`\``);
+            await interaction.editReply(`\`\`\`js\n${output}\n\`\`\``);
         } catch (error) {
-            await interaction.reply(`\`\`\`js\n${error}\n\`\`\``);
+            await interaction.editReply(`\`\`\`js\n${error}\n\`\`\``);
         }
     },
 };

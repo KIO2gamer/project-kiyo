@@ -15,7 +15,7 @@ module.exports = {
         'Generates a random color and displays it along with its hexadecimal code.',
     usage: '/random_color',
     examples: ['/random_color'],
-    category: 'utility',
+    category: 'fun',
     data: new SlashCommandBuilder()
         .setName('random_color')
         .setDescription('Get a random color'),
@@ -29,7 +29,7 @@ module.exports = {
             .setColor(`#${randomHex}`)
             .setTitle('Random Color!')
             .setDescription(
-                `**Here is your random hex color code:** \n \`#${randomHex}\``,
+                `**Here is your random hex color code:** \n \`#${randomHex}\``
             )
             .setThumbnail(`https://www.colorhexa.com/${randomHex}.png`);
         await interaction.reply({ embeds: [embed], ephemeral: true });

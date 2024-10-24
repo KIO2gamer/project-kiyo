@@ -15,7 +15,7 @@ module.exports = {
         '/create_poll question:"What is your favorite color?" options:"Red,Blue,Green" multi_select:false duration:1',
         '/create_poll question:"Which games do you like?" options:"Minecraft,Fortnite,Valorant" multi_select:true duration:24',
     ],
-    category: 'polls',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('create_poll')
         .setDescription('Create a poll')

@@ -4,7 +4,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
+const { handleError } = require('./../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
@@ -14,7 +14,7 @@ module.exports = {
         '/echo input:"Hello there!" channel:#general',
         '/echo input:"Important announcement!" channel:#announcements embed:true',
     ],
-    category: 'dev',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('echo')
         .setDescription('Replies with your input!')

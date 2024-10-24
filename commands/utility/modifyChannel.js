@@ -3,7 +3,7 @@ const {
     PermissionsBitField,
     ChannelType,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler.js');
+const { handleError } = require('./../../bot_utils/errorHandler.js');
 
 module.exports = {
     description_full:
@@ -21,7 +21,7 @@ module.exports = {
         '/modify_channel voice channel:text_old newname:text_new permissions:Manage Messages toggle:Off role:@everyone', // Disables "Manage Messages" for everyone in a text channel
         '\n',
     ],
-    category: 'channels',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('modify_channel')
         .setDescription('Modify a text or voice channel.')

@@ -6,7 +6,7 @@ const {
     ButtonStyle,
     ComponentType,
 } = require('discord.js');
-const moderationLogs = require('../bot_utils/moderationLogs');
+const moderationLogs = require('./../../bot_utils/moderationLogs');
 
 const ACTION_CHOICES = [
     { name: 'Warn', value: 'warn' },
@@ -30,7 +30,7 @@ module.exports = {
         '/mod_logs action:ban',
         '/mod_logs moderator:@mod456',
     ],
-    category: 'mod_logging',
+    category: 'moderation',
     data: new SlashCommandBuilder()
         .setName('mod_logs')
         .setDescription('Show the moderation logs.')

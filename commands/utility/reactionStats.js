@@ -11,25 +11,25 @@ module.exports = {
         '/reaction_stats #general 7d',
         '/reaction_stats 1M',
     ],
-    category: 'info',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('reaction_stats')
         .setDescription(
-            'Displays statistics on reactions given in a specific channel or server-wide.',
+            'Displays statistics on reactions given in a specific channel or server-wide.'
         )
         .addChannelOption((option) =>
             option
                 .setName('channel')
                 .setDescription(
-                    'The channel to get reaction stats from (optional)',
+                    'The channel to get reaction stats from (optional)'
                 )
-                .setRequired(false),
+                .setRequired(false)
         )
         .addStringOption((option) =>
             option
                 .setName('timeframe')
                 .setDescription(
-                    'The timeframe to get stats for (e.g., "24h", "7d", "1M")',
+                    'The timeframe to get stats for (e.g., "24h", "7d", "1M")'
                 )
                 .setRequired(false)
                 .addChoices(
@@ -37,8 +37,8 @@ module.exports = {
                     { name: 'Last 7 Days', value: '7d' },
                     { name: 'Last 30 Days', value: '30d' }, // Added more timeframe options
                     { name: 'Last Month', value: '1M' }, // Use moment.js shorthand for months
-                    { name: 'All Time', value: 'all' },
-                ),
+                    { name: 'All Time', value: 'all' }
+                )
         ),
 
     async execute(interaction) {
@@ -90,7 +90,7 @@ module.exports = {
             ); // Limit to 10,000 messages for performance
 
             return messages.filter(
-                (msg) => msg.createdAt >= startDate && msg.createdAt <= endDate,
+                (msg) => msg.createdAt >= startDate && msg.createdAt <= endDate
             );
         };
 
@@ -103,12 +103,12 @@ module.exports = {
                 async (acc, ch) => {
                     if (ch.isTextBased()) {
                         return (await acc).concat(
-                            await getMessagesInTimeframe(ch),
+                            await getMessagesInTimeframe(ch)
                         );
                     }
                     return acc;
                 },
-                Promise.resolve([]),
+                Promise.resolve([])
             );
             messages = allMessages;
         }
@@ -141,7 +141,13 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Reaction Stats')
             .setDescription(
-                `Reaction statistics from ${channel ? `<#${channel.id}>` : 'the server'} for the ${timeframe === 'all' ? 'entire server history' : `past ${timeframe}`}`,
+                `Reaction statistics from ${
+                    channel ? `<#${channel.id}>` : 'the server'
+                } for the ${
+                    timeframe === 'all'
+                        ? 'entire server history'
+                        : `past ${timeframe}`
+                }`
             )
             .addFields([
                 {

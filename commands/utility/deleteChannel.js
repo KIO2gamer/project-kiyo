@@ -3,8 +3,8 @@ const {
     PermissionFlagsBits,
     EmbedBuilder,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
-const { getChannelType } = require('../bot_utils/channelTypes');
+const { handleError } = require('./../../bot_utils/errorHandler');
+const { getChannelType } = require('./../../bot_utils/channelTypes');
 
 module.exports = {
     description_full:
@@ -15,7 +15,7 @@ module.exports = {
         '/delete_channel channel:text', // Deletes a channel named "text"
         '/delete_channel channel:voice', // Deletes a channel named "voice"
     ],
-    category: 'channels',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('delete_channel')
         .setDescription('Deletes a specified channel.')

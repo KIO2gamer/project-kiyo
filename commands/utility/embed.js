@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
+const { handleError } = require('./../../bot_utils/errorHandler');
 const { description_full } = require('./imageHeaders');
 
 /**
@@ -23,7 +23,7 @@ module.exports = {
     description_full: 'Posts a pre-formatted embed message.',
     usage: '/embed <type>',
     examples: ['/embed welcome', '/embed booster_perks', '/embed all'],
-    category: 'dev',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('embed')
         .setDescription('Posts a pre-formatted embed message.')

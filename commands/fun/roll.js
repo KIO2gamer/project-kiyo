@@ -5,7 +5,7 @@ module.exports = {
         'This command simulates a dice roll. It uses a random number generator to generate a number between 1 and 6 (inclusive) and displays the corresponding dice face in an embedded message.',
     usage: '/roll',
     examples: ['/roll'],
-    category: 'games',
+    category: 'fun',
     data: new SlashCommandBuilder()
         .setName('roll')
         .setDescription('Roll a dice.'),

@@ -5,7 +5,7 @@ module.exports = {
         'Ends a poll from a specific message, preventing further voting.',
     usage: '/end_poll message_id:"message ID" channel:#channel',
     examples: ['/end_poll message_id:"123456789012345678" channel:#general'],
-    category: 'polls',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('end_poll')
         .setDescription('Ends a poll')
@@ -13,13 +13,13 @@ module.exports = {
             option
                 .setName('message_id')
                 .setDescription('Message ID of the poll')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addChannelOption((option) =>
             option
                 .setName('channel')
                 .setDescription('Channel where the poll is created')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -31,7 +31,7 @@ module.exports = {
             const message = await channel.messages.fetch(messageId);
             if (!message || !message.poll) {
                 return interaction.reply(
-                    'Poll not found or message does not contain a poll.',
+                    'Poll not found or message does not contain a poll.'
                 );
             }
 
@@ -41,7 +41,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'An error occurred while trying to end the poll.',
+                'An error occurred while trying to end the poll.'
             );
         }
     },

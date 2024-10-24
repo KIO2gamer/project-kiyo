@@ -8,32 +8,32 @@ module.exports = {
         '/topic user1:@user123',
         '/topic user1:@user123 user2:@user456 user3:@user789',
     ],
-    category: 'moderation',
+    category: 'utility',
     data: new SlashCommandBuilder()
         .setName('topic')
         .setDescription('Sends a message about changing the topic.')
         .setDefaultMemberPermissions(
             PermissionFlagsBits.BanMembers |
                 PermissionFlagsBits.KickMembers |
-                PermissionFlagsBits.ManageChannels,
+                PermissionFlagsBits.ManageChannels
         )
         .addUserOption((option) =>
             option
                 .setName('user1')
                 .setDescription('The first user to change the topic of.')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addUserOption((option) =>
             option
                 .setName('user2')
                 .setDescription('The second user to change the topic of.')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addUserOption((option) =>
             option
                 .setName('user3')
                 .setDescription('The third user to change the topic of.')
-                .setRequired(false),
+                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -60,7 +60,7 @@ module.exports = {
             ephemeral: true,
         });
         await interaction.channel.send(
-            `${userMentions}\n**Please change the topic immediately. Failing to do so will result in a mute/ban.**`,
+            `${userMentions}\n**Please change the topic immediately. Failing to do so will result in a mute/ban.**`
         );
     },
 };

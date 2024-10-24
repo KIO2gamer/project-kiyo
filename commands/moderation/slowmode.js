@@ -4,7 +4,7 @@ const {
     PermissionFlagsBits,
 } = require('discord.js');
 const ms = require('ms');
-const { handleError } = require('../bot_utils/errorHandler');
+const { handleError } = require('./../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
@@ -14,7 +14,7 @@ module.exports = {
         '/slowmode 10s', // Set slowmode to 10 seconds in the current channel
         '/slowmode 5m #general', // Set slowmode to 5 minutes in the #general channel
     ],
-    category: 'channels',
+    category: 'moderation',
     data: new SlashCommandBuilder()
         .setName('slowmode')
         .setDescription('Set a slowmode for a channel.')

@@ -52,11 +52,15 @@ module.exports = {
             const aiChannelDoc = await AIChatChannel.findOne({
                 guildId: message.guild.id,
             });
-            if (!aiChannelDoc || message.channel.id !== aiChannelDoc.channelId)
+            if (!aiChannelDoc) {
+                await message.reply(
+                    'AI chat channel is not set up. Please use `/set_ai_chat_channel` to configure it first.'
+                );
                 return;
+            }
+            if (message.channel.id !== aiChannelDoc.channelId) return;
 
             const imageAttachment = message.attachments.first();
-
             // Check if an image is attached
             if (imageAttachment) {
                 // Fetch and convert the image to base64
@@ -100,7 +104,7 @@ module.exports = {
             let replyContext = '';
             if (message.reference && message.reference.messageId) {
                 const repliedMessage = await message.channel.messages.fetch(
-                    message.reference.messageId,
+                    message.reference.messageId
                 );
                 if (repliedMessage.author.bot) {
                     replyContext = `The user is replying to this previous message from the bot: "${repliedMessage.content}". `;
@@ -130,7 +134,7 @@ module.exports = {
                 history: geminiConversation,
             });
             const result = await chat.sendMessage(
-                replyContext + message.content,
+                replyContext + message.content
             );
 
             // Get the AI's response
@@ -155,7 +159,7 @@ module.exports = {
             await ChatHistory.findOneAndUpdate(
                 { userId: message.author.id },
                 { userId: message.author.id, messages: conversationHistory },
-                { upsert: true, new: true },
+                { upsert: true, new: true }
             );
 
             // Reply with the AI response

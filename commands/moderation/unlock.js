@@ -4,14 +4,14 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const { handleError } = require('../bot_utils/errorHandler');
+const { handleError } = require('./../../bot_utils/errorHandler');
 
 module.exports = {
     description_full:
         'This command unlocks a specified channel or the current channel if no channel is specified.',
     usage: '/unlock <channel?>',
     examples: ['/unlock', '/unlock #general'],
-    category: 'channels',
+    category: 'moderation',
     data: new SlashCommandBuilder()
         .setName('unlock')
         .setDescription('Unlock a channel')
