@@ -2,226 +2,377 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     ActionRowBuilder,
-    StringSelectMenuBuilder,
     ButtonBuilder,
     ButtonStyle,
 } = require('discord.js');
 
 module.exports = {
-    description_full:
-        'Displays a list of available commands and their descriptions.',
-    usage: '/help [command] [search]',
-    examples: ['/help', '/help ping', '/help search:music'],
-    category: 'info',
     data: new SlashCommandBuilder()
         .setName('help')
-        .setDescription('Get information about available commands')
-        .addStringOption((option) =>
-            option
-                .setName('command')
-                .setDescription('Specific command to get help for')
-                .setRequired(false)
-        )
-        .addStringOption((option) =>
-            option
-                .setName('search')
-                .setDescription('Search term to filter commands')
-                .setRequired(false)
-        ),
+        .setDescription('Shows help menu with guides and commands'),
+    description_full:
+        'Shows an interactive help menu with guides, commands, FAQs and important links. Navigate through different sections using the buttons provided.',
+    usage: '/help',
+    examples: ['/help'],
+    category: 'info',
+
     async execute(interaction) {
-        const commandName = interaction.options.getString('command');
-        const search = interaction.options.getString('search');
-
-        // If a specific command is requested, show that command's help
-        if (commandName) {
-            const command = interaction.client.commands.get(commandName);
-            if (!command) {
-                return interaction.editReply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor('#ff0000')
-                            .setDescription(
-                                `❌ Command \`${commandName}\` not found.`
-                            ),
-                    ],
-                });
-            }
-            const embed = new EmbedBuilder()
-                .setColor('#00ff00')
-                .setTitle(`Command: ${commandName}`)
-                .setDescription(
-                    command.description_full || command.data.description
-                )
-                .addFields(
-                    {
-                        name: '🔧 Usage',
-                        value: `\`${command.usage || command.data.name}\``,
-                    },
-                    ...(command.examples && command.examples.length
-                        ? [
-                              {
-                                  name: '📝 Examples',
-                                  value: `\`\`\`\n${command.examples.join(
-                                      '\n'
-                                  )}\`\`\``,
-                              },
-                          ]
-                        : []),
-                    {
-                        name: '📁 Category',
-                        value: `\`${command.category || 'No category'}\``,
-                    }
-                )
-                .setFooter({ text: 'Tip: Use /help to see all commands' });
-
-            return interaction.editReply({ embeds: [embed] });
-        }
-
-        // If a search term is provided, filter commands and show results
-        if (search) {
-            const commands = interaction.client.commands.filter(
-                (command) =>
-                    command.data.name
-                        .toLowerCase()
-                        .includes(search.toLowerCase()) ||
-                    command.data.description
-                        .toLowerCase()
-                        .includes(search.toLowerCase())
-            );
-            if (commands.size === 0) {
-                return interaction.editReply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setColor('#ff0000')
-                            .setDescription(
-                                `❌ No commands found matching \`${search}\``
-                            ),
-                    ],
-                });
-            }
-            const embed = new EmbedBuilder()
-                .setColor('#00ff00')
-                .setTitle('🔍 Search Results')
-                .setDescription(
-                    commands
-                        .map(
-                            (cmd) =>
-                                `**/${cmd.data.name}**\n└ ${cmd.data.description}`
-                        )
-                        .join('\n\n')
-                )
-                .setFooter({ text: `Found ${commands.size} command(s)` });
-
-            return interaction.editReply({ embeds: [embed] });
-        }
-
-        // Show the main help menu with select menu and buttons
-        const categories = new Map();
-        interaction.client.commands.forEach((command) => {
-            if (!categories.has(command.category)) {
-                categories.set(command.category, []);
-            }
-            categories.get(command.category).push(command);
-        });
-
-        // Create the main help embed
         const helpEmbed = new EmbedBuilder()
-            .setColor('#00ff00')
-            .setTitle('📚 Statbot Help Menu')
+            .setColor('#2F3136')
+            .setTitle('🎮 Interactive Help Menu')
             .setDescription(
-                "This is Statbot's help menu. Use the dropdown below to navigate to the category of your choice."
+                '> Welcome to the interactive help menu! Select a category below to get started!'
             )
+            .addFields(
+                {
+                    name: '📚 Guide',
+                    value: ' started with our comprehensive setup guide',
+                    inline: true,
+                },
+                {
+                    name: '❓ FAQ',
+                    value: ' answers to common questions',
+                    inline: true,
+                },
+                {
+                    name: '🤖 Commands',
+                    value: ' all available bot commands',
+                    inline: true,
+                },
+                {
+                    name: '🔗 Links',
+                    value: ' important resources',
+                    inline: true,
+                }
+            )
+            .setThumbnail(
+                interaction.client.user.displayAvatarURL({
+                    dynamic: true,
+                    size: 256,
+                })
+            )
+            .setTimestamp()
             .setFooter({
-                text: `Total Commands: ${interaction.client.commands.size}`,
+                text: 'Use the buttons below to navigate',
+                iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
             });
 
-        // Create the select menu for categories
-        const options = Array.from(categories.keys()).map((category) => ({
-            label: category
-                ? category.charAt(0).toUpperCase() + category.slice(1)
-                : 'Miscellaneous',
-            description: `Commands related to ${category || 'Misc'}`,
-            value: category || 'miscellaneous',
-            emoji: getCategoryEmoji(category),
-        }));
-
-        const selectMenu = new StringSelectMenuBuilder()
-            .setCustomId('help-menu')
-            .setPlaceholder('Make a selection')
-            .addOptions(options);
-
-        // Add buttons for quick navigation
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('guide')
-                .setLabel('📘 Guide')
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId('commands')
-                .setLabel('⚙️ Commands')
-                .setStyle(ButtonStyle.Secondary),
+                .setLabel('Guide')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('📚'),
             new ButtonBuilder()
                 .setCustomId('faq')
-                .setLabel('❓ FAQs')
-                .setStyle(ButtonStyle.Secondary),
+                .setLabel('FAQ')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('❓'),
             new ButtonBuilder()
-                .setLabel('🔗 Links')
-                .setStyle(ButtonStyle.Link) // Button that links to a URL
-                .setURL('https://example.com') // Replace with actual link, no customId
+                .setCustomId('commands')
+                .setLabel('Commands')
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji('🤖'),
+            new ButtonBuilder()
+                .setLabel('Links')
+                .setStyle(ButtonStyle.Link)
+                .setURL('https://discord.gg/support')
+                .setEmoji('🔗')
         );
 
-        // Send the initial help menu with select menu and buttons
         await interaction.editReply({
             embeds: [helpEmbed],
-            components: [new ActionRowBuilder().addComponents(selectMenu), row],
+            components: [row],
+            ephemeral: true,
         });
 
-        // Handle the selection
-        const filter = (i) =>
-            i.customId === 'help-menu' && i.user.id === interaction.user.id;
+        let activeCollector = true;
+        const filter = (i) => i.user.id === interaction.user.id;
         const collector = interaction.channel.createMessageComponentCollector({
             filter,
-            time: 60000, // Collector time limit (60 seconds)
+            time: 300000,
         });
 
         collector.on('collect', async (i) => {
-            const selectedCategory = i.values[0];
-            const selectedCommands = categories.get(selectedCategory) || [];
+            collector.resetTimer();
+            if (i.customId === 'guide') {
+                const guideEmbed = new EmbedBuilder()
+                    .setColor('#2F3136')
+                    .setTitle('📚 Setup Guide')
+                    .setDescription(
+                        '> Welcome to the comprehensive setup guide! Follow these steps to get started:'
+                    )
+                    .addFields(
+                        {
+                            name: '🔹 1. Initial Setup',
+                            value: '\n+ Invite the bot using the official invite link\n+ Ensure it joins your server successfully',
+                            inline: false,
+                        },
+                        {
+                            name: '🔹 2. Configure Permissions',
+                            value: '\n+ Check bot role permissions\n+ Verify channel access permissions',
+                            inline: false,
+                        },
+                        {
+                            name: '🔹 3. Explore Commands',
+                            value: '\n+ Use /help command\n+ Click on Commands button to view all features',
+                            inline: false,
+                        },
+                        {
+                            name: '🔹 4. Get Support',
+                            value: '\n+ Join our support server\n+ Create a ticket if you need assistance',
+                            inline: false,
+                        }
+                    )
+                    .setThumbnail(
+                        interaction.client.user.displayAvatarURL({
+                            dynamic: true,
+                            size: 256,
+                        })
+                    )
+                    .setTimestamp()
+                    .setFooter({
+                        text: 'Click the back button to return to the main menu',
+                        iconURL: interaction.user.displayAvatarURL({
+                            dynamic: true,
+                        }),
+                    });
 
-            const categoryEmbed = new EmbedBuilder()
-                .setColor('#00ff00')
-                .setTitle(`📂 ${selectedCategory} Commands`)
-                .setDescription(
-                    selectedCommands
-                        .map(
-                            (cmd) =>
-                                `**/${cmd.data.name}**\n└ ${cmd.data.description}`
-                        )
-                        .join('\n\n')
-                )
-                .setFooter({
-                    text: `Category: ${selectedCategory} • Total: ${selectedCommands.length} commands`,
+                const backRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('back')
+                        .setLabel('Back')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('↩️')
+                );
+
+                await i.update({
+                    embeds: [guideEmbed],
+                    components: [backRow],
+                });
+            }
+
+            if (i.customId === 'faq') {
+                const faqEmbed = new EmbedBuilder()
+                    .setColor('#2F3136')
+                    .setTitle('❓ Frequently Asked Questions')
+                    .setDescription(
+                        '> Here are the most common questions and their detailed answers:'
+                    )
+                    .addFields(
+                        {
+                            name: '🔸 How do I invite the bot?',
+                            value: ' can invite the bot through our official invite link available in the support server. Make sure you have the necessary permissions in your server.',
+                            inline: false,
+                        },
+                        {
+                            name: '🔸 Bot not responding?',
+                            value: '\n1. Verify bot permissions\n2. Check command syntax (/)\n3. Ensure bot has channel access',
+                            inline: false,
+                        },
+                        {
+                            name: '🔸 Reporting Bugs',
+                            value: '\n- Join support server\n- Go to #bug-reports\n- Create a detailed ticket',
+                            inline: false,
+                        },
+                        {
+                            name: '🔸 Contributing',
+                            value: '\n[Ways to Contribute]\nCode = Visit our GitHub\nIdeas = Join support server\nFeedback = Use feedback command',
+                            inline: false,
+                        },
+                        {
+                            name: '🔸 Update Schedule',
+                            value: '\nMajor Updates: Monthly\nBug Fixes: Weekly\nHotfixes: As needed',
+                            inline: false,
+                        }
+                    )
+                    .setThumbnail(
+                        interaction.client.user.displayAvatarURL({
+                            dynamic: true,
+                            size: 256,
+                        })
+                    )
+                    .setTimestamp()
+                    .setFooter({
+                        text: 'Click the back button to return to the main menu',
+                        iconURL: interaction.user.displayAvatarURL({
+                            dynamic: true,
+                        }),
+                    });
+
+                const backRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('back')
+                        .setLabel('Back')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('↩️')
+                );
+
+                await i.update({
+                    embeds: [faqEmbed],
+                    components: [backRow],
+                });
+            }
+
+            if (i.customId === 'commands') {
+                const commands = interaction.client.commands;
+                const categories = new Map();
+
+                commands.forEach((cmd) => {
+                    const category = cmd.category || 'Uncategorized';
+                    if (!categories.has(category)) {
+                        categories.set(category, []);
+                    }
+                    categories.get(category).push(cmd);
                 });
 
-            await i.update({ embeds: [categoryEmbed], components: [] });
+                const pages = [];
+                for (const [category, cmds] of categories) {
+                    const embed = new EmbedBuilder()
+                        .setColor('#2F3136')
+                        .setTitle(
+                            `🤖 ${
+                                category.charAt(0).toUpperCase() +
+                                category.slice(1)
+                            } Commands`
+                        )
+                        .setDescription(
+                            '> Here are all the available commands in this category:'
+                        )
+                        .addFields(
+                            cmds.map((cmd) => ({
+                                name: `/${cmd.data.name}`,
+                                value: `\`\`\`yaml\nDescription: ${
+                                    cmd.data.description || 'No description'
+                                }\nUsage: ${
+                                    cmd.usage || 'No usage info'
+                                }\`\`\``,
+                                inline: false,
+                            }))
+                        )
+                        .setThumbnail(
+                            interaction.client.user.displayAvatarURL({
+                                dynamic: true,
+                                size: 256,
+                            })
+                        )
+                        .setTimestamp()
+                        .setFooter({
+                            text: `Page ${pages.length + 1}/${
+                                categories.size
+                            } • Use the buttons to navigate`,
+                            iconURL: interaction.user.displayAvatarURL({
+                                dynamic: true,
+                            }),
+                        });
+                    pages.push(embed);
+                }
+
+                let currentPage = 0;
+
+                const pageRow = new ActionRowBuilder().addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('prev')
+                        .setLabel('Previous')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('⬅️')
+                        .setDisabled(currentPage === 0),
+                    new ButtonBuilder()
+                        .setCustomId('back')
+                        .setLabel('Back')
+                        .setStyle(ButtonStyle.Secondary)
+                        .setEmoji('↩️'),
+                    new ButtonBuilder()
+                        .setCustomId('next')
+                        .setLabel('Next')
+                        .setStyle(ButtonStyle.Primary)
+                        .setEmoji('➡️')
+                        .setDisabled(currentPage === pages.length - 1)
+                );
+
+                await i.update({
+                    embeds: [pages[currentPage]],
+                    components: [pageRow],
+                });
+
+                const pageCollector = i.channel.createMessageComponentCollector(
+                    {
+                        filter: (interaction) =>
+                            interaction.user.id === i.user.id,
+                        time: 300000,
+                    }
+                );
+
+                pageCollector.on('collect', async (interaction) => {
+                    pageCollector.resetTimer();
+                    if (interaction.customId === 'prev' && currentPage > 0) {
+                        currentPage--;
+                    } else if (
+                        interaction.customId === 'next' &&
+                        currentPage < pages.length - 1
+                    ) {
+                        currentPage++;
+                    } else if (interaction.customId === 'back') {
+                        pageCollector.stop();
+                        await interaction.update({
+                            embeds: [helpEmbed],
+                            components: [row],
+                        });
+                        return;
+                    }
+
+                    const newRow = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('prev')
+                            .setLabel('Previous')
+                            .setStyle(ButtonStyle.Primary)
+                            .setEmoji('⬅️')
+                            .setDisabled(currentPage === 0),
+                        new ButtonBuilder()
+                            .setCustomId('back')
+                            .setLabel('Back')
+                            .setStyle(ButtonStyle.Secondary)
+                            .setEmoji('↩️'),
+                        new ButtonBuilder()
+                            .setCustomId('next')
+                            .setLabel('Next')
+                            .setStyle(ButtonStyle.Primary)
+                            .setEmoji('➡️')
+                            .setDisabled(currentPage === pages.length - 1)
+                    );
+
+                    await interaction.update({
+                        embeds: [pages[currentPage]],
+                        components: [newRow],
+                    });
+                });
+
+                pageCollector.on('end', () => {
+                    if (!i.replied && !i.deferred && activeCollector) {
+                        i.update({
+                            components: [],
+                            content:
+                                '> ⏰ This commands menu has expired. Please use `/help` again.',
+                        });
+                    }
+                });
+            }
+
+            if (i.customId === 'back') {
+                await i.update({
+                    embeds: [helpEmbed],
+                    components: [row],
+                });
+            }
         });
 
-        collector.on('end', (collected) => {
-            console.log(`Collected ${collected.size} interactions.`);
+        collector.on('end', () => {
+            activeCollector = false;
+            interaction.editReply({
+                components: [],
+                content:
+                    '> ⏰ This help menu has expired. Please use `/help` again.',
+            });
         });
     },
 };
-
-// Helper function to get emojis for categories
-function getCategoryEmoji(category) {
-    const emojiMap = {
-        info: 'ℹ️',
-        moderation: '🛡️',
-        fun: '🎮',
-        utility: '🔧',
-        music: '🎵',
-        economy: '💰',
-        admin: '⚡',
-    };
-    return emojiMap[category] || '📁';
-}

@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('setcmdperms')
+        .setName('set_cmd_perms')
         .setDescription('Set permissions for commands')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption((option) =>
@@ -29,6 +29,15 @@ module.exports = {
                 .setDescription('The user to set permissions for')
                 .setRequired(false)
         ),
+    description_full:
+        'Set custom permissions for commands, allowing or denying access for specific roles or users',
+    usage: '/set_cmd_perms <command> <allowed> [role] [user]',
+    examples: [
+        '/set_cmd_perms command:ping allowed:true role:@Moderator',
+        '/set_cmd_perms command:kick allowed:false user:@JohnDoe',
+        '/set_cmd_perms command:ban allowed:true role:@Admin',
+    ],
+    category: 'admin',
 
     async execute(interaction) {
         // Check if user is bot owner

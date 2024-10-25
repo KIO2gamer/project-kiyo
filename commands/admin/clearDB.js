@@ -3,9 +3,14 @@ const mongoose = require('mongoose');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('cleardb')
+        .setName('clear_db')
         .setDescription('⚠️ DANGER: Wipes all database contents. Admin only.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    description_full:
+        'Completely wipes all collections and data from the connected MongoDB database. This action is irreversible and should be used with extreme caution. Only server administrators can use this command.',
+    usage: '/clear_db',
+    examples: ['/clear_db'],
+    category: 'admin',
 
     async execute(interaction) {
         // Check if user has the highest admin role

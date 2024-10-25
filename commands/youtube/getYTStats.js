@@ -19,7 +19,7 @@ module.exports = {
         '/youtube_stats UC_x5XG1OV2P6uZZ5FSM9Ttw',
         '/youtube_stats https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     ],
-    category: 'google_services',
+    category: 'youtube',
     async execute(interaction) {
         const channelInput = interaction.options.getString('channel');
         const channelId = await extractChannelId(channelInput);

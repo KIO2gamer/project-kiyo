@@ -4,7 +4,7 @@
     "description": "A versatile Discord bot with moderation, entertainment, and utility features.",
     "main": "index.js",
     "scripts": {
-        "start": "node main.js",
+        "start": "node index.js",
         "dev": "nodemon",
         "test": "test-settings.js"
     },
