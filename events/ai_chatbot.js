@@ -11,6 +11,9 @@ const AIChatChannel = require('./../bot_utils/AIChatChannel');
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Initialize Embedding Model using the example code
+const embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' });
+
 // Config Safety settings
 const safetySettings = [
     {
@@ -40,7 +43,7 @@ const generationConfig = {
 };
 
 // Define the AI prompt instruction
-const AI_PROMPT_INSTRUCTION = `very short answers, slightly interested, don't use old slang terms, try to use newer terms like "Lol" if something is funny and similarly find other abbeviations that would fit well with the conversation, try to blend in and be as humanlike as possible. this includes only asking questions half of the time and not assisting the user. you do you. don't say things like "just here to help", as you're not here not help but to be free. don't use exclamation marks and don't start your sentences with a capital letter`;
+const AI_PROMPT_INSTRUCTION = `very short answers, slightly interested, don't use old slang terms, try to use newer terms like "Lol" if something is funny and similarly find other abbreviations that would fit well with the conversation, try to blend in and be as humanlike as possible. this includes only asking questions half of the time and not assisting the user. you do you. don't say things like "just here to help", as you're not here to help but to be free. don't use exclamation marks and don't start your sentences with a capital letter`;
 
 module.exports = {
     name: Events.MessageCreate,
@@ -48,128 +51,193 @@ module.exports = {
         if (message.author.bot || message.content.startsWith('!')) return;
 
         try {
-            // Check if the message is in a designated AI chat channel
-            const aiChannelDoc = await AIChatChannel.findOne({
-                guildId: message.guild.id,
-            });
-            if (!aiChannelDoc) {
-                await message.reply(
-                    'AI chat channel is not set up. Please use `/set_ai_chat_channel` to configure it first.'
-                );
-                return;
-            }
-            if (message.channel.id !== aiChannelDoc.channelId) return;
+            const aiChannelDoc = await this.checkAIChannel(message);
+            if (!aiChannelDoc) return;
 
             const imageAttachment = message.attachments.first();
-            // Check if an image is attached
             if (imageAttachment) {
-                // Fetch and convert the image to base64
-                const response = await fetch(imageAttachment.url);
-                const buffer = await response.buffer();
-                const base64Image = buffer.toString('base64');
-
-                // Prepare image part for Gemini API
-                const imagePart = {
-                    inlineData: {
-                        data: base64Image,
-                        mimeType: 'image/jpeg',
-                    },
-                };
-
-                // Send the image and ask for a description
-                const model = genAI.getGenerativeModel({
-                    model: 'gemini-1.5-flash',
-                    systemInstruction: AI_PROMPT_INSTRUCTION,
-                    safetySettings: safetySettings,
-                    generationConfig: generationConfig,
-                });
-
-                const result = await model.generateContent([
-                    { text: 'Describe this image:' },
-                    imagePart,
-                ]);
-
-                const description = result.response.text();
-                await sendLongMessage(message, description);
+                await this.handleImageAttachment(message, imageAttachment);
                 return;
             }
 
-            // Handle text-only messages if no image is attached
-            const chatHistory = await ChatHistory.findOne({
-                userId: message.author.id,
-            });
-            let conversationHistory = chatHistory ? chatHistory.messages : [];
+            await this.handleTextMessage(message);
+        } catch (error) {
+            await handleError(message, error);
+        }
+    },
 
-            // Check if the message is a reply to a bot message
-            let replyContext = '';
-            if (message.reference && message.reference.messageId) {
-                const repliedMessage = await message.channel.messages.fetch(
-                    message.reference.messageId
-                );
-                if (repliedMessage.author.bot) {
-                    replyContext = `The user is replying to this previous message from the bot: "${repliedMessage.content}". `;
-                }
-            }
-
-            // Prepare the conversation for Gemini
-            const geminiConversation = conversationHistory.map((msg) => ({
-                role: msg.role,
-                parts: [{ text: msg.content }],
-            }));
-
-            // Add the new user message with reply context
-            geminiConversation.push({
-                role: 'user',
-                parts: [{ text: replyContext + message.content }],
-            });
-
-            // Generate AI response using Gemini
-            const model = genAI.getGenerativeModel({
-                model: 'gemini-1.5-flash',
-                systemInstruction: AI_PROMPT_INSTRUCTION,
-                safetySettings: safetySettings,
-                generationConfig: generationConfig,
-            });
-            const chat = model.startChat({
-                history: geminiConversation,
-            });
-            const result = await chat.sendMessage(
-                replyContext + message.content
+    async checkAIChannel(message) {
+        const aiChannelDoc = await AIChatChannel.findOne({
+            guildId: message.guild.id,
+        });
+        if (!aiChannelDoc) {
+            await message.reply(
+                'AI chat channel is not set up. Please use `/set_ai_chat_channel` to configure it first.'
             );
+            return null;
+        }
+        if (message.channel.id !== aiChannelDoc.channelId) return null;
+        return aiChannelDoc;
+    },
 
-            // Get the AI's response
-            const response = result.response.text();
+    async handleImageAttachment(message, imageAttachment) {
+        const response = await fetch(imageAttachment.url);
+        const buffer = await response.buffer();
+        const base64Image = buffer.toString('base64');
 
-            // Update conversation history
-            conversationHistory.push({
-                role: 'user',
-                content: message.content,
-            });
-            conversationHistory.push({
-                role: 'model',
-                content: response,
-            });
+        const imagePart = {
+            inlineData: {
+                data: base64Image,
+                mimeType: 'image/jpeg',
+            },
+        };
 
-            // Trim history if necessary
-            if (conversationHistory.length > 50) {
-                conversationHistory = conversationHistory.slice(-50);
-            }
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            systemInstruction: AI_PROMPT_INSTRUCTION,
+            safetySettings: safetySettings,
+            generationConfig: generationConfig,
+        });
 
-            // Save updated history to the database
+        const result = await model.generateContent([
+            { text: 'Describe this image:' },
+            imagePart,
+        ]);
+
+        const description = result.response.text();
+        await sendLongMessage(message, description);
+    },
+
+    async handleTextMessage(message) {
+        const chatHistory = await ChatHistory.findOne({
+            userId: message.author.id,
+        });
+        let conversationHistory = chatHistory ? chatHistory.messages : [];
+
+        try {
+            const userEmbedding = await this.generateUserEmbedding(message.content);
+            conversationHistory = this.storeUserMessage(conversationHistory, message.content, userEmbedding);
+
+            const relevantMessages = this.retrieveRelevantMessages(conversationHistory, userEmbedding);
+            let geminiConversation = this.combineContextWithMessage(relevantMessages, message.content);
+
+            geminiConversation = this.ensureConversationStartsWithUser(geminiConversation, message.content);
+
+            const response = await this.getAIResponse(geminiConversation, message.content);
+
+            conversationHistory = this.storeModelResponse(conversationHistory, response);
+
+            conversationHistory = this.limitConversationHistory(conversationHistory, 50);
+
             await ChatHistory.findOneAndUpdate(
                 { userId: message.author.id },
                 { userId: message.author.id, messages: conversationHistory },
                 { upsert: true, new: true }
             );
 
-            // Reply with the AI response
             await sendLongMessage(message, response);
         } catch (error) {
-            await handleError(message, error);
+            console.error('Error generating embeddings:', error);
+            await message.channel.send('Sorry, there was an error processing your message.');
         }
+    },
+
+    storeUserMessage(conversationHistory, content, userEmbedding) {
+        conversationHistory.push({
+            role: 'user',
+            content: content,
+            embedding: userEmbedding,
+        });
+        return conversationHistory;
+    },
+
+    ensureConversationStartsWithUser(geminiConversation, content) {
+        if (geminiConversation.length === 0 || geminiConversation[0].role !== 'user') {
+            geminiConversation = [
+                {
+                    role: 'user',
+                    parts: [{ text: content }],
+                },
+            ];
+        }
+        return geminiConversation;
+    },
+
+    storeModelResponse(conversationHistory, response) {
+        conversationHistory.push({
+            role: 'model',
+            content: response,
+            embedding: null,
+        });
+        return conversationHistory;
+    },
+
+    limitConversationHistory(conversationHistory, limit) {
+        if (conversationHistory.length > limit) {
+            conversationHistory = conversationHistory.slice(-limit);
+        }
+        return conversationHistory;
+    },
+
+    async generateUserEmbedding(content) {
+        const embeddingResult = await embeddingModel.embedContent(content);
+        return embeddingResult.embedding.values;
+    },
+
+    retrieveRelevantMessages(conversationHistory, userEmbedding) {
+        const relevantMessages = [];
+        if (conversationHistory.length > 1) {
+            const previousMessages = conversationHistory.slice(0, -1);
+            const embeddings = previousMessages.map(msg => msg.embedding).filter(e => e);
+            const similarityScores = embeddings.map(embedding => cosineSimilarity(embedding, userEmbedding));
+
+            const topN = 3;
+            const topIndices = similarityScores
+                .map((score, index) => ({ score, index }))
+                .sort((a, b) => b.score - a.score)
+                .slice(0, topN)
+                .map(item => item.index);
+
+            topIndices.forEach(index => {
+                relevantMessages.push({
+                    role: previousMessages[index].role,
+                    content: previousMessages[index].content,
+                });
+            });
+        }
+        return relevantMessages;
+    },
+
+    combineContextWithMessage(relevantMessages, content) {
+        const geminiConversation = relevantMessages.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.content }],
+        }));
+
+        geminiConversation.push({
+            role: 'user',
+            parts: [{ text: content }],
+        });
+
+        return geminiConversation;
+    },
+
+    async getAIResponse(geminiConversation, content) {
+        const model = genAI.getGenerativeModel({
+            model: 'gemini-1.5-flash',
+            systemInstruction: AI_PROMPT_INSTRUCTION,
+            safetySettings: safetySettings,
+            generationConfig: generationConfig,
+        });
+        const chat = model.startChat({
+            history: geminiConversation,
+        });
+        const result = await chat.sendMessage(content);
+        return result.response.text();
     },
 };
 
+// Utility function to send long messages
 async function sendLongMessage(message, content) {
     const maxLength = 2000;
     const chunks = [];
@@ -181,4 +249,12 @@ async function sendLongMessage(message, content) {
     for (const chunk of chunks) {
         await message.channel.send(chunk);
     }
+}
+
+// Utility function to calculate cosine similarity
+function cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, a, idx) => sum + a * vecB[idx], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
 }

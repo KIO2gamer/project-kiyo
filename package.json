@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon",
-        "test": "test-settings.js"
+        "test": "mocha && node test_settings.js"
     },
     "repository": {
         "type": "git",
@@ -43,7 +43,7 @@
         "boxen": "^8.0.1",
         "chalk": "^5.3.0",
         "discord.js": "^14.16.1",
-        "dotenv": "^16.3.1",
+        "dotenv": "^16.4.5",
         "googleapis": "^144.0.0",
         "he": "^1.2.0",
         "mathjs": "^13.1.1",
@@ -55,5 +55,8 @@
     },
     "bugs": {
         "url": "https://github.com/KIO2gamer/discordbot/issues"
+    },
+    "devDependencies": {
+        "mocha": "^10.8.2"
     }
 }
