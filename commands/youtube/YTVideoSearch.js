@@ -1,16 +1,3 @@
-/**
- * Provides a Discord slash command to search for YouTube videos with optional filters.
- *
- * The command allows users to search for YouTube videos by providing a query string, and optionally filter the results by channel, duration, order, and maximum number of results. The results are displayed in an embedded message with pagination controls.
- *
- * The command uses the Google YouTube API to fetch the search results and video details, and formats the information into a user-friendly format.
- *
- * @module commands/utility/video_search
- * @example
- * /youtube_search query:cats
- * /youtube_search query:"funny videos" channel:PewDiePie
- * /youtube_search query:tutorials duration:long order:viewCount type:episode max_results:10
- */
 const {
     SlashCommandBuilder,
     EmbedBuilder,
@@ -119,48 +106,13 @@ module.exports = {
         // Function to fetch and display results
         const displayResults = async () => {
             try {
-                const searchParams = {
-                    part: 'snippet',
-                    q: query,
-                    type: 'video',
-                    maxResults: maxResults,
-                    pageToken: nextPageToken || prevPageToken || '',
-                    order: orderFilter,
-                };
-
-                if (channelFilter) {
-                    searchParams.channelId = await getChannelId(channelFilter);
-                }
-
-                if (durationFilter !== 'any') {
-                    searchParams.videoDuration = durationFilter;
-                }
-
+                const searchParams = await buildSearchParams();
                 const searchResponse = await youtube.search.list(searchParams);
-                const videoIds = searchResponse.data.items
-                    .map((item) => item.id.videoId)
-                    .join(',');
-
-                const videoResponse = await youtube.videos.list({
-                    part: 'contentDetails,statistics',
-                    id: videoIds,
-                });
-
-                const videoDetails = videoResponse.data.items.reduce(
-                    (acc, item) => {
-                        acc[item.id] = {
-                            contentDetails: item.contentDetails,
-                            statistics: item.statistics,
-                        };
-                        return acc;
-                    },
-                    {},
-                );
-
+                const videoDetails = await fetchVideoDetails(searchResponse);
                 const results = searchResponse.data;
+
                 nextPageToken = results.nextPageToken || '';
-                prevPageToken =
-                    currentPage > 1 ? results.prevPageToken || '' : '';
+                prevPageToken = currentPage > 1 ? results.prevPageToken || '' : '';
 
                 // Handle case when there are no results
                 if (results.items.length === 0) {
@@ -170,65 +122,8 @@ module.exports = {
                     };
                 }
 
-                const embed = new EmbedBuilder()
-                    .setColor('#FF0000')
-                    .setTitle(`YouTube Search Results for "${query}"`)
-                    .setDescription(`Page ${currentPage}`);
-
-                results.items.forEach((item, index) => {
-                    const details = videoDetails[item.id.videoId];
-                    const duration = details
-                        ? formatDuration(details.contentDetails.duration)
-                        : 'N/A';
-                    const views = details
-                        ? parseInt(
-                              details.statistics.viewCount,
-                          ).toLocaleString()
-                        : 'N/A';
-                    const likes = details
-                        ? parseInt(
-                              details.statistics.likeCount,
-                          ).toLocaleString()
-                        : 'N/A';
-
-                    // Combine information into a single field
-                    const videoInfo =
-                        `**Channel:** ${item.snippet.channelTitle}\n` +
-                        `**Published:** ${new Date(item.snippet.publishedAt).toLocaleDateString()}\n` +
-                        `**Duration:** ${duration}\n` +
-                        `**Views:** ${views}\n` +
-                        `**Likes:** ${likes}`;
-
-                    embed.addFields({
-                        name: `${(currentPage - 1) * maxResults + index + 1}. ${item.snippet.title}`,
-                        value: `[Watch Video](https://www.youtube.com/watch?v=${item.id.videoId})\n\n${videoInfo}`,
-                    });
-                });
-
-                // Create buttons based on available page tokens
-                const buttons = [];
-                if (prevPageToken) {
-                    buttons.push(
-                        new ButtonBuilder()
-                            .setCustomId('prev')
-                            .setLabel('Previous')
-                            .setStyle(ButtonStyle.Primary)
-                            .setDisabled(currentPage === 1), // Disable 'Previous' on first page
-                    );
-                }
-                if (nextPageToken) {
-                    buttons.push(
-                        new ButtonBuilder()
-                            .setCustomId('next')
-                            .setLabel('Next')
-                            .setStyle(ButtonStyle.Primary),
-                    );
-                }
-
-                const row =
-                    buttons.length > 0
-                        ? new ActionRowBuilder().addComponents(buttons)
-                        : null;
+                const embed = buildEmbed(results, videoDetails);
+                const row = buildActionRow();
 
                 return {
                     embeds: [embed],
@@ -242,6 +137,108 @@ module.exports = {
                     components: [],
                 };
             }
+        };
+
+        // Function to build search parameters
+        const buildSearchParams = async () => {
+            const searchParams = {
+                part: 'snippet',
+                q: query,
+                type: 'video',
+                maxResults: maxResults,
+                pageToken: nextPageToken || prevPageToken || '',
+                order: orderFilter,
+            };
+
+            if (channelFilter) {
+                searchParams.channelId = await getChannelId(channelFilter);
+            }
+
+            if (durationFilter !== 'any') {
+                searchParams.videoDuration = durationFilter;
+            }
+
+            return searchParams;
+        };
+
+        // Function to fetch video details
+        const fetchVideoDetails = async (searchResponse) => {
+            const videoIds = searchResponse.data.items
+                .map((item) => item.id.videoId)
+                .join(',');
+
+            const videoResponse = await youtube.videos.list({
+                part: 'contentDetails,statistics',
+                id: videoIds,
+            });
+
+            return videoResponse.data.items.reduce((acc, item) => {
+                acc[item.id] = {
+                    contentDetails: item.contentDetails,
+                    statistics: item.statistics,
+                };
+                return acc;
+            }, {});
+        };
+
+        // Function to build embed message
+        const buildEmbed = (results, videoDetails) => {
+            const embed = new EmbedBuilder()
+                .setColor('#FF0000')
+                .setTitle(`YouTube Search Results for "${query}"`)
+                .setDescription(`Page ${currentPage}`);
+
+            results.items.forEach((item, index) => {
+                const details = videoDetails[item.id.videoId];
+                const duration = details
+                    ? formatDuration(details.contentDetails.duration)
+                    : 'N/A';
+                const views = details
+                    ? parseInt(details.statistics.viewCount).toLocaleString()
+                    : 'N/A';
+                const likes = details
+                    ? parseInt(details.statistics.likeCount).toLocaleString()
+                    : 'N/A';
+
+                // Combine information into a single field
+                const videoInfo =
+                    `**Channel:** ${item.snippet.channelTitle}\n` +
+                    `**Published:** ${new Date(item.snippet.publishedAt).toLocaleDateString()}\n` +
+                    `**Duration:** ${duration}\n` +
+                    `**Views:** ${views}\n` +
+                    `**Likes:** ${likes}`;
+
+                embed.addFields({
+                    name: `${(currentPage - 1) * maxResults + index + 1}. ${item.snippet.title}`,
+                    value: `[Watch Video](https://www.youtube.com/watch?v=${item.id.videoId})\n\n${videoInfo}`,
+                });
+            });
+
+            return embed;
+        };
+
+        // Function to build action row with buttons
+        const buildActionRow = () => {
+            const buttons = [];
+            if (prevPageToken) {
+                buttons.push(
+                    new ButtonBuilder()
+                        .setCustomId('prev')
+                        .setLabel('Previous')
+                        .setStyle(ButtonStyle.Primary)
+                        .setDisabled(currentPage === 1), // Disable 'Previous' on first page
+                );
+            }
+            if (nextPageToken) {
+                buttons.push(
+                    new ButtonBuilder()
+                        .setCustomId('next')
+                        .setLabel('Next')
+                        .setStyle(ButtonStyle.Primary),
+                );
+            }
+
+            return buttons.length > 0 ? new ActionRowBuilder().addComponents(buttons) : null;
         };
         // Function to get channel ID from channel name
         const getChannelId = async (channelName) => {
