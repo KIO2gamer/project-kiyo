@@ -43,7 +43,15 @@ module.exports = {
         const reason =
             interaction.options.getString('reason') ?? 'No reason provided';
 
-        // Check if the target user exists
+        if (!await this.checkTargetUser(interaction, targetUser)) return;
+        if (!await this.checkRolePositions(interaction, targetUser)) return;
+        const durationMs = this.parseDuration(interaction, duration);
+        if (!durationMs) return;
+
+        await this.banUser({ interaction, targetUser, duration, reason, durationMs });
+    },
+
+    async checkTargetUser(interaction, targetUser) {
         if (!targetUser) {
             await interaction.editReply({
                 embeds: [
@@ -57,10 +65,9 @@ module.exports = {
                         }),
                 ],
             });
-            return;
+            return false;
         }
 
-        // Check if the target user is the server owner
         if (targetUser.id === interaction.guild.ownerId) {
             await interaction.editReply({
                 embeds: [
@@ -76,17 +83,19 @@ module.exports = {
                         }),
                 ],
             });
-            return;
+            return false;
         }
 
-        // Get role positions
+        return true;
+    },
+
+    async checkRolePositions(interaction, targetUser) {
         const targetUserRolePosition = targetUser.roles.highest.position;
         const requestUserRolePosition =
             interaction.member.roles.highest.position;
         const botRolePosition =
             interaction.guild.members.me.roles.highest.position;
 
-        // Check if the user trying to ban has a higher role than the target
         if (targetUserRolePosition >= requestUserRolePosition) {
             await interaction.editReply({
                 embeds: [
@@ -102,10 +111,9 @@ module.exports = {
                         }),
                 ],
             });
-            return;
+            return false;
         }
 
-        // Check if the bot has a higher role than the target
         if (targetUserRolePosition >= botRolePosition) {
             await interaction.editReply({
                 embeds: [
@@ -121,13 +129,16 @@ module.exports = {
                         }),
                 ],
             });
-            return;
+            return false;
         }
 
-        // Parse duration
+        return true;
+    },
+
+    parseDuration(interaction, duration) {
         const durationMs = ms(duration);
         if (!durationMs) {
-            await interaction.editReply({
+            interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
                         .setTitle('ERROR')
@@ -141,10 +152,12 @@ module.exports = {
                         }),
                 ],
             });
-            return;
+            return null;
         }
+        return durationMs;
+    },
 
-        // Attempt to ban the user
+    async banUser({ interaction, targetUser, duration, reason, durationMs }) {
         try {
             const logEntry = new moderationLogs({
                 action: 'temp_ban',
@@ -172,7 +185,6 @@ module.exports = {
                 ],
             });
 
-            // Schedule unban
             setTimeout(async () => {
                 try {
                     await interaction.guild.members.unban(targetUser.id);
