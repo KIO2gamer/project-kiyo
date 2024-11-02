@@ -20,7 +20,7 @@ module.exports = {
                 const response = await axios.get('https://meme-api.com/gimme');
                 meme = response.data;
 
-                if (meme && !meme.nsfw && meme.title && meme.url) {
+                if (isValidMeme(meme)) {
                     break;
                 }
             } catch (error) {
@@ -29,7 +29,7 @@ module.exports = {
             attempts++;
         }
 
-        if (meme && !meme.nsfw && meme.title && meme.url) {
+        if (isValidMeme(meme)) {
             const memeEmbed = new EmbedBuilder()
                 .setTitle(meme.title)
                 .setImage(meme.url)
@@ -48,3 +48,7 @@ module.exports = {
         }
     },
 };
+
+function isValidMeme(meme) {
+    return meme && !meme.nsfw && meme.title && meme.url;
+}
