@@ -23,11 +23,22 @@ module.exports = {
         const clientSecret = process.env.IGDB_CLIENT_SECRET;
 
         try {
-            const accessToken = await this.getAccessToken(clientId, clientSecret);
-            const gameSlug = await this.searchGame(gameName, clientId, accessToken);
+            const accessToken = await this.getAccessToken(
+                clientId,
+                clientSecret,
+            );
+            const gameSlug = await this.searchGame(
+                gameName,
+                clientId,
+                accessToken,
+            );
 
             if (gameSlug) {
-                const game = await this.fetchGameDetails(gameSlug, clientId, accessToken);
+                const game = await this.fetchGameDetails(
+                    gameSlug,
+                    clientId,
+                    accessToken,
+                );
                 const embed = this.createGameEmbed(game, interaction.user);
                 await interaction.editReply({ embeds: [embed] });
             } else {
@@ -65,7 +76,9 @@ module.exports = {
                 },
             },
         );
-        return searchResponse.data.length > 0 ? searchResponse.data[0].slug : null;
+        return searchResponse.data.length > 0
+            ? searchResponse.data[0].slug
+            : null;
     },
 
     async fetchGameDetails(gameSlug, clientId, accessToken) {
@@ -96,7 +109,9 @@ module.exports = {
                 {
                     name: 'Release Date',
                     value: game.first_release_date
-                        ? new Date(game.first_release_date * 1000).toLocaleDateString()
+                        ? new Date(
+                              game.first_release_date * 1000,
+                          ).toLocaleDateString()
                         : 'Unknown',
                     inline: true,
                 },
@@ -107,7 +122,8 @@ module.exports = {
                 },
                 {
                     name: 'Platforms',
-                    value: game.platforms?.map((p) => p.name).join(', ') || 'N/A',
+                    value:
+                        game.platforms?.map((p) => p.name).join(', ') || 'N/A',
                     inline: true,
                 },
                 {

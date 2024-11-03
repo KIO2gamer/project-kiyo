@@ -21,13 +21,13 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The member to ban')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for banning')
+            option.setName('reason').setDescription('The reason for banning'),
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
         ),
 
     async execute(interaction) {
@@ -59,7 +59,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban the owner of the server'
+                            'You cannot ban the owner of the server',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -85,7 +85,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban someone with a higher or equal role than you'
+                            'You cannot ban someone with a higher or equal role than you',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -104,7 +104,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot ban someone with a higher or equal role than myself'
+                            'I cannot ban someone with a higher or equal role than myself',
                         )
                         .setColor('Red')
                         .setFooter({
@@ -133,7 +133,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('BANNED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been banned for reason: \`${reason}\``
+                            `<@${targetUser.id}> has been banned for reason: \`${reason}\``,
                         )
                         .setColor('Green')
                         .setFooter({
@@ -149,7 +149,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to ban the user'
+                            'An error occurred while trying to ban the user',
                         )
                         .setColor('Red')
                         .setFooter({

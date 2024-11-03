@@ -26,7 +26,9 @@ module.exports = {
 
                 await interaction.editReply({ embeds: [embed] });
             } else {
-                await interaction.editReply('Sorry, I could not find a uwu GIF.');
+                await interaction.editReply(
+                    'Sorry, I could not find a uwu GIF.',
+                );
             }
         } catch (error) {
             console.error('Error fetching uwu GIF:', error);

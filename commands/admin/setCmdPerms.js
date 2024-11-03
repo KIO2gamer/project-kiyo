@@ -9,25 +9,25 @@ module.exports = {
             option
                 .setName('command')
                 .setDescription('The command to set permissions for')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addBooleanOption((option) =>
             option
                 .setName('allowed')
                 .setDescription('Whether to allow or deny the permission')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addRoleOption((option) =>
             option
                 .setName('role')
                 .setDescription('The role to set permissions for')
-                .setRequired(false)
+                .setRequired(false),
         )
         .addUserOption((option) =>
             option
                 .setName('user')
                 .setDescription('The user to set permissions for')
-                .setRequired(false)
+                .setRequired(false),
         ),
     description_full:
         'Set custom permissions for commands, allowing or denying access for specific roles or users',

@@ -34,19 +34,19 @@ module.exports = {
                         .setName('channel')
                         .setDescription('The text channel to modify')
                         .setRequired(true)
-                        .addChannelTypes(ChannelType.GuildText)
+                        .addChannelTypes(ChannelType.GuildText),
                 )
                 .addStringOption((option) =>
                     option
                         .setName('newname')
                         .setDescription('The new name for the channel')
-                        .setRequired(false)
+                        .setRequired(false),
                 )
                 .addStringOption((option) =>
                     option
                         .setName('permission')
                         .setDescription(
-                            'Permission to modify for the text channel'
+                            'Permission to modify for the text channel',
                         )
                         .setRequired(false)
                         .addChoices(
@@ -109,8 +109,8 @@ module.exports = {
                                 name: 'Send Voice Messages',
                                 value: 'SendVoiceMessages',
                             },
-                            { name: 'Send Polls', value: 'SendPolls' }
-                        )
+                            { name: 'Send Polls', value: 'SendPolls' },
+                        ),
                 )
                 .addStringOption((option) =>
                     option
@@ -119,17 +119,17 @@ module.exports = {
                         .setRequired(false)
                         .addChoices(
                             { name: 'On', value: 'on' },
-                            { name: 'Off', value: 'off' }
-                        )
+                            { name: 'Off', value: 'off' },
+                        ),
                 )
                 .addRoleOption((option) =>
                     option
                         .setName('role')
                         .setDescription(
-                            'The role to modify permissions for (leave empty for everyone)'
+                            'The role to modify permissions for (leave empty for everyone)',
                         )
-                        .setRequired(false)
-                )
+                        .setRequired(false),
+                ),
         )
         .addSubcommand((subcommand) =>
             subcommand
@@ -140,19 +140,19 @@ module.exports = {
                         .setName('channel')
                         .setDescription('The voice channel to modify')
                         .setRequired(true)
-                        .addChannelTypes(ChannelType.GuildVoice)
+                        .addChannelTypes(ChannelType.GuildVoice),
                 )
                 .addStringOption((option) =>
                     option
                         .setName('newname')
                         .setDescription('The new name for the channel')
-                        .setRequired(false)
+                        .setRequired(false),
                 )
                 .addStringOption((option) =>
                     option
                         .setName('permission')
                         .setDescription(
-                            'Permission to modify for the voice channel'
+                            'Permission to modify for the voice channel',
                         )
                         .setRequired(false)
                         .addChoices(
@@ -180,8 +180,8 @@ module.exports = {
                             {
                                 name: 'Create Instant Invite',
                                 value: 'CreateInstantInvite',
-                            }
-                        )
+                            },
+                        ),
                 )
                 .addStringOption((option) =>
                     option
@@ -190,17 +190,17 @@ module.exports = {
                         .setRequired(false)
                         .addChoices(
                             { name: 'On', value: 'on' },
-                            { name: 'Off', value: 'off' }
-                        )
+                            { name: 'Off', value: 'off' },
+                        ),
                 )
                 .addRoleOption((option) =>
                     option
                         .setName('role')
                         .setDescription(
-                            'The role to modify permissions for (leave empty for everyone)'
+                            'The role to modify permissions for (leave empty for everyone)',
                         )
-                        .setRequired(false)
-                )
+                        .setRequired(false),
+                ),
         ),
 
     async execute(interaction) {
@@ -215,7 +215,7 @@ module.exports = {
 
         if (
             !interaction.guild.members.me.permissions.has(
-                PermissionsBitField.Flags.ManageChannels
+                PermissionsBitField.Flags.ManageChannels,
             )
         ) {
             return interaction.reply({
@@ -226,7 +226,7 @@ module.exports = {
 
         if (
             !interaction.member.permissions.has(
-                PermissionsBitField.Flags.ManageChannels
+                PermissionsBitField.Flags.ManageChannels,
             )
         ) {
             return interaction.reply({
@@ -259,7 +259,7 @@ module.exports = {
                 channel,
                 permissionChoice,
                 toggleChoice,
-                role
+                role,
             ) {
                 if (permissionChoice && toggleChoice) {
                     const permissionFlag =
@@ -297,7 +297,7 @@ module.exports = {
                     channel,
                     permissionChoice,
                     toggleChoice,
-                    role
+                    role,
                 );
 
                 if (permissionResponse.startsWith('The permission')) {
@@ -315,7 +315,7 @@ module.exports = {
                     channel,
                     permissionChoice,
                     toggleChoice,
-                    role
+                    role,
                 );
 
                 if (permissionResponse.startsWith('The permission')) {
@@ -343,7 +343,7 @@ module.exports = {
                 await interaction.reply({
                     content: 'An error occurred while modifying the channel.',
                     ephemeral: true,
-                })
+                }),
             );
         }
     },

@@ -21,12 +21,12 @@ module.exports = {
             option
                 .setName('user')
                 .setDescription(
-                    'The ID or unique username of the member to unban'
+                    'The ID or unique username of the member to unban',
                 )
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for unbanning')
+            option.setName('reason').setDescription('The reason for unbanning'),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
@@ -40,7 +40,7 @@ module.exports = {
             const bannedUser = bans.find(
                 (ban) =>
                     ban.user.id === userInput ||
-                    ban.user.tag.toLowerCase() === userInput.toLowerCase()
+                    ban.user.tag.toLowerCase() === userInput.toLowerCase(),
             );
 
             if (!bannedUser) {
@@ -76,7 +76,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('User Unbanned')
                         .setDescription(
-                            `Successfully unbanned ${bannedUser.user.tag}`
+                            `Successfully unbanned ${bannedUser.user.tag}`,
                         )
                         .addFields(
                             {
@@ -84,7 +84,7 @@ module.exports = {
                                 value: bannedUser.user.id,
                                 inline: true,
                             },
-                            { name: 'Reason', value: reason, inline: true }
+                            { name: 'Reason', value: reason, inline: true },
                         )
                         .setColor('Green')
                         .setTimestamp()
@@ -101,7 +101,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('Error')
                         .setDescription(
-                            'An error occurred while trying to unban the user'
+                            'An error occurred while trying to unban the user',
                         )
                         .setColor('Red')
                         .setTimestamp()

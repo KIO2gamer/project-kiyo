@@ -30,7 +30,9 @@ module.exports = {
 
                 await interaction.editReply({ embeds: [embed] });
             } else {
-                await interaction.editReply('Sorry, I could not find a Boba GIF.');
+                await interaction.editReply(
+                    'Sorry, I could not find a Boba GIF.',
+                );
             }
         } catch (error) {
             console.error('Error fetching Boba GIF:', error);

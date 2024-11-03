@@ -20,7 +20,7 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
 if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN || !MONGODB_URI) {
     console.error(
         '\x1b[31m%s\x1b[0m',
-        '[ERROR] Missing required environment variables.'
+        '[ERROR] Missing required environment variables.',
     );
     process.exit(1);
 }
@@ -54,39 +54,60 @@ const loadFiles = (dir, fileAction) => {
     });
 };
 
-const loadCommands = (dir) => {
-    console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...');
-    loadFiles(dir, (filePath) => {
-        const command = require(filePath);
-        if (command?.data && command?.execute) {
-            client.commands.set(command.data.name, command);
-            if (command.data.aliases) {
-                command.data.aliases.forEach((alias) => {
-                    client.commands.set(alias, command);
-                });
-            }
-        }
-    });
+const loadCommandsAndEvents = (commandsDir, eventsDir) => {
+    console.log(
+        '\x1b[33m%s\x1b[0m',
+        '[COMMANDS & EVENTS] Loading commands and events...',
+    );
+    loadCommands(commandsDir);
+    loadEvents(eventsDir);
     console.log(
         '\x1b[32m%s\x1b[0m',
-        '[COMMANDS] All Commands Loaded Successfully!!!'
+        '[COMMANDS & EVENTS] Commands and events loaded successfully!!!',
     );
 };
 
-const loadEvents = (dir) => {
-    console.log('\x1b[33m%s\x1b[0m', '[EVENTS] Loading events...');
-    loadFiles(dir, (filePath) => {
+const loadCommands = (commandsDir) => {
+    loadFiles(commandsDir, (filePath) => {
+        const command = require(filePath);
+        if (command?.data && command?.execute) {
+            registerCommand(command);
+        }
+    });
+};
+
+const registerCommand = (command) => {
+    if (client.commands.has(command.data.name)) {
+        console.warn(
+            '\x1b[33m%s\x1b[0m',
+            `[WARNING] Duplicate command name detected: ${command.data.name}`,
+        );
+    } else {
+        client.commands.set(command.data.name, command);
+        if (command.data.aliases) {
+            command.data.aliases.forEach((alias) => {
+                if (client.commands.has(alias)) {
+                    console.warn(
+                        '\x1b[33m%s\x1b[0m',
+                        `[WARNING] Duplicate command alias detected: ${alias}`,
+                    );
+                } else {
+                    client.commands.set(alias, command);
+                }
+            });
+        }
+    }
+};
+
+const loadEvents = (eventsDir) => {
+    loadFiles(eventsDir, (filePath) => {
         const event = require(filePath);
         const execute = (...args) => event.execute(...args);
         event.once
             ? client.once(event.name, execute)
             : client.on(event.name, execute);
     });
-    console.log('\x1b[32m%s\x1b[0m', '[EVENTS] Events loaded successfully!!!');
 };
-
-loadCommands(path.join(__dirname, 'commands'));
-loadEvents(path.join(__dirname, 'events'));
 
 const connectToMongoDB = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...');
@@ -97,7 +118,7 @@ const connectToMongoDB = async () => {
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[DATABASE] MongoDB connection failed: ${error.message}`
+            `[DATABASE] MongoDB connection failed: ${error.message}`,
         );
         process.exit(1);
     }
@@ -105,6 +126,10 @@ const connectToMongoDB = async () => {
 
 const deployCommands = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...');
+
+    // Clear the commands cache
+    client.commands.clear();
+
     const commands = [];
     loadFiles(path.join(__dirname, 'commands'), (filePath) => {
         const command = require(filePath);
@@ -114,29 +139,16 @@ const deployCommands = async () => {
     const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
     try {
         await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), {
-            body: [],
+            body: commands,
         });
-        for (const guildId of DISCORD_GUILD_IDS) {
-            try {
-                const result = await rest.put(
-                    Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-                    { body: commands }
-                );
-                console.log(
-                    '\x1b[32m%s\x1b[0m',
-                    `[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`
-                );
-            } catch (error) {
-                console.error(
-                    '\x1b[31m%s\x1b[0m',
-                    `[DEPLOY] Failed to deploy commands to guild ${guildId}: ${error.message}`
-                );
-            }
-        }
+        console.log(
+            '\x1b[32m%s\x1b[0m',
+            `[DEPLOY] Successfully deployed ${commands.length} commands globally`,
+        );
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[DEPLOY] Command deployment failed: ${error.message}`
+            `[DEPLOY] Command deployment failed: ${error.message}`,
         );
     }
 };
@@ -176,15 +188,18 @@ process.on('SIGINT', async () => {
 
 (async () => {
     try {
-        await connectToMongoDB();
-        await deployCommands();
+        await Promise.all([connectToMongoDB(), deployCommands()]);
+        loadCommandsAndEvents(
+            path.join(__dirname, 'commands'),
+            path.join(__dirname, 'events'),
+        );
         await client.login(DISCORD_TOKEN);
         setRichPresence({});
         console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!');
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[BOT] Failed to start the bot: ${error.message}`
+            `[BOT] Failed to start the bot: ${error.message}`,
         );
         process.exit(1);
     }

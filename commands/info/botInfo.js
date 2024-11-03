@@ -15,7 +15,7 @@ module.exports = {
         .setDescription('Retrieve detailed information about the bot.'),
 
     async execute(interaction) {
-        const sent = await interaction.editReply({ content: "Pinging..." });
+        const sent = await interaction.editReply({ content: 'Pinging...' });
         await sendBotInfo(sent, interaction);
     },
 };
@@ -70,7 +70,7 @@ Memory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
             })
             .setTimestamp();
 
-        await interaction.editReply({ content: " ", embeds: [embed] });
+        await interaction.editReply({ content: ' ', embeds: [embed] });
     } catch (error) {
         console.error('Error retrieving bot information:', error);
         await interaction.editReply({

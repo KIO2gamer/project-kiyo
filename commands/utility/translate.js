@@ -14,15 +14,15 @@ module.exports = {
             option
                 .setName('input')
                 .setDescription('The text to translate')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('target_lang')
                 .setDescription(
-                    'The target language (e.g., en, es, fr, de, ja)'
+                    'The target language (e.g., en, es, fr, de, ja)',
                 )
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
@@ -42,7 +42,7 @@ module.exports = {
                         name: 'Target Language',
                         value: targetLang,
                         inline: true,
-                    }
+                    },
                 )
                 .setFooter({
                     text: `Requested by ${interaction.user.tag}`,
@@ -54,7 +54,7 @@ module.exports = {
         } catch (error) {
             console.error('Error executing translate command:', error);
             await interaction.editReply(
-                'There was an error while executing this command. Please try again later.'
+                'There was an error while executing this command. Please try again later.',
             );
         }
     },

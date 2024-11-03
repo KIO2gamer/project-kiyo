@@ -16,7 +16,7 @@ module.exports = {
             option
                 .setName('command')
                 .setDescription('The command to reload.')
-                .setRequired(false)
+                .setRequired(false),
         ),
     async execute(interaction) {
         const commandName = interaction.options.getString('command');
@@ -24,14 +24,32 @@ module.exports = {
         const commandFolders = fs.readdirSync(foldersPath);
 
         if (commandName) {
-            await this.reloadSingleCommand(interaction, commandName, foldersPath, commandFolders);
+            await this.reloadSingleCommand(
+                interaction,
+                commandName,
+                foldersPath,
+                commandFolders,
+            );
         } else {
-            await this.reloadAllCommands(interaction, foldersPath, commandFolders);
+            await this.reloadAllCommands(
+                interaction,
+                foldersPath,
+                commandFolders,
+            );
         }
     },
 
-    async reloadSingleCommand(interaction, commandName, foldersPath, commandFolders) {
-        const commandPath = this.findCommandPath(commandName, foldersPath, commandFolders);
+    async reloadSingleCommand(
+        interaction,
+        commandName,
+        foldersPath,
+        commandFolders,
+    ) {
+        const commandPath = this.findCommandPath(
+            commandName,
+            foldersPath,
+            commandFolders,
+        );
 
         if (!commandPath) {
             return interaction.reply({
@@ -68,7 +86,7 @@ module.exports = {
                         .readdirSync(commandsPath)
                         .filter((file) => file.endsWith('.js'));
                     const commandFile = commandFiles.find(
-                        (file) => file === `${commandName}.js`
+                        (file) => file === `${commandName}.js`,
                     );
                     if (commandFile) {
                         return path.join(commandsPath, commandFile);
@@ -92,10 +110,13 @@ module.exports = {
                     try {
                         const command = require(filePath);
                         if ('data' in command && 'execute' in command) {
-                            interaction.client.commands.set(command.data.name, command);
+                            interaction.client.commands.set(
+                                command.data.name,
+                                command,
+                            );
                         } else {
                             console.log(
-                                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+                                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
                             );
                         }
                     } catch (error) {

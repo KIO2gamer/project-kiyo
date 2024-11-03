@@ -17,7 +17,7 @@ module.exports = {
             option
                 .setName('query')
                 .setDescription('The search query')
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     async execute(interaction) {
@@ -43,7 +43,7 @@ module.exports = {
                         cx: searchEngineId,
                         q: query,
                     },
-                }
+                },
             );
 
             const results = response.data.items.slice(0, 5); // Show top 3 results
@@ -64,7 +64,7 @@ module.exports = {
                     name: `${index + 1}. ${item.title}`,
                     value: `${item.link}\n${item.snippet.replace(
                         /(\r\n|\n|\r)/gm,
-                        ''
+                        '',
                     )}`, // Remove line breaks from snippet
                 });
             });

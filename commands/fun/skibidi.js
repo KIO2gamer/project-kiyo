@@ -17,8 +17,8 @@ module.exports = {
                 .setRequired(true)
                 .addChoices(
                     { name: 'Yes', value: 'yes' },
-                    { name: 'No', value: 'no' }
-                )
+                    { name: 'No', value: 'no' },
+                ),
         ),
 
     async execute(interaction) {
@@ -27,11 +27,11 @@ module.exports = {
         if (option === 'yes') {
             await interaction.reply('Skibidi powers activated successfully ✅');
             await interaction.channel.send(
-                'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344'
+                'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344',
             );
         } else {
             await interaction.reply(
-                '***You are not worthy enough to wield the powers, mortal***'
+                '***You are not worthy enough to wield the powers, mortal***',
             );
         }
     },

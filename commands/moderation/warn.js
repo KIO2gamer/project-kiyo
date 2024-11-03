@@ -47,15 +47,15 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The member to warn')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('reason')
-                .setDescription('The reason for the warning')
+                .setDescription('The reason for the warning'),
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
         ),
 
     async execute(interaction) {
@@ -78,7 +78,7 @@ module.exports = {
                     createErrorEmbed(
                         'ERROR',
                         'You cannot warn the owner of the server',
-                        interaction
+                        interaction,
                     ),
                 ],
             });
@@ -108,7 +108,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('WARNED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been warned for reason: \`${reason}\``
+                            `<@${targetUser.id}> has been warned for reason: \`${reason}\``,
                         )
                         .setColor('Orange')
                         .setFooter({
@@ -120,14 +120,14 @@ module.exports = {
         } catch (error) {
             console.error(
                 'An error occurred while trying to warn the user:',
-                error
+                error,
             );
             await interaction.editReply({
                 embeds: [
                     createErrorEmbed(
                         'ERROR',
                         'An error occurred while trying to warn the user',
-                        interaction
+                        interaction,
                     ),
                 ],
             });

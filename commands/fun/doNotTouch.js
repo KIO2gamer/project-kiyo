@@ -24,7 +24,7 @@ module.exports = {
             new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel('Confirm Override')
-                .setStyle(ButtonStyle.Danger)
+                .setStyle(ButtonStyle.Danger),
         );
 
         await interaction.editReply({

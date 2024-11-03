@@ -16,9 +16,6 @@ const chatHistorySchema = new mongoose.Schema({
                 type: String,
                 required: true,
             },
-            embedding: {
-                type: [Number],
-            },
         },
     ],
 });

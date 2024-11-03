@@ -23,9 +23,9 @@ module.exports = {
                 .setDescription('The channel you want to unlock')
                 .addChannelTypes(
                     ChannelType.GuildText,
-                    ChannelType.GuildAnnouncement
+                    ChannelType.GuildAnnouncement,
                 )
-                .setRequired(false)
+                .setRequired(false),
         ),
 
     async execute(interaction) {
@@ -42,7 +42,7 @@ module.exports = {
                 .setTitle('ERROR')
                 .setColor('Red')
                 .setDescription(
-                    'I do not have the required permissions to unlock the channel.'
+                    'I do not have the required permissions to unlock the channel.',
                 );
             await interaction.editReply({ embeds: [noPermissionEmbed] });
             return;

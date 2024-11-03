@@ -10,7 +10,7 @@ module.exports = {
             option
                 .setName('channel')
                 .setDescription('The channel to set for AI chat')
-                .setRequired(true)
+                .setRequired(true),
         ),
     description_full:
         'Sets a specific channel where users can interact with the AI chatbot. This helps keep AI conversations organized in a dedicated channel.',
@@ -29,10 +29,10 @@ module.exports = {
             await AIChatChannel.findOneAndUpdate(
                 { guildId: interaction.guild.id },
                 { channelId: channel.id },
-                { upsert: true, new: true }
+                { upsert: true, new: true },
             );
             await interaction.editReply(
-                `AI chat channel has been set to ${channel}`
+                `AI chat channel has been set to ${channel}`,
             );
         } catch (error) {
             await handleError(interaction, error);

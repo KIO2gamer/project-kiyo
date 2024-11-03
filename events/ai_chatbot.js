@@ -11,9 +11,6 @@ const AIChatChannel = require('./../bot_utils/AIChatChannel');
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Initialize Embedding Model using the example code
-const embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' });
-
 // Config Safety settings
 const safetySettings = [
     {
@@ -70,12 +67,7 @@ module.exports = {
         const aiChannelDoc = await AIChatChannel.findOne({
             guildId: message.guild.id,
         });
-        if (!aiChannelDoc) {
-            await message.reply(
-                'AI chat channel is not set up. Please use `/set_ai_chat_channel` to configure it first.'
-            );
-            return null;
-        }
+        if (!aiChannelDoc) return null;
         if (message.channel.id !== aiChannelDoc.channelId) return null;
         return aiChannelDoc;
     },
@@ -115,44 +107,64 @@ module.exports = {
         let conversationHistory = chatHistory ? chatHistory.messages : [];
 
         try {
-            const userEmbedding = await this.generateUserEmbedding(message.content);
-            conversationHistory = this.storeUserMessage(conversationHistory, message.content, userEmbedding);
+            conversationHistory = this.storeUserMessage(
+                conversationHistory,
+                message.content,
+            );
 
-            const relevantMessages = this.retrieveRelevantMessages(conversationHistory, userEmbedding);
-            let geminiConversation = this.combineContextWithMessage(relevantMessages, message.content);
+            let geminiConversation = this.combineContextWithMessage(
+                conversationHistory,
+                message.content,
+            );
 
-            geminiConversation = this.ensureConversationStartsWithUser(geminiConversation, message.content);
+            geminiConversation = this.ensureConversationStartsWithUser(
+                geminiConversation,
+                message.content,
+            );
 
-            const response = await this.getAIResponse(geminiConversation, message.content);
+            const response = await this.getAIResponse(
+                geminiConversation,
+                message.content,
+            );
 
-            conversationHistory = this.storeModelResponse(conversationHistory, response);
+            conversationHistory = this.storeModelResponse(
+                conversationHistory,
+                response,
+            );
 
-            conversationHistory = this.limitConversationHistory(conversationHistory, 50);
+            conversationHistory = this.limitConversationHistory(
+                conversationHistory,
+                50,
+            );
 
             await ChatHistory.findOneAndUpdate(
                 { userId: message.author.id },
                 { userId: message.author.id, messages: conversationHistory },
-                { upsert: true, new: true }
+                { upsert: true, new: true },
             );
 
             await sendLongMessage(message, response);
         } catch (error) {
-            console.error('Error generating embeddings:', error);
-            await message.channel.send('Sorry, there was an error processing your message.');
+            console.error('Error generating response:', error);
+            await message.channel.send(
+                'Sorry, there was an error processing your message.',
+            );
         }
     },
 
-    storeUserMessage(conversationHistory, content, userEmbedding) {
+    storeUserMessage(conversationHistory, content) {
         conversationHistory.push({
             role: 'user',
             content: content,
-            embedding: userEmbedding,
         });
         return conversationHistory;
     },
 
     ensureConversationStartsWithUser(geminiConversation, content) {
-        if (geminiConversation.length === 0 || geminiConversation[0].role !== 'user') {
+        if (
+            geminiConversation.length === 0 ||
+            geminiConversation[0].role !== 'user'
+        ) {
             geminiConversation = [
                 {
                     role: 'user',
@@ -167,7 +179,6 @@ module.exports = {
         conversationHistory.push({
             role: 'model',
             content: response,
-            embedding: null,
         });
         return conversationHistory;
     },
@@ -179,37 +190,8 @@ module.exports = {
         return conversationHistory;
     },
 
-    async generateUserEmbedding(content) {
-        const embeddingResult = await embeddingModel.embedContent(content);
-        return embeddingResult.embedding.values;
-    },
-
-    retrieveRelevantMessages(conversationHistory, userEmbedding) {
-        const relevantMessages = [];
-        if (conversationHistory.length > 1) {
-            const previousMessages = conversationHistory.slice(0, -1);
-            const embeddings = previousMessages.map(msg => msg.embedding).filter(e => e);
-            const similarityScores = embeddings.map(embedding => cosineSimilarity(embedding, userEmbedding));
-
-            const topN = 3;
-            const topIndices = similarityScores
-                .map((score, index) => ({ score, index }))
-                .sort((a, b) => b.score - a.score)
-                .slice(0, topN)
-                .map(item => item.index);
-
-            topIndices.forEach(index => {
-                relevantMessages.push({
-                    role: previousMessages[index].role,
-                    content: previousMessages[index].content,
-                });
-            });
-        }
-        return relevantMessages;
-    },
-
     combineContextWithMessage(relevantMessages, content) {
-        const geminiConversation = relevantMessages.map(msg => ({
+        const geminiConversation = relevantMessages.map((msg) => ({
             role: msg.role,
             parts: [{ text: msg.content }],
         }));
@@ -249,12 +231,4 @@ async function sendLongMessage(message, content) {
     for (const chunk of chunks) {
         await message.channel.send(chunk);
     }
-}
-
-// Utility function to calculate cosine similarity
-function cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, a, idx) => sum + a * vecB[idx], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
 }

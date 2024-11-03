@@ -9,15 +9,15 @@ module.exports = {
             option
                 .setName('time')
                 .setDescription(
-                    'Time in seconds after which you want to be reminded'
+                    'Time in seconds after which you want to be reminded',
                 )
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('message')
                 .setDescription('Message to be reminded of')
-                .setRequired(true)
+                .setRequired(true),
         ),
 
     description_full:
@@ -51,7 +51,7 @@ module.exports = {
 
         // Confirm that the reminder is set
         await interaction.reply(
-            `Reminder set! I'll remind you in ${time} seconds: "${reminderMessage}"`
+            `Reminder set! I'll remind you in ${time} seconds: "${reminderMessage}"`,
         );
 
         // Schedule the reminder

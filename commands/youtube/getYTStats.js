@@ -9,7 +9,7 @@ module.exports = {
             option
                 .setName('channel')
                 .setDescription('YouTube channel ID, URL, handle, or video URL')
-                .setRequired(true)
+                .setRequired(true),
         ),
     description_full:
         'Get YouTube channel statistics for a given channel ID, URL, handle, or video URL.',
@@ -26,7 +26,7 @@ module.exports = {
 
         if (!channelId) {
             return interaction.editReply(
-                'Invalid YouTube channel ID, URL, handle, or video URL. Please provide a valid input.'
+                'Invalid YouTube channel ID, URL, handle, or video URL. Please provide a valid input.',
             );
         }
 
@@ -39,13 +39,13 @@ module.exports = {
             const channelData = await getChannelData(youtube, channelId);
             if (!channelData) {
                 return interaction.editReply(
-                    'No channel found with the provided ID.'
+                    'No channel found with the provided ID.',
                 );
             }
 
             const latestVideoData = await getLatestVideoData(
                 youtube,
-                channelId
+                channelId,
             );
 
             const embed = createEmbed(channelData, latestVideoData, channelId);
@@ -53,7 +53,7 @@ module.exports = {
         } catch (error) {
             console.error('Error fetching YouTube stats:', error);
             await interaction.editReply(
-                'An error occurred while fetching YouTube statistics. Please try again later.'
+                'An error occurred while fetching YouTube statistics. Please try again later.',
             );
         }
     },
@@ -88,14 +88,14 @@ function isChannelId(input) {
 
 function extractChannelIdFromUrl(input) {
     const channelUrlMatch = input.match(
-        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/channel\/(UC[\w-]{21}[AQgw])/
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/channel\/(UC[\w-]{21}[AQgw])/,
     );
     return channelUrlMatch ? channelUrlMatch[1] : null;
 }
 
 async function extractChannelIdFromVideo(input) {
     const videoUrlMatch = input.match(
-        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([\w-]{11})/
+        /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([\w-]{11})/,
     );
     if (videoUrlMatch) {
         const videoId = videoUrlMatch[1];
@@ -277,7 +277,7 @@ function createFields(channelData, latestVideoData) {
         {
             name: 'Published',
             value: new Date(
-                latestVideoData.latestVideoPublishedAt
+                latestVideoData.latestVideoPublishedAt,
             ).toDateString(),
             inline: true,
         },

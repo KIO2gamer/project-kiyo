@@ -64,7 +64,7 @@ module.exports = {
                     .setCustomId('next')
                     .setLabel('Next')
                     .setStyle(ButtonStyle.Primary)
-                    .setDisabled(pages === 1)
+                    .setDisabled(pages === 1),
             );
 
             const initialMessage = await interaction.editReply({

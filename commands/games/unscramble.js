@@ -97,7 +97,9 @@ async function updateEmbed(interaction, embed, result, chosenWord) {
             .setDescription(
                 `You got it right! The word was **${chosenWord}**. 🎉`,
             )
-            .setFooter({ text: `You completed in ${interaction.createdTimestamp - interaction.createdTimestamp}ms!` });
+            .setFooter({
+                text: `You completed in ${interaction.createdTimestamp - interaction.createdTimestamp}ms!`,
+            });
     } else {
         embed
             .setColor(0xff0000)

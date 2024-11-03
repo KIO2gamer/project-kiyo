@@ -10,9 +10,9 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription(
-                    'The name or alias of the custom command to preview'
+                    'The name or alias of the custom command to preview',
                 )
-                .setRequired(true)
+                .setRequired(true),
         ),
     category: 'customs',
     description_full: "Previews a custom command stored in the bot's database.",
@@ -45,7 +45,7 @@ module.exports = {
                     {
                         name: 'Aliases',
                         value: customCommand.alias_name || 'None',
-                    }
+                    },
                 )
                 .setTimestamp();
 

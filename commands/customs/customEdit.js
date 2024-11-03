@@ -10,19 +10,19 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription('The name or alias of the command to edit')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('new_message')
                 .setDescription('The new response message for the command')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('new_alias')
                 .setDescription('A new alias for the command (optional)')
-                .setRequired(false)
+                .setRequired(false),
         ),
     category: 'customs',
     description_full: "Edits an existing custom command in the bot's database.",

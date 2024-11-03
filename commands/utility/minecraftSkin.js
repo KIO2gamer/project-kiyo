@@ -18,7 +18,7 @@ module.exports = {
             option
                 .setName('username')
                 .setDescription('The Minecraft username')
-                .setRequired(true)
+                .setRequired(true),
         ),
     async execute(interaction) {
         const username = interaction.options.getString('username');
@@ -33,7 +33,7 @@ module.exports = {
         try {
             // 1. Get UUID from Mojang API
             const mojangResponse = await axios.get(
-                `${MOJANG_API_BASE}${username}`
+                `${MOJANG_API_BASE}${username}`,
             );
             const mojangData = mojangResponse.data;
 
@@ -45,7 +45,7 @@ module.exports = {
                     .setColor('#0099ff')
                     .setTitle(`Minecraft Player: ${mojangData.name}`)
                     .setThumbnail(
-                        `https://crafatar.com/avatars/${uuid}?size=256`
+                        `https://crafatar.com/avatars/${uuid}?size=256`,
                     ) // Crafatar URL
                     .addFields(
                         {
@@ -53,7 +53,7 @@ module.exports = {
                             value: mojangData.name,
                             inline: true,
                         },
-                        { name: 'UUID', value: uuid, inline: true }
+                        { name: 'UUID', value: uuid, inline: true },
                     )
                     .setTimestamp();
 
@@ -67,7 +67,7 @@ module.exports = {
         } catch (error) {
             console.error('Error fetching Minecraft player data:', error);
             await interaction.reply(
-                'An error occurred while fetching player information.'
+                'An error occurred while fetching player information.',
             );
         }
     },

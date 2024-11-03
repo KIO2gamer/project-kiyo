@@ -10,7 +10,7 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription('The name or alias of the command to delete')
-                .setRequired(true)
+                .setRequired(true),
         ),
     category: 'customs',
     description_full:

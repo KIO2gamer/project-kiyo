@@ -112,7 +112,8 @@ module.exports = {
                 const results = searchResponse.data;
 
                 nextPageToken = results.nextPageToken || '';
-                prevPageToken = currentPage > 1 ? results.prevPageToken || '' : '';
+                prevPageToken =
+                    currentPage > 1 ? results.prevPageToken || '' : '';
 
                 // Handle case when there are no results
                 if (results.items.length === 0) {
@@ -238,7 +239,9 @@ module.exports = {
                 );
             }
 
-            return buttons.length > 0 ? new ActionRowBuilder().addComponents(buttons) : null;
+            return buttons.length > 0
+                ? new ActionRowBuilder().addComponents(buttons)
+                : null;
         };
         // Function to get channel ID from channel name
         const getChannelId = async (channelName) => {

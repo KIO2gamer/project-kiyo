@@ -10,19 +10,19 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription('The main name of the command')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('message')
                 .setDescription('The response message of the command')
-                .setRequired(true)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName('alias_name')
                 .setDescription('The alternate name of the command')
-                .setRequired(false)
+                .setRequired(false),
         ),
     category: 'customs',
     description_full: "Adds a custom command to the bot's database.",

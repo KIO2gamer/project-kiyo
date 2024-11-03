@@ -18,7 +18,7 @@ module.exports = {
             await ChatHistory.findOneAndDelete({ userId: interaction.user.id });
 
             await interaction.editReply(
-                'Your AI chat history has been cleared.'
+                'Your AI chat history has been cleared.',
             );
         } catch (error) {
             await handleError(interaction, error);

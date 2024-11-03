@@ -25,14 +25,14 @@ module.exports = {
             option
                 .setName('code')
                 .setDescription('The code to evaluate')
-                .setRequired(true)
+                .setRequired(true),
         ),
     async execute(interaction) {
         // Check if the user has permission to use this command
         if (
             !allowedUsers.includes(interaction.user.id) &&
             !interaction.member.roles.cache.some((role) =>
-                allowedRoles.includes(role.id)
+                allowedRoles.includes(role.id),
             )
         ) {
             return interaction.editReply({
