@@ -125,15 +125,34 @@ const connectToMongoDB = async () => {
 };
 
 const deployCommands = async () => {
+    if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN) {
+        console.error(
+            '\x1b[31m%s\x1b[0m',
+            '[DEPLOY] Missing required environment variables for deploying commands.',
+        );
+        return;
+    }
     console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...');
 
     // Clear the commands cache
     client.commands.clear();
 
     const commands = [];
+    const commandNames = new Set();
+
     loadFiles(path.join(__dirname, 'commands'), (filePath) => {
         const command = require(filePath);
-        if (command?.data?.toJSON) commands.push(command.data.toJSON());
+        if (command?.data?.toJSON) {
+            if (commandNames.has(command.data.name)) {
+                console.warn(
+                    '\x1b[33m%s\x1b[0m',
+                    `[WARNING] Duplicate command name detected: ${command.data.name}`,
+                );
+            } else {
+                commands.push(command.data.toJSON());
+                commandNames.add(command.data.name);
+            }
+        }
     });
 
     const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);

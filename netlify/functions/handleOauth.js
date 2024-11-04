@@ -119,11 +119,50 @@ function createSuccessResponse(connectionsLength) {
             <html>
                 <head>
                     <title>Success</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            text-align: center;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 50px auto;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 10px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }
+                        h1 {
+                            color: #4CAF50;
+                        }
+                        p {
+                            font-size: 16px;
+                            color: #333;
+                        }
+                        .button {
+                            display: inline-block;
+                            margin-top: 20px;
+                            padding: 10px 20px;
+                            font-size: 16px;
+                            color: white;
+                            background-color: #7289DA;
+                            border: none;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                    </style>
                 </head>
                 <body>
-                    <h1>Authorization successful! 🎉</h1>
-                    <p>Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.</p>
-                    <p>Number of connections: ${connectionsLength}</p>
+                    <div class="container">
+                        <h1>Authorization successful!</h1>
+                        <p>Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.</p>
+                        <p>Number of connections: ${connectionsLength}</p>
+                        <a class="button" href="discord://">Return to Discord</a>
+                    </div>
                 </body>
             </html>
         `,
