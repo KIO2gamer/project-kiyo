@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon",
-        "test": "mocha && node test_settings.js"
+        "test": "mocha && node test_settings.js",
+        "format": "npx prettier --write ."
     },
     "repository": {
         "type": "git",
@@ -62,5 +63,9 @@
     "devDependencies": {
         "mocha": "^10.8.2",
         "prettier": "^3.3.3"
+    },
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/KIO2gamer"
     }
 }
