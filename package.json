@@ -1,6 +1,6 @@
 {
     "name": "kiyo-discord-bot",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A versatile Discord bot with moderation, entertainment, and utility features.",
     "main": "index.js",
     "scripts": {
@@ -67,5 +67,8 @@
     "funding": {
         "type": "github",
         "url": "https://github.com/sponsors/KIO2gamer"
+    },
+    "engines": {
+        "node": ">=14.0.0"
     }
 }
