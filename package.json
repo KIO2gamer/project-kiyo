@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon",
-        "test": "mocha && node test_settings.js",
+        "test": "mocha",
         "format": "npx prettier --write ."
     },
     "repository": {

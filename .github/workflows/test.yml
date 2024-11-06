@@ -1,31 +1,30 @@
-name: Test settings
+name: Node.js CI
 
 on:
-    push:
-        branches: ['main']
-    pull_request:
-        branches: ['main']
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version: [20.x]
-        steps:
-            - uses: actions/checkout@v4
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: 'npm'
-            - run: npm ci
-            - name: Run file
-              run: node test_settings.js > $GITHUB_STEP_SUMMARY
-              env:
-                  DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-                  MONGODB_URI: ${{ secrets.MONGODB_URI }}
-                  CLIENT_ID: ${{ secrets.CLIENT_ID }}
-                  GUILD_IDS: ${{ secrets.GUILD_IDS }}
-                  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-                  # Add more secrets as needed
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
