@@ -18,7 +18,7 @@ module.exports = {
 
             if (roles.length === 0) {
                 return interaction.editReply(
-                    'There are no roles stored in the database.',
+                    'There are no roles stored in the database.'
                 );
             }
 
@@ -31,9 +31,9 @@ module.exports = {
                             (role, index) =>
                                 `${index + 1}. **${role.roleName}** (ID: \`${
                                     role.roleID
-                                }\`, Color: \`${role.roleColor}\`)`,
+                                }\`, Color: \`${role.roleColor}\`)`
                         )
-                        .join('\n'),
+                        .join('\n')
                 );
 
             await interaction.editReply({ embeds: [embed] });

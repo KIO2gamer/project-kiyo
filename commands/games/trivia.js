@@ -16,32 +16,32 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('trivia')
         .setDescription(
-            'Answer a fun trivia question and test your knowledge!',
+            'Answer a fun trivia question and test your knowledge!'
         ),
     async execute(interaction) {
         try {
             const response = await fetch(
-                'https://opentdb.com/api.php?amount=1&type=multiple',
+                'https://opentdb.com/api.php?amount=1&type=multiple'
             );
             const data = await response.json();
             const questionData = data.results[0];
 
             const decodedQuestion = he.decode(questionData.question);
             const decodedAnswers = questionData.incorrect_answers.map(
-                (answer) => he.decode(answer),
+                (answer) => he.decode(answer)
             );
             decodedAnswers.push(he.decode(questionData.correct_answer));
 
             const answers = [...decodedAnswers].sort(() => Math.random() - 0.5);
             const correctIndex = answers.indexOf(
-                he.decode(questionData.correct_answer),
+                he.decode(questionData.correct_answer)
             );
 
             const embed = new EmbedBuilder()
                 .setColor('#FF69B4')
                 .setTitle('🎲 Epic Trivia Challenge! 🎲')
                 .setDescription(
-                    `**${decodedQuestion}**\n\n*Choose wisely, you have 20 seconds!*`,
+                    `**${decodedQuestion}**\n\n*Choose wisely, you have 20 seconds!*`
                 )
                 .setFooter({
                     text: `Category: ${questionData.category} | Difficulty: ${questionData.difficulty.charAt(0).toUpperCase() + questionData.difficulty.slice(1)}`,
@@ -52,8 +52,8 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId(letter)
                         .setLabel(letter)
-                        .setStyle(ButtonStyle.Primary),
-                ),
+                        .setStyle(ButtonStyle.Primary)
+                )
             );
 
             const answerFields = answers.map((answer, index) => ({
@@ -86,10 +86,10 @@ module.exports = {
                     .setTitle(
                         correct
                             ? "🎉 Correct! You're a Trivia Master! 🎉"
-                            : '😢 Oops! Not Quite Right 😢',
+                            : '😢 Oops! Not Quite Right 😢'
                     )
                     .setDescription(
-                        `The correct answer was: **${answers[correctIndex]}**`,
+                        `The correct answer was: **${answers[correctIndex]}**`
                     )
                     .addFields(
                         {
@@ -101,7 +101,7 @@ module.exports = {
                             name: 'Correct Answer',
                             value: answers[correctIndex],
                             inline: true,
-                        },
+                        }
                     )
                     .setFooter({
                         text: `You answered in ${((i.createdTimestamp - interaction.createdTimestamp) / 1000).toFixed(2)} seconds!`,
@@ -117,7 +117,7 @@ module.exports = {
                         .setColor('#FFA500')
                         .setTitle("⏰ Time's Up! ⏰")
                         .setDescription(
-                            `The correct answer was: **${answers[correctIndex]}**`,
+                            `The correct answer was: **${answers[correctIndex]}**`
                         )
                         .setFooter({ text: 'Better luck next time!' });
 

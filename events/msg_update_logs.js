@@ -9,7 +9,7 @@ module.exports = {
         // Handle partial messages
         if (oldMessage.partial || newMessage.partial) {
             console.error(
-                'One or both messages are partial, unable to fetch content.',
+                'One or both messages are partial, unable to fetch content.'
             );
             try {
                 await oldMessage.fetch();
@@ -40,11 +40,11 @@ module.exports = {
                 return;
             }
             const botMember = await newMessage.guild.members.fetch(
-                newMessage.client.user.id,
+                newMessage.client.user.id
             );
             if (!botMember.permissionsIn(logChannel).has('SEND_MESSAGES')) {
                 console.error(
-                    `Bot doesn't have permission to send messages to the channel: ${logChannelId}`,
+                    `Bot doesn't have permission to send messages to the channel: ${logChannelId}`
                 );
                 return;
             }
@@ -74,7 +74,7 @@ module.exports = {
                 {
                     name: 'New Content',
                     value: newMessage.content || 'No text content',
-                },
+                }
             );
 
             // Handle attachments

@@ -14,7 +14,7 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to delete')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const role = interaction.options.getRole('role');
@@ -24,7 +24,7 @@ module.exports = {
             const existingRole = await Role.findOne({ roleID: role.id });
             if (!existingRole) {
                 return interaction.editReply(
-                    `The role "${role.name}" was not found in the database!`,
+                    `The role "${role.name}" was not found in the database!`
                 );
             }
 
@@ -32,7 +32,7 @@ module.exports = {
             await Role.deleteOne({ roleID: role.id });
 
             await interaction.editReply(
-                `Role "${role.name}" has been deleted from the database!`,
+                `Role "${role.name}" has been deleted from the database!`
             );
         } catch (error) {
             handleError(error, interaction);

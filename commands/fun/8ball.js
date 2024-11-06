@@ -16,7 +16,7 @@ module.exports = {
             option
                 .setName('question')
                 .setDescription('The question to ask')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -36,7 +36,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setDescription(
-                `## **Question:** ${question}\n**Answer:** ${responses[Math.floor(Math.random() * responses.length)]}`,
+                `## **Question:** ${question}\n**Answer:** ${responses[Math.floor(Math.random() * responses.length)]}`
             )
             .setColor('#00ff00')
             .setFooter({

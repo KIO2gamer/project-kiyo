@@ -9,7 +9,7 @@ module.exports = {
 
     async execute(interaction) {
         await interaction.reply(
-            'https://tenor.com/view/yeet-lion-king-simba-rafiki-throw-gif-16194362',
+            'https://tenor.com/view/yeet-lion-king-simba-rafiki-throw-gif-16194362'
         );
     },
 };

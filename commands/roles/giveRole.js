@@ -12,13 +12,13 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The user to assign the role to')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addRoleOption((option) =>
             option
                 .setName('role')
                 .setDescription('The role to assign')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {

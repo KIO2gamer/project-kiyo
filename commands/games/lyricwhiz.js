@@ -18,7 +18,7 @@ module.exports = {
                 .setDescription('Number of rounds to play (1-5)')
                 .setRequired(true)
                 .setMinValue(1)
-                .setMaxValue(5),
+                .setMaxValue(5)
         ),
 
     async execute(interaction) {
@@ -44,7 +44,7 @@ module.exports = {
                                 page_size: 100,
                                 page: 1,
                             },
-                        },
+                        }
                     );
 
                     const tracks = response.data.message.body.track_list;
@@ -58,7 +58,7 @@ module.exports = {
                                 apikey: process.env.MUSIXMATCH_API_KEY,
                                 track_id: randomTrack.track_id,
                             },
-                        },
+                        }
                     );
 
                     lyrics =
@@ -71,7 +71,7 @@ module.exports = {
 
                 if (!lyrics) {
                     throw new Error(
-                        'Unable to find a song with lyrics after multiple attempts',
+                        'Unable to find a song with lyrics after multiple attempts'
                     );
                 }
 
@@ -84,8 +84,8 @@ module.exports = {
                         (line) =>
                             line.trim() !== '' &&
                             !line.includes(
-                                'This Lyrics is NOT for Commercial use',
-                            ),
+                                'This Lyrics is NOT for Commercial use'
+                            )
                     );
                 const randomLines = lines
                     .sort(() => 0.5 - Math.random())
@@ -95,7 +95,7 @@ module.exports = {
                     .setColor('#0099ff')
                     .setTitle(`Lyric Whiz - Round ${currentRound}/${rounds}`)
                     .setDescription(
-                        `Guess the song from these lyrics:\n\n${randomLines.map((line) => `"${line}"`).join('\n\n')}`,
+                        `Guess the song from these lyrics:\n\n${randomLines.map((line) => `"${line}"`).join('\n\n')}`
                     )
                     .setFooter({ text: 'You have 30 seconds to guess!' });
 
@@ -103,7 +103,7 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId('skip')
                         .setLabel('Skip')
-                        .setStyle(ButtonStyle.Secondary),
+                        .setStyle(ButtonStyle.Secondary)
                 );
 
                 await interaction.editReply({
@@ -144,7 +144,7 @@ module.exports = {
                             .setColor('#00ff00')
                             .setTitle('Correct!')
                             .setDescription(
-                                `You got it right!\nThe song is "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`,
+                                `You got it right!\nThe song is "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`
                             );
 
                         await interaction.followUp({ embeds: [correctEmbed] });
@@ -158,7 +158,7 @@ module.exports = {
                             .setColor('#ff0000')
                             .setTitle("Time's up!")
                             .setDescription(
-                                `The correct answer was "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`,
+                                `The correct answer was "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`
                             );
 
                         await interaction.followUp({ embeds: [timeUpEmbed] });
@@ -167,7 +167,7 @@ module.exports = {
                             .setColor('#ffa500')
                             .setTitle('Skipped!')
                             .setDescription(
-                                `The song was "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`,
+                                `The song was "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`
                             );
 
                         await interaction.followUp({ embeds: [skippedEmbed] });
@@ -180,7 +180,7 @@ module.exports = {
                             .setColor('#9932cc')
                             .setTitle('Game Over!')
                             .setDescription(
-                                `Final Score: ${score}/${rounds}\n\n${getFinalMessage(score, rounds)}`,
+                                `Final Score: ${score}/${rounds}\n\n${getFinalMessage(score, rounds)}`
                             );
 
                         await interaction.followUp({ embeds: [finalEmbed] });
@@ -192,7 +192,7 @@ module.exports = {
                     .setColor('#ff0000')
                     .setTitle('Error')
                     .setDescription(
-                        'Sorry, there was an error while trying to play the game. Please try again later.',
+                        'Sorry, there was an error while trying to play the game. Please try again later.'
                     );
 
                 await interaction.editReply({ embeds: [errorEmbed] });

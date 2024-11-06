@@ -21,13 +21,13 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The member to kick')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for the kick'),
+            option.setName('reason').setDescription('The reason for the kick')
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
         ),
 
     async execute(interaction) {
@@ -57,7 +57,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot kick the owner of the server',
+                            'You cannot kick the owner of the server'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -80,7 +80,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot kick someone with a higher or equal role than you',
+                            'You cannot kick someone with a higher or equal role than you'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -98,7 +98,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot kick someone with a higher or equal role than myself',
+                            'I cannot kick someone with a higher or equal role than myself'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -126,7 +126,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('KICKED!!!')
                         .setDescription(
-                            `<@${targetUser.id}> has been kicked for reason: \`${reason}\``,
+                            `<@${targetUser.id}> has been kicked for reason: \`${reason}\``
                         )
                         .setColor('Green')
                         .setFooter({
@@ -141,7 +141,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to kick the user',
+                            'An error occurred while trying to kick the user'
                         )
                         .setColor('Red')
                         .setFooter({

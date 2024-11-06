@@ -22,19 +22,19 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The member to ban')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('duration')
                 .setDescription('The duration of the ban (e.g., 1h, 1d)')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for banning'),
+            option.setName('reason').setDescription('The reason for banning')
         )
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
         ),
 
     async execute(interaction) {
@@ -80,7 +80,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban the owner of the server',
+                            'You cannot ban the owner of the server'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -108,7 +108,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot ban someone with a higher or equal role than you',
+                            'You cannot ban someone with a higher or equal role than you'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -126,7 +126,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot ban someone with a higher or equal role than myself',
+                            'I cannot ban someone with a higher or equal role than myself'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -149,7 +149,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'Invalid duration format. Please use formats like 1h, 1d, etc.',
+                            'Invalid duration format. Please use formats like 1h, 1d, etc.'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -181,7 +181,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('TEMPORARY BAN')
                         .setDescription(
-                            `<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``,
+                            `<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``
                         )
                         .setColor('Green')
                         .setFooter({
@@ -195,11 +195,11 @@ module.exports = {
                 try {
                     await interaction.guild.members.unban(targetUser.id);
                     console.log(
-                        `Successfully unbanned ${targetUser.tag} after ${duration}`,
+                        `Successfully unbanned ${targetUser.tag} after ${duration}`
                     );
                 } catch (error) {
                     console.error(
-                        `Failed to unban ${targetUser.tag}: ${error}`,
+                        `Failed to unban ${targetUser.tag}: ${error}`
                     );
                 }
             }, durationMs);
@@ -210,7 +210,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to ban the user',
+                            'An error occurred while trying to ban the user'
                         )
                         .setColor('Red')
                         .setFooter({

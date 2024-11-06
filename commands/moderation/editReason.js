@@ -14,25 +14,25 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('edit_reason')
         .setDescription(
-            'Edit the reason for a specific log entry / a range of log entries.',
+            'Edit the reason for a specific log entry / a range of log entries.'
         )
         .addStringOption((option) =>
             option
                 .setName('reason')
                 .setDescription('The new reason for the log entry or entries')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addIntegerOption((option) =>
             option
                 .setName('lognumber')
                 .setDescription('The log number to edit')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addStringOption((option) =>
             option
                 .setName('logrange')
                 .setDescription('The range of log numbers to edit (e.g., 1-5)')
-                .setRequired(false),
+                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -42,7 +42,7 @@ module.exports = {
 
         if (!logNumber && !logRange) {
             await interaction.reply(
-                'Please provide either a log number or a range of log numbers to edit.',
+                'Please provide either a log number or a range of log numbers to edit.'
             );
             return;
         }
@@ -57,11 +57,11 @@ module.exports = {
                     log.reason = newReason;
                     await log.save();
                     await interaction.reply(
-                        `Successfully updated reason for log #${logNumber} to: ${newReason}`,
+                        `Successfully updated reason for log #${logNumber} to: ${newReason}`
                     );
                 } else {
                     await interaction.reply(
-                        `No log found with log number ${logNumber}.`,
+                        `No log found with log number ${logNumber}.`
                     );
                 }
             } else if (logRange) {
@@ -71,7 +71,7 @@ module.exports = {
 
                 if (isNaN(start) || isNaN(end)) {
                     await interaction.reply(
-                        'Invalid log range. Please provide a valid range (e.g., 1-5).',
+                        'Invalid log range. Please provide a valid range (e.g., 1-5).'
                     );
                     return;
                 }
@@ -83,21 +83,21 @@ module.exports = {
                 if (logs.length > 0) {
                     await moderationLogs.updateMany(
                         { logNumber: { $gte: start, $lte: end } },
-                        { $set: { reason: newReason } },
+                        { $set: { reason: newReason } }
                     );
                     await interaction.reply(
-                        `Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`,
+                        `Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`
                     );
                 } else {
                     await interaction.reply(
-                        `No logs found in the range #${start}-#${end}.`,
+                        `No logs found in the range #${start}-#${end}.`
                     );
                 }
             }
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'Failed to update the log(s). Please try again later.',
+                'Failed to update the log(s). Please try again later.'
             );
         }
     },

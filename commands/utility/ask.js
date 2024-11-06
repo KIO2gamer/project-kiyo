@@ -9,7 +9,7 @@ module.exports = {
             option
                 .setName('question')
                 .setDescription('The question you want to ask Gemini AI')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     description_full:
@@ -42,7 +42,7 @@ module.exports = {
         } catch (error) {
             console.error('Error in ask-gemini command:', error);
             await interaction.editReply(
-                'Sorry, there was an error processing your request.',
+                'Sorry, there was an error processing your request.'
             );
         }
     },

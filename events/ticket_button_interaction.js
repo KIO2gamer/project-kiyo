@@ -55,7 +55,7 @@ module.exports = {
 
                 // Send a message to the ticket channel
                 await ticketChannel.send(
-                    `<@${interaction.user.id}>, your ticket has been created!`,
+                    `<@${interaction.user.id}>, your ticket has been created!`
                 );
 
                 // Send a message to the user

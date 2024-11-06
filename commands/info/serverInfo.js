@@ -88,7 +88,7 @@ async function sendServerInfo(interaction) {
                 name: '🔗 Vanity URL',
                 value: guild.vanityURLCode || 'None',
                 inline: true,
-            },
+            }
         )
         .setColor(0x00ae86)
         .setFooter({

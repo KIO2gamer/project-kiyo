@@ -23,27 +23,27 @@ module.exports = {
             option
                 .setName('question')
                 .setDescription('The question of the poll')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('options')
                 .setDescription('The options of the poll, separated by commas')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addBooleanOption((option) =>
             option
                 .setName('multi_select')
                 .setDescription('Allow multiple answer selections')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addIntegerOption((option) =>
             option
                 .setName('duration')
                 .setDescription(
-                    `Duration of the poll in hours (max ${MAX_POLL_DURATION_HOURS} hours)`,
+                    `Duration of the poll in hours (max ${MAX_POLL_DURATION_HOURS} hours)`
                 )
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -74,7 +74,7 @@ module.exports = {
 
             const durationMinutes = Math.min(
                 durationHours * 60,
-                MAX_POLL_DURATION_MINUTES,
+                MAX_POLL_DURATION_MINUTES
             );
 
             const pollEmbed = new EmbedBuilder()

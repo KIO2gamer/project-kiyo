@@ -16,8 +16,8 @@ module.exports = {
                 .setRequired(false)
                 .addChoices(
                     { name: 'Heads', value: 'heads' },
-                    { name: 'Tails', value: 'tails' },
-                ),
+                    { name: 'Tails', value: 'tails' }
+                )
         ),
     async execute(interaction) {
         const bet = interaction.options.getString('bet')?.toLowerCase();

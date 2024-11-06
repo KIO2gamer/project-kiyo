@@ -10,9 +10,9 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription(
-                    'The name or alias of the custom command to run',
+                    'The name or alias of the custom command to run'
                 )
-                .setRequired(true),
+                .setRequired(true)
         ),
     category: 'customs',
     description_full:

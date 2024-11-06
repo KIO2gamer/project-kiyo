@@ -17,7 +17,7 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The user to get information about')
-                .setRequired(false),
+                .setRequired(false)
         ),
     async execute(interaction) {
         const user = interaction.options.getUser('target') || interaction.user;
@@ -83,7 +83,7 @@ module.exports = {
                     member.roles.cache.size > 1 // Show roles only if there's more than @everyone
                         ? member.roles.cache
                               .filter(
-                                  (role) => role.id !== interaction.guild.id,
+                                  (role) => role.id !== interaction.guild.id
                               )
                               .sort((a, b) => b.position - a.position)
                               .map((role) => role.toString())

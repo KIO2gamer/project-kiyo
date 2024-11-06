@@ -14,7 +14,7 @@ module.exports = {
             option
                 .setName('search')
                 .setDescription('Name of the game')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -25,19 +25,19 @@ module.exports = {
         try {
             const accessToken = await this.getAccessToken(
                 clientId,
-                clientSecret,
+                clientSecret
             );
             const gameSlug = await this.searchGame(
                 gameName,
                 clientId,
-                accessToken,
+                accessToken
             );
 
             if (gameSlug) {
                 const game = await this.fetchGameDetails(
                     gameSlug,
                     clientId,
-                    accessToken,
+                    accessToken
                 );
                 const embed = this.createGameEmbed(game, interaction.user);
                 await interaction.editReply({ embeds: [embed] });
@@ -60,7 +60,7 @@ module.exports = {
                     client_secret: clientSecret,
                     grant_type: 'client_credentials',
                 },
-            },
+            }
         );
         return tokenResponse.data.access_token;
     },
@@ -74,7 +74,7 @@ module.exports = {
                     'Client-ID': clientId,
                     Authorization: `Bearer ${accessToken}`,
                 },
-            },
+            }
         );
         return searchResponse.data.length > 0
             ? searchResponse.data[0].slug
@@ -90,7 +90,7 @@ module.exports = {
                     'Client-ID': clientId,
                     Authorization: `Bearer ${accessToken}`,
                 },
-            },
+            }
         );
         return gameResponse.data[0];
     },
@@ -110,7 +110,7 @@ module.exports = {
                     name: 'Release Date',
                     value: game.first_release_date
                         ? new Date(
-                              game.first_release_date * 1000,
+                              game.first_release_date * 1000
                           ).toLocaleDateString()
                         : 'Unknown',
                     inline: true,
@@ -130,7 +130,7 @@ module.exports = {
                     name: 'IGDB',
                     value: `[Link](${game.url})`,
                     inline: true,
-                },
+                }
             )
             .setFooter({
                 text: `Requested by ${user.tag}`,

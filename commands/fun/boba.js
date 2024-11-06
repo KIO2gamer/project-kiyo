@@ -14,13 +14,13 @@ module.exports = {
     async execute(interaction) {
         try {
             const response = await fetch(
-                `https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=boba&limit=20`,
+                `https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=boba&limit=20`
             );
             const data = await response.json();
 
             if (data.data && data.data.length > 0) {
                 const randomIndex = Math.floor(
-                    Math.random() * data.data.length,
+                    Math.random() * data.data.length
                 );
                 const bobaGif = data.data[randomIndex].images.original.url;
 
@@ -31,13 +31,13 @@ module.exports = {
                 await interaction.editReply({ embeds: [embed] });
             } else {
                 await interaction.editReply(
-                    'Sorry, I could not find a Boba GIF.',
+                    'Sorry, I could not find a Boba GIF.'
                 );
             }
         } catch (error) {
             console.error('Error fetching Boba GIF:', error);
             await interaction.editReply(
-                'There was an error trying to fetch a Boba GIF.',
+                'There was an error trying to fetch a Boba GIF.'
             );
         }
     },

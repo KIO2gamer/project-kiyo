@@ -15,7 +15,7 @@ module.exports = {
             option
                 .setName('location')
                 .setDescription('The location to get the weather for')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -30,7 +30,7 @@ module.exports = {
                         key: apiKey,
                         q: city,
                     },
-                },
+                }
             );
 
             const weather = response.data;
@@ -98,7 +98,7 @@ module.exports = {
                         value: `${vis_km} km / ${vis_miles} miles`,
                         inline: true,
                     },
-                    { name: 'Local Time', value: `${localtime}`, inline: true },
+                    { name: 'Local Time', value: `${localtime}`, inline: true }
                 )
                 .setFooter({
                     text: 'Powered by WeatherAPI',
@@ -110,7 +110,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'Could not fetch the weather. Please make sure the city name is correct.',
+                'Could not fetch the weather. Please make sure the city name is correct.'
             );
         }
     },

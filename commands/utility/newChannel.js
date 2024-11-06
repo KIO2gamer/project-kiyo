@@ -24,7 +24,7 @@ module.exports = {
             option
                 .setName('name')
                 .setDescription('The name of the new channel')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addIntegerOption((option) =>
             option
@@ -37,23 +37,23 @@ module.exports = {
                     { name: 'Category', value: 4 },
                     { name: 'Announcement', value: 5 },
                     { name: 'Announcement', value: 5 },
-                    { name: 'Forum', value: 15 },
-                ),
+                    { name: 'Forum', value: 15 }
+                )
         )
         .addChannelOption((option) =>
             option
                 .setName('category')
                 .setDescription(
-                    'The category to create the channel in (optional)',
+                    'The category to create the channel in (optional)'
                 )
-                .addChannelTypes(ChannelType.GuildCategory),
+                .addChannelTypes(ChannelType.GuildCategory)
         )
         .addStringOption((option) =>
             option
                 .setName('topic')
                 .setDescription(
-                    'The topic (description) for the channel (optional)',
-                ),
+                    'The topic (description) for the channel (optional)'
+                )
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
@@ -77,7 +77,7 @@ module.exports = {
                 .setDescription(
                     `The ${getChannelType(newChannel)} channel <#${
                         newChannel.id
-                    }> has been successfully created.`,
+                    }> has been successfully created.`
                 )
                 .setTimestamp();
 
@@ -89,7 +89,7 @@ module.exports = {
                 await interaction.editReply({
                     content: 'An error occurred while creating the channel.',
                     ephemeral: true,
-                }),
+                })
             );
         }
     },

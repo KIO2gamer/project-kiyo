@@ -24,7 +24,10 @@ exports.handler = async function (event, context) {
     const { code, state } = getCodeAndState(event);
 
     if (!code || !state) {
-        return createErrorResponse(400, 'Missing authorization code or state parameter.');
+        return createErrorResponse(
+            400,
+            'Missing authorization code or state parameter.'
+        );
     }
 
     try {
@@ -32,15 +35,24 @@ exports.handler = async function (event, context) {
         const youtubeConnections = await getYouTubeConnections(accessToken);
 
         if (youtubeConnections.length === 0) {
-            return createErrorResponse(404, 'No YouTube connections found for this Discord account.');
+            return createErrorResponse(
+                404,
+                'No YouTube connections found for this Discord account.'
+            );
         }
 
         await saveOAuthRecord(state, code, youtubeConnections);
 
         return createSuccessResponse(youtubeConnections.length);
     } catch (error) {
-        console.error('❌ Error fetching Discord connections or saving to MongoDB:', error);
-        return createErrorResponse(500, 'An unexpected error occurred while processing your request.');
+        console.error(
+            '❌ Error fetching Discord connections or saving to MongoDB:',
+            error
+        );
+        return createErrorResponse(
+            500,
+            'An unexpected error occurred while processing your request.'
+        );
     }
 };
 
@@ -91,12 +103,17 @@ async function exchangeCodeForToken(code) {
 }
 
 async function getYouTubeConnections(accessToken) {
-    const connectionsResponse = await fetch('https://discord.com/api/users/@me/connections', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const connectionsResponse = await fetch(
+        'https://discord.com/api/users/@me/connections',
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        }
+    );
 
     const connectionsData = await connectionsResponse.json();
-    return connectionsData.filter((connection) => connection.type === 'youtube');
+    return connectionsData.filter(
+        (connection) => connection.type === 'youtube'
+    );
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {

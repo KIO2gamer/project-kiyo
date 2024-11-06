@@ -58,25 +58,25 @@ const commandBuilder = new SlashCommandBuilder()
         option
             .setName('name')
             .setDescription('The name of the role')
-            .setRequired(true),
+            .setRequired(true)
     )
     .addStringOption((option) =>
         option
             .setName('color')
             .setDescription('The color of the role')
-            .setRequired(false),
+            .setRequired(false)
     )
     .addBooleanOption((option) =>
         option
             .setName('hoist')
             .setDescription('Display role members separately')
-            .setRequired(false),
+            .setRequired(false)
     )
     .addBooleanOption((option) =>
         option
             .setName('mentionable')
             .setDescription('Allow the role to be mentionable')
-            .setRequired(false),
+            .setRequired(false)
     );
 
 // Add grouped permission options dynamically
@@ -85,7 +85,7 @@ permissionGroups.forEach((group) => {
         option
             .setName(group.name)
             .setDescription(group.description)
-            .setRequired(false),
+            .setRequired(false)
     );
 });
 

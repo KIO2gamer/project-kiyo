@@ -14,7 +14,7 @@ module.exports = {
             option
                 .setName('search')
                 .setDescription('Search for a specific command or topic')
-                .setRequired(false),
+                .setRequired(false)
         ),
     description_full:
         'Shows an interactive help menu with guides, commands, FAQs, and important links. Navigate through different sections using the buttons provided.',
@@ -33,7 +33,7 @@ module.exports = {
                 .setColor('#2F3136')
                 .setTitle('🎮 Interactive Help Menu')
                 .setDescription(
-                    '> Welcome to the interactive help menu! Select a category below to get started!',
+                    '> Welcome to the interactive help menu! Select a category below to get started!'
                 )
                 .addFields(
                     {
@@ -55,13 +55,13 @@ module.exports = {
                         name: '🔗 Links',
                         value: 'Important resources',
                         inline: true,
-                    },
+                    }
                 )
                 .setThumbnail(
                     interaction.client.user.displayAvatarURL({
                         dynamic: true,
                         size: 256,
-                    }),
+                    })
                 )
                 .setTimestamp()
                 .setFooter({
@@ -92,7 +92,7 @@ module.exports = {
                     .setLabel('Links')
                     .setStyle(ButtonStyle.Link)
                     .setURL('https://discord.gg/support')
-                    .setEmoji('🔗'),
+                    .setEmoji('🔗')
             );
 
             // Send initial editReply with the main help menu
@@ -121,7 +121,7 @@ module.exports = {
                         (cmd.description_full &&
                             cmd.description_full
                                 .toLowerCase()
-                                .includes(searchQuery)),
+                                .includes(searchQuery))
                 );
 
                 if (commands.length === 0) {
@@ -151,20 +151,20 @@ module.exports = {
                         .setColor('#2F3136')
                         .setTitle(`🤖 ${category} Commands`)
                         .setDescription(
-                            '> Here are the available commands in this category:',
+                            '> Here are the available commands in this category:'
                         )
                         .addFields(
                             pageCommands.map((cmd) => ({
                                 name: `/${cmd.data.name}`,
                                 value: `**Description:** ${cmd.data.description || 'No description'}\n**Usage:** ${cmd.usage || 'No usage info'}`,
                                 inline: false,
-                            })),
+                            }))
                         )
                         .setThumbnail(
                             interaction.client.user.displayAvatarURL({
                                 dynamic: true,
                                 size: 256,
-                            }),
+                            })
                         )
                         .setFooter({
                             text: `Page ${pages.length + 1}`,
@@ -195,7 +195,7 @@ module.exports = {
                         .setLabel('Next')
                         .setStyle(ButtonStyle.Primary)
                         .setEmoji('➡️')
-                        .setDisabled(currentPage === pages.length - 1),
+                        .setDisabled(currentPage === pages.length - 1)
                 );
 
             // Collector for button interactions
@@ -212,7 +212,7 @@ module.exports = {
                             .setColor('#2F3136')
                             .setTitle('📚 Setup Guide')
                             .setDescription(
-                                '> Follow these steps to get started:',
+                                '> Follow these steps to get started:'
                             )
                             .addFields(
                                 {
@@ -234,13 +234,13 @@ module.exports = {
                                     name: '4️⃣ Get Support',
                                     value: 'Join our support server if you need help.',
                                     inline: false,
-                                },
+                                }
                             )
                             .setThumbnail(
                                 interaction.client.user.displayAvatarURL({
                                     dynamic: true,
                                     size: 256,
-                                }),
+                                })
                             )
                             .setFooter({
                                 text: 'Click the back button to return to the main menu',
@@ -254,7 +254,7 @@ module.exports = {
                                 .setCustomId('back')
                                 .setLabel('Back')
                                 .setStyle(ButtonStyle.Secondary)
-                                .setEmoji('↩️'),
+                                .setEmoji('↩️')
                         );
 
                         await i.update({
@@ -276,13 +276,13 @@ module.exports = {
                                     name: 'Bot not responding?',
                                     value: 'Check permissions and command syntax.',
                                     inline: false,
-                                },
+                                }
                             )
                             .setThumbnail(
                                 interaction.client.user.displayAvatarURL({
                                     dynamic: true,
                                     size: 256,
-                                }),
+                                })
                             )
                             .setFooter({
                                 text: 'Click the back button to return to the main menu',
@@ -296,7 +296,7 @@ module.exports = {
                                 .setCustomId('back')
                                 .setLabel('Back')
                                 .setStyle(ButtonStyle.Secondary)
-                                .setEmoji('↩️'),
+                                .setEmoji('↩️')
                         );
 
                         await i.update({

@@ -17,7 +17,7 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription("The user's avatar to show")
-                .setRequired(false),
+                .setRequired(false)
         )
         .addIntegerOption((option) =>
             option
@@ -33,8 +33,8 @@ module.exports = {
                     { name: '512', value: 512 },
                     { name: '1024', value: 1024 },
                     { name: '2048', value: 2048 },
-                    { name: '4096', value: 4096 },
-                ),
+                    { name: '4096', value: 4096 }
+                )
         )
         .addStringOption((option) =>
             option
@@ -44,9 +44,9 @@ module.exports = {
                 .addChoices(
                     { name: 'PNG', value: 'png' },
                     { name: 'JPEG', value: 'jpg' },
-                    { name: 'WebP', value: 'webp' },
+                    { name: 'WebP', value: 'webp' }
                     // Only allow GIF if the user has a GIF avatar
-                ),
+                )
         ),
 
     async execute(interaction) {

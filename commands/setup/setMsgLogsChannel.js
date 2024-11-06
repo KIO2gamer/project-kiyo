@@ -14,7 +14,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('set_msg_logs_channel')
         .setDescription(
-            'Sets the channel where message logs would be sent into.',
+            'Sets the channel where message logs would be sent into.'
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption((option) =>
@@ -22,7 +22,7 @@ module.exports = {
                 .setName('channel')
                 .setDescription('The channel to show message logs to.')
                 .setRequired(true)
-                .addChannelTypes(ChannelType.GuildText),
+                .addChannelTypes(ChannelType.GuildText)
         ),
     async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
@@ -32,11 +32,11 @@ module.exports = {
             await MsgLogsConfig.findOneAndUpdate(
                 { guildId: interaction.guild.id },
                 { channelId: channel.id },
-                { upsert: true, new: true },
+                { upsert: true, new: true }
             );
 
             await interaction.editReply(
-                `Message logs channel set to: ${channel}`,
+                `Message logs channel set to: ${channel}`
             );
         } catch (error) {
             console.error('Error setting message logs channel:', error);

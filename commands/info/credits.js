@@ -30,7 +30,7 @@ module.exports = {
             .setTitle('✨ Credits ✨')
             .setColor('#0099ff')
             .setDescription(
-                'A big thank you to all the amazing contributors who helped make this bot possible!',
+                'A big thank you to all the amazing contributors who helped make this bot possible!'
             )
             .setTimestamp()
             .setFooter({ text: 'Thanks to all the contributors!' });
@@ -39,7 +39,7 @@ module.exports = {
 
         contributors.forEach((contributor) => {
             const command = guildCommands.find(
-                (cmd) => cmd.name === contributor.command,
+                (cmd) => cmd.name === contributor.command
             );
             if (command) {
                 embed.addFields([

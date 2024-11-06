@@ -20,9 +20,9 @@ module.exports = {
             option
                 .setName('expression')
                 .setDescription(
-                    'The mathematical expression to calculate (e.g., 2 + 5 * 3)',
+                    'The mathematical expression to calculate (e.g., 2 + 5 * 3)'
                 )
-                .setRequired(true),
+                .setRequired(true)
         ),
     description_full:
         'Perform mathematical calculations using the mathjs library. This command can handle a wide range of mathematical operations and functions.',
@@ -48,7 +48,7 @@ module.exports = {
                         value: `\`${expression}\``,
                         inline: false,
                     },
-                    { name: 'Result:', value: `\`${result}\``, inline: false },
+                    { name: 'Result:', value: `\`${result}\``, inline: false }
                 )
                 .setTimestamp();
 

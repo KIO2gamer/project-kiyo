@@ -24,13 +24,13 @@ module.exports = {
             option
                 .setName('query')
                 .setDescription('The search query')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('channel')
                 .setDescription('Filter by channel name')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addStringOption((option) =>
             option
@@ -41,8 +41,8 @@ module.exports = {
                     { name: 'Any', value: 'any' },
                     { name: 'Short (< 4 minutes)', value: 'short' },
                     { name: 'Medium (4-20 minutes)', value: 'medium' },
-                    { name: 'Long (> 20 minutes)', value: 'long' },
-                ),
+                    { name: 'Long (> 20 minutes)', value: 'long' }
+                )
         )
         .addStringOption((option) =>
             option
@@ -53,8 +53,8 @@ module.exports = {
                     { name: 'Relevance', value: 'relevance' },
                     { name: 'Date', value: 'date' },
                     { name: 'View Count', value: 'viewCount' },
-                    { name: 'Rating', value: 'rating' },
-                ),
+                    { name: 'Rating', value: 'rating' }
+                )
         )
         .addIntegerOption((option) =>
             option
@@ -62,7 +62,7 @@ module.exports = {
                 .setDescription('Maximum number of results per page (1-10)')
                 .setRequired(false)
                 .setMinValue(1)
-                .setMaxValue(10),
+                .setMaxValue(10)
         ),
     description_full:
         'Search for YouTube videos with optional filters for channel, duration, order, type, and max results. Results are displayed in an embedded message with pagination.',
@@ -227,7 +227,7 @@ module.exports = {
                         .setCustomId('prev')
                         .setLabel('Previous')
                         .setStyle(ButtonStyle.Primary)
-                        .setDisabled(currentPage === 1), // Disable 'Previous' on first page
+                        .setDisabled(currentPage === 1) // Disable 'Previous' on first page
                 );
             }
             if (nextPageToken) {
@@ -235,7 +235,7 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId('next')
                         .setLabel('Next')
-                        .setStyle(ButtonStyle.Primary),
+                        .setStyle(ButtonStyle.Primary)
                 );
             }
 

@@ -31,7 +31,7 @@ module.exports = {
         try {
             const data = await fs.readFile(
                 './assets/texts/hangmanWords.txt',
-                'utf-8',
+                'utf-8'
             );
             const words = data
                 .split('\n')
@@ -40,7 +40,7 @@ module.exports = {
 
             if (words.length === 0) {
                 await interaction.reply(
-                    'Oops! The word list is as empty as a ghost town!',
+                    'Oops! The word list is as empty as a ghost town!'
                 );
                 return;
             }
@@ -54,7 +54,7 @@ module.exports = {
                 .setColor(0x0099ff)
                 .setTitle('🎭 Hangman Extravaganza! 🎭')
                 .setDescription(
-                    `Can you save the stickman? Let's find out!\n\n\`\`\`${wordState}\`\`\``,
+                    `Can you save the stickman? Let's find out!\n\n\`\`\`${wordState}\`\`\``
                 )
                 .setThumbnail(hangmanImages[0])
                 .addFields(
@@ -67,7 +67,7 @@ module.exports = {
                         name: '🔤 Guessed Letters',
                         value: 'None yet!',
                         inline: true,
-                    },
+                    }
                 )
                 .setFooter({ text: 'Type a letter to make a guess!' });
 
@@ -89,7 +89,7 @@ module.exports = {
                 const letter = m.content.toLowerCase();
                 if (guessedLetters.includes(letter)) {
                     const reply = await m.reply(
-                        "You've already guessed that letter! Try another one.",
+                        "You've already guessed that letter! Try another one."
                     );
                     setTimeout(() => reply.delete(), 3000);
                     m.delete();
@@ -108,7 +108,7 @@ module.exports = {
                         }
                     }
                     const reply = await m.reply(
-                        `🎉 Great guess! '${letter.toUpperCase()}' is in the word!`,
+                        `🎉 Great guess! '${letter.toUpperCase()}' is in the word!`
                     );
                     setTimeout(() => reply.delete(), 3000);
                 } else {
@@ -125,7 +125,7 @@ module.exports = {
 
                 gameEmbed
                     .setDescription(
-                        `Let's keep the guessing game going!\n\n\`\`\`${wordState}\`\`\``,
+                        `Let's keep the guessing game going!\n\n\`\`\`${wordState}\`\`\``
                     )
                     .setThumbnail(hangmanImages[6 - remainingGuesses])
                     .setFields([
@@ -152,7 +152,7 @@ module.exports = {
                         .setColor(0xff0000)
                         .setTitle('💀 Game Over! The hangman got hanged! 💀')
                         .setDescription(
-                            `Oh no! The word was **${word}**. Better luck next time!`,
+                            `Oh no! The word was **${word}**. Better luck next time!`
                         )
                         .setFooter({
                             text: "Don't worry, it's just a game... right?",
@@ -167,7 +167,7 @@ module.exports = {
                         .setColor(0x00ff00)
                         .setTitle('🎊 Woohoo! You saved the day! 🎊')
                         .setDescription(
-                            `Congratulations! You guessed the word **${word}**!`,
+                            `Congratulations! You guessed the word **${word}**!`
                         )
                         .setFooter({
                             text: "You're officially a word wizard!",
@@ -186,7 +186,7 @@ module.exports = {
                         .setColor(0xff0000)
                         .setTitle("⏰ Time's Up! ⏰")
                         .setDescription(
-                            `Looks like the clock won this round! The word was **${word}**.`,
+                            `Looks like the clock won this round! The word was **${word}**.`
                         )
                         .setFooter({
                             text: "Time flies when you're having fun... or trying to guess words!",
@@ -197,7 +197,7 @@ module.exports = {
         } catch (err) {
             console.error('Failed to read the word list:', err);
             await interaction.reply(
-                'Oops! An error occurred while setting up the game. Maybe the hangman took a coffee break?',
+                'Oops! An error occurred while setting up the game. Maybe the hangman took a coffee break?'
             );
         }
     },

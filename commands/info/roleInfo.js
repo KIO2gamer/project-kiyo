@@ -14,14 +14,14 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to get information about')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const role = interaction.options.getRole('role');
 
         const permissions = role.permissions.toArray().map((perm) => {
             const permName = Object.keys(PermissionsBitField.Flags).find(
-                (key) => PermissionsBitField.Flags[key] === perm,
+                (key) => PermissionsBitField.Flags[key] === perm
             );
             return permName ? permName.replace(/_/g, ' ').toLowerCase() : perm;
         });
@@ -48,7 +48,7 @@ module.exports = {
                     name: 'Number of Members with Role',
                     value: role.members.size.toString(),
                     inline: true,
-                },
+                }
             );
 
         await interaction.reply({ embeds: [embed] });

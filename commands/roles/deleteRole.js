@@ -12,7 +12,7 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to delete')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {

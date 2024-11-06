@@ -20,7 +20,7 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
 if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN || !MONGODB_URI) {
     console.error(
         '\x1b[31m%s\x1b[0m',
-        '[ERROR] Missing required environment variables.',
+        '[ERROR] Missing required environment variables.'
     );
     process.exit(1);
 }
@@ -57,13 +57,13 @@ const loadFiles = (dir, fileAction) => {
 const loadCommandsAndEvents = (commandsDir, eventsDir) => {
     console.log(
         '\x1b[33m%s\x1b[0m',
-        '[COMMANDS & EVENTS] Loading commands and events...',
+        '[COMMANDS & EVENTS] Loading commands and events...'
     );
     loadCommands(commandsDir);
     loadEvents(eventsDir);
     console.log(
         '\x1b[32m%s\x1b[0m',
-        '[COMMANDS & EVENTS] Commands and events loaded successfully!!!',
+        '[COMMANDS & EVENTS] Commands and events loaded successfully!!!'
     );
 };
 
@@ -80,7 +80,7 @@ const registerCommand = (command) => {
     if (client.commands.has(command.data.name)) {
         console.warn(
             '\x1b[33m%s\x1b[0m',
-            `[WARNING] Duplicate command name detected: ${command.data.name}`,
+            `[WARNING] Duplicate command name detected: ${command.data.name}`
         );
     } else {
         client.commands.set(command.data.name, command);
@@ -89,7 +89,7 @@ const registerCommand = (command) => {
                 if (client.commands.has(alias)) {
                     console.warn(
                         '\x1b[33m%s\x1b[0m',
-                        `[WARNING] Duplicate command alias detected: ${alias}`,
+                        `[WARNING] Duplicate command alias detected: ${alias}`
                     );
                 } else {
                     client.commands.set(alias, command);
@@ -118,7 +118,7 @@ const connectToMongoDB = async () => {
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[DATABASE] MongoDB connection failed: ${error.message}`,
+            `[DATABASE] MongoDB connection failed: ${error.message}`
         );
         process.exit(1);
     }
@@ -128,7 +128,7 @@ const deployCommands = async () => {
     if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            '[DEPLOY] Missing required environment variables for deploying commands.',
+            '[DEPLOY] Missing required environment variables for deploying commands.'
         );
         return;
     }
@@ -146,7 +146,7 @@ const deployCommands = async () => {
             if (commandNames.has(command.data.name)) {
                 console.warn(
                     '\x1b[33m%s\x1b[0m',
-                    `[WARNING] Duplicate command name detected: ${command.data.name}`,
+                    `[WARNING] Duplicate command name detected: ${command.data.name}`
                 );
             } else {
                 commands.push(command.data.toJSON());
@@ -162,17 +162,17 @@ const deployCommands = async () => {
                 Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
                 {
                     body: commands,
-                },
+                }
             );
             console.log(
                 '\x1b[32m%s\x1b[0m',
-                `[DEPLOY] Successfully deployed ${commands.length} commands to guild ${guildId}`,
+                `[DEPLOY] Successfully deployed ${commands.length} commands to guild ${guildId}`
             );
         }
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[DEPLOY] Command deployment failed: ${error.message}`,
+            `[DEPLOY] Command deployment failed: ${error.message}`
         );
     }
 };
@@ -215,7 +215,7 @@ process.on('SIGINT', async () => {
         await Promise.all([connectToMongoDB(), deployCommands()]);
         loadCommandsAndEvents(
             path.join(__dirname, 'commands'),
-            path.join(__dirname, 'events'),
+            path.join(__dirname, 'events')
         );
         await client.login(DISCORD_TOKEN);
         setRichPresence({});
@@ -223,7 +223,7 @@ process.on('SIGINT', async () => {
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
-            `[BOT] Failed to start the bot: ${error.message}`,
+            `[BOT] Failed to start the bot: ${error.message}`
         );
         process.exit(1);
     }

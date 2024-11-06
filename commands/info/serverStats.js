@@ -15,8 +15,8 @@ module.exports = {
                     { name: 'Last 7 Days', value: '7d' },
                     { name: 'Last 30 Days', value: '30d' },
                     { name: 'Last Month', value: '1M' },
-                    { name: 'All Time', value: 'all' },
-                ),
+                    { name: 'All Time', value: 'all' }
+                )
         ),
     description_full:
         'Displays various statistics about this server, including member count, channel count, message activity, and more. You can specify a timeframe to view stats for a specific period.',
@@ -41,7 +41,7 @@ module.exports = {
         } catch (error) {
             console.error('Error executing server_stats:', error);
             await interaction.editReply(
-                'An error occurred while fetching server stats.',
+                'An error occurred while fetching server stats.'
             );
         }
     },
@@ -89,12 +89,12 @@ async function collectServerStats(guild, startDate) {
             if (messages.size === 0) break;
 
             const relevantMessages = messages.filter(
-                (msg) => msg.createdAt >= startDate,
+                (msg) => msg.createdAt >= startDate
             );
             stats.messagesSent += relevantMessages.size;
             stats.reactionsGiven += relevantMessages.reduce(
                 (acc, msg) => acc + msg.reactions.cache.size,
-                0,
+                0
             );
 
             if (messages.size < 100) break;
@@ -109,7 +109,7 @@ function createStatsEmbed(guild, timeframe, stats) {
     return new EmbedBuilder()
         .setTitle(`Server Stats for ${guild.name}`)
         .setDescription(
-            `Statistics from ${timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`}`,
+            `Statistics from ${timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`}`
         )
         .addFields(
             { name: 'New Members', value: `${stats.newMembers}`, inline: true },
@@ -143,7 +143,7 @@ function createStatsEmbed(guild, timeframe, stats) {
                 value: `${stats.reactionsGiven}`,
                 inline: true,
             },
-            { name: '\u200B', value: '\u200B', inline: true },
+            { name: '\u200B', value: '\u200B', inline: true }
         )
         .setTimestamp();
 }

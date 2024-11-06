@@ -16,7 +16,7 @@ module.exports = {
             option
                 .setName('command')
                 .setDescription('The command to reload.')
-                .setRequired(false),
+                .setRequired(false)
         ),
     async execute(interaction) {
         const commandName = interaction.options.getString('command');
@@ -28,13 +28,13 @@ module.exports = {
                 interaction,
                 commandName,
                 foldersPath,
-                commandFolders,
+                commandFolders
             );
         } else {
             await this.reloadAllCommands(
                 interaction,
                 foldersPath,
-                commandFolders,
+                commandFolders
             );
         }
     },
@@ -43,12 +43,12 @@ module.exports = {
         interaction,
         commandName,
         foldersPath,
-        commandFolders,
+        commandFolders
     ) {
         const commandPath = this.findCommandPath(
             commandName,
             foldersPath,
-            commandFolders,
+            commandFolders
         );
 
         if (!commandPath) {
@@ -86,7 +86,7 @@ module.exports = {
                         .readdirSync(commandsPath)
                         .filter((file) => file.endsWith('.js'));
                     const commandFile = commandFiles.find(
-                        (file) => file === `${commandName}.js`,
+                        (file) => file === `${commandName}.js`
                     );
                     if (commandFile) {
                         return path.join(commandsPath, commandFile);
@@ -112,11 +112,11 @@ module.exports = {
                         if ('data' in command && 'execute' in command) {
                             interaction.client.commands.set(
                                 command.data.name,
-                                command,
+                                command
                             );
                         } else {
                             console.log(
-                                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
+                                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
                             );
                         }
                     } catch (error) {

@@ -9,7 +9,7 @@ module.exports = {
             option
                 .setName('url')
                 .setDescription('URL to check')
-                .setRequired(true),
+                .setRequired(true)
         ),
     category: 'utility',
     description_full:
@@ -38,7 +38,7 @@ module.exports = {
                 .setColor(response.ok ? 0x00ff00 : 0xff0000)
                 .setTitle(`Status Check: ${url}`)
                 .setDescription(
-                    response.ok ? 'Service is online' : 'Service is offline',
+                    response.ok ? 'Service is online' : 'Service is offline'
                 )
                 .addFields(
                     {
@@ -72,7 +72,7 @@ module.exports = {
                             ? `${contentLength} bytes`
                             : 'Not specified',
                         inline: true,
-                    },
+                    }
                 )
                 .setFooter({ text: 'Status check performed at' })
                 .setTimestamp();

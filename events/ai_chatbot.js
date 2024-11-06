@@ -114,45 +114,45 @@ module.exports = {
         try {
             conversationHistory = this.storeUserMessage(
                 conversationHistory,
-                message.content,
+                message.content
             );
 
             let geminiConversation = this.combineContextWithMessage(
                 conversationHistory,
-                message.content,
+                message.content
             );
 
             geminiConversation = this.ensureConversationStartsWithUser(
                 geminiConversation,
-                message.content,
+                message.content
             );
 
             const response = await this.getAIResponse(
                 geminiConversation,
-                message.content,
+                message.content
             );
 
             conversationHistory = this.storeModelResponse(
                 conversationHistory,
-                response,
+                response
             );
 
             conversationHistory = this.limitConversationHistory(
                 conversationHistory,
-                50,
+                50
             );
 
             await ChatHistory.findOneAndUpdate(
                 { userId: message.author.id },
                 { userId: message.author.id, messages: conversationHistory },
-                { upsert: true, new: true },
+                { upsert: true, new: true }
             );
 
             await sendLongMessage(message, response);
         } catch (error) {
             console.error('Error generating response:', error);
             await message.channel.send(
-                'Sorry, there was an error processing your message.',
+                'Sorry, there was an error processing your message.'
             );
         }
     },

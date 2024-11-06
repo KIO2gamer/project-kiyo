@@ -22,7 +22,7 @@ module.exports = {
             option
                 .setName('channel')
                 .setDescription('The channel to get information about')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
@@ -30,7 +30,7 @@ module.exports = {
         try {
             const getPermissions = (channel, guild) => {
                 const permissions = channel.permissionsFor(
-                    guild.roles.everyone,
+                    guild.roles.everyone
                 );
                 if (!permissions) return 'No permissions';
 
@@ -44,10 +44,10 @@ module.exports = {
                                       .find(
                                           (key) =>
                                               PermissionsBitField.Flags[key] ===
-                                              perm,
+                                              perm
                                       )
                                       ?.replace(/_/g, ' ')
-                                      .toLowerCase() || perm,
+                                      .toLowerCase() || perm
                           )
                           .join(', ')
                     : 'No permissions';
@@ -67,7 +67,7 @@ module.exports = {
                     {
                         name: 'Created At',
                         value: `<t:${Math.floor(
-                            channel.createdAt.getTime() / 1000,
+                            channel.createdAt.getTime() / 1000
                         )}>`,
                         inline: true,
                     },
@@ -85,7 +85,7 @@ module.exports = {
                         name: 'Permissions',
                         value: getPermissions(channel, interaction.guild),
                         inline: false,
-                    },
+                    }
                 );
             if (channel.parent) {
                 embed.addFields({

@@ -13,32 +13,32 @@ module.exports = {
     async execute(interaction) {
         try {
             const response = await fetch(
-                `https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=quokka&limit=10`,
+                `https://api.giphy.com/v1/gifs/search?api_key=${process.env.GIPHY_API_KEY}&q=quokka&limit=10`
             );
             const data = await response.json();
 
             if (data.results && data.results.length > 0) {
                 const randomIndex = Math.floor(
-                    Math.random() * data.data.length,
+                    Math.random() * data.data.length
                 );
                 const quokkaGif = data.data[randomIndex].images.original.url; // Adjust as necessary for the correct URL
 
                 const embed = new EmbedBuilder()
                     .setTitle(
-                        'You have been blessed by the powers of a quokka!',
+                        'You have been blessed by the powers of a quokka!'
                     )
                     .setImage(quokkaGif);
 
                 await interaction.editReply({ embeds: [embed] });
             } else {
                 await interaction.editReply(
-                    'Sorry, I could not find a quokka GIF.',
+                    'Sorry, I could not find a quokka GIF.'
                 );
             }
         } catch (error) {
             console.error('Error fetching quokka GIF:', error);
             await interaction.editReply(
-                'There was an error trying to fetch a quokka GIF.',
+                'There was an error trying to fetch a quokka GIF.'
             );
         }
     },

@@ -24,7 +24,7 @@ module.exports = {
             option
                 .setName('channel')
                 .setDescription('The channel to delete')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const channel = interaction.options.getChannel('channel');
@@ -38,7 +38,7 @@ module.exports = {
                 .setDescription(
                     `The ${getChannelType(channel)} ${
                         channel.id
-                    } has been successfully deleted.`,
+                    } has been successfully deleted.`
                 )
                 .setTimestamp();
 

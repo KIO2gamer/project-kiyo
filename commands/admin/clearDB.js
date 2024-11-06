@@ -16,7 +16,7 @@ module.exports = {
         // Check if user has the highest admin role
         if (
             !interaction.member.permissions.has(
-                PermissionFlagsBits.Administrator,
+                PermissionFlagsBits.Administrator
             )
         ) {
             return interaction.editReply({
@@ -54,12 +54,12 @@ module.exports = {
                         }
 
                         await message.editReply(
-                            '✅ Database has been completely wiped.',
+                            '✅ Database has been completely wiped.'
                         );
                     } catch (error) {
                         console.error('Database clear error:', error);
                         await message.editReply(
-                            '❌ An error occurred while clearing the database.',
+                            '❌ An error occurred while clearing the database.'
                         );
                     }
                 } else {

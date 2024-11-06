@@ -25,8 +25,8 @@ module.exports = {
                     { name: 'Paper 📄', value: 'paper' },
                     { name: 'Scissors ✂️', value: 'scissors' },
                     { name: 'Lizard 🦎', value: 'lizard' },
-                    { name: 'Spock 🖖', value: 'spock' },
-                ),
+                    { name: 'Spock 🖖', value: 'spock' }
+                )
         ),
     async execute(interaction) {
         const userChoice = interaction.options.getString('choice');
@@ -74,7 +74,7 @@ module.exports = {
             .setColor('#0099ff')
             .setTitle('Rock, Paper, Scissors, Lizard, Spock')
             .setDescription(
-                `You chose ${emojis[userChoice]} ${userChoice}.\nI chose ${emojis[botChoice]} ${botChoice}.\n\n${result}\n${action}`,
+                `You chose ${emojis[userChoice]} ${userChoice}.\nI chose ${emojis[botChoice]} ${botChoice}.\n\n${result}\n${action}`
             )
             .setFooter({ text: 'As Sheldon Cooper would say, "Bazinga!"' });
 

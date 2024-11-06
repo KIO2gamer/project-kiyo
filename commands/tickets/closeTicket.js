@@ -23,7 +23,7 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName('reason')
-                .setDescription('The reason for closing the ticket'),
+                .setDescription('The reason for closing the ticket')
         ),
     async execute(interaction) {
         const reason =
@@ -48,7 +48,7 @@ module.exports = {
                         new EmbedBuilder()
                             .setTitle('Ticket Closed')
                             .setDescription(
-                                `Your ticket in \`${interaction.channel.guild.name}\` has been closed. Reason: ${reason}`,
+                                `Your ticket in \`${interaction.channel.guild.name}\` has been closed. Reason: ${reason}`
                             )
                             .setColor('Green')
                             .setThumbnail(interaction.channel.guild.iconURL())

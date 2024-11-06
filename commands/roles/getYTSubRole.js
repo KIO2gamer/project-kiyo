@@ -17,7 +17,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('get_yt_sub_role')
         .setDescription(
-            'Automatically assign a role based on your channel with the highest subscriber count.',
+            'Automatically assign a role based on your channel with the highest subscriber count.'
         ),
 
     async execute(interaction) {
@@ -27,7 +27,7 @@ module.exports = {
             const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${
                 process.env.DISCORD_CLIENT_ID
             }&redirect_uri=${encodeURIComponent(
-                process.env.DISCORD_REDIRECT_URI,
+                process.env.DISCORD_REDIRECT_URI
             )}&response_type=code&scope=identify%20connections&state=${interactionId}`;
 
             const embed = {
@@ -90,14 +90,14 @@ module.exports = {
 
             // Fetch subscriber counts for all YouTube connections and find the one with the highest count
             const highestSubscriberData = await getHighestSubscriberCount(
-                oauthData.youtubeConnections,
+                oauthData.youtubeConnections
             );
             const { youtubeChannelId, subscriberCount } = highestSubscriberData;
 
             if (subscriberCount !== null) {
                 const assignedRole = await assignSubscriberRole(
                     interaction.member,
-                    subscriberCount,
+                    subscriberCount
                 );
                 const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
                 const embed = {

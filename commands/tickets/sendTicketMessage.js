@@ -24,24 +24,24 @@ module.exports = {
             option
                 .setName('channel')
                 .setDescription('The channel to send the setup message to.')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('title')
-                .setDescription('The title of the ticket embed (optional)'),
+                .setDescription('The title of the ticket embed (optional)')
         )
         .addStringOption((option) =>
             option
                 .setName('description')
                 .setDescription(
-                    'The description of the ticket embed (optional)',
-                ),
+                    'The description of the ticket embed (optional)'
+                )
         )
         .addStringOption((option) =>
             option
                 .setName('button_label')
-                .setDescription('The label for the ticket button (optional)'),
+                .setDescription('The label for the ticket button (optional)')
         ),
     async execute(interaction) {
         const channel = interaction.options.getChannel('channel');

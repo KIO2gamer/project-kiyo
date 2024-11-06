@@ -23,13 +23,13 @@ module.exports = {
                 .setDescription('The number of messages to delete')
                 .setRequired(true)
                 .setMinValue(1)
-                .setMaxValue(100),
+                .setMaxValue(100)
         )
         .addUserOption((option) =>
             option
                 .setName('user')
                 .setDescription('The user whose messages to delete (optional)')
-                .setRequired(false),
+                .setRequired(false)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
@@ -62,7 +62,7 @@ module.exports = {
                         new EmbedBuilder()
                             .setTitle('No Messages Found')
                             .setDescription(
-                                'There are no messages to delete that match the criteria.',
+                                'There are no messages to delete that match the criteria.'
                             )
                             .setColor('Yellow'),
                     ],
@@ -72,13 +72,13 @@ module.exports = {
 
             const deletedCount = await interaction.channel.bulkDelete(
                 messages,
-                true,
+                true
             );
 
             const embed = new EmbedBuilder()
                 .setTitle('Purge Completed')
                 .setDescription(
-                    `Successfully deleted ${deletedCount.size} message(s).`,
+                    `Successfully deleted ${deletedCount.size} message(s).`
                 )
                 .setColor('Green')
                 .setTimestamp();
@@ -91,13 +91,13 @@ module.exports = {
 
             // Log the purge action
             const logChannel = interaction.guild.channels.cache.find(
-                (channel) => channel.name === 'mod-logs',
+                (channel) => channel.name === 'mod-logs'
             );
             if (logChannel) {
                 const logEmbed = new EmbedBuilder()
                     .setTitle('Purge Action')
                     .setDescription(
-                        `${interaction.user.tag} purged ${deletedCount.size} message(s) in #${interaction.channel.name}`,
+                        `${interaction.user.tag} purged ${deletedCount.size} message(s) in #${interaction.channel.name}`
                     )
                     .setColor('Blue')
                     .setTimestamp();
@@ -118,7 +118,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('Purge Failed')
                         .setDescription(
-                            'An error occurred while trying to purge messages. Messages older than 14 days cannot be bulk deleted.',
+                            'An error occurred while trying to purge messages. Messages older than 14 days cannot be bulk deleted.'
                         )
                         .setColor('Red'),
                 ],

@@ -25,7 +25,7 @@ async function handleError(interaction, error) {
     const errorEmbed = new EmbedBuilder()
         .setTitle('An error occurred')
         .setDescription(
-            'There was a problem executing the command. Please try again later.',
+            'There was a problem executing the command. Please try again later.'
         )
         .setColor('Red')
         .setTimestamp();

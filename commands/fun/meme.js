@@ -43,7 +43,7 @@ module.exports = {
             await interaction.reply({ embeds: [memeEmbed] });
         } else {
             await interaction.reply(
-                'Could not fetch a non-NSFW meme at this time. Please try again later.',
+                'Could not fetch a non-NSFW meme at this time. Please try again later.'
             );
         }
     },

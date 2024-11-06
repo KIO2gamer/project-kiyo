@@ -28,7 +28,7 @@ module.exports = {
                     name: 'WebSocket Ping',
                     value: `${interaction.client.ws.ping}ms`,
                     inline: true,
-                },
+                }
             )
             .setTimestamp();
 

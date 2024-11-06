@@ -21,18 +21,18 @@ module.exports = {
             option
                 .setName('target')
                 .setDescription('The member to timeout')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('amount')
                 .setDescription(
-                    'The duration of the timeout (max 28 days) e.g. 1d | 2 weeks | 3hrs',
+                    'The duration of the timeout (max 28 days) e.g. 1d | 2 weeks | 3hrs'
                 )
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for timeout'),
+            option.setName('reason').setDescription('The reason for timeout')
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
 
@@ -65,7 +65,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot timeout the owner of the server',
+                            'You cannot timeout the owner of the server'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -89,7 +89,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'You cannot timeout someone with a higher or equal role than you',
+                            'You cannot timeout someone with a higher or equal role than you'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -107,7 +107,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'I cannot timeout someone with a higher or equal role than myself',
+                            'I cannot timeout someone with a higher or equal role than myself'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -125,7 +125,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'Please provide a valid duration (max 28 days)',
+                            'Please provide a valid duration (max 28 days)'
                         )
                         .setColor('Red')
                         .setFooter({
@@ -154,7 +154,7 @@ module.exports = {
                         new EmbedBuilder()
                             .setTitle('Timeout Removed')
                             .setDescription(
-                                `<@${targetUser.id}>'s timeout has been removed. Reason: \`${reason}\``,
+                                `<@${targetUser.id}>'s timeout has been removed. Reason: \`${reason}\``
                             )
                             .setColor('Green')
                             .setFooter({
@@ -169,7 +169,7 @@ module.exports = {
                         new EmbedBuilder()
                             .setTitle('ERROR')
                             .setDescription(
-                                'The total timeout duration exceeds the maximum limit of 28 days.',
+                                'The total timeout duration exceeds the maximum limit of 28 days.'
                             )
                             .setColor('Red')
                             .setFooter({
@@ -195,7 +195,7 @@ module.exports = {
                         new EmbedBuilder()
                             .setTitle('Timeout Updated')
                             .setDescription(
-                                `<@${targetUser.id}>'s timeout has been updated. Reason: \`${reason}\`\nNew Duration: \`${ms(newTimeoutDuration, { long: true })}\``,
+                                `<@${targetUser.id}>'s timeout has been updated. Reason: \`${reason}\`\nNew Duration: \`${ms(newTimeoutDuration, { long: true })}\``
                             )
                             .setColor('Green')
                             .setFooter({
@@ -212,7 +212,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            `An error occurred while trying to timeout the user\n\`${error.message}\``,
+                            `An error occurred while trying to timeout the user\n\`${error.message}\``
                         )
                         .setColor('Red')
                         .setFooter({

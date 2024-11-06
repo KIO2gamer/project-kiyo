@@ -14,7 +14,7 @@ module.exports = {
             option
                 .setName('user')
                 .setDescription('The user to summon')
-                .setRequired(true),
+                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -25,7 +25,7 @@ module.exports = {
         if (timestamps && now < timestamps + cooldownAmount) {
             const timeLeft = (timestamps + cooldownAmount - now) / 1000;
             return interaction.reply(
-                `Please wait ${timeLeft.toFixed(1)} more seconds before using the \`summon\` command again.`,
+                `Please wait ${timeLeft.toFixed(1)} more seconds before using the \`summon\` command again.`
             );
         }
 
@@ -53,12 +53,12 @@ module.exports = {
             await interaction.channel.send({ embeds: [embed] });
             cooldowns.set(interaction.user.id, now);
             console.log(
-                `${interaction.user.tag} summoned ${userOption.tag} at ${new Date(now).toISOString()}`,
+                `${interaction.user.tag} summoned ${userOption.tag} at ${new Date(now).toISOString()}`
             );
         } catch (error) {
             console.error('Error executing summon command:', error);
             interaction.reply(
-                'There was an error while executing this command.',
+                'There was an error while executing this command.'
             );
         }
     },

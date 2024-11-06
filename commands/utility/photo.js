@@ -17,14 +17,14 @@ module.exports = {
             option
                 .setName('query')
                 .setDescription('The search query')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addIntegerOption((option) =>
             option
                 .setName('count')
                 .setDescription('Number of photos to fetch (1-5)')
                 .setMinValue(1)
-                .setMaxValue(5),
+                .setMaxValue(5)
         )
         .addStringOption((option) =>
             option
@@ -33,8 +33,8 @@ module.exports = {
                 .addChoices(
                     { name: 'Landscape', value: 'landscape' },
                     { name: 'Portrait', value: 'portrait' },
-                    { name: 'Square', value: 'square' },
-                ),
+                    { name: 'Square', value: 'square' }
+                )
         )
         .addStringOption((option) =>
             option
@@ -43,11 +43,11 @@ module.exports = {
                 .addChoices(
                     { name: 'Small', value: 'small' },
                     { name: 'Medium', value: 'medium' },
-                    { name: 'Large', value: 'large' },
-                ),
+                    { name: 'Large', value: 'large' }
+                )
         )
         .addBooleanOption((option) =>
-            option.setName('random').setDescription('Fetch a random photo'),
+            option.setName('random').setDescription('Fetch a random photo')
         ),
 
     async execute(interaction) {
@@ -86,13 +86,13 @@ module.exports = {
                 await interaction.editReply({ embeds });
             } else {
                 await interaction.editReply(
-                    'Sorry, I could not find any photos for that query.',
+                    'Sorry, I could not find any photos for that query.'
                 );
             }
         } catch (error) {
             console.error('Error fetching photo:', error);
             await interaction.editReply(
-                'There was an error trying to fetch the photo.',
+                'There was an error trying to fetch the photo.'
             );
         }
     },

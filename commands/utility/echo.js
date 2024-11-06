@@ -23,19 +23,19 @@ module.exports = {
                 .setName('input')
                 .setDescription('The input to echo back')
                 .setMaxLength(2000)
-                .setRequired(true),
+                .setRequired(true)
         )
         .addChannelOption((option) =>
             option
                 .setName('channel')
                 .setDescription('The channel to echo into')
                 .addChannelTypes(ChannelType.GuildText)
-                .setRequired(true),
+                .setRequired(true)
         )
         .addBooleanOption((option) =>
             option
                 .setName('embed')
-                .setDescription('Whether or not the echo should be embedded'),
+                .setDescription('Whether or not the echo should be embedded')
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
@@ -67,7 +67,7 @@ module.exports = {
                 await channel.send({ embeds: [echoEmbed] });
             } else {
                 await channel.send(
-                    `**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`,
+                    `**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`
                 );
             }
 
@@ -83,7 +83,7 @@ module.exports = {
                     content:
                         'There was an error trying to execute that command.',
                     ephemeral: true,
-                }),
+                })
             );
         }
     },

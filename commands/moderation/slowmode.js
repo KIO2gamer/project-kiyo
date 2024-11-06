@@ -22,15 +22,15 @@ module.exports = {
             option
                 .setName('duration')
                 .setDescription(
-                    'The duration of the slowmode (e.g., 10s, 5m, 1h)',
+                    'The duration of the slowmode (e.g., 10s, 5m, 1h)'
                 )
-                .setRequired(true),
+                .setRequired(true)
         )
         .addChannelOption((option) =>
             option
                 .setName('channel')
                 .setDescription('The channel to set slowmode in')
-                .setRequired(false),
+                .setRequired(false)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
@@ -46,7 +46,7 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'Invalid duration. Please provide a duration between 0 seconds and 6 hours.',
+                            'Invalid duration. Please provide a duration between 0 seconds and 6 hours.'
                         )
                         .setColor('Red')
                         .setFooter({

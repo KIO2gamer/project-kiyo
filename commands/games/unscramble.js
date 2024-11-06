@@ -22,7 +22,7 @@ module.exports = {
         } catch (error) {
             console.error('Error in unscramble command:', error);
             await interaction.editReply(
-                'An error occurred while running the game.',
+                'An error occurred while running the game.'
             );
         }
     },
@@ -35,7 +35,7 @@ async function loadWords() {
         '..',
         'assets',
         'texts',
-        'hangmanWords.txt',
+        'hangmanWords.txt'
     );
     const data = await fs.readFile(filePath, 'utf-8');
     const words = data
@@ -95,7 +95,7 @@ async function updateEmbed(interaction, embed, result, chosenWord) {
             .setColor(0x00ff00)
             .setTitle('Correct!')
             .setDescription(
-                `You got it right! The word was **${chosenWord}**. 🎉`,
+                `You got it right! The word was **${chosenWord}**. 🎉`
             )
             .setFooter({
                 text: `You completed in ${interaction.createdTimestamp - interaction.createdTimestamp}ms!`,

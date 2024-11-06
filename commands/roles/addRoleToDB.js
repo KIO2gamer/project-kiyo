@@ -15,7 +15,7 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to add')
-                .setRequired(true),
+                .setRequired(true)
         ),
     async execute(interaction) {
         const role = interaction.options.getRole('role');
@@ -25,7 +25,7 @@ module.exports = {
             const existingRole = await Role.findOne({ roleID: role.id });
             if (existingRole) {
                 return interaction.editReply(
-                    `The role "${role.name}" is already in the database!`,
+                    `The role "${role.name}" is already in the database!`
                 );
             }
 
@@ -42,7 +42,7 @@ module.exports = {
             await newRole.save();
 
             await interaction.editReply(
-                'Role data successfully added to the database!',
+                'Role data successfully added to the database!'
             );
         } catch (error) {
             handleError(error, interaction);

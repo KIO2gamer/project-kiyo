@@ -18,21 +18,21 @@ module.exports = {
             option
                 .setName('role')
                 .setDescription('The role to edit')
-                .setRequired(true),
+                .setRequired(true)
         )
         .addStringOption((option) =>
             option
                 .setName('name')
                 .setDescription('The new name for the role')
-                .setRequired(false),
+                .setRequired(false)
         )
         .addStringOption((option) =>
             option
                 .setName('color')
                 .setDescription(
-                    'The new color for the role in hex format (#000000)',
+                    'The new color for the role in hex format (#000000)'
                 )
-                .setRequired(false),
+                .setRequired(false)
         ),
     async execute(interaction) {
         const role = interaction.options.getRole('role');
@@ -44,7 +44,7 @@ module.exports = {
             const existingRole = await Role.findOne({ roleID: role.id });
             if (!existingRole) {
                 return interaction.editReply(
-                    `The role "${role.name}" was not found in the database!`,
+                    `The role "${role.name}" was not found in the database!`
                 );
             }
 
@@ -59,7 +59,7 @@ module.exports = {
             await existingRole.save();
 
             await interaction.editReply(
-                `Role "${role.name}" has been updated in the database!`,
+                `Role "${role.name}" has been updated in the database!`
             );
         } catch (error) {
             handleError(error, interaction);

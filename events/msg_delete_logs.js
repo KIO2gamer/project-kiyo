@@ -7,7 +7,7 @@ module.exports = {
         // Check if the message author exists and it's not a bot
         if (!message.author && message.partial) {
             console.error(
-                'Message is partial, unable to fetch author details.',
+                'Message is partial, unable to fetch author details.'
             );
             return;
         }
@@ -32,11 +32,11 @@ module.exports = {
                 return;
             }
             const botMember = await message.guild.members.fetch(
-                message.client.user.id,
+                message.client.user.id
             );
             if (!botMember.permissionsIn(logChannel).has('SEND_MESSAGES')) {
                 console.error(
-                    `Bot doesn't have permission to send messages to the channel: ${logChannelId}`,
+                    `Bot doesn't have permission to send messages to the channel: ${logChannelId}`
                 );
                 return;
             }

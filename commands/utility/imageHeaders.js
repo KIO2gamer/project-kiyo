@@ -14,7 +14,7 @@ module.exports = {
         .setName('image_headers')
         .setDescription('Posts an image.')
         .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
         )
         .addStringOption((option) =>
             option
@@ -26,14 +26,14 @@ module.exports = {
                     { name: 'Self Roles', value: 'self_roles' },
                     { name: 'Rules', value: 'rules' },
                     { name: 'Roles', value: 'roles' },
-                    { name: 'Forms', value: 'forms' },
-                ),
+                    { name: 'Forms', value: 'forms' }
+                )
         )
         .addStringOption((option) =>
             option
                 .setName('caption')
                 .setDescription('Add a caption to the image')
-                .setRequired(false),
+                .setRequired(false)
         ),
 
     async execute(interaction) {
@@ -55,7 +55,7 @@ module.exports = {
                     files: [imagePaths[options]],
                 });
                 console.log(
-                    `Image posted by ${interaction.user.tag}: ${options}`,
+                    `Image posted by ${interaction.user.tag}: ${options}`
                 );
                 await interaction.reply({
                     content: `Image successfully posted: ${options}`,

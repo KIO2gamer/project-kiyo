@@ -9,7 +9,7 @@ module.exports = {
 
     async execute(interaction) {
         await interaction.reply(
-            'Guess wat? you just got steeled.\n*metal pipe drop sound*',
+            'Guess wat? you just got steeled.\n*metal pipe drop sound*'
         );
     },
 };
