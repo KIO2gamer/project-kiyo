@@ -1,5 +1,5 @@
 const { expect } = import('chai');
-const { Client, GatewayIntentBits } = import('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 
 let client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
