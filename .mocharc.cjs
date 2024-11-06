@@ -1,5 +1,5 @@
 module.exports = {
     extends: 'mocha',
-    spec: ['test/**/*.test.js'],
+    spec: ['test/**/*.test.cjs'],
     reporter: 'spec',
 };
