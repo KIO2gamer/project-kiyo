@@ -1,13 +1,12 @@
 const { expect } = import('chai');
-const { Client, Intents } = import('discord.js');
+const { Client, GatewayIntentBits } = import('discord.js');
+
+let client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 require('dotenv').config();
 
 describe('Discord Bot', () => {
-    let client;
-
     before(async () => {
-        client = new Client({ intents: [Intents.FLAGS.GUILDS] });
         await client.login(process.env.DISCORD_TOKEN);
     });
 
