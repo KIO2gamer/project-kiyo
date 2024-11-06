@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const assert = require('assert');
 const { Client, GatewayIntentBits } = require('discord.js');
 
 let client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -15,19 +15,19 @@ describe('Discord Bot', () => {
     });
 
     it('should log in successfully', () => {
-        expect(client.user).to.not.be.null;
-        expect(client.user.username).to.equal('Kiyo');
+        assert(client.user !== null);
+        assert.strictEqual(client.user.username, 'Kiyo');
     });
 
     it('should join a guild successfully', async () => {
         const guild = await client.guilds.fetch(process.env.GUILD_ID);
-        expect(guild).to.not.be.null;
-        expect(guild.name).to.equal('testing server');
+        assert(guild !== null);
+        assert.strictEqual(guild.name, 'testing server');
     });
 
     it('should fetch a user by ID', async () => {
         const user = await client.users.fetch(process.env.USER_ID);
-        expect(user).to.not.be.null;
-        expect(user.username).to.equal('KIO2gamer');
+        assert(user !== null);
+        assert.strictEqual(user.username, 'KIO2gamer');
     });
 });
