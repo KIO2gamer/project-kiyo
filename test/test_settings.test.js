@@ -1,19 +1,16 @@
 const { Client, GatewayIntentBits } = require('discord.js');
+const assert = require('assert');
 
-(async () => {
-    const chalk = (await import('chalk')).default;
-    const boxen = (await import('boxen')).default;
+describe('Discord Bot Workflow', function () {
+    this.timeout(10000); // Set timeout to 10 seconds for the test suite
 
-    // Timeout in seconds (default 5, can be customized via environment variable)
+    let client;
     const TIMEOUT = process.env.WORKFLOW_TIMEOUT || 5;
-
-    // Create a Discord client with minimal intents
-    const client = new Client({
-        intents: [GatewayIntentBits.Guilds],
-    });
 
     // Function to display a boxed, colorful message
     const printMessage = (message, type = 'info') => {
+        const chalk = require('chalk');
+        const boxen = require('boxen');
         const colors = {
             info: chalk.blueBright,
             success: chalk.greenBright,
@@ -32,46 +29,65 @@ const { Client, GatewayIntentBits } = require('discord.js');
         );
     };
 
-    client.once('ready', () => {
-        printMessage('✅ Bot is online for workflow check!', 'success');
+    before(async () => {
+        client = new Client({
+            intents: [GatewayIntentBits.Guilds],
+        });
 
-        // Perform any startup checks or tasks
+        client.once('ready', () => {
+            printMessage('✅ Bot is online for workflow check!', 'success');
+        });
 
-        // Schedule shutdown after timeout
+        await client.login(process.env.DISCORD_TOKEN);
+    });
+
+    after((done) => {
+        printMessage(
+            `🕒 Exiting workflow bot after ${TIMEOUT} seconds`,
+            'info',
+        );
         setTimeout(() => {
-            printMessage(
-                `🕒 Exiting workflow bot after ${TIMEOUT} seconds`,
-                'info',
-            );
-            process.exit(0);
+            client.destroy();
+            done();
         }, TIMEOUT * 1000);
     });
 
-    // Handle potential errors during login
-    client
-        .login(process.env.DISCORD_TOKEN)
-        .then(() => {
-            printMessage(`🔐 Login successful!`, 'success');
-        })
-        .catch((error) => {
-            printMessage(`❌ Login failed: ${error.message}`, 'error');
-            process.exit(1);
+    it('should login successfully', (done) => {
+        client.once('ready', () => {
+            printMessage('🔐 Login successful!', 'success');
+            assert(client.user !== null, 'Client user should not be null');
+            done();
         });
 
-    // Graceful shutdown on SIGINT or SIGTERM (for manual termination)
-    process.on('SIGINT', () => {
-        printMessage(
-            '⚠️ Workflow bot interrupted (SIGINT). Shutting down...',
-            'warning',
-        );
-        process.exit(0);
+        client.once('error', (error) => {
+            printMessage(`❌ Login failed: ${error.message}`, 'error');
+            done(error);
+        });
     });
 
-    process.on('SIGTERM', () => {
-        printMessage(
-            '⚠️ Workflow bot terminated (SIGTERM). Shutting down...',
-            'warning',
-        );
-        process.exit(0);
+    it('should handle SIGINT gracefully', (done) => {
+        process.once('SIGINT', () => {
+            printMessage(
+                '⚠️ Workflow bot interrupted (SIGINT). Shutting down...',
+                'warning',
+            );
+            client.destroy();
+            done();
+        });
+
+        process.kill(process.pid, 'SIGINT');
     });
-})();
+
+    it('should handle SIGTERM gracefully', (done) => {
+        process.once('SIGTERM', () => {
+            printMessage(
+                '⚠️ Workflow bot terminated (SIGTERM). Shutting down...',
+                'warning',
+            );
+            client.destroy();
+            done();
+        });
+
+        process.kill(process.pid, 'SIGTERM');
+    });
+});
