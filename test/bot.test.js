@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const { expect } = await import('chai');
 const { Client, Intents } = require('discord.js');
 
 require('dotenv').config();
