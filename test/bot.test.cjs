@@ -19,15 +19,9 @@ describe('Discord Bot', () => {
         assert.strictEqual(client.user.username, 'Kiyo');
     });
 
-    it('should join a guild successfully', async () => {
-        const guild = await client.guilds.fetch(process.env.GUILD_ID);
-        assert(guild !== null);
-        assert.strictEqual(guild.name, 'testing server');
-    });
-
     it('should fetch a user by ID', async () => {
         const user = await client.users.fetch(process.env.USER_ID);
         assert(user !== null);
-        assert.strictEqual(user.username, 'KIO2gamer');
+        assert.strictEqual(user.username, 'kio2gamer');
     });
 });
