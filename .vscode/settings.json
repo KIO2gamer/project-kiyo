@@ -1,9 +1,0 @@
-{
-    "search.exclude": {
-        "**/node_modules": false
-    },
-    "notebook.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled": true,
-    "github.copilot.chat.experimental.inlineChatHint.enabled": true
-}
