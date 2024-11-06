@@ -3,6 +3,7 @@
     "version": "1.0.2",
     "description": "A versatile Discord bot with moderation, entertainment, and utility features.",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon",
