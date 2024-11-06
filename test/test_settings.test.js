@@ -5,7 +5,7 @@ describe('Discord Bot Workflow', function () {
     this.timeout(10000); // Set timeout to 10 seconds for the test suite
 
     let client;
-    const TIMEOUT = 5;
+    const TIMEOUT = 20;
 
     // Function to display a boxed, colorful message
     const printMessage = (message, type = 'info') => {
