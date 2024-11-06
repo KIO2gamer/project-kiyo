@@ -12,6 +12,7 @@ describe('Discord Bot', () => {
 
     after(() => {
         client.destroy();
+        console.log('All tests passed successfully.');
     });
 
     it('should log in successfully', () => {
