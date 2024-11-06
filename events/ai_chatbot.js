@@ -42,6 +42,14 @@ const generationConfig = {
 // Define the AI prompt instruction
 const AI_PROMPT_INSTRUCTION = `very short answers, slightly interested, don't use old slang terms, try to use newer terms like "Lol" if something is funny and similarly find other abbreviations that would fit well with the conversation, try to blend in and be as humanlike as possible. this includes only asking questions half of the time and not assisting the user. you do you. don't say things like "just here to help", as you're not here to help but to be free. don't use exclamation marks and don't start your sentences with a capital letter`;
 
+// Initialize the generative model once
+const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: AI_PROMPT_INSTRUCTION,
+    safetySettings: safetySettings,
+    generationConfig: generationConfig,
+});
+
 module.exports = {
     name: Events.MessageCreate,
     async execute(message) {
@@ -73,31 +81,28 @@ module.exports = {
     },
 
     async handleImageAttachment(message, imageAttachment) {
-        const response = await fetch(imageAttachment.url);
-        const buffer = await response.buffer();
-        const base64Image = buffer.toString('base64');
+        try {
+            const response = await fetch(imageAttachment.url);
+            const buffer = await response.buffer();
+            const base64Image = buffer.toString('base64');
 
-        const imagePart = {
-            inlineData: {
-                data: base64Image,
-                mimeType: 'image/jpeg',
-            },
-        };
+            const imagePart = {
+                inlineData: {
+                    data: base64Image,
+                    mimeType: 'image/jpeg',
+                },
+            };
 
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            systemInstruction: AI_PROMPT_INSTRUCTION,
-            safetySettings: safetySettings,
-            generationConfig: generationConfig,
-        });
+            const result = await model.generateContent([
+                { text: 'Describe this image:' },
+                imagePart,
+            ]);
 
-        const result = await model.generateContent([
-            { text: 'Describe this image:' },
-            imagePart,
-        ]);
-
-        const description = result.response.text();
-        await sendLongMessage(message, description);
+            const description = result.response.text();
+            await sendLongMessage(message, description);
+        } catch (error) {
+            await handleError(message, error);
+        }
     },
 
     async handleTextMessage(message) {
@@ -205,12 +210,6 @@ module.exports = {
     },
 
     async getAIResponse(geminiConversation, content) {
-        const model = genAI.getGenerativeModel({
-            model: 'gemini-1.5-flash',
-            systemInstruction: AI_PROMPT_INSTRUCTION,
-            safetySettings: safetySettings,
-            generationConfig: generationConfig,
-        });
         const chat = model.startChat({
             history: geminiConversation,
         });

@@ -157,13 +157,18 @@ const deployCommands = async () => {
 
     const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
     try {
-        await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), {
-            body: commands,
-        });
-        console.log(
-            '\x1b[32m%s\x1b[0m',
-            `[DEPLOY] Successfully deployed ${commands.length} commands globally`,
-        );
+        for (const guildId of DISCORD_GUILD_IDS) {
+            await rest.put(
+                Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
+                {
+                    body: commands,
+                },
+            );
+            console.log(
+                '\x1b[32m%s\x1b[0m',
+                `[DEPLOY] Successfully deployed ${commands.length} commands to guild ${guildId}`,
+            );
+        }
     } catch (error) {
         console.error(
             '\x1b[31m%s\x1b[0m',
