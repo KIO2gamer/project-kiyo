@@ -21,7 +21,7 @@ describe('Discord Bot', () => {
     });
 
     it('should fetch a user by ID', async () => {
-        const user = await client.users.fetch(process.env.USER_ID);
+        const user = await client.users.fetch(process.env.OWNER_ID);
         assert(user !== null);
         assert.strictEqual(user.username, 'kio2gamer');
     });
