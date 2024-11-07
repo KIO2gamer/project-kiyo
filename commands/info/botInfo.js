@@ -48,9 +48,7 @@ Memory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
 
         const embed = new EmbedBuilder()
             .setTitle('Bot Information')
-            .setURL(
-                `https://discord.com/oauth2/authorize?client_id=1155222493079015545&permissions=8&integration_type=0&scope=bot`
-            )
+            .setURL(process.env.DISCORD_INVITE)
             .setColor('#8A2BE2')
             .setDescription(description)
             .addFields(
