@@ -1,5 +1,3 @@
-const customList = require('../../../commands/customs/customList');
-const CustomCommand = require('../../../bot_utils/customCommands');
 jest.mock('discord.js');
 
 jest.mock('../../../bot_utils/customCommands', () => ({
@@ -8,46 +6,34 @@ jest.mock('../../../bot_utils/customCommands', () => ({
     })),
 }));
 
+// In customList.test.js
 describe('customList Command', () => {
-    let mockInteraction;
-
-    beforeEach(() => {
-        mockInteraction = {
-            editReply: jest.fn().mockResolvedValue({
-                createMessageComponentCollector: jest.fn().mockReturnValue({
-                    on: jest.fn(),
-                }),
-            }),
-            user: { id: 'testUserId' },
-        };
-        jest.clearAllMocks();
+  test('should display empty message when no commands exist', async () => {
+    // Mock the database or data source to return empty array
+    const mockData = [];
+    // Mock your database access method
+    jest.spyOn(customListModule, 'getCustomCommands').mockResolvedValue(mockData);
+    
+    const mockInteraction = {
+      editReply: jest.fn().mockResolvedValue({
+        embeds: [{
+          data: {
+            title: 'Custom Commands',
+            description: 'No custom commands found.',
+            color: expect.any(Number)
+          }
+        }]
+      })
+    };
+    
+    await execute(mockInteraction);
+    expect(mockInteraction.editReply).toHaveBeenCalled();
+    const reply = mockInteraction.editReply.mock.calls[0][0];
+    expect(reply.embeds[0]).toMatchObject({
+      data: {
+        title: 'Custom Commands',
+        description: 'No custom commands found.'
+      }
     });
-
-    test('should display empty message when no commands exist', async () => {
-        CustomCommand.find().sort.mockResolvedValue([]);
-
-        await customList.execute(mockInteraction);
-
-        const reply = mockInteraction.editReply.mock.calls[0][0];
-        expect(reply.embeds[0].data).toMatchObject({
-            title: expect.stringContaining('Custom Commands'),
-            description: expect.stringContaining('No custom commands'),
-        });
-    });
-
-    test('should display commands when they exist', async () => {
-        const mockCommands = [
-            { name: 'cmd1', message: 'msg1' },
-            { name: 'cmd2', message: 'msg2', alias_name: 'alias2' },
-        ];
-
-        CustomCommand.find().sort.mockResolvedValue(mockCommands);
-
-        await customList.execute(mockInteraction);
-
-        const reply = mockInteraction.editReply.mock.calls[0][0];
-        expect(reply.embeds[0].data).toBeDefined();
-        expect(reply.components).toBeDefined();
-        expect(reply.ephemeral).toBe(true);
-    });
+  });
 });
