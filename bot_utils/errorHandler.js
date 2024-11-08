@@ -8,19 +8,8 @@ const { EmbedBuilder } = require('discord.js');
  * @param {import('discord.js').Message} sent - The initial message sent by the command.
  */
 async function handleError(interaction, error) {
-    const chalk = (await import('chalk')).default; // Dynamic import
-    const boxen = (await import('boxen')).default; // Dynamic import
-
-    // Boxen options
-    const boxOptions = {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'double',
-        borderColor: 'red', // Red border for errors
-        align: 'center',
-    };
-
-    console.error(boxen(chalk.red.bold(`❌ ${error.message}`), boxOptions));
+    // Simple console error log
+    console.error(`❌ Error: ${error.message}`);
 
     const errorEmbed = new EmbedBuilder()
         .setTitle('An error occurred')

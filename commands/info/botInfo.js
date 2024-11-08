@@ -38,7 +38,7 @@ Node.js Version: ${process.version}
 discord.js Version: v${djsVersion}
 \`\`\``;
 
-        const systemSpecs = `\`\`\`fix
+        const systemSpecs = `\`\`\`fix 
 Bot ID: ${interaction.client.user.id}
 Type: Private
 Command Count: ${interaction.client.commands.size}
