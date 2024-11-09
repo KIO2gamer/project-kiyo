@@ -1,7 +1,6 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
-    ApplicationCommandOptionType,
+    EmbedBuilder
 } = require('discord.js');
 
 module.exports = {

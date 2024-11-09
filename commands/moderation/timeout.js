@@ -4,6 +4,7 @@ const {
     PermissionFlagsBits,
 } = require('discord.js');
 const ms = require('ms');
+const moderationLogs = require('./../../bot_utils/moderationLogs');
 
 module.exports = {
     description_full:
@@ -182,8 +183,8 @@ module.exports = {
                 const logEntry = new moderationLogs({
                     action: 'timeout',
                     duration: newTimeoutDuration,
-                    moderator: moderator.id,
-                    user: target.id,
+                    moderator: interaction.user.id,
+                    user: targetUser.id,
                     reason: reason,
                 });
 

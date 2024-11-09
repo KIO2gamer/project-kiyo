@@ -19,7 +19,7 @@ async function connectToDatabase() {
     }
 }
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
     await connectToDatabase();
     const { code, state } = getCodeAndState(event);
 

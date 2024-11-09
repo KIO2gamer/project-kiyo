@@ -48,7 +48,7 @@ module.exports = {
                 });
 
             const row = new ActionRowBuilder().addComponents(
-                ['A', 'B', 'C', 'D'].map((letter, index) =>
+                ['A', 'B', 'C', 'D'].map((letter) =>
                     new ButtonBuilder()
                         .setCustomId(letter)
                         .setLabel(letter)
@@ -111,7 +111,7 @@ module.exports = {
                 collector.stop();
             });
 
-            collector.on('end', async (collected) => {
+            collector.on('end', async () => {
                 if (!answered) {
                     const timeoutEmbed = new EmbedBuilder()
                         .setColor('#FFA500')

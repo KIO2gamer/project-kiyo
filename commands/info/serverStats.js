@@ -81,7 +81,8 @@ async function collectServerStats(guild, startDate) {
     const textChannels = channels.filter((channel) => channel.isTextBased());
     for (const channel of textChannels.values()) {
         let lastId;
-        while (true) {
+        let fetchMore = true;
+        while (fetchMore) {
             const messages = await channel.messages.fetch({
                 limit: 100,
                 before: lastId,
@@ -97,7 +98,7 @@ async function collectServerStats(guild, startDate) {
                 0
             );
 
-            if (messages.size < 100) break;
+            if (messages.size < 100) fetchMore = false;
             lastId = messages.last().id;
         }
     }
