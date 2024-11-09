@@ -36,7 +36,7 @@ describe('Error Handler', () => {
         expect(reply.embeds[0].data).toMatchObject({
             title: 'An error occurred',
             description: expect.any(String),
-            color: expect any(Number),
+            color: expect.any(Number),
         });
         expect(reply.ephemeral).toBe(true);
     });
