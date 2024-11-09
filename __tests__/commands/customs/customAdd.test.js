@@ -1,4 +1,3 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const customAdd = require('../../../commands/customs/customAdd');
 const CustomCommand = require('../../../bot_utils/customCommands');
 jest.mock('discord.js');
