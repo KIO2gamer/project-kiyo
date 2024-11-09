@@ -141,7 +141,8 @@ module.exports = {
                     new EmbedBuilder()
                         .setTitle('ERROR')
                         .setDescription(
-                            'An error occurred while trying to kick the user'
+                            error.message ??
+                                'An error occurred while trying to kick the user'
                         )
                         .setColor('Red')
                         .setFooter({
