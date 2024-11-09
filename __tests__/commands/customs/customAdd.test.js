@@ -1,3 +1,4 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const customAdd = require('../../../commands/customs/customAdd');
 const CustomCommand = require('../../../bot_utils/customCommands');
 jest.mock('discord.js');
@@ -9,29 +10,59 @@ jest.mock('../../../bot_utils/customCommands', () => {
     }));
 });
 
-// In customAdd.test.js
 describe('customAdd Command', () => {
-  test('should handle error when saving fails', async () => {
-    const mockInteraction = {
-      editReply: jest.fn().mockResolvedValue({
-        embeds: [{
-          data: {
-            title: 'An error occurred',
-            description: 'Database error',
-            color: expect.any(Number)
-          }
-        }]
-      })
-    };
-    
-    await execute(mockInteraction); // Your command's execute function
-    expect(mockInteraction.editReply).toHaveBeenCalled();
-    const reply = mockInteraction.editReply.mock.calls[0][0];
-    expect(reply.embeds[0]).toMatchObject({
-      data: {
-        title: 'An error occurred',
-        description: expect.any(String)
-      }
+    let mockInteraction;
+
+    beforeEach(() => {
+        mockInteraction = {
+            options: {
+                getString: jest.fn(),
+            },
+            editReply: jest.fn().mockResolvedValue({}),
+        };
+        jest.clearAllMocks();
     });
-  });
+
+    test('should add a custom command successfully', async () => {
+        const commandName = 'testCommand';
+        const commandMessage = 'Test message';
+
+        mockInteraction.options.getString
+            .mockReturnValueOnce(commandName)
+            .mockReturnValueOnce(commandMessage)
+            .mockReturnValueOnce(undefined);
+
+        await customAdd.execute(mockInteraction);
+
+        expect(CustomCommand).toHaveBeenCalledWith({
+            name: commandName,
+            message: commandMessage,
+            alias_name: undefined,
+        });
+
+        const reply = mockInteraction.editReply.mock.calls[0][0];
+        expect(reply.embeds[0].data).toMatchObject({
+            title: expect.stringContaining('Success'),
+            description: expect.stringContaining(commandName),
+        });
+    });
+
+    test('should handle error when saving fails', async () => {
+        const error = new Error('Database error');
+        mockInteraction.options.getString
+            .mockReturnValueOnce('testCommand')
+            .mockReturnValueOnce('Test message');
+
+        CustomCommand.mockImplementationOnce(() => ({
+            save: jest.fn().mockRejectedValue(error),
+        }));
+
+        await customAdd.execute(mockInteraction);
+
+        const reply = mockInteraction.editReply.mock.calls[0][0];
+        expect(reply.embeds[0].data).toMatchObject({
+            title: 'An error occurred',
+            description: expect.any(String),
+        });
+    });
 });
