@@ -4,5 +4,4 @@ module.exports = {
     collectCoverage: true,
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov'],
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 };
