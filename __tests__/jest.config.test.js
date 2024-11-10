@@ -1,7 +1,5 @@
-/* eslint-disable no-self-assign */
 /* eslint-disable no-undef */
 const config = require('./../jest.config');
-const path = require('path');
 
 // Mock process.exit
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
