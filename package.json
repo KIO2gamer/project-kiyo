@@ -8,10 +8,7 @@
         "dev": "nodemon",
         "format": "npx prettier --write .",
         "lint": "eslint .",
-        "test": "jest",
-        "build": "tsc",
-        "prestart": "npm install",
-        "postinstall": "npm run build"
+        "prestart": "npm install"
     },
     "repository": {
         "type": "git",

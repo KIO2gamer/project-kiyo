@@ -31,9 +31,9 @@ module.exports = {
         // Check if the user has permission to use this command
         if (
             !allowedUsers.includes(interaction.user.id) &&
-            !interaction.member.roles.cache.some((role) =>
+            !(interaction.member.roles.cache.size > 0 && interaction.member.roles.cache.some((role) =>
                 allowedRoles.includes(role.id)
-            )
+            ))
         ) {
             return interaction.editReply({
                 content: 'You do not have permission to use this command.',
