@@ -4,23 +4,50 @@ const config = require('./../jest.config');
 // Mock process.exit
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
 
-// Updated mock implementation
-jest.mock('discord.js', () => {
-    const mClient = {
-        login: jest.fn().mockResolvedValue('logged in'),
-        on: jest.fn(),
-        user: {
-            setPresence: jest.fn(),
-        },
-        commands: new (jest.fn(() => ({
-            clear: jest.fn(),
-            has: jest.fn(),
-            set: jest.fn(),
-        })))(),
-        destroy: jest.fn(),
+// Create a mock Client instance
+const mockClient = {
+    login: jest.fn().mockImplementation(() => {
+        // Simulate successful login and trigger ready event
+        setTimeout(() => {
+            mockClient.emit('ready', mockClient);
+        }, 0);
+        return Promise.resolve('logged in');
+    }),
+    on: jest.fn(),
+    emit: jest.fn(),
+    user: {
+        setPresence: jest.fn().mockResolvedValue(true),
+    },
+    commands: {
+        clear: jest.fn(),
+        has: jest.fn().mockReturnValue(false),
+        set: jest.fn(),
+    },
+    destroy: jest.fn(),
+};
+
+// Add event handling functionality to mockClient
+mockClient.on = jest.fn((event, callback) => {
+    mockClient.emit = (eventName, ...args) => {
+        if (event === eventName) {
+            callback(...args);
+        }
     };
+});
+
+// Mock REST instance
+const mockRest = {
+    setToken: jest.fn().mockReturnThis(),
+    put: jest.fn().mockResolvedValue(true),
+};
+
+// Mock discord.js
+jest.mock('discord.js', () => {
+    const REST = jest.fn(() => mockRest);
+    REST.mockImplementation(() => mockRest);
+
     return {
-        Client: jest.fn(() => mClient),
+        Client: jest.fn(() => mockClient),
         GatewayIntentBits: {
             Guilds: 'GUILDS',
             GuildMessages: 'GUILD_MESSAGES',
@@ -43,20 +70,29 @@ jest.mock('discord.js', () => {
         ActivityType: {
             Playing: 'PLAYING',
         },
-        REST: jest.fn(() => ({
-            setToken: jest.fn().mockReturnThis(),
-            put: jest.fn().mockResolvedValue(true),
-        })),
+        REST,
         Routes: {
-            applicationGuildCommands: jest.fn(),
+            applicationGuildCommands: jest.fn().mockReturnValue('/mock/route'),
         },
     };
 });
 
+// Mock command file
+const mockCommand = {
+    data: {
+        name: 'test',
+        toJSON: () => ({ name: 'test' }),
+        aliases: ['t'],
+    },
+    execute: jest.fn(),
+};
+
 // Mock fs module
 jest.mock('fs', () => ({
-    readdirSync: jest.fn().mockReturnValue([]),
-    statSync: jest.fn().mockReturnValue({ isDirectory: () => false }),
+    readdirSync: jest.fn().mockReturnValue(['test.js']),
+    statSync: jest.fn().mockReturnValue({
+        isDirectory: jest.fn().mockReturnValue(false),
+    }),
 }));
 
 // Mock path module
@@ -66,38 +102,23 @@ jest.mock('path', () => ({
 }));
 
 // Mock mongoose
-jest.mock('mongoose', () => ({
+const mockMongoose = {
     connect: jest.fn().mockResolvedValue(undefined),
     set: jest.fn(),
     connection: {
         close: jest.fn().mockResolvedValue(undefined),
     },
-}));
+};
+jest.mock('mongoose', () => mockMongoose);
 
 jest.mock('dotenv', () => ({
     config: jest.fn(),
 }));
 
-// Mock process.env
-process.env = {
-    ...process.env,
-    DISCORD_TOKEN: 'mock-token',
-    DISCORD_CLIENT_ID: 'mock-client-id',
-    MONGODB_URI: 'mock-mongodb-uri',
-    DISCORD_GUILD_IDS: 'guild1,guild2',
-};
+// Mock command module
+jest.mock('../commands/test.js', () => mockCommand, { virtual: true });
 
-describe('Jest Configuration', () => {
-    test('should have node as test environment', () => {
-        expect(config.testEnvironment).toBe('node');
-    });
-
-    test('should be verbose', () => {
-        expect(config.verbose).toBe(true);
-    });
-});
-
-describe('Bot Startup', () => {
+describe('Bot Implementation', () => {
     let consoleOutput = [];
     const mockedLog = jest.fn((...args) => {
         consoleOutput.push(...args);
@@ -109,7 +130,14 @@ describe('Bot Startup', () => {
         consoleOutput = [];
         console.log = mockedLog;
         console.error = mockedLog;
+        process.env = {
+            DISCORD_TOKEN: 'mock-token',
+            DISCORD_CLIENT_ID: 'mock-client-id',
+            MONGODB_URI: 'mock-mongodb-uri',
+            DISCORD_GUILD_IDS: 'guild1,guild2',
+        };
         jest.clearAllMocks();
+        jest.resetModules();
     });
 
     afterEach(() => {
@@ -121,27 +149,107 @@ describe('Bot Startup', () => {
         mockExit.mockRestore();
     });
 
-    test('should log bot startup message', async () => {
-        const { Client } = require('discord.js');
-        const client = new Client();
+    describe('Environment Variables', () => {
+        test('should exit if required environment variables are missing', async () => {
+            process.env = {};
+            require('./../index');
+            await new Promise(process.nextTick);
+            expect(mockExit).toHaveBeenCalledWith(1);
+        });
+    });
 
-        // Ensure client.login resolves
-        client.login.mockResolvedValueOnce('logged in');
-
-        require('./../index');
-
-        // Wait for all promises to resolve
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Check if the console output contains the startup message
-        const containsStartupMessage = consoleOutput.some((item, index) => {
-            return (
-                consoleOutput[index] === '\x1b[32m%s\x1b[0m' &&
-                consoleOutput[index + 1] === '[BOT] Bot is running!'
+    describe('MongoDB Connection', () => {
+        test('should connect to MongoDB successfully', async () => {
+            require('./../index');
+            await new Promise(process.nextTick);
+            expect(mockMongoose.connect).toHaveBeenCalledWith(
+                'mock-mongodb-uri'
             );
         });
 
-        expect(containsStartupMessage).toBe(true);
-        expect(mockExit).not.toHaveBeenCalled();
+        test('should handle MongoDB connection error', async () => {
+            mockMongoose.connect.mockRejectedValueOnce(
+                new Error('Connection failed')
+            );
+            require('./../index');
+            await new Promise(process.nextTick);
+            expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
+        });
+    });
+
+    describe('Command Loading', () => {
+        test('should load commands successfully', async () => {
+            const fs = require('fs');
+            require('./../index');
+            await new Promise(process.nextTick);
+            expect(fs.readdirSync).toHaveBeenCalled();
+        });
+
+        test('should handle duplicate command names', async () => {
+            mockClient.commands.has.mockReturnValueOnce(true);
+            require('./../index');
+            await new Promise(process.nextTick);
+            expect(consoleOutput).toContain('\x1b[33m%s\x1b[0m');
+        });
+    });
+
+    describe('Rich Presence', () => {
+        test('should set rich presence successfully', async () => {
+            // Initialize the bot
+            require('./../index');
+
+            // Wait for login and ready event
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // Verify setPresence was called
+            expect(mockClient.user.setPresence).toHaveBeenCalled();
+        });
+    });
+
+    describe('Graceful Shutdown', () => {
+        test('should handle SIGINT signal', async () => {
+            require('./../index');
+            process.emit('SIGINT');
+            await new Promise(process.nextTick);
+            expect(mockMongoose.connection.close).toHaveBeenCalled();
+        });
+    });
+
+    describe('Command Deployment', () => {
+        test('should deploy commands successfully', async () => {
+            // Clear previous calls
+            mockRest.put.mockClear();
+
+            // Initialize the bot
+            require('./../index');
+
+            // Wait for deployment
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // Verify REST put was called
+            expect(mockRest.put).toHaveBeenCalled();
+        });
+
+        test('should handle deployment errors', async () => {
+            // Mock a deployment error
+            mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
+
+            require('./../index');
+
+            // Wait for error handling
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
+        });
+    });
+});
+
+describe('Jest Configuration', () => {
+    test('should have node as test environment', () => {
+        expect(config.testEnvironment).toBe('node');
+    });
+
+    test('should be verbose', () => {
+        expect(config.verbose).toBe(true);
     });
 });
