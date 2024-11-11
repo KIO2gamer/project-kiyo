@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const ivm = require('isolated-vm');
 
 // **VERY IMPORTANT SECURITY WARNING:**
 // Using `eval` in a Discord bot is extremely dangerous! It allows anyone
@@ -46,14 +47,31 @@ module.exports = {
 
         const code = interaction.options.getString('code');
         try {
-            const result = eval(code);
-            let output = result;
-            if (typeof result !== 'string') {
-                output = require('util').inspect(result);
-            }
+            const output = await runCodeInIsolatedVM(code);
             await interaction.editReply(`\`\`\`js\n${output}\n\`\`\``);
         } catch (error) {
             await interaction.editReply(`\`\`\`js\n${error}\n\`\`\``);
         }
     },
 };
+
+async function runCodeInIsolatedVM(code) {
+    const isolate = new ivm.Isolate({ memoryLimit: 128 }); // Memory limit in MB
+    const context = await isolate.createContext();
+    const jail = context.global;
+    await jail.set('global', jail.derefInto());
+
+    let output;
+    try {
+        const script = await isolate.compileScript(code);
+        const result = await script.run(context, { timeout: 1000 });
+        output =
+            typeof result !== 'string'
+                ? require('util').inspect(result)
+                : result;
+    } catch (vmError) {
+        output = vmError.toString();
+    }
+
+    return output;
+}
