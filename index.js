@@ -8,7 +8,6 @@ const {
     Partials,
     REST,
     Routes,
-    ActivityType,
 } = require('discord.js');
 require('dotenv').config();
 
