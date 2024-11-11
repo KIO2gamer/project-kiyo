@@ -2,9 +2,11 @@ name: Node.js CI
 
 on:
     push:
-        branches: [main]
+        branches:
+            - main
     pull_request:
-        branches: [main]
+        branches:
+            - main
 
 jobs:
     build:
@@ -26,10 +28,17 @@ jobs:
             - name: Install dependencies
               run: npm install
 
-            - name: Set up environment variables
-              run: |
-                  echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> $GITHUB_ENV
-                  echo OWNER_ID=${{ secrets.OWNER_ID }} >> $GITHUB_ENV
+            - name: Lint code
+              run: npm run lint
 
             - name: Run tests
               run: npm test
+
+            - name: Generate coverage report
+              run: npm test -- --coverage
+
+            - name: Upload coverage report
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-report
+                  path: coverage
