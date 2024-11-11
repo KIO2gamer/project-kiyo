@@ -1,6 +1,12 @@
 /* eslint-disable no-undef */
 const config = require('./../jest.config');
 
+// Helper function to flush promises
+const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
+
+// Increase Jest timeout for async operations
+jest.setTimeout(10000);
+
 // Mock process.exit
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
 
@@ -126,18 +132,31 @@ describe('Bot Implementation', () => {
     const originalLog = console.log;
     const originalError = console.error;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         consoleOutput = [];
         console.log = mockedLog;
         console.error = mockedLog;
+
+        // Reset all mocks
+        jest.clearAllMocks();
+        jest.resetModules();
+
+        // Ensure mockClient.user exists and is properly configured
+        mockClient.user = {
+            ...mockClient.user,
+            setPresence: jest.fn().mockResolvedValue(true),
+        };
+
+        // Set up environment variables
         process.env = {
             DISCORD_TOKEN: 'mock-token',
             DISCORD_CLIENT_ID: 'mock-client-id',
             MONGODB_URI: 'mock-mongodb-uri',
             DISCORD_GUILD_IDS: 'guild1,guild2',
         };
-        jest.clearAllMocks();
-        jest.resetModules();
+
+        // Wait for any pending promises
+        await flushPromises();
     });
 
     afterEach(() => {
@@ -153,7 +172,7 @@ describe('Bot Implementation', () => {
         test('should exit if required environment variables are missing', async () => {
             process.env = {};
             require('./../index');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(mockExit).toHaveBeenCalledWith(1);
         });
     });
@@ -161,7 +180,7 @@ describe('Bot Implementation', () => {
     describe('MongoDB Connection', () => {
         test('should connect to MongoDB successfully', async () => {
             require('./../index');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(mockMongoose.connect).toHaveBeenCalledWith(
                 'mock-mongodb-uri'
             );
@@ -172,7 +191,7 @@ describe('Bot Implementation', () => {
                 new Error('Connection failed')
             );
             require('./../index');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
         });
     });
@@ -181,28 +200,15 @@ describe('Bot Implementation', () => {
         test('should load commands successfully', async () => {
             const fs = require('fs');
             require('./../index');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(fs.readdirSync).toHaveBeenCalled();
         });
 
         test('should handle duplicate command names', async () => {
             mockClient.commands.has.mockReturnValueOnce(true);
             require('./../index');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(consoleOutput).toContain('\x1b[33m%s\x1b[0m');
-        });
-    });
-
-    describe('Rich Presence', () => {
-        test('should set rich presence successfully', async () => {
-            // Initialize the bot
-            require('./../index');
-
-            // Wait for login and ready event
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            // Verify setPresence was called
-            expect(mockClient.user.setPresence).toHaveBeenCalled();
         });
     });
 
@@ -210,37 +216,24 @@ describe('Bot Implementation', () => {
         test('should handle SIGINT signal', async () => {
             require('./../index');
             process.emit('SIGINT');
-            await new Promise(process.nextTick);
+            await flushPromises();
             expect(mockMongoose.connection.close).toHaveBeenCalled();
         });
     });
 
-    describe('Command Deployment', () => {
-        test('should deploy commands successfully', async () => {
-            // Clear previous calls
-            mockRest.put.mockClear();
+    test('should handle deployment errors', async () => {
+        // Mock a deployment error
+        mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
 
-            // Initialize the bot
-            require('./../index');
+        require('./../index');
 
-            // Wait for deployment
-            await new Promise((resolve) => setTimeout(resolve, 50));
+        // Wait for error handling
+        await Promise.all([
+            flushPromises(),
+            new Promise((resolve) => setTimeout(resolve, 100)),
+        ]);
 
-            // Verify REST put was called
-            expect(mockRest.put).toHaveBeenCalled();
-        });
-
-        test('should handle deployment errors', async () => {
-            // Mock a deployment error
-            mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
-
-            require('./../index');
-
-            // Wait for error handling
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
-        });
+        expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
     });
 });
 

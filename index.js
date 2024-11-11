@@ -177,32 +177,6 @@ const deployCommands = async () => {
     }
 };
 
-const setRichPresence = ({
-    activityName,
-    activityType,
-    activityDetails,
-    activityState,
-    activityButtons,
-    status,
-}) => {
-    client.user.setPresence({
-        activities: [
-            {
-                name: activityName || 'with Discord.js',
-                type: activityType || ActivityType.Playing,
-                details: activityDetails || 'Managing server tasks',
-                state: activityState || 'Active and ready',
-                buttons: activityButtons || [
-                    { label: 'Visit Website', url: 'https://example.com' },
-                    { label: 'Join Server', url: 'https://discord.gg/example' },
-                ],
-            },
-        ],
-        status: status || 'online',
-    });
-    console.log('\x1b[32m%s\x1b[0m', '[BOT] Rich Presence set successfully');
-};
-
 process.on('SIGINT', async () => {
     console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...');
     await mongoose.connection.close();
@@ -218,7 +192,6 @@ process.on('SIGINT', async () => {
             path.join(__dirname, 'events')
         );
         await client.login(DISCORD_TOKEN);
-        setRichPresence({});
         console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!');
     } catch (error) {
         console.error(
