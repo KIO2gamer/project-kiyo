@@ -118,10 +118,9 @@ module.exports = {
                         cmd.data.description
                             .toLowerCase()
                             .includes(searchQuery) ||
-                        (cmd.description_full &&
-                            cmd.description_full
-                                .toLowerCase()
-                                .includes(searchQuery))
+                        cmd.description_full
+                            ?.toLowerCase()
+                            .includes(searchQuery)
                 );
 
                 if (commands.length === 0) {

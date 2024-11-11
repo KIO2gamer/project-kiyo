@@ -87,16 +87,18 @@ module.exports = {
                                 'This Lyrics is NOT for Commercial use'
                             )
                     );
-                const randomLines = lines
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, 3);
+                const shuffledLines = lines.sort(() => 0.5 - Math.random());
+                const randomLines = shuffledLines.slice(0, 3);
+
+                const descriptionLines = randomLines
+                    .map((line) => `"${line}"`)
+                    .join('\n\n');
+                const description = `Guess the song from these lyrics:\n\n${descriptionLines}`;
 
                 const questionEmbed = new EmbedBuilder()
                     .setColor('#0099ff')
                     .setTitle(`Lyric Whiz - Round ${currentRound}/${rounds}`)
-                    .setDescription(
-                        `Guess the song from these lyrics:\n\n${randomLines.map((line) => `"${line}"`).join('\n\n')}`
-                    )
+                    .setDescription(description)
                     .setFooter({ text: 'You have 30 seconds to guess!' });
 
                 const row = new ActionRowBuilder().addComponents(

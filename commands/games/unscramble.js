@@ -98,7 +98,7 @@ async function updateEmbed(interaction, embed, result, chosenWord) {
                 `You got it right! The word was **${chosenWord}**. 🎉`
             )
             .setFooter({
-                text: `You completed in ${interaction.createdTimestamp - interaction.createdTimestamp}ms!`,
+                text: `You completed in ${Date.now() - interaction.createdTimestamp}ms!`,
             });
     } else {
         embed

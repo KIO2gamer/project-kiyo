@@ -15,7 +15,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('unlock')
         .setDescription('Unlock a channel')
-        .setDMPermission(false)
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
         .addChannelOption((option) =>
             option

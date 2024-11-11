@@ -291,7 +291,14 @@ module.exports = {
                 return '';
             }
 
-            if (subcommand === 'text') {
+            async function handleChannelUpdate(
+                channel,
+                newChannelName,
+                permissionChoice,
+                toggleChoice,
+                role
+            ) {
+                let response = '';
                 response += await updateChannelName(channel, newChannelName);
                 const permissionResponse = await updateChannelPermission(
                     channel,
@@ -301,30 +308,30 @@ module.exports = {
                 );
 
                 if (permissionResponse.startsWith('The permission')) {
-                    return interaction.reply({
-                        content: permissionResponse,
-                        ephemeral: true,
-                    });
+                    return { response: permissionResponse, updated: false };
                 } else {
                     response += permissionResponse;
-                    updated = true;
+                    return { response, updated: true };
                 }
-            } else if (subcommand === 'voice') {
-                response += await updateChannelName(channel, newChannelName);
-                const permissionResponse = await updateChannelPermission(
-                    channel,
-                    permissionChoice,
-                    toggleChoice,
-                    role
-                );
+            }
 
-                if (permissionResponse.startsWith('The permission')) {
+            if (subcommand === 'text' || subcommand === 'voice') {
+                const { response: channelResponse, updated: channelUpdated } =
+                    await handleChannelUpdate(
+                        channel,
+                        newChannelName,
+                        permissionChoice,
+                        toggleChoice,
+                        role
+                    );
+
+                if (!channelUpdated) {
                     return interaction.reply({
-                        content: permissionResponse,
+                        content: channelResponse,
                         ephemeral: true,
                     });
                 } else {
-                    response += permissionResponse;
+                    response += channelResponse;
                     updated = true;
                 }
             }

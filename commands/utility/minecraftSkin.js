@@ -37,7 +37,7 @@ module.exports = {
             );
             const mojangData = mojangResponse.data;
 
-            if (mojangData && mojangData.id) {
+            if (mojangData?.id) {
                 const uuid = mojangData.id;
 
                 // 2. Create Embed with Crafatar URL

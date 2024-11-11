@@ -89,18 +89,25 @@ module.exports = {
         // Function to convert ISO 8601 duration to human-readable format
         function formatDuration(duration) {
             const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-            if (match) {
-                let formattedDuration = '';
-                if (match[1])
-                    formattedDuration += `${parseInt(match[1])} hour${parseInt(match[1]) > 1 ? 's' : ''} `;
-                if (match[2])
-                    formattedDuration += `${parseInt(match[2])} minute${parseInt(match[2]) > 1 ? 's' : ''} `;
-                if (match[3])
-                    formattedDuration += `${parseInt(match[3])} second${parseInt(match[3]) > 1 ? 's' : ''} `;
-                return formattedDuration.trim();
-            } else {
+            if (!match) {
                 return 'N/A';
             }
+
+            const timeUnits = [
+                { unit: 'hour', value: match[1] },
+                { unit: 'minute', value: match[2] },
+                { unit: 'second', value: match[3] },
+            ];
+
+            const formattedDuration = timeUnits
+                .filter((timeUnit) => timeUnit.value)
+                .map((timeUnit) => {
+                    const value = parseInt(timeUnit.value);
+                    return `${value} ${timeUnit.unit}${value > 1 ? 's' : ''}`;
+                })
+                .join(' ');
+
+            return formattedDuration.trim();
         }
 
         // Function to fetch and display results

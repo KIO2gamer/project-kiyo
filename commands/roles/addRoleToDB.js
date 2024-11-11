@@ -45,7 +45,7 @@ module.exports = {
                 'Role data successfully added to the database!'
             );
         } catch (error) {
-            handleError(error, interaction);
+            handleError(interaction, error);
         }
     },
 };

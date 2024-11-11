@@ -35,7 +35,7 @@ module.exports = {
             });
 
             const result = await model.generateContent(question);
-            const response = await result.response;
+            const response = result.response;
             const text = response.text();
 
             await interaction.editReply(text);

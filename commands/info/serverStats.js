@@ -107,11 +107,10 @@ async function collectServerStats(guild, startDate) {
 }
 
 function createStatsEmbed(guild, timeframe, stats) {
+    const descriptionText = timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`;
     return new EmbedBuilder()
         .setTitle(`Server Stats for ${guild.name}`)
-        .setDescription(
-            `Statistics from ${timeframe === 'all' ? 'the server creation' : `the past ${timeframe}`}`
-        )
+        .setDescription(`Statistics from ${descriptionText}`)
         .addFields(
             { name: 'New Members', value: `${stats.newMembers}`, inline: true },
             {

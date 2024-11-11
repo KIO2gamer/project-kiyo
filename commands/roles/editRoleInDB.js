@@ -62,7 +62,7 @@ module.exports = {
                 `Role "${role.name}" has been updated in the database!`
             );
         } catch (error) {
-            handleError(error, interaction);
+            handleError(interaction, error);
         }
     },
 };

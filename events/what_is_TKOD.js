@@ -8,7 +8,6 @@ module.exports = {
             await message.channel.send(
                 '**T**he\n**K**IO2gamer\n**O**fficial\n**D**iscord'
             );
-            return;
         }
     },
 };

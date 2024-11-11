@@ -35,7 +35,7 @@ module.exports = {
                 `Role "${role.name}" has been deleted from the database!`
             );
         } catch (error) {
-            handleError(error, interaction);
+            handleError(interaction, error);
         }
     },
 };
