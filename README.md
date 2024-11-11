@@ -4,8 +4,8 @@ A versatile Discord bot with moderation, entertainment, and utility features. Th
 
 ## Requirements
 
--   Node.js >= 18.0.0
--   npm
+- Node.js >= 18.0.0
+- npm
 
 ## Installation
 
@@ -45,6 +45,7 @@ A versatile Discord bot with moderation, entertainment, and utility features. Th
     ```
 
 4. Start the bot:
+
     ```sh
     npm start
     ```
@@ -57,6 +58,63 @@ To run tests, use:
 npm test
 ```
 
+## Commands
+
+### Moderation
+
+- **Edit Reason**: Edits the reason for a specific log entry or a range of log entries.
+
+  - Usage: `/edit_reason reason:"new reason" [lognumber] [logrange]`
+  - Examples:
+    - `/edit_reason reason:"Spamming" lognumber:5`
+    - `/edit_reason reason:"Inappropriate behavior" logrange:10-15`
+  - File: [commands/moderation/editReason.js](commands/moderation/editReason.js)
+
+- **Warn**: Issues a warning to a user.
+  - File: [commands/moderation/warn.js](commands/moderation/warn.js)
+
+### Info
+
+- **User Info**: Shows information about a user.
+
+  - Usage: `/user_info [target]`
+  - Examples:
+    - `/user_info`
+    - `/user_info @user`
+  - File: [commands/info/userInfo.js](commands/info/userInfo.js)
+
+- **Credits**: Shows an embed acknowledging and listing the contributors who helped create the bot.
+
+  - Usage: `/credits`
+  - Examples: `/credits`
+  - File: [commands/info/credits.js](commands/info/credits.js)
+
+- **Game Info**: Displays information about a game.
+  - File: [commands/info/gameInfo.js](commands/info/gameInfo.js)
+
+### Customs
+
+- **Custom Edit**: Edits an existing custom command.
+  - Usage: `/custom_edit <name:command_name_or_alias> <new_message:updated_response> [new_alias:new_alternate_name]`
+  - Examples:
+    - `/custom_edit name:hello new_message:Hello, world!`
+    - `/custom_edit name:greet new_message:Welcome! new_alias:welcome`
+  - File: [commands/customs/customEdit.js](commands/customs/customEdit.js)
+
+### Roles
+
+- **Edit Role in DB**: Edits the name and/or color of a role stored in the database.
+  - Usage: `/edit_role_in_data <role:role> [name:new_name] [color:#hexcolor]`
+  - Examples:
+    - `/edit_role_in_data role:Moderators name:"Senior Moderators"`
+    - `/edit_role_in_data role:VIP color:#FFD700`
+  - File: [commands/roles/editRoleInDB.js](commands/roles/editRoleInDB.js)
+
+### Utility
+
+- **Modify Channel**: Updates the name of a channel.
+  - File: [commands/utility/modifyChannel.js](commands/utility/modifyChannel.js)
+
 ## Deployment
 
 1. Initialize a new Git repository:
@@ -68,6 +126,7 @@ npm test
     ```
 
 2. Add the remote repository and push the code:
+
     ```sh
     git remote add origin https://github.com/KIO2gamer/project-kiyo.git
     git branch -M main
