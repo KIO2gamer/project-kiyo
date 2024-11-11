@@ -43,31 +43,15 @@ jobs:
                   name: coverage-report
                   path: coverage
 
-    sonarqube:
+    sonarcloud:
+        name: SonarCloud
         runs-on: ubuntu-latest
-        needs: build
-
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v2
+            - uses: actions/checkout@v4
               with:
-                  node-version: 18
-
-            - name: Install dependencies
-              run: npm install
-
-            - name: Run SonarQube Scanner
+                  fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarcloud-github-action@master
               env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-              run: |
-                  npx sonarqube-scanner \
-                    -Dsonar.projectKey=KIO2gamer_project-kiyo \
-                    -Dsonar.organization=kio2gamer \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.login=$SONAR_TOKEN \
-                    -Dsonar.sources=. \
-                    -Dsonar.exclusions=node_modules/**,coverage/** \
-                    -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
