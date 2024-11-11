@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const vm = require('vm');
 
 // **VERY IMPORTANT SECURITY WARNING:**
 // Using `eval` in a Discord bot is extremely dangerous! It allows anyone
@@ -46,7 +47,10 @@ module.exports = {
 
         const code = interaction.options.getString('code');
         try {
-            const result = eval(code);
+            const sandbox = { interaction, console, require, process };
+            const script = new vm.Script(code);
+            const context = new vm.createContext(sandbox);
+            const result = script.runInContext(context);
             let output = result;
             if (typeof result !== 'string') {
                 output = require('util').inspect(result);

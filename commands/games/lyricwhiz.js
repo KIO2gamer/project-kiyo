@@ -49,7 +49,10 @@ module.exports = {
 
                     const tracks = response.data.message.body.track_list;
                     randomTrack =
-                        tracks[Math.floor(Math.random() * tracks.length)].track;
+                        tracks.length > 0
+                            ? tracks[Math.floor(Math.random() * tracks.length)]
+                                  .track
+                            : null;
 
                     const lyricsResponse = await axios.get(
                         'https://api.musixmatch.com/ws/1.1/track.lyrics.get',
@@ -87,7 +90,7 @@ module.exports = {
                                 'This Lyrics is NOT for Commercial use'
                             )
                     );
-                const shuffledLines = lines.sort(() => 0.5 - Math.random());
+                const shuffledLines = lines.toSorted(() => 0.5 - Math.random());
                 const randomLines = shuffledLines.slice(0, 3);
 
                 const descriptionLines = randomLines
