@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const config = require('./../jest.config');
+const config = require('../jest.config');
 
 // Helper function to flush promises
 const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
@@ -171,7 +171,7 @@ describe('Bot Implementation', () => {
     describe('Environment Variables', () => {
         test('should exit if required environment variables are missing', async () => {
             process.env = {};
-            require('./../index');
+            require('../index');
             await flushPromises();
             expect(mockExit).toHaveBeenCalledWith(1);
         });
@@ -179,7 +179,7 @@ describe('Bot Implementation', () => {
 
     describe('MongoDB Connection', () => {
         test('should connect to MongoDB successfully', async () => {
-            require('./../index');
+            require('../index');
             await flushPromises();
             expect(mockMongoose.connect).toHaveBeenCalledWith(
                 'mock-mongodb-uri'
@@ -190,7 +190,7 @@ describe('Bot Implementation', () => {
             mockMongoose.connect.mockRejectedValueOnce(
                 new Error('Connection failed')
             );
-            require('./../index');
+            require('../index');
             await flushPromises();
             expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
         });
@@ -199,14 +199,14 @@ describe('Bot Implementation', () => {
     describe('Command Loading', () => {
         test('should load commands successfully', async () => {
             const fs = require('fs');
-            require('./../index');
+            require('../index');
             await flushPromises();
             expect(fs.readdirSync).toHaveBeenCalled();
         });
 
         test('should handle duplicate command names', async () => {
             mockClient.commands.has.mockReturnValueOnce(true);
-            require('./../index');
+            require('../index');
             await flushPromises();
             expect(consoleOutput).toContain('\x1b[33m%s\x1b[0m');
         });
@@ -214,7 +214,7 @@ describe('Bot Implementation', () => {
 
     describe('Graceful Shutdown', () => {
         test('should handle SIGINT signal', async () => {
-            require('./../index');
+            require('../index');
             process.emit('SIGINT');
             await flushPromises();
             expect(mockMongoose.connection.close).toHaveBeenCalled();
@@ -225,7 +225,7 @@ describe('Bot Implementation', () => {
         // Mock a deployment error
         mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
 
-        require('./../index');
+        require('../index');
 
         // Wait for error handling
         await Promise.all([
@@ -244,5 +244,13 @@ describe('Jest Configuration', () => {
 
     test('should be verbose', () => {
         expect(config.verbose).toBe(true);
+    });
+
+    test('should collect coverage from all relevant files', () => {
+        expect(config.collectCoverageFrom).toEqual([
+            '**/*.js',
+            '!**/node_modules/**',
+            '!**/vendor/**',
+        ]);
     });
 });
