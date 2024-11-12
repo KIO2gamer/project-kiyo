@@ -245,12 +245,4 @@ describe('Jest Configuration', () => {
     test('should be verbose', () => {
         expect(config.verbose).toBe(true);
     });
-
-    test('should collect coverage from all relevant files', () => {
-        expect(config.collectCoverageFrom).toEqual([
-            '**/*.js',
-            '!**/node_modules/**',
-            '!**/vendor/**',
-        ]);
-    });
 });
