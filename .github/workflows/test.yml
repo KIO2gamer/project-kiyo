@@ -49,6 +49,10 @@ jobs:
                   fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
             - name: SonarQube Cloud Scan
               uses: SonarSource/sonarcloud-github-action@master
+              with:
+                  args: >
+                      -Dsonar.projectKey=KIO2gamer_project-kiyo
+                      -Dsonar.organization=kio2gamer
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
