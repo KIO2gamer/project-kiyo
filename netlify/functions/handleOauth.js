@@ -111,9 +111,12 @@ async function getYouTubeConnections(accessToken) {
     );
 
     const connectionsData = await connectionsResponse.json();
-    return connectionsData.filter(
+    console.log('Fetched connections:', connectionsData); // Add logging
+    const youtubeConnections = connectionsData.filter(
         (connection) => connection.type === 'youtube'
     );
+    console.log('Filtered YouTube connections:', youtubeConnections); // Add logging
+    return youtubeConnections;
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {

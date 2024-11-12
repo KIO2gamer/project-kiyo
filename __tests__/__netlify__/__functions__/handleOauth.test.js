@@ -1,187 +1,229 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
-const OAuthCode = require('./../../bot_utils/OauthCode');
+const { handler } = require('../../../netlify/functions/handleOauth');
+const OAuthCode = require('./../../../bot_utils/OauthCode');
 
-// MongoDB connection URI from environment variables
-const mongoUri = process.env.MONGODB_URI;
+jest.mock('mongoose');
+jest.mock('./../../../bot_utils/OauthCode');
 
-let isConnected = false;
+describe('handleOauth', () => {
+    beforeEach(() => {
+        mongoose.connect.mockClear();
+        OAuthCode.mockClear = jest.fn();
+    });
 
-async function connectToDatabase() {
-    if (!isConnected) {
-        try {
-            await mongoose.connect(mongoUri, { bufferCommands: false });
-            isConnected = true;
-            console.log('✅ MongoDB connection established successfully');
-        } catch (error) {
-            console.error('❌ MongoDB connection error:', error);
-            throw error;
-        }
-    }
-}
+    it('should return 400 if code or state is missing', async () => {
+        const event = {
+            queryStringParameters: {
+                code: null,
+                state: null,
+            },
+        };
 
-exports.handler = async function (event) {
-    await connectToDatabase();
-    const { code, state } = getCodeAndState(event);
+        const response = await handler(event);
 
-    if (!code || !state) {
-        return createErrorResponse(
-            400,
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toContain(
             'Missing authorization code or state parameter.'
         );
-    }
+    });
 
-    try {
-        const accessToken = await exchangeCodeForToken(code);
-        const youtubeConnections = await getYouTubeConnections(accessToken);
+    it('should return 404 if no YouTube connections are found', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
 
-        if (youtubeConnections.length === 0) {
-            return createErrorResponse(
-                404,
-                'No YouTube connections found for this Discord account.'
-            );
-        }
-
-        await saveOAuthRecord(state, code, youtubeConnections);
-
-        return createSuccessResponse(youtubeConnections.length);
-    } catch (error) {
-        console.error(
-            '❌ Error fetching Discord connections or saving to MongoDB:',
-            error
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
         );
-        return createErrorResponse(
-            500,
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () => Promise.resolve([]),
+            })
+        );
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body).toContain(
+            'No YouTube connections found for this Discord account.'
+        );
+    });
+
+    it('should return 200 if YouTube connections are found and saved', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
+
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
+        );
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve([
+                        { id: '1', name: 'YouTube Channel 1', type: 'youtube' },
+                    ]),
+            })
+        );
+
+        OAuthCode.prototype.save = jest.fn().mockResolvedValue({});
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toContain('Authorization successful!');
+        expect(response.body).toContain('Number of connections: 1');
+    });
+
+    it('should return 500 if an error occurs during processing', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
+
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
+        );
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.reject(new Error('Fetch error'))
+        );
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toContain(
             'An unexpected error occurred while processing your request.'
         );
-    }
-};
-
-function getCodeAndState(event) {
-    const urlParams = new URLSearchParams(event.queryStringParameters);
-    return {
-        code: urlParams.get('code'),
-        state: urlParams.get('state'),
-    };
-}
-
-function createErrorResponse(statusCode, message) {
-    return {
-        statusCode,
-        headers: { 'Content-Type': 'text/html' },
-        body: `
-            <html>
-                <head>
-                    <title>Error</title>
-                </head>
-                <body>
-                    <h1>Error: ${statusCode}</h1>
-                    <p>${message}</p>
-                    <p>Please ensure both code and state are provided in the request.</p>
-                </body>
-            </html>
-        `,
-    };
-}
-
-async function exchangeCodeForToken(code) {
-    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            client_id: process.env.DISCORD_CLIENT_ID,
-            client_secret: process.env.DISCORD_CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: process.env.DISCORD_REDIRECT_URI,
-        }),
     });
 
-    const tokenData = await tokenResponse.json();
-    return tokenData.access_token;
-}
+    it('should return 500 if database connection fails', async () => {
+        mongoose.connect.mockImplementationOnce(() => {
+            throw new Error('Database connection error');
+        });
 
-async function getYouTubeConnections(accessToken) {
-    const connectionsResponse = await fetch(
-        'https://discord.com/api/users/@me/connections',
-        {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        }
-    );
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
 
-    const connectionsData = await connectionsResponse.json();
-    return connectionsData.filter(
-        (connection) => connection.type === 'youtube'
-    );
-}
+        const response = await handler(event);
 
-async function saveOAuthRecord(state, code, youtubeConnections) {
-    const oauthRecord = new OAuthCode({
-        interactionId: state,
-        code,
-        youtubeConnections: youtubeConnections.map((conn) => ({
-            id: conn.id,
-            name: conn.name,
-        })),
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toContain(
+            'An unexpected error occurred while processing your request.'
+        );
     });
-    await oauthRecord.save();
-}
 
-function createSuccessResponse(connectionsLength) {
-    return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: `
-            <html>
-                <head>
-                    <title>Success</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            text-align: center;
-                            background-color: #f4f4f4;
-                            margin: 0;
-                            padding: 0;
-                        }
-                        .container {
-                            max-width: 600px;
-                            margin: 50px auto;
-                            background: white;
-                            padding: 20px;
-                            border-radius: 10px;
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        }
-                        h1 {
-                            color: #4CAF50;
-                        }
-                        p {
-                            font-size: 16px;
-                            color: #333;
-                        }
-                        .button {
-                            display: inline-block;
-                            margin-top: 20px;
-                            padding: 10px 20px;
-                            font-size: 16px;
-                            color: white;
-                            background-color: #7289DA;
-                            border: none;
-                            border-radius: 5px;
-                            text-decoration: none;
-                            cursor: pointer;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>Authorization successful!</h1>
-                        <p>Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.</p>
-                        <p>Number of connections: ${connectionsLength}</p>
-                        <a class="button" href="discord://">Return to Discord</a>
-                    </div>
-                </body>
-            </html>
-        `,
-    };
-}
+    it('should return 500 if saving OAuth record fails', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
+
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
+        );
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve([
+                        { id: '1', name: 'YouTube Channel 1', type: 'youtube' },
+                    ]),
+            })
+        );
+
+        OAuthCode.prototype.save = jest
+            .fn()
+            .mockRejectedValue(new Error('Save error'));
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toContain(
+            'An unexpected error occurred while processing your request.'
+        );
+    });
+
+    it('should return 200 if YouTube connections are found and saved', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
+
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
+        );
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () =>
+                    Promise.resolve([
+                        { id: '1', name: 'YouTube Channel 1', type: 'youtube' },
+                    ]),
+            })
+        );
+
+        OAuthCode.prototype.save = jest.fn().mockResolvedValue({});
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toContain('Authorization successful!');
+        expect(response.body).toContain('Number of connections: 1');
+    });
+
+    it('should return 500 if an error occurs during processing', async () => {
+        const event = {
+            queryStringParameters: {
+                code: 'valid_code',
+                state: 'valid_state',
+            },
+        };
+
+        global.fetch = jest.fn(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({ access_token: 'valid_token' }),
+            })
+        );
+
+        global.fetch.mockImplementationOnce(() =>
+            Promise.reject(new Error('Fetch error'))
+        );
+
+        const response = await handler(event);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toContain(
+            'An unexpected error occurred while processing your request.'
+        );
+    });
+});
