@@ -9,6 +9,7 @@ const {
     REST,
     Routes,
 } = require('discord.js');
+const winston = require('winston');
 require('dotenv').config();
 
 const { DISCORD_CLIENT_ID, DISCORD_TOKEN, MONGODB_URI } = process.env;
@@ -17,14 +18,27 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
     : [];
 
 if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN || !MONGODB_URI) {
-    console.error(
-        '\x1b[31m%s\x1b[0m',
-        '[ERROR] Missing required environment variables.'
-    );
+    console.error('[ERROR] Missing required environment variables.');
     process.exit(1);
 }
 
-console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...');
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.timestamp(),
+        winston.format.printf(
+            ({ timestamp, level, message }) =>
+                `${timestamp} ${level}: ${message}`
+        )
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'bot.log' }),
+    ],
+});
+
+logger.info('[BOT] Starting bot...');
 
 const client = new Client({
     intents: [
@@ -54,14 +68,10 @@ const loadFiles = (dir, fileAction) => {
 };
 
 const loadCommandsAndEvents = (commandsDir, eventsDir) => {
-    console.log(
-        '\x1b[33m%s\x1b[0m',
-        '[COMMANDS & EVENTS] Loading commands and events...'
-    );
+    logger.info('[COMMANDS & EVENTS] Loading commands and events...');
     loadCommands(commandsDir);
     loadEvents(eventsDir);
-    console.log(
-        '\x1b[32m%s\x1b[0m',
+    logger.info(
         '[COMMANDS & EVENTS] Commands and events loaded successfully!!!'
     );
 };
@@ -77,8 +87,7 @@ const loadCommands = (commandsDir) => {
 
 const registerCommand = (command) => {
     if (client.commands.has(command.data.name)) {
-        console.warn(
-            '\x1b[33m%s\x1b[0m',
+        logger.warn(
             `[WARNING] Duplicate command name detected: ${command.data.name}`
         );
     } else {
@@ -86,8 +95,7 @@ const registerCommand = (command) => {
         if (command.data.aliases) {
             command.data.aliases.forEach((alias) => {
                 if (client.commands.has(alias)) {
-                    console.warn(
-                        '\x1b[33m%s\x1b[0m',
+                    logger.warn(
                         `[WARNING] Duplicate command alias detected: ${alias}`
                     );
                 } else {
@@ -109,29 +117,25 @@ const loadEvents = (eventsDir) => {
 };
 
 const connectToMongoDB = async () => {
-    console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...');
+    logger.info('[DATABASE] Connecting to MongoDB...');
     try {
         mongoose.set('strictQuery', false);
         await mongoose.connect(MONGODB_URI);
-        console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB');
+        logger.info('[DATABASE] Connected to MongoDB');
     } catch (error) {
-        console.error(
-            '\x1b[31m%s\x1b[0m',
-            `[DATABASE] MongoDB connection failed: ${error.message}`
-        );
+        logger.error(`[DATABASE] MongoDB connection failed: ${error.message}`);
         process.exit(1);
     }
 };
 
 const deployCommands = async () => {
     if (!DISCORD_CLIENT_ID || !DISCORD_TOKEN) {
-        console.error(
-            '\x1b[31m%s\x1b[0m',
+        logger.error(
             '[DEPLOY] Missing required environment variables for deploying commands.'
         );
         return;
     }
-    console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...');
+    logger.info('[DEPLOY] Deploying commands...');
 
     // Clear the commands cache
     client.commands.clear();
@@ -143,8 +147,7 @@ const deployCommands = async () => {
         const command = require(filePath);
         if (command?.data?.toJSON) {
             if (commandNames.has(command.data.name)) {
-                console.warn(
-                    '\x1b[33m%s\x1b[0m',
+                logger.warn(
                     `[WARNING] Duplicate command name detected: ${command.data.name}`
                 );
             } else {
@@ -159,25 +162,19 @@ const deployCommands = async () => {
         for (const guildId of DISCORD_GUILD_IDS) {
             await rest.put(
                 Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-                {
-                    body: commands,
-                }
+                { body: commands }
             );
-            console.log(
-                '\x1b[32m%s\x1b[0m',
+            logger.info(
                 `[DEPLOY] Successfully deployed ${commands.length} commands to guild ${guildId}`
             );
         }
     } catch (error) {
-        console.error(
-            '\x1b[31m%s\x1b[0m',
-            `[DEPLOY] Command deployment failed: ${error.message}`
-        );
+        logger.error(`[DEPLOY] Command deployment failed: ${error.message}`);
     }
 };
 
 process.on('SIGINT', async () => {
-    console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...');
+    logger.info('[BOT] Shutting down gracefully...');
     await mongoose.connection.close();
     client.destroy();
     process.exit(0);
@@ -191,12 +188,9 @@ process.on('SIGINT', async () => {
             path.join(__dirname, 'events')
         );
         await client.login(DISCORD_TOKEN);
-        console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!');
+        logger.info('[BOT] Bot is running!');
     } catch (error) {
-        console.error(
-            '\x1b[31m%s\x1b[0m',
-            `[BOT] Failed to start the bot: ${error.message}`
-        );
+        logger.error(`[BOT] Failed to start the bot: ${error.message}`);
         process.exit(1);
     }
 })();

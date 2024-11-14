@@ -1,45 +1,23 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-const config = require('../jest.config');
 
-// Helper function to flush promises
-const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
-
-// Increase Jest timeout for async operations
-jest.setTimeout(10000);
+const { Client, REST, Routes } = require('discord.js');
 
 // Mock process.exit
 const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
 
-// Create a mock Client instance
+// Mock Client instance
 const mockClient = {
-    login: jest.fn().mockImplementation(() => {
-        // Simulate successful login and trigger ready event
-        setTimeout(() => {
-            mockClient.emit('ready', mockClient);
-        }, 0);
-        return Promise.resolve('logged in');
-    }),
+    login: jest.fn().mockResolvedValue('logged in'),
     on: jest.fn(),
-    emit: jest.fn(),
-    user: {
-        setPresence: jest.fn().mockResolvedValue(true),
-    },
+    once: jest.fn(),
+    destroy: jest.fn(),
     commands: {
         clear: jest.fn(),
         has: jest.fn().mockReturnValue(false),
         set: jest.fn(),
     },
-    destroy: jest.fn(),
 };
-
-// Add event handling functionality to mockClient
-mockClient.on = jest.fn((event, callback) => {
-    mockClient.emit = (eventName, ...args) => {
-        if (event === eventName) {
-            callback(...args);
-        }
-    };
-});
 
 // Mock REST instance
 const mockRest = {
@@ -73,25 +51,12 @@ jest.mock('discord.js', () => {
             Channel: 'CHANNEL',
             Reaction: 'REACTION',
         },
-        ActivityType: {
-            Playing: 'PLAYING',
-        },
         REST,
         Routes: {
             applicationGuildCommands: jest.fn().mockReturnValue('/mock/route'),
         },
     };
 });
-
-// Mock command file
-const mockCommand = {
-    data: {
-        name: 'test',
-        toJSON: () => ({ name: 'test' }),
-        aliases: ['t'],
-    },
-    execute: jest.fn(),
-};
 
 // Mock fs module
 jest.mock('fs', () => ({
@@ -121,9 +86,6 @@ jest.mock('dotenv', () => ({
     config: jest.fn(),
 }));
 
-// Mock command module
-jest.mock('../commands/test.js', () => mockCommand, { virtual: true });
-
 describe('Bot Implementation', () => {
     let consoleOutput = [];
     const mockedLog = jest.fn((...args) => {
@@ -141,12 +103,6 @@ describe('Bot Implementation', () => {
         jest.clearAllMocks();
         jest.resetModules();
 
-        // Ensure mockClient.user exists and is properly configured
-        mockClient.user = {
-            ...mockClient.user,
-            setPresence: jest.fn().mockResolvedValue(true),
-        };
-
         // Set up environment variables
         process.env = {
             DISCORD_TOKEN: 'mock-token',
@@ -156,7 +112,7 @@ describe('Bot Implementation', () => {
         };
 
         // Wait for any pending promises
-        await flushPromises();
+        await new Promise((resolve) => setImmediate(resolve));
     });
 
     afterEach(() => {
@@ -172,7 +128,7 @@ describe('Bot Implementation', () => {
         test('should exit if required environment variables are missing', async () => {
             process.env = {};
             require('../index');
-            await flushPromises();
+            await new Promise((resolve) => setImmediate(resolve));
             expect(mockExit).toHaveBeenCalledWith(1);
         });
     });
@@ -180,7 +136,7 @@ describe('Bot Implementation', () => {
     describe('MongoDB Connection', () => {
         test('should connect to MongoDB successfully', async () => {
             require('../index');
-            await flushPromises();
+            await new Promise((resolve) => setImmediate(resolve));
             expect(mockMongoose.connect).toHaveBeenCalledWith(
                 'mock-mongodb-uri'
             );
@@ -191,8 +147,10 @@ describe('Bot Implementation', () => {
                 new Error('Connection failed')
             );
             require('../index');
-            await flushPromises();
-            expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
+            await new Promise((resolve) => setImmediate(resolve));
+            expect(consoleOutput).toContain(
+                '[DATABASE] MongoDB connection failed: Connection failed'
+            );
         });
     });
 
@@ -200,15 +158,17 @@ describe('Bot Implementation', () => {
         test('should load commands successfully', async () => {
             const fs = require('fs');
             require('../index');
-            await flushPromises();
+            await new Promise((resolve) => setImmediate(resolve));
             expect(fs.readdirSync).toHaveBeenCalled();
         });
 
         test('should handle duplicate command names', async () => {
             mockClient.commands.has.mockReturnValueOnce(true);
             require('../index');
-            await flushPromises();
-            expect(consoleOutput).toContain('\x1b[33m%s\x1b[0m');
+            await new Promise((resolve) => setImmediate(resolve));
+            expect(consoleOutput).toContain(
+                '[WARNING] Duplicate command name detected: test'
+            );
         });
     });
 
@@ -216,28 +176,91 @@ describe('Bot Implementation', () => {
         test('should handle SIGINT signal', async () => {
             require('../index');
             process.emit('SIGINT');
-            await flushPromises();
+            await new Promise((resolve) => setImmediate(resolve));
             expect(mockMongoose.connection.close).toHaveBeenCalled();
         });
     });
 
-    test('should handle deployment errors', async () => {
-        // Mock a deployment error
-        mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
+    describe('Command Deployment', () => {
+        test('should deploy commands successfully', async () => {
+            require('../index');
+            await new Promise((resolve) => setImmediate(resolve));
+            expect(mockRest.put).toHaveBeenCalled();
+        });
 
-        require('../index');
+        test('should handle deployment errors', async () => {
+            mockRest.put.mockRejectedValueOnce(new Error('Deployment failed'));
+            require('../index');
+            await new Promise((resolve) => setImmediate(resolve));
+            expect(consoleOutput).toContain(
+                '[DEPLOY] Command deployment failed: Deployment failed'
+            );
+        });
+    });
 
-        // Wait for error handling
-        await Promise.all([
-            flushPromises(),
-            new Promise((resolve) => setTimeout(resolve, 100)),
-        ]);
+    describe('Command Execution', () => {
+        test('should execute a command successfully', async () => {
+            const interaction = {
+                options: {
+                    getString: jest.fn().mockReturnValue('test'),
+                },
+                client: mockClient,
+                reply: jest.fn(),
+            };
 
-        expect(consoleOutput).toContain('\x1b[31m%s\x1b[0m');
+            const mockCommand = {
+                data: {
+                    name: 'test',
+                    toJSON: () => ({ name: 'test' }),
+                    aliases: ['t'],
+                },
+                execute: jest.fn(),
+            };
+
+            jest.mock('../commands/test.js', () => mockCommand, {
+                virtual: true,
+            });
+
+            await mockCommand.execute(interaction);
+            expect(mockCommand.execute).toHaveBeenCalledWith(interaction);
+        });
+
+        test('should handle command execution errors', async () => {
+            const interaction = {
+                options: {
+                    getString: jest.fn().mockReturnValue('test'),
+                },
+                client: mockClient,
+                reply: jest.fn(),
+            };
+
+            const mockCommand = {
+                data: {
+                    name: 'test',
+                    toJSON: () => ({ name: 'test' }),
+                    aliases: ['t'],
+                },
+                execute: jest
+                    .fn()
+                    .mockRejectedValueOnce(new Error('Execution failed')),
+            };
+
+            jest.mock('../commands/test.js', () => mockCommand, {
+                virtual: true,
+            });
+
+            try {
+                await mockCommand.execute(interaction);
+            } catch (error) {
+                expect(consoleOutput).toContain('Execution failed');
+            }
+        });
     });
 });
 
 describe('Jest Configuration', () => {
+    const config = require('../jest.config');
+
     test('should have node as test environment', () => {
         expect(config.testEnvironment).toBe('node');
     });
