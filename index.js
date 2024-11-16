@@ -126,6 +126,24 @@ const deployCommands = async (commands) => {
     }
 };
 
+const loadEvents = (client, dir) => {
+    const files = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const file of files) {
+        const filePath = path.join(dir, file.name);
+        if (file.isDirectory()) {
+            loadEvents(client, filePath);
+        } else if (file.name.endsWith('.js')) {
+            const event = require(filePath);
+            if (event.once) {
+                client.once(event.name, (...args) => event.execute(...args));
+            } else {
+                client.on(event.name, (...args) => event.execute(...args));
+            }
+        }
+    }
+};
+
 const initializeBot = async (client = createClient()) => {
     try {
         validateConfig();
@@ -136,9 +154,9 @@ const initializeBot = async (client = createClient()) => {
         const commands = loadCommands(path.join(__dirname, 'commands'));
         await deployCommands(commands);
 
-        await client.login(process.env.DISCORD_TOKEN);
-        logger.info('Bot is running!');
+        loadEvents(client, path.join(__dirname, 'events'));
 
+        await client.login(process.env.DISCORD_TOKEN);
         return client;
     } catch (error) {
         logger.error(error.message);
