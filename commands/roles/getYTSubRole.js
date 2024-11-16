@@ -23,19 +23,13 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
         try {
-            const interactionId = interaction.id; // Use the interaction ID as state
-            const discordOAuthUrl = `https://discord.com/oauth2/authorize?client_id=${
-                process.env.DISCORD_CLIENT_ID
-            }&redirect_uri=${encodeURIComponent(
-                process.env.DISCORD_REDIRECT_URI
-            )}&response_type=code&scope=identify%20connections&state=${interactionId}`;
+            const interactionId = interaction.id;
+            const discordOAuthUrl = generateDiscordOAuthUrl(interactionId);
 
-            const embed = {
-                color: 0x0099ff,
-                title: '🎥 YouTube Subscriber Role Verification',
-                description:
-                    "Let's get you verified and assign you a special role based on your YouTube subscriber count!",
-                fields: [
+            const embed = createEmbed(
+                '🎥 YouTube Subscriber Role Verification',
+                "Let's get you verified and assign you a special role based on your YouTube subscriber count!",
+                [
                     {
                         name: '📋 What to do:',
                         value: '1. Click the link below\n2. Authorize the app\n3. Connect your YouTube account\n4. Wait for confirmation',
@@ -47,10 +41,8 @@ module.exports = {
                         inline: false,
                     },
                 ],
-                footer: {
-                    text: 'This process is safe and secure. We only access your public YouTube data.',
-                },
-            };
+                'This process is safe and secure. We only access your public YouTube data.'
+            );
 
             await interaction.editReply({
                 embeds: [embed],
@@ -63,23 +55,19 @@ module.exports = {
                 !oauthData.youtubeConnections ||
                 oauthData.youtubeConnections.length === 0
             ) {
-                const errorEmbed = {
-                    color: 0xff0000,
-                    title: '❌ No YouTube Connections Found',
-                    description:
-                        "We couldn't find any YouTube connections associated with your account.",
-                    fields: [
+                const errorEmbed = createEmbed(
+                    '❌ No YouTube Connections Found',
+                    "We couldn't find any YouTube connections associated with your account.",
+                    [
                         {
                             name: '🔄 What to do next',
                             value: 'Please make sure you have connected your YouTube account to Discord and try again.',
                             inline: false,
                         },
                     ],
-                    footer: {
-                        text: 'If the problem persists, please contact a server administrator.',
-                    },
-                    timestamp: new Date(),
-                };
+                    'If the problem persists, please contact a server administrator.',
+                    0xff0000
+                );
 
                 await interaction.followUp({
                     embeds: [errorEmbed],
@@ -88,7 +76,6 @@ module.exports = {
                 return;
             }
 
-            // Fetch subscriber counts for all YouTube connections and find the one with the highest count
             const highestSubscriberData = await getHighestSubscriberCount(
                 oauthData.youtubeConnections
             );
@@ -100,11 +87,10 @@ module.exports = {
                     subscriberCount
                 );
                 const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
-                const embed = {
-                    color: 0x0099ff,
-                    title: '🎉 YouTube Channel Verified Successfully! 🎉',
-                    description: `Great news! We've successfully verified your YouTube channel. Here's what you need to know:`,
-                    fields: [
+                const successEmbed = createEmbed(
+                    '🎉 YouTube Channel Verified Successfully! 🎉',
+                    `Great news! We've successfully verified your YouTube channel. Here's what you need to know:`,
+                    [
                         {
                             name: '🏆 Your New Role',
                             value: `You've been awarded the **${assignedRole}** role!`,
@@ -121,13 +107,11 @@ module.exports = {
                             inline: false,
                         },
                     ],
-                    footer: {
-                        text: 'Thank you for verifying your YouTube channel with us!',
-                    },
-                    timestamp: new Date(),
-                };
+                    'Thank you for verifying your YouTube channel with us!'
+                );
+
                 await interaction.editReply({
-                    embeds: [embed],
+                    embeds: [successEmbed],
                     ephemeral: true,
                 });
             } else {
@@ -135,12 +119,10 @@ module.exports = {
             }
         } catch (error) {
             console.log(error);
-            const errorEmbed = {
-                color: 0xff0000,
-                title: '❌ Oops! Something went wrong',
-                description:
-                    'We encountered an error while processing your request.',
-                fields: [
+            const errorEmbed = createEmbed(
+                '❌ Oops! Something went wrong',
+                'We encountered an error while processing your request.',
+                [
                     {
                         name: '📝 Error Details',
                         value: error.message,
@@ -152,11 +134,9 @@ module.exports = {
                         inline: false,
                     },
                 ],
-                footer: {
-                    text: 'We apologize for the inconvenience.',
-                },
-                timestamp: new Date(),
-            };
+                'We apologize for the inconvenience.',
+                0xff0000
+            );
 
             await interaction.editReply({
                 embeds: [errorEmbed],
@@ -166,7 +146,23 @@ module.exports = {
     },
 };
 
-// Function to poll MongoDB for the OAuth2 code and YouTube connections
+function generateDiscordOAuthUrl(interactionId) {
+    return `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${interactionId}`;
+}
+
+function createEmbed(title, description, fields, footerText, color = 0x0099ff) {
+    return {
+        color,
+        title,
+        description,
+        fields,
+        footer: {
+            text: footerText,
+        },
+        timestamp: new Date(),
+    };
+}
+
 async function getAuthorizationDataFromMongoDB(interactionId) {
     const fetchTimeout = 60000; // 60 seconds timeout
     const pollingInterval = 3000; // Poll every 3 seconds
@@ -224,8 +220,6 @@ async function getYouTubeSubscriberCount(youtubeChannelId) {
 }
 
 async function assignSubscriberRole(member, subscriberCount) {
-    let roleName;
-
     const roleRanges = [
         { max: 100, name: 'Less than 100 Subs' },
         { max: 500, name: '100 - 499 Subs' },
@@ -239,7 +233,9 @@ async function assignSubscriberRole(member, subscriberCount) {
         { max: Infinity, name: '1M+ Subs' },
     ];
 
-    roleName = roleRanges.find((range) => subscriberCount < range.max).name;
+    const roleName = roleRanges.find(
+        (range) => subscriberCount < range.max
+    ).name;
 
     try {
         const subscriberRoleData = await RoleSchema.findOne({ roleName });

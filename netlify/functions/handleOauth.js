@@ -68,18 +68,12 @@ function createErrorResponse(statusCode, message) {
     return {
         statusCode,
         headers: { 'Content-Type': 'text/html' },
-        body: `
-            <html>
-                <head>
-                    <title>Error</title>
-                </head>
-                <body>
-                    <h1>Error: ${statusCode}</h1>
-                    <p>${message}</p>
-                    <p>Please ensure both code and state are provided in the request.</p>
-                </body>
-            </html>
-        `,
+        body: generateHtmlResponse(
+            'Error',
+            statusCode,
+            message,
+            'Please ensure both code and state are provided in the request.'
+        ),
     };
 }
 
@@ -135,56 +129,74 @@ function createSuccessResponse(connectionsLength) {
     return {
         statusCode: 200,
         headers: { 'Content-Type': 'text/html' },
-        body: `
-            <html>
-                <head>
-                    <title>Success</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            text-align: center;
-                            background-color: #f4f4f4;
-                            margin: 0;
-                            padding: 0;
-                        }
-                        .container {
-                            max-width: 600px;
-                            margin: 50px auto;
-                            background: white;
-                            padding: 20px;
-                            border-radius: 10px;
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        }
-                        h1 {
-                            color: #4CAF50;
-                        }
-                        p {
-                            font-size: 16px;
-                            color: #333;
-                        }
-                        .button {
-                            display: inline-block;
-                            margin-top: 20px;
-                            padding: 10px 20px;
-                            font-size: 16px;
-                            color: white;
-                            background-color: #7289DA;
-                            border: none;
-                            border-radius: 5px;
-                            text-decoration: none;
-                            cursor: pointer;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>Authorization successful!</h1>
-                        <p>Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.</p>
-                        <p>Number of connections: ${connectionsLength}</p>
-                        <a class="button" href="discord://">Return to Discord</a>
-                    </div>
-                </body>
-            </html>
-        `,
+        body: generateHtmlResponse(
+            'Success',
+            'Authorization successful!',
+            `Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.`,
+            `Number of connections: ${connectionsLength}`,
+            'Return to Discord',
+            'discord://'
+        ),
     };
+}
+
+function generateHtmlResponse(
+    title,
+    heading,
+    message,
+    additionalMessage,
+    buttonText = '',
+    buttonLink = ''
+) {
+    return `
+        <html>
+            <head>
+                <title>${title}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 50px auto;
+                        background: white;
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    h1 {
+                        color: ${title === 'Success' ? '#4CAF50' : '#FF0000'};
+                    }
+                    p {
+                        font-size: 16px;
+                        color: #333;
+                    }
+                    .button {
+                        display: inline-block;
+                        margin-top: 20px;
+                        padding: 10px 20px;
+                        font-size: 16px;
+                        color: white;
+                        background-color: #7289DA;
+                        border: none;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        cursor: pointer;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>${heading}</h1>
+                    <p>${message}</p>
+                    <p>${additionalMessage}</p>
+                    ${buttonText && buttonLink ? `<a class="button" href="${buttonLink}">${buttonText}</a>` : ''}
+                </div>
+            </body>
+        </html>
+    `;
 }
