@@ -100,6 +100,23 @@ const connectToMongoDB = async () => {
 };
 
 // Deploy commands to Discord API
+/**
+ * Deploys commands to Discord application and guilds.
+ * 
+ * This function loads command files, converts them to JSON, and deploys them
+ * to the specified Discord application and guilds using the Discord REST API.
+ * 
+ * @async
+ * @function deployCommands
+ * @returns {Promise<void>} A promise that resolves when the deployment is complete.
+ * 
+ * @example
+ * deployCommands().then(() => {
+ *   console.log('Commands deployed successfully.');
+ * }).catch((error) => {
+ *   console.error('Failed to deploy commands:', error);
+ * });
+ */
 const deployCommands = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
     const commands = [];
