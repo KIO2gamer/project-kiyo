@@ -3,6 +3,13 @@ const { Events } = require('discord.js');
 module.exports = {
     name: Events.ClientReady,
     once: true,
+    /**
+     * Executes the ready event when the bot is fully operational.
+     * Logs various details about the bot's status, including the number of guilds, channels, and users it is serving.
+     * Additionally, logs detailed information about each guild the bot is connected to.
+     *
+     * @param {object} client - The Discord client instance.
+     */
     execute(client) {
         try {
             console.log(

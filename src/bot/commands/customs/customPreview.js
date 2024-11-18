@@ -18,6 +18,15 @@ module.exports = {
     description_full: "Previews a custom command stored in the bot's database.",
     usage: '/custom_preview <name_or_alias>',
     examples: ['/custom_preview hello'],
+    /**
+     * Executes the custom command preview interaction.
+     *
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Object} interaction.options - The options provided with the interaction.
+     * @param {Function} interaction.options.getString - Function to get a string option by name.
+     * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+     * @returns {Promise<void>} - A promise that resolves when the interaction is handled.
+     */
     async execute(interaction) {
         try {
             const commandNameOrAlias = interaction.options.getString('name');

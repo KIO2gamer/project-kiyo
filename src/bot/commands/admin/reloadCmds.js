@@ -96,6 +96,14 @@ module.exports = {
             .find((path) => path !== undefined);
     },
 
+    /**
+     * Reloads all commands from the specified command folders.
+     *
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {string} foldersPath - The path to the folders containing command files.
+     * @param {Array<string>} commandFolders - An array of folder names containing command files.
+     * @returns {Promise<void>} - A promise that resolves when all commands have been reloaded and a reply has been sent.
+     */
     async reloadAllCommands(interaction, foldersPath, commandFolders) {
         commandFolders.forEach((folder) => {
             const commandsPath = path.join(foldersPath, folder, 'commands');

@@ -48,6 +48,20 @@ async function getLogChannel(newMessage) {
     return logChannel;
 }
 
+/**
+ * Creates an embed object for logging message updates.
+ *
+ * @param {Object} oldMessage - The original message object before the update.
+ * @param {Object} newMessage - The updated message object.
+ * @param {Object} newMessage.author - The author of the updated message.
+ * @param {string} newMessage.author.id - The ID of the author.
+ * @param {Object} newMessage.channel - The channel where the message was updated.
+ * @param {string} newMessage.channel.id - The ID of the channel.
+ * @param {string} [oldMessage.content] - The content of the original message.
+ * @param {string} [newMessage.content] - The content of the updated message.
+ * @param {Map} newMessage.attachments - A collection of attachments in the updated message.
+ * @returns {Object} An embed object containing the log information.
+ */
 async function createLogEmbed(oldMessage, newMessage) {
     const logEmbed = {
         color: 0x0099ff,

@@ -12,6 +12,14 @@ module.exports = {
     usage: '/clear_history',
     examples: ['/clear_history'],
 
+    /**
+     * Executes the clearHistory command to delete the user's chat history.
+     *
+     * @param {Object} interaction - The interaction object from the Discord API.
+     * @param {Object} interaction.user - The user object from the interaction.
+     * @param {string} interaction.user.id - The ID of the user whose chat history is to be deleted.
+     * @returns {Promise<void>} - A promise that resolves when the chat history is deleted and the reply is sent.
+     */
     async execute(interaction) {
         try {
             // Delete the user's chat history

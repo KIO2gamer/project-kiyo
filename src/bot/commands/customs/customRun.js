@@ -19,6 +19,18 @@ module.exports = {
         "Runs a specified custom command stored in the bot's database.",
     usage: '/custom_run <name_or_alias>',
     examples: ['/custom_run greet', '/custom_run hello'],
+    /**
+     * Executes a custom command based on the provided interaction.
+     * 
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Object} interaction.options - The options provided with the interaction.
+     * @param {Function} interaction.options.getString - Function to get a string option by name.
+     * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the command execution is complete.
+     * 
+     * @throws Will call handleError function if an error occurs during execution.
+     */
     async execute(interaction) {
         try {
             const commandNameOrAlias = interaction.options.getString('name');

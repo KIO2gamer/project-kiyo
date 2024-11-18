@@ -4,6 +4,16 @@ const { Events } = require('discord.js');
 module.exports = {
     name: Events.ClientReady,
     once: true,
+    /**
+     * Executes the reminder check process.
+     * 
+     * Fetches all pending reminders from MongoDB and schedules them to be sent at the appropriate time.
+     * If the reminder time has already passed while the bot was offline, sends the reminder immediately.
+     * After sending a reminder, it deletes the reminder from the database.
+     * 
+     * @param {Object} client - The Discord client instance.
+     * @returns {Promise<void>} - A promise that resolves when the reminder check process is complete.
+     */
     async execute(client) {
         // Fetch all pending reminders from MongoDB
         const pendingReminders = await Reminder.find({

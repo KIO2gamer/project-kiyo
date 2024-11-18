@@ -12,6 +12,25 @@ module.exports = {
     examples: ['/clear_db'],
     category: 'admin',
 
+    /**
+     * Executes the clear database command.
+     * 
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Object} interaction.member - The member object of the user who initiated the interaction.
+     * @param {Object} interaction.member.permissions - The permissions object of the member.
+     * @param {Object} interaction.user - The user object of the member who initiated the interaction.
+     * @param {Object} interaction.channel - The channel object where the interaction was initiated.
+     * @param {Function} interaction.editReply - Function to edit the initial reply of the interaction.
+     * @param {Function} interaction.followUp - Function to send a follow-up message to the interaction.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the command execution is complete.
+     * 
+     * @description
+     * This command checks if the user has the Administrator permission. If not, it sends an error message.
+     * If the user has the required permission, it sends a warning message and waits for the user to type `CONFIRM`.
+     * If the user confirms, it deletes all collections in the MongoDB database.
+     * If an error occurs during the process, it sends an appropriate error message.
+     */
     async execute(interaction) {
         // Check if user has the highest admin role
         if (

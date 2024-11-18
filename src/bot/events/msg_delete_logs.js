@@ -3,6 +3,22 @@ const MsgLogsConfig = require('../bot_utils/msgLogsConfig');
 
 module.exports = {
     name: Events.MessageDelete,
+    /**
+     * Handles the message delete event and logs the details to a specified log channel.
+     * 
+     * @async
+     * @function execute
+     * @param {Message} message - The deleted message object.
+     * @returns {Promise<void>}
+     * 
+     * @description
+     * This function checks if the message author exists and is not a bot. It fetches the log channel ID from the database,
+     * verifies the bot's permissions to send messages in the log channel, and creates an embed with the message details.
+     * If the message has attachments, they are included in the embed. The function also fetches audit logs to determine
+     * who deleted the message and includes this information in the embed if available. Finally, it sends the embed to the log channel.
+     * 
+     * @throws Will log an error if there is an issue fetching the log channel ID, the log channel itself, or if the bot lacks permissions.
+     */
     async execute(message) {
         // Check if the message author exists and it's not a bot
         if (!message.author && message.partial) {

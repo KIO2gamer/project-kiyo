@@ -16,6 +16,13 @@ module.exports = {
     description_full: "Lists all custom commands stored in the bot's database.",
     usage: '/custom_list',
     examples: ['/custom_list'],
+    /**
+     * Executes the custom command list interaction.
+     * 
+     * @param {Object} interaction - The interaction object from Discord.
+     * @returns {Promise<void>} - A promise that resolves when the interaction is complete.
+     * @throws {Error} - Throws an error if the interaction fails.
+     */
     async execute(interaction) {
         try {
             const customCommands = await cc.find({}).sort({ name: 1 });

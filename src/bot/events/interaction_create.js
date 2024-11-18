@@ -2,6 +2,17 @@ const { Events } = require('discord.js');
 
 module.exports = {
     name: Events.InteractionCreate,
+    /**
+     * Executes the interaction command.
+     * 
+     * @param {Object} interaction - The interaction object.
+     * @param {Function} interaction.isCommand - Checks if the interaction is a command.
+     * @param {Object} interaction.client - The client object.
+     * @param {Map} interaction.client.commands - The collection of commands.
+     * @param {string} interaction.commandName - The name of the command.
+     * @returns {Promise<void>} - A promise that resolves when the command execution is complete.
+     * @throws Will throw an error if the command execution fails.
+     */
     async execute(interaction) {
         if (!interaction.isCommand()) return;
 

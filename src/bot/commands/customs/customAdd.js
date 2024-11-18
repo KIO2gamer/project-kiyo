@@ -31,6 +31,14 @@ module.exports = {
         '/custom_add name:hello message:Hello!',
         '/custom_add name:hello message:Hi! alias_name:hey',
     ],
+    /**
+     * Executes the custom command addition process.
+     *
+     * @param {Object} interaction - The interaction object from the Discord API.
+     * @param {Object} interaction.options - The options provided with the interaction.
+     * @param {Function} interaction.options.getString - Function to get a string option by name.
+     * @returns {Promise<void>} - A promise that resolves when the command execution is complete.
+     */
     async execute(interaction) {
         const name = interaction.options.getString('name');
         const message = interaction.options.getString('message');

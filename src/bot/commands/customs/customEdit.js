@@ -31,6 +31,19 @@ module.exports = {
         '/custom_edit name:hello new_message:Hello, world!',
         '/custom_edit name:greet new_message:Welcome! new_alias:welcome',
     ],
+    /**
+     * Executes the custom command edit interaction.
+     *
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Object} interaction.options - The options provided with the interaction.
+     * @param {Function} interaction.options.getString - Function to get a string option by name.
+     * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+     * @param {Function} interaction.awaitMessageComponent - Function to await a message component interaction.
+     * @param {Object} interaction.user - The user who initiated the interaction.
+     * @param {string} interaction.user.id - The ID of the user who initiated the interaction.
+     *
+     * @returns {Promise<void>} - A promise that resolves when the interaction is complete.
+     */
     async execute(interaction) {
         const name = interaction.options.getString('name');
         const newMessage = interaction.options.getString('new_message');

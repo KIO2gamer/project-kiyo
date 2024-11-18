@@ -105,6 +105,19 @@ module.exports = {
         }
     },
 
+    /**
+     * Handles incoming text messages, processes them through an AI model, and sends a response.
+     * 
+     * @async
+     * @param {Object} message - The message object containing the user's message.
+     * @param {Object} message.author - The author of the message.
+     * @param {string} message.author.id - The ID of the message author.
+     * @param {string} message.content - The content of the message.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the message has been processed and a response has been sent.
+     * 
+     * @throws Will throw an error if there is an issue generating the response.
+     */
     async handleTextMessage(message) {
         const chatHistory = await ChatHistory.findOne({
             userId: message.author.id,

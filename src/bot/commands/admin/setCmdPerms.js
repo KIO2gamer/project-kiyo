@@ -39,6 +39,23 @@ module.exports = {
     ],
     category: 'admin',
 
+    /**
+     * Executes the setCmdPerms command to set permissions for a specific command.
+     * 
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Object} interaction.user - The user who initiated the interaction.
+     * @param {string} interaction.user.id - The ID of the user.
+     * @param {Object} interaction.options - The options provided with the interaction.
+     * @param {Function} interaction.options.getString - Function to get a string option.
+     * @param {Function} interaction.options.getRole - Function to get a role option.
+     * @param {Function} interaction.options.getUser - Function to get a user option.
+     * @param {Function} interaction.options.getBoolean - Function to get a boolean option.
+     * @param {Object} interaction.client - The client object from Discord.
+     * @param {Map} interaction.client.commands - The collection of commands.
+     * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the interaction reply is edited.
+     */
     async execute(interaction) {
         // Check if user is bot owner
         if (interaction.user.id !== process.env.OWNER_ID) {

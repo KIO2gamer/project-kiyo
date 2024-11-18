@@ -3,6 +3,21 @@ const TicketConfig = require('../bot_utils/ticketConfig');
 
 module.exports = {
     name: Events.InteractionCreate,
+    /**
+     * Handles the interaction when a button is clicked.
+     * 
+     * @param {Object} interaction - The interaction object from Discord.
+     * @param {Function} interaction.isButton - Checks if the interaction is a button.
+     * @param {string} interaction.customId - The custom ID of the button.
+     * @param {Object} interaction.guild - The guild object where the interaction took place.
+     * @param {Object} interaction.user - The user who initiated the interaction.
+     * @param {Object} interaction.client - The client object representing the bot.
+     * @param {Function} interaction.reply - Sends a reply to the interaction.
+     * 
+     * @returns {Promise<void>} - A promise that resolves when the interaction is handled.
+     * 
+     * @throws Will throw an error if there is an issue creating the ticket channel.
+     */
     async execute(interaction) {
         if (!interaction.isButton()) return;
 
