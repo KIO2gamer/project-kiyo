@@ -1,20 +1,6 @@
 {
+    "semi": false,
     "singleQuote": true,
-    "jsxSingleQuote": true,
     "tabWidth": 4,
-    "semi": true,
-    "trailingComma": "es5",
-    "printWidth": 80,
-    "bracketSpacing": true,
-    "arrowParens": "always",
-    "endOfLine": "lf",
-    "overrides": [
-        {
-            "files": "*.md",
-            "options": {
-                "parser": "markdown",
-                "proseWrap": "preserve"
-            }
-        }
-    ]
+    "trailingComma": "es5"
 }
