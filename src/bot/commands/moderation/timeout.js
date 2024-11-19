@@ -2,55 +2,55 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     PermissionFlagsBits,
-} = require('discord.js');
-const ms = require('ms');
-const moderationLogs = require('./../../bot_utils/moderationLogs');
+} = require("discord.js");
+const ms = require("ms");
+const moderationLogs = require("./../../../database/moderationLogs");
 
 module.exports = {
     description_full:
-        'Timeouts a member for the specified duration and reason.',
+        "Timeouts a member for the specified duration and reason.",
     usage: '/timeout target:@user amount:"duration" [reason:"timeout reason"]',
     examples: [
         '/timeout target:@user123 amount:"1h"',
         '/timeout target:@user123 amount:"30m" reason:"Being disruptive"',
     ],
-    category: 'moderation',
+    category: "moderation",
     data: new SlashCommandBuilder()
-        .setName('timeout')
-        .setDescription('Select a member and timeout them.')
+        .setName("timeout")
+        .setDescription("Select a member and timeout them.")
         .addUserOption((option) =>
             option
-                .setName('target')
-                .setDescription('The member to timeout')
+                .setName("target")
+                .setDescription("The member to timeout")
                 .setRequired(true)
         )
         .addStringOption((option) =>
             option
-                .setName('amount')
+                .setName("amount")
                 .setDescription(
-                    'The duration of the timeout (max 28 days) e.g. 1d | 2 weeks | 3hrs'
+                    "The duration of the timeout (max 28 days) e.g. 1d | 2 weeks | 3hrs"
                 )
                 .setRequired(true)
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for timeout')
+            option.setName("reason").setDescription("The reason for timeout")
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
 
     async execute(interaction) {
-        const targetUser = interaction.options.getMember('target');
+        const targetUser = interaction.options.getMember("target");
         const reason =
-            interaction.options.getString('reason') ?? 'No reason provided';
-        const duration = interaction.options.getString('amount');
+            interaction.options.getString("reason") ?? "No reason provided";
+        const duration = interaction.options.getString("amount");
         const durationMs = ms(duration);
 
         if (!targetUser) {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription('User not found')
-                        .setColor('Red')
+                        .setTitle("ERROR")
+                        .setDescription("User not found")
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -64,11 +64,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'You cannot timeout the owner of the server'
+                            "You cannot timeout the owner of the server"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -88,11 +88,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'You cannot timeout someone with a higher or equal role than you'
+                            "You cannot timeout someone with a higher or equal role than you"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -106,11 +106,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'I cannot timeout someone with a higher or equal role than myself'
+                            "I cannot timeout someone with a higher or equal role than myself"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -120,15 +120,15 @@ module.exports = {
             return;
         }
 
-        if (!durationMs || durationMs > ms('28d')) {
+        if (!durationMs || durationMs > ms("28d")) {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'Please provide a valid duration (max 28 days)'
+                            "Please provide a valid duration (max 28 days)"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -153,26 +153,26 @@ module.exports = {
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
-                            .setTitle('Timeout Removed')
+                            .setTitle("Timeout Removed")
                             .setDescription(
                                 `<@${targetUser.id}>'s timeout has been removed. Reason: \`${reason}\``
                             )
-                            .setColor('Green')
+                            .setColor("Green")
                             .setFooter({
                                 text: `Done by: ${interaction.user.username}`,
                                 iconURL: `${interaction.user.avatarURL()}`,
                             }),
                     ],
                 });
-            } else if (newTimeoutDuration > ms('28d')) {
+            } else if (newTimeoutDuration > ms("28d")) {
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
-                            .setTitle('ERROR')
+                            .setTitle("ERROR")
                             .setDescription(
-                                'The total timeout duration exceeds the maximum limit of 28 days.'
+                                "The total timeout duration exceeds the maximum limit of 28 days."
                             )
-                            .setColor('Red')
+                            .setColor("Red")
                             .setFooter({
                                 text: `Done by: ${interaction.user.username}`,
                                 iconURL: `${interaction.user.avatarURL()}`,
@@ -181,7 +181,7 @@ module.exports = {
                 });
             } else {
                 const logEntry = new moderationLogs({
-                    action: 'timeout',
+                    action: "timeout",
                     duration: newTimeoutDuration,
                     moderator: interaction.user.id,
                     user: targetUser.id,
@@ -194,11 +194,11 @@ module.exports = {
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
-                            .setTitle('Timeout Updated')
+                            .setTitle("Timeout Updated")
                             .setDescription(
                                 `<@${targetUser.id}>'s timeout has been updated. Reason: \`${reason}\`\nNew Duration: \`${ms(newTimeoutDuration, { long: true })}\``
                             )
-                            .setColor('Green')
+                            .setColor("Green")
                             .setFooter({
                                 text: `Done by: ${interaction.user.username}`,
                                 iconURL: `${interaction.user.avatarURL()}`,
@@ -207,15 +207,15 @@ module.exports = {
                 });
             }
         } catch (error) {
-            console.error('Failed to timeout user:', error);
+            console.error("Failed to timeout user:", error);
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
                             `An error occurred while trying to timeout the user\n\`${error.message}\``
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,

@@ -1,89 +1,89 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require("discord.js");
 const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ComponentType,
-} = require('discord.js');
-const moderationLogs = require('./../../bot_utils/moderationLogs');
+} = require("discord.js");
+const moderationLogs = require("./../../../database/moderationLogs");
 
 const ACTION_CHOICES = [
-    { name: 'Warn', value: 'warn' },
-    { name: 'Ban', value: 'ban' },
-    { name: 'Timeout', value: 'timeout' },
-    { name: 'Kick', value: 'kick' },
-    { name: 'Tempban', value: 'tempban' },
-    { name: 'Unban', value: 'unban' },
+    { name: "Warn", value: "warn" },
+    { name: "Ban", value: "ban" },
+    { name: "Timeout", value: "timeout" },
+    { name: "Kick", value: "kick" },
+    { name: "Tempban", value: "tempban" },
+    { name: "Unban", value: "unban" },
 ];
 
 module.exports = {
     description_full:
-        'Displays the moderation logs with various filtering options.',
-    usage: '/mod_logs [limit] [user] [lognumber] [logrange] [action] [moderator]',
+        "Displays the moderation logs with various filtering options.",
+    usage: "/mod_logs [limit] [user] [lognumber] [logrange] [action] [moderator]",
     examples: [
-        '/mod_logs',
-        '/mod_logs limit:10',
-        '/mod_logs user:@user123',
-        '/mod_logs lognumber:5',
-        '/mod_logs logrange:1-5',
-        '/mod_logs action:ban',
-        '/mod_logs moderator:@mod456',
+        "/mod_logs",
+        "/mod_logs limit:10",
+        "/mod_logs user:@user123",
+        "/mod_logs lognumber:5",
+        "/mod_logs logrange:1-5",
+        "/mod_logs action:ban",
+        "/mod_logs moderator:@mod456",
     ],
-    category: 'moderation',
+    category: "moderation",
     data: new SlashCommandBuilder()
-        .setName('mod_logs')
-        .setDescription('Show the moderation logs.')
+        .setName("mod_logs")
+        .setDescription("Show the moderation logs.")
         .addIntegerOption((option) =>
             option
-                .setName('limit')
-                .setDescription('The number of logs per page')
+                .setName("limit")
+                .setDescription("The number of logs per page")
                 .setMinValue(1)
                 .setMaxValue(25)
                 .setRequired(false)
         )
         .addUserOption((option) =>
             option
-                .setName('user')
-                .setDescription('The user to filter logs by')
+                .setName("user")
+                .setDescription("The user to filter logs by")
                 .setRequired(false)
         )
         .addIntegerOption((option) =>
             option
-                .setName('lognumber')
-                .setDescription('The log number to search for')
+                .setName("lognumber")
+                .setDescription("The log number to search for")
                 .setMinValue(1)
                 .setRequired(false)
         )
         .addStringOption((option) =>
             option
-                .setName('logrange')
+                .setName("logrange")
                 .setDescription(
-                    'The range of log numbers to search for (e.g., 1-5)'
+                    "The range of log numbers to search for (e.g., 1-5)"
                 )
                 .setRequired(false)
         )
         .addStringOption((option) =>
             option
-                .setName('action')
-                .setDescription('The action to filter logs by')
+                .setName("action")
+                .setDescription("The action to filter logs by")
                 .setRequired(false)
                 .addChoices(...ACTION_CHOICES)
         )
         .addUserOption((option) =>
             option
-                .setName('moderator')
-                .setDescription('The moderator to filter logs by')
+                .setName("moderator")
+                .setDescription("The moderator to filter logs by")
                 .setRequired(false)
         ),
 
     async execute(interaction) {
-        const limit = interaction.options.getInteger('limit') || 5;
-        const user = interaction.options.getUser('user');
-        const logNumber = interaction.options.getInteger('lognumber');
-        const logRange = interaction.options.getString('logrange');
-        const action = interaction.options.getString('action');
-        const moderator = interaction.options.getUser('moderator');
+        const limit = interaction.options.getInteger("limit") || 5;
+        const user = interaction.options.getUser("user");
+        const logNumber = interaction.options.getInteger("lognumber");
+        const logRange = interaction.options.getString("logrange");
+        const action = interaction.options.getString("action");
+        const moderator = interaction.options.getUser("moderator");
 
         try {
             const query = {};
@@ -94,7 +94,7 @@ module.exports = {
 
             if (logRange) {
                 const [start, end] = logRange
-                    .split('-')
+                    .split("-")
                     .map((num) => parseInt(num.trim()));
                 if (!isNaN(start) && !isNaN(end) && start <= end) {
                     query.logNumber = { $gte: start, $lte: end };
@@ -123,7 +123,7 @@ module.exports = {
 
             if (logs.length === 0) {
                 return interaction.reply({
-                    content: 'No moderation logs found.',
+                    content: "No moderation logs found.",
                     ephemeral: true,
                 });
             }
@@ -136,8 +136,8 @@ module.exports = {
                 const endIndex = Math.min(page * limit, logs.length);
 
                 const embed = new EmbedBuilder()
-                    .setTitle('Moderation Logs')
-                    .setColor('#FF0000')
+                    .setTitle("Moderation Logs")
+                    .setColor("#FF0000")
                     .setTimestamp()
                     .setFooter({ text: `Page ${page} of ${totalPages}` });
 
@@ -152,7 +152,7 @@ module.exports = {
 
                         return `**Log #${log.logNumber}**\n**Action:** ${log.action}\n**Moderator:** ${moderatorMention}\n**User:** ${userMention}\n**Reason:** ${log.reason}\n**Timestamp:** ${timestamp}`;
                     })
-                    .join('\n\n');
+                    .join("\n\n");
 
                 embed.setDescription(logDescriptions);
                 return embed;
@@ -164,8 +164,8 @@ module.exports = {
                 if (page > 1) {
                     row.addComponents(
                         new ButtonBuilder()
-                            .setCustomId('prevPage')
-                            .setLabel('Previous')
+                            .setCustomId("prevPage")
+                            .setLabel("Previous")
                             .setStyle(ButtonStyle.Primary)
                     );
                 }
@@ -173,8 +173,8 @@ module.exports = {
                 if (page < totalPages) {
                     row.addComponents(
                         new ButtonBuilder()
-                            .setCustomId('nextPage')
-                            .setLabel('Next')
+                            .setCustomId("nextPage")
+                            .setLabel("Next")
                             .setStyle(ButtonStyle.Primary)
                     );
                 }
@@ -197,10 +197,10 @@ module.exports = {
                 time: 60000,
             });
 
-            collector.on('collect', async (i) => {
-                if (i.customId === 'prevPage') {
+            collector.on("collect", async (i) => {
+                if (i.customId === "prevPage") {
                     currentPage--;
-                } else if (i.customId === 'nextPage') {
+                } else if (i.customId === "nextPage") {
                     currentPage++;
                 }
                 const newEmbed = createEmbed(currentPage);
@@ -209,14 +209,14 @@ module.exports = {
                 await i.update({ embeds: [newEmbed], components: newButtons });
             });
 
-            collector.on('end', () => {
+            collector.on("end", () => {
                 message.edit({ components: [] }); // Update, not reply
             });
         } catch (error) {
-            console.error('Error retrieving logs:', error);
+            console.error("Error retrieving logs:", error);
             // Only one reply if an error occurs:
             await interaction.reply({
-                content: 'Failed to retrieve logs.',
+                content: "Failed to retrieve logs.",
                 ephemeral: true,
             });
         }

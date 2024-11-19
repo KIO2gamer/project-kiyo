@@ -2,53 +2,53 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     PermissionFlagsBits,
-} = require('discord.js');
-const ms = require('ms');
-const { handleError } = require('./../../bot_utils/errorHandler');
+} = require("discord.js");
+const ms = require("ms");
+const { handleError } = require("./../../utils/errorHandler");
 
 module.exports = {
     description_full:
-        'This command allows you to set a slowmode for a channel. Slowmode limits how often users can send messages in the specified channel. You can set the slowmode duration using common time units (e.g., 10s, 5m, 1h).',
-    usage: '/slowmode [duration] [channel]',
+        "This command allows you to set a slowmode for a channel. Slowmode limits how often users can send messages in the specified channel. You can set the slowmode duration using common time units (e.g., 10s, 5m, 1h).",
+    usage: "/slowmode [duration] [channel]",
     examples: [
-        '/slowmode 10s', // Set slowmode to 10 seconds in the current channel
-        '/slowmode 5m #general', // Set slowmode to 5 minutes in the #general channel
+        "/slowmode 10s", // Set slowmode to 10 seconds in the current channel
+        "/slowmode 5m #general", // Set slowmode to 5 minutes in the #general channel
     ],
-    category: 'moderation',
+    category: "moderation",
     data: new SlashCommandBuilder()
-        .setName('slowmode')
-        .setDescription('Set a slowmode for a channel.')
+        .setName("slowmode")
+        .setDescription("Set a slowmode for a channel.")
         .addStringOption((option) =>
             option
-                .setName('duration')
+                .setName("duration")
                 .setDescription(
-                    'The duration of the slowmode (e.g., 10s, 5m, 1h)'
+                    "The duration of the slowmode (e.g., 10s, 5m, 1h)"
                 )
                 .setRequired(true)
         )
         .addChannelOption((option) =>
             option
-                .setName('channel')
-                .setDescription('The channel to set slowmode in')
+                .setName("channel")
+                .setDescription("The channel to set slowmode in")
                 .setRequired(false)
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
     async execute(interaction) {
         const channel =
-            interaction.options.getChannel('channel') || interaction.channel;
-        const durationInput = interaction.options.getString('duration');
+            interaction.options.getChannel("channel") || interaction.channel;
+        const durationInput = interaction.options.getString("duration");
         const duration = ms(durationInput) / 1000;
 
         if (isNaN(duration) || duration < 0 || duration > 21600) {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'Invalid duration. Please provide a duration between 0 seconds and 6 hours.'
+                            "Invalid duration. Please provide a duration between 0 seconds and 6 hours."
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Set by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.displayAvatarURL()}`,
@@ -71,9 +71,9 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('Slowmode Set')
+                        .setTitle("Slowmode Set")
                         .setDescription(description)
-                        .setColor('Green')
+                        .setColor("Green")
                         .setFooter({
                             text: `Set by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.displayAvatarURL()}`,

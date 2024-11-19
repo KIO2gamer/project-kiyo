@@ -1,37 +1,37 @@
-const { SlashCommandBuilder } = require('discord.js');
-const moderationLogs = require('./../../bot_utils/moderationLogs');
+const { SlashCommandBuilder } = require("discord.js");
+const moderationLogs = require("./../../../database/moderationLogs");
 
 module.exports = {
     description_full:
-        'Deletes a moderation log or a range of logs by log number or range.',
-    usage: '/delete_log [lognumber] [logrange]',
-    examples: ['/delete_log lognumber:5', '/delete_log logrange:1-5'],
-    category: 'utility',
+        "Deletes a moderation log or a range of logs by log number or range.",
+    usage: "/delete_log [lognumber] [logrange]",
+    examples: ["/delete_log lognumber:5", "/delete_log logrange:1-5"],
+    category: "utility",
     data: new SlashCommandBuilder()
-        .setName('delete_log')
-        .setDescription('Delete a moderation log/logs by log number/range.')
+        .setName("delete_log")
+        .setDescription("Delete a moderation log/logs by log number/range.")
         .addIntegerOption((option) =>
             option
-                .setName('lognumber')
-                .setDescription('The log number to delete')
+                .setName("lognumber")
+                .setDescription("The log number to delete")
                 .setRequired(false)
         )
         .addStringOption((option) =>
             option
-                .setName('logrange')
+                .setName("logrange")
                 .setDescription(
-                    'The range of log numbers to delete (e.g., 1-5)'
+                    "The range of log numbers to delete (e.g., 1-5)"
                 )
                 .setRequired(false)
         ),
 
     async execute(interaction) {
-        const logNumber = interaction.options.getInteger('lognumber');
-        const logRange = interaction.options.getString('logrange');
+        const logNumber = interaction.options.getInteger("lognumber");
+        const logRange = interaction.options.getString("logrange");
 
         if (!logNumber && !logRange) {
             await interaction.reply(
-                'Please provide either a log number or a range of log numbers to delete.'
+                "Please provide either a log number or a range of log numbers to delete."
             );
             return;
         }
@@ -53,12 +53,12 @@ module.exports = {
                 }
             } else if (logRange) {
                 const [start, end] = logRange
-                    .split('-')
+                    .split("-")
                     .map((num) => parseInt(num.trim()));
 
                 if (isNaN(start) || isNaN(end)) {
                     await interaction.reply(
-                        'Invalid log range. Please provide a valid range (e.g., 1-5).'
+                        "Invalid log range. Please provide a valid range (e.g., 1-5)."
                     );
                     return;
                 }
@@ -80,7 +80,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             await interaction.reply(
-                'Failed to delete the log(s). Please try again later.'
+                "Failed to delete the log(s). Please try again later."
             );
         }
     },

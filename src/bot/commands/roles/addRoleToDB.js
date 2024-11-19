@@ -1,24 +1,24 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { handleError } = require('../../bot_utils/errorHandler.js');
-const Role = require('../../bot_utils/roleStorage.js');
+const { SlashCommandBuilder } = require("discord.js");
+const { handleError } = require("./../../utils/errorHandler");
+const Role = require("./../../../database/roleStorage.js");
 
 module.exports = {
     description_full:
-        'Adds a role to the database. Useful for managing roles that your bot might need to reference.',
-    usage: '/add_role_to_data <role:role>',
-    examples: ['/add_role_to_data role:Moderators'],
-    category: 'roles',
+        "Adds a role to the database. Useful for managing roles that your bot might need to reference.",
+    usage: "/add_role_to_data <role:role>",
+    examples: ["/add_role_to_data role:Moderators"],
+    category: "roles",
     data: new SlashCommandBuilder()
-        .setName('add_role_to_data')
-        .setDescription('Adds a role to the database.')
+        .setName("add_role_to_data")
+        .setDescription("Adds a role to the database.")
         .addRoleOption((option) =>
             option
-                .setName('role')
-                .setDescription('The role to add')
+                .setName("role")
+                .setDescription("The role to add")
                 .setRequired(true)
         ),
     async execute(interaction) {
-        const role = interaction.options.getRole('role');
+        const role = interaction.options.getRole("role");
 
         try {
             // Check for Duplicates
@@ -42,7 +42,7 @@ module.exports = {
             await newRole.save();
 
             await interaction.editReply(
-                'Role data successfully added to the database!'
+                "Role data successfully added to the database!"
             );
         } catch (error) {
             handleError(interaction, error);

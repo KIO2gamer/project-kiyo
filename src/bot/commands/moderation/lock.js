@@ -3,27 +3,27 @@ const {
     EmbedBuilder,
     PermissionFlagsBits,
     ChannelType,
-} = require('discord.js');
-const { handleError } = require('./../../bot_utils/errorHandler');
+} = require("discord.js");
+const { handleError } = require("./../../utils/errorHandler");
 
 module.exports = {
     description_full:
-        'This command locks a specified text or announcement channel, preventing users from sending messages in it. If no channel is specified, it will lock the channel the command is used in.',
-    usage: '/lock <channel>',
+        "This command locks a specified text or announcement channel, preventing users from sending messages in it. If no channel is specified, it will lock the channel the command is used in.",
+    usage: "/lock <channel>",
     examples: [
-        '/lock channel:text_channel', // Locks the "text_channel" channel
-        '/lock channel:announcement_channel', // Locks the "announcement_channel" channel
-        '/lock', // Locks the current channel where the command is used
+        "/lock channel:text_channel", // Locks the "text_channel" channel
+        "/lock channel:announcement_channel", // Locks the "announcement_channel" channel
+        "/lock", // Locks the current channel where the command is used
     ],
-    category: 'moderation',
+    category: "moderation",
     data: new SlashCommandBuilder()
-        .setName('lock')
-        .setDescription('Lock a channel')
+        .setName("lock")
+        .setDescription("Lock a channel")
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
         .addChannelOption((option) =>
             option
-                .setName('channel')
-                .setDescription('The channel you want to lock')
+                .setName("channel")
+                .setDescription("The channel you want to lock")
                 .addChannelTypes(
                     ChannelType.GuildText,
                     ChannelType.GuildAnnouncement
@@ -33,7 +33,7 @@ module.exports = {
 
     async execute(interaction) {
         const channel =
-            interaction.options.getChannel('channel') || interaction.channel;
+            interaction.options.getChannel("channel") || interaction.channel;
 
         // Check if the bot has the required permissions
         if (
@@ -42,10 +42,10 @@ module.exports = {
                 .has(PermissionFlagsBits.ManageChannels)
         ) {
             const noPermissionEmbed = new EmbedBuilder()
-                .setTitle('ERROR')
-                .setColor('Red')
+                .setTitle("ERROR")
+                .setColor("Red")
                 .setDescription(
-                    'I do not have the required permissions to lock the channel.'
+                    "I do not have the required permissions to lock the channel."
                 );
             await interaction.editReply({ embeds: [noPermissionEmbed] });
             return;
@@ -58,8 +58,8 @@ module.exports = {
                 ?.deny.has(PermissionFlagsBits.SendMessages)
         ) {
             const alreadyLockedEmbed = new EmbedBuilder()
-                .setTitle('ERROR')
-                .setColor('Red')
+                .setTitle("ERROR")
+                .setColor("Red")
                 .setDescription(`${channel} is already locked.`);
             await interaction.editReply({ embeds: [alreadyLockedEmbed] });
             return;
@@ -73,7 +73,7 @@ module.exports = {
 
             const lockEmbed = new EmbedBuilder()
                 .setTitle(`<#${channel.id}> has been locked`)
-                .setColor('Red')
+                .setColor("Red")
                 .setFooter({
                     text: `Done by: ${interaction.user.username}`,
                     iconURL: `${interaction.user.avatarURL()}`,
@@ -86,7 +86,7 @@ module.exports = {
                 });
             } else {
                 await interaction.editReply({
-                    content: '**Locked Successfully**',
+                    content: "**Locked Successfully**",
                 });
                 await channel.send({
                     embeds: [lockEmbed],

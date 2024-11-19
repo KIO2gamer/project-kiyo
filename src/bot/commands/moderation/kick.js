@@ -2,46 +2,46 @@ const {
     SlashCommandBuilder,
     PermissionFlagsBits,
     EmbedBuilder,
-} = require('discord.js');
-const moderationLogs = require('./../../bot_utils/moderationLogs');
+} = require("discord.js");
+const moderationLogs = require("./../../../database/moderationLogs");
 
 module.exports = {
     description_full:
-        'Kicks a member from the server with the specified reason.',
+        "Kicks a member from the server with the specified reason.",
     usage: '/kick target:@user [reason:"kick reason"]',
     examples: [
-        '/kick target:@user123',
+        "/kick target:@user123",
         '/kick target:@user123 reason:"Violating server rules"',
     ],
-    category: 'moderation',
+    category: "moderation",
     data: new SlashCommandBuilder()
-        .setName('kick')
-        .setDescription('Select a member and kick them.')
+        .setName("kick")
+        .setDescription("Select a member and kick them.")
         .addUserOption((option) =>
             option
-                .setName('target')
-                .setDescription('The member to kick')
+                .setName("target")
+                .setDescription("The member to kick")
                 .setRequired(true)
         )
         .addStringOption((option) =>
-            option.setName('reason').setDescription('The reason for the kick')
+            option.setName("reason").setDescription("The reason for the kick")
         )
         .setDefaultMemberPermissions(
             PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
         ),
 
     async execute(interaction) {
-        const targetUser = interaction.options.getMember('target');
+        const targetUser = interaction.options.getMember("target");
         const reason =
-            interaction.options.getString('reason') ?? 'No reason provided';
+            interaction.options.getString("reason") ?? "No reason provided";
 
         if (!targetUser) {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription('User not found')
-                        .setColor('Red')
+                        .setTitle("ERROR")
+                        .setDescription("User not found")
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -55,11 +55,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'You cannot kick the owner of the server'
+                            "You cannot kick the owner of the server"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -78,11 +78,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'You cannot kick someone with a higher or equal role than you'
+                            "You cannot kick someone with a higher or equal role than you"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -96,11 +96,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
-                            'I cannot kick someone with a higher or equal role than myself'
+                            "I cannot kick someone with a higher or equal role than myself"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -112,7 +112,7 @@ module.exports = {
 
         try {
             const logEntry = new moderationLogs({
-                action: 'kick',
+                action: "kick",
                 moderator: interaction.user.id,
                 user: targetUser.id,
                 reason: reason,
@@ -124,11 +124,11 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('KICKED!!!')
+                        .setTitle("KICKED!!!")
                         .setDescription(
                             `<@${targetUser.id}> has been kicked for reason: \`${reason}\``
                         )
-                        .setColor('Green')
+                        .setColor("Green")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,
@@ -139,12 +139,12 @@ module.exports = {
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setTitle('ERROR')
+                        .setTitle("ERROR")
                         .setDescription(
                             error.message ??
-                                'An error occurred while trying to kick the user'
+                                "An error occurred while trying to kick the user"
                         )
-                        .setColor('Red')
+                        .setColor("Red")
                         .setFooter({
                             text: `Done by: ${interaction.user.username}`,
                             iconURL: `${interaction.user.avatarURL()}`,

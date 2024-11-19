@@ -1,16 +1,16 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { handleError } = require('./../../bot_utils/errorHandler.js');
-const Role = require('./../../bot_utils/roleStorage.js');
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { handleError } = require("./../../utils/errorHandler.js");
+const Role = require("././../../../database/roleStorage.js.js");
 
 module.exports = {
     description_full:
-        'Displays a list of roles that have been stored in the database.',
-    usage: '/view_roles_from_data',
-    examples: ['/view_roles_from_data'],
-    category: 'roles',
+        "Displays a list of roles that have been stored in the database.",
+    usage: "/view_roles_from_data",
+    examples: ["/view_roles_from_data"],
+    category: "roles",
     data: new SlashCommandBuilder()
-        .setName('view_roles_from_data')
-        .setDescription('View the roles stored in the database.'),
+        .setName("view_roles_from_data")
+        .setDescription("View the roles stored in the database."),
     async execute(interaction) {
         try {
             // Fetch all roles from the database
@@ -18,13 +18,13 @@ module.exports = {
 
             if (roles.length === 0) {
                 return interaction.editReply(
-                    'There are no roles stored in the database.'
+                    "There are no roles stored in the database."
                 );
             }
 
             const embed = new EmbedBuilder()
-                .setTitle('Stored Roles')
-                .setColor('#00FFFF')
+                .setTitle("Stored Roles")
+                .setColor("#00FFFF")
                 .setDescription(
                     roles
                         .map(
@@ -33,7 +33,7 @@ module.exports = {
                                     role.roleID
                                 }\`, Color: \`${role.roleColor}\`)`
                         )
-                        .join('\n')
+                        .join("\n")
                 );
 
             await interaction.editReply({ embeds: [embed] });

@@ -1,21 +1,21 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const axios = require('axios');
-const { handleError } = require('./../../bot_utils/errorHandler'); // Import errorHandler
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const axios = require("axios");
+const { handleError } = require("./../../utils/errorHandler"); // Import errorHandler
 
 module.exports = {
-    category: 'utility',
+    category: "utility",
     data: new SlashCommandBuilder()
-        .setName('dictionary')
-        .setDescription('Look up the definition of a word')
+        .setName("dictionary")
+        .setDescription("Look up the definition of a word")
         .addStringOption((option) =>
             option
-                .setName('word')
-                .setDescription('The word to look up')
+                .setName("word")
+                .setDescription("The word to look up")
                 .setRequired(true)
         ),
 
     async execute(interaction) {
-        const word = interaction.options.getString('word');
+        const word = interaction.options.getString("word");
         const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
 
         try {
@@ -30,12 +30,12 @@ module.exports = {
                     .setTitle(word)
                     .setDescription(definition)
                     .addFields({
-                        name: 'Part of Speech',
+                        name: "Part of Speech",
                         value: partOfSpeech,
                     })
                     .setFooter({
-                        text: 'Powered by DictionaryAPI',
-                        iconURL: 'https://i.imgur.com/AfFp7pu.png',
+                        text: "Powered by DictionaryAPI",
+                        iconURL: "https://i.imgur.com/AfFp7pu.png",
                     })
                     .setTimestamp();
                 await interaction.reply({ embeds: [embed] });

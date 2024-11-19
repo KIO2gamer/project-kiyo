@@ -3,46 +3,46 @@ const {
     ChannelType,
     EmbedBuilder,
     PermissionFlagsBits,
-} = require('discord.js');
-const { handleError } = require('./../../bot_utils/errorHandler');
+} = require("discord.js");
+const { handleError } = require("./../../utils/errorHandler");
 
 module.exports = {
     description_full:
         'Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the "Manage Channels" permission to prevent misuse.',
-    usage: '/echo <input:text_to_echo> <channel:channel> [embed:true/false]',
+    usage: "/echo <input:text_to_echo> <channel:channel> [embed:true/false]",
     examples: [
         '/echo input:"Hello there!" channel:#general',
         '/echo input:"Important announcement!" channel:#announcements embed:true',
     ],
-    category: 'utility',
+    category: "utility",
     data: new SlashCommandBuilder()
-        .setName('echo')
-        .setDescription('Replies with your input!')
+        .setName("echo")
+        .setDescription("Replies with your input!")
         .addStringOption((option) =>
             option
-                .setName('input')
-                .setDescription('The input to echo back')
+                .setName("input")
+                .setDescription("The input to echo back")
                 .setMaxLength(2000)
                 .setRequired(true)
         )
         .addChannelOption((option) =>
             option
-                .setName('channel')
-                .setDescription('The channel to echo into')
+                .setName("channel")
+                .setDescription("The channel to echo into")
                 .addChannelTypes(ChannelType.GuildText)
                 .setRequired(true)
         )
         .addBooleanOption((option) =>
             option
-                .setName('embed')
-                .setDescription('Whether or not the echo should be embedded')
+                .setName("embed")
+                .setDescription("Whether or not the echo should be embedded")
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
     async execute(interaction) {
-        const input = interaction.options.getString('input');
-        const channel = interaction.options.getChannel('channel');
-        const useEmbed = interaction.options.getBoolean('embed') || false;
+        const input = interaction.options.getString("input");
+        const channel = interaction.options.getChannel("channel");
+        const useEmbed = interaction.options.getBoolean("embed") || false;
 
         // Check if the bot has permission to send messages in the target channel
         if (
@@ -59,7 +59,7 @@ module.exports = {
         try {
             if (useEmbed) {
                 const echoEmbed = new EmbedBuilder()
-                    .setColor('#0099ff')
+                    .setColor("#0099ff")
                     .setTitle(`Echoed by ${interaction.user.tag}`)
                     .setDescription(input)
                     .setTimestamp();
@@ -81,7 +81,7 @@ module.exports = {
                 error,
                 await interaction.reply({
                     content:
-                        'There was an error trying to execute that command.',
+                        "There was an error trying to execute that command.",
                     ephemeral: true,
                 })
             );

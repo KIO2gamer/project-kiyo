@@ -80,8 +80,8 @@ const loadEvents = (dir) => {
 };
 
 // Load commands and events from their respective directories
-loadCommands(path.join(__dirname, 'commands')); // Recursively loads commands from all sub-categories
-loadEvents(path.join(__dirname, 'events')); // Loads all events
+loadCommands(path.join(__dirname, 'bot/commands')); // Recursively loads commands from all sub-categories
+loadEvents(path.join(__dirname, 'bot/events')); // Loads all events
 
 // Function to connect to MongoDB
 const connectToMongoDB = async () => {

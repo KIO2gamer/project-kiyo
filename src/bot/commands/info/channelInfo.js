@@ -3,8 +3,8 @@ const {
     EmbedBuilder,
     PermissionsBitField,
 } = require('discord.js');
-const { handleError } = require('./../../bot_utils/errorHandler');
-const { getChannelType } = require('./../../bot_utils/channelTypes');
+const { handleError } = require("./../../utils/errorHandler");
+const { getChannelType } = require('./../../utils/channelTypes');
 
 module.exports = {
     description_full:
