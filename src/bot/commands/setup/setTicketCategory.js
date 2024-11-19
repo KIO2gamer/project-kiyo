@@ -3,7 +3,7 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const TicketConfig = require('./../../bot_utils/ticketConfig');
+const TicketConfig = require("./../../../database/ticketConfig");
 
 module.exports = {
     description_full:

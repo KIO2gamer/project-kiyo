@@ -5,7 +5,7 @@ const {
     EmbedBuilder,
 } = require("discord.js");
 const { handleError } = require("./../../utils/errorHandler");
-const { getChannelType } = require("./../../bot_utils/channelTypes");
+const { getChannelType } = require("./../../utils/channelTypes");
 
 module.exports = {
     description_full:

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const Reminder = require('./../../bot_utils/reminderStorage');
+const Reminder = require('./../../../database/reminderStorage');
 
 module.exports = {
     data: new SlashCommandBuilder()

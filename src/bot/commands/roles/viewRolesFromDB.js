@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { handleError } = require("./../../utils/errorHandler.js");
-const Role = require("././../../../database/roleStorage.js.js");
+const Role = require("././../../../database/roleStorage.js");
 
 module.exports = {
     description_full:

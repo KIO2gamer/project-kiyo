@@ -1,5 +1,5 @@
 const { Events, AuditLogEvent } = require('discord.js');
-const MsgLogsConfig = require('../bot_utils/msgLogsConfig');
+const MsgLogsConfig = require("./../../database/msgLogsConfig");
 
 async function fetchPartialMessages(oldMessage, newMessage) {
     if (oldMessage.partial || newMessage.partial) {

@@ -4,9 +4,9 @@ const {
     HarmBlockThreshold,
     HarmCategory,
 } = require('@google/generative-ai');
-const ChatHistory = require('./../bot_utils/ChatHistory');
-const { handleError } = require('../bot_utils/errorHandler');
-const AIChatChannel = require('./../bot_utils/AIChatChannel');
+const ChatHistory = require('./../../database/ChatHistory');
+const { handleError } = require('./../utils/errorHandler');
+const AIChatChannel = require('./../../database/ChatHistory');
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

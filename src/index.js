@@ -120,7 +120,7 @@ const connectToMongoDB = async () => {
 const deployCommands = async () => {
     console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
     const commands = [];
-    loadFiles(path.join(__dirname, 'commands'), (filePath) => {
+    loadFiles(path.join(__dirname, 'bot/commands'), (filePath) => {
         const command = require(filePath);
         if (command?.data?.toJSON) commands.push(command.data.toJSON());
     });

@@ -3,7 +3,7 @@ const {
     PermissionFlagsBits,
     ChannelType,
 } = require('discord.js');
-const MsgLogsConfig = require('./../../bot_utils/msgLogsConfig');
+const MsgLogsConfig = require("./../../../database/msgLogsConfig");
 
 module.exports = {
     description_full:

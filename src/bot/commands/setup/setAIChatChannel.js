@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { handleError } = require("./../../utils/errorHandler");
-const AIChatChannel = require("./../../bot_utils/AIChatChannel");
+const AIChatChannel = require("./../../../database/AIChatChannel");
 
 module.exports = {
     data: new SlashCommandBuilder()
