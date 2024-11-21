@@ -1,15 +1,15 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-	description_full: 'Tells the user they have been steeled.',
-	usage: '/steel',
-	examples: ['/steel'],
-	category: 'fun',
-	data: new SlashCommandBuilder().setName('steel').setDescription('steel'),
+  description_full: 'Tells the user they have been steeled.',
+  usage: '/steel',
+  examples: ['/steel'],
+  category: 'fun',
+  data: new SlashCommandBuilder().setName('steel').setDescription('steel'),
 
-	async execute(interaction) {
-		await interaction.reply(
-			'Guess wat? you just got steeled.\n*metal pipe drop sound*',
-		);
-	},
+  async execute(interaction) {
+    await interaction.reply(
+      'Guess wat? you just got steeled.\n*metal pipe drop sound*',
+    );
+  },
 };
