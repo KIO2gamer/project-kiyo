@@ -8,7 +8,9 @@
     "dev": "nodemon src/index.js",
     "prestart": "npm install",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "repository": {
     "type": "git",
@@ -61,6 +63,8 @@
     "url": "https://github.com/sponsors/KIO2gamer"
   },
   "devDependencies": {
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
     "prettier": "^3.3.3"
   }
 }
