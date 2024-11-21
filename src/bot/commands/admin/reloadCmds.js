@@ -30,7 +30,8 @@ module.exports = {
 				foldersPath,
 				commandFolders,
 			);
-		} else {
+		}
+		else {
 			await this.reloadAllCommands(
 				interaction,
 				foldersPath,
@@ -68,7 +69,8 @@ module.exports = {
 				content: `Command \`${commandName}\` was reloaded!`,
 				ephemeral: true,
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply({
 				content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
@@ -122,12 +124,14 @@ module.exports = {
 								command.data.name,
 								command,
 							);
-						} else {
+						}
+						else {
 							console.log(
 								`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
 							);
 						}
-					} catch (error) {
+					}
+					catch (error) {
 						console.error(error);
 					}
 				}

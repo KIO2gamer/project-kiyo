@@ -17,7 +17,7 @@ module.exports = {
 			'Watch out! A ninja is coming... to steal your snacks!',
 			'A secret agent is en route... to prank you with a water balloon!',
 			'Beware! A spy is nearby... to tell you a funny joke!',
-			`i got yr home address\nalso get rekt bozo coz im sending a hitman to yeet ya`,
+			'i got yr home address\nalso get rekt bozo coz im sending a hitman to yeet ya',
 		];
 
 		const randomMessage =

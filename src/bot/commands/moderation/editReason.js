@@ -59,12 +59,14 @@ module.exports = {
 					await interaction.reply(
 						`Successfully updated reason for log #${logNumber} to: ${newReason}`,
 					);
-				} else {
+				}
+				else {
 					await interaction.reply(
 						`No log found with log number ${logNumber}.`,
 					);
 				}
-			} else if (logRange) {
+			}
+			else if (logRange) {
 				const [start, end] = logRange
 					.split('-')
 					.map(num => parseInt(num.trim()));
@@ -88,13 +90,15 @@ module.exports = {
 					await interaction.reply(
 						`Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`,
 					);
-				} else {
+				}
+				else {
 					await interaction.reply(
 						`No logs found in the range #${start}-#${end}.`,
 					);
 				}
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply(
 				'Failed to update the log(s). Please try again later.',

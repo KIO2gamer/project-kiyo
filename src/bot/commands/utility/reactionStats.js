@@ -48,24 +48,24 @@ module.exports = {
 
 		// More robust timeframe handling using moment.js:
 		switch (timeframe) {
-			case '24h':
-				startDate = moment().subtract(1, 'day').toDate();
-				break;
-			case '7d':
-				startDate = moment().subtract(7, 'days').toDate();
-				break;
-			case '30d':
-				startDate = moment().subtract(30, 'days').toDate();
-				break;
-			case '1M':
-				startDate = moment().subtract(1, 'month').toDate();
-				break;
-			case 'all':
-				startDate = new Date(0); // Beginning of time
-				break;
-			default:
-				// Default to 7 days if invalid timeframe is provided
-				startDate = moment().subtract(7, 'days').toDate();
+		case '24h':
+			startDate = moment().subtract(1, 'day').toDate();
+			break;
+		case '7d':
+			startDate = moment().subtract(7, 'days').toDate();
+			break;
+		case '30d':
+			startDate = moment().subtract(30, 'days').toDate();
+			break;
+		case '1M':
+			startDate = moment().subtract(1, 'month').toDate();
+			break;
+		case 'all':
+			startDate = new Date(0); // Beginning of time
+			break;
+		default:
+			// Default to 7 days if invalid timeframe is provided
+			startDate = moment().subtract(7, 'days').toDate();
 		}
 
 		const endDate = new Date();
@@ -97,7 +97,8 @@ module.exports = {
 		let messages;
 		if (channel) {
 			messages = await getMessagesInTimeframe(channel);
-		} else {
+		}
+		else {
 			// Use a more efficient method to get messages from all channels
 			const allMessages = await interaction.guild.channels.cache.reduce(
 				async (acc, ch) => {

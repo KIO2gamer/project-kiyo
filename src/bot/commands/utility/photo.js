@@ -84,12 +84,14 @@ module.exports = {
 				});
 
 				await interaction.editReply({ embeds });
-			} else {
+			}
+			else {
 				await interaction.editReply(
 					'Sorry, I could not find any photos for that query.',
 				);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching photo:', error);
 			await interaction.editReply(
 				'There was an error trying to fetch the photo.',

@@ -41,7 +41,8 @@ module.exports = {
 				'\x1b[32m%s\x1b[0m',
 				'Bot is fully operational and ready to serve!',
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(
 				'\x1b[31m%s\x1b[0m',
 				`Error during ready event: ${error.message}`,

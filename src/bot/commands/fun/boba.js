@@ -29,12 +29,14 @@ module.exports = {
 					.setImage(bobaGif);
 
 				await interaction.editReply({ embeds: [embed] });
-			} else {
+			}
+			else {
 				await interaction.editReply(
 					'Sorry, I could not find a Boba GIF.',
 				);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching Boba GIF:', error);
 			await interaction.editReply(
 				'There was an error trying to fetch a Boba GIF.',

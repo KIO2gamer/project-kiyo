@@ -78,7 +78,8 @@ module.exports = {
 				.setTimestamp();
 
 			await interaction.editReply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			const errorEmbed = new EmbedBuilder()
 				.setColor(0xff0000)
 				.setTitle('Error')

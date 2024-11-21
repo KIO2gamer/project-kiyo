@@ -46,12 +46,14 @@ module.exports = {
 					await interaction.reply(
 						`Successfully deleted log #${logNumber}.`,
 					);
-				} else {
+				}
+				else {
 					await interaction.reply(
 						`No log found with log number ${logNumber}.`,
 					);
 				}
-			} else if (logRange) {
+			}
+			else if (logRange) {
 				const [start, end] = logRange
 					.split('-')
 					.map(num => parseInt(num.trim()));
@@ -71,13 +73,15 @@ module.exports = {
 					await interaction.reply(
 						`Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,
 					);
-				} else {
+				}
+				else {
 					await interaction.reply(
 						`No logs found in the range #${start}-#${end}.`,
 					);
 				}
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply(
 				'Failed to delete the log(s). Please try again later.',

@@ -137,7 +137,8 @@ module.exports = {
 					embeds: [embed],
 					components: row ? [row] : [],
 				};
-			} catch (error) {
+			}
+			catch (error) {
 				console.error('Error fetching YouTube results:', error);
 				return {
 					content: 'An error occurred while searching YouTube.',
@@ -264,7 +265,8 @@ module.exports = {
 					return response.data.items[0].id.channelId;
 				}
 				return null;
-			} catch (error) {
+			}
+			catch (error) {
 				console.error('Error fetching channel ID:', error);
 				return null;
 			}
@@ -291,7 +293,8 @@ module.exports = {
 			// Update the page and refresh the results
 			if (i.customId === 'prev') {
 				currentPage--;
-			} else if (i.customId === 'next') {
+			}
+			else if (i.customId === 'next') {
 				currentPage++;
 			}
 

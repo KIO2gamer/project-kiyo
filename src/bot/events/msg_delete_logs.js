@@ -103,7 +103,8 @@ module.exports = {
 
 			// Send the log to the log channel
 			await logChannel.send({ embeds: [logEmbed] });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error in MessageDelete event:', error);
 		}
 	},

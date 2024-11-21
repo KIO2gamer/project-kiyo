@@ -38,19 +38,19 @@ module.exports = {
 
 				return permsArray.length > 0
 					? permsArray
-							.map(
-								perm =>
-									Object.keys(PermissionsBitField.Flags)
-										.find(
-											key =>
-												PermissionsBitField.Flags[
-													key
-												] === perm,
-										)
-										?.replace(/_/g, ' ')
-										.toLowerCase() || perm,
-							)
-							.join(', ')
+						.map(
+							perm =>
+								Object.keys(PermissionsBitField.Flags)
+									.find(
+										key =>
+											PermissionsBitField.Flags[
+												key
+											] === perm,
+									)
+									?.replace(/_/g, ' ')
+									.toLowerCase() || perm,
+						)
+						.join(', ')
 					: 'No permissions';
 			};
 
@@ -95,7 +95,8 @@ module.exports = {
 			}
 
 			await interaction.editReply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(interaction, error);
 		}
 	},

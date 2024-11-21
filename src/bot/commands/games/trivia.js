@@ -85,7 +85,7 @@ module.exports = {
 					.setColor(correct ? '#00FF00' : '#FF0000')
 					.setTitle(
 						correct
-							? "🎉 Correct! You're a Trivia Master! 🎉"
+							? '🎉 Correct! You\'re a Trivia Master! 🎉'
 							: '😢 Oops! Not Quite Right 😢',
 					)
 					.setDescription(
@@ -115,7 +115,7 @@ module.exports = {
 				if (!answered) {
 					const timeoutEmbed = new EmbedBuilder()
 						.setColor('#FFA500')
-						.setTitle("⏰ Time's Up! ⏰")
+						.setTitle('⏰ Time\'s Up! ⏰')
 						.setDescription(
 							`The correct answer was: **${answers[correctIndex]}**`,
 						)
@@ -127,11 +127,12 @@ module.exports = {
 					});
 				}
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching trivia:', error);
 			await interaction.editReply({
 				content:
-					"Oops! The trivia machine broke. Let's try again later!",
+					'Oops! The trivia machine broke. Let\'s try again later!',
 				ephemeral: true,
 			});
 		}

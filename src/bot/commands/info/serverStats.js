@@ -38,7 +38,8 @@ module.exports = {
 			const stats = await collectServerStats(guild, startDate);
 			const embed = createStatsEmbed(guild, timeframe, stats);
 			await interaction.editReply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error executing server_stats:', error);
 			await interaction.editReply(
 				'An error occurred while fetching server stats.',
@@ -49,16 +50,16 @@ module.exports = {
 
 function getStartDate(timeframe) {
 	switch (timeframe) {
-		case '24h':
-			return moment().subtract(1, 'day').toDate();
-		case '7d':
-			return moment().subtract(7, 'days').toDate();
-		case '30d':
-			return moment().subtract(30, 'days').toDate();
-		case '1M':
-			return moment().subtract(1, 'month').toDate();
-		default:
-			return new Date(0);
+	case '24h':
+		return moment().subtract(1, 'day').toDate();
+	case '7d':
+		return moment().subtract(7, 'days').toDate();
+	case '30d':
+		return moment().subtract(30, 'days').toDate();
+	case '1M':
+		return moment().subtract(1, 'month').toDate();
+	default:
+		return new Date(0);
 	}
 }
 

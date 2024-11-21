@@ -28,7 +28,7 @@ module.exports = {
 		);
 
 		await interaction.editReply({
-			content: `ALERT: Unauthorized system override detected. Your device and account have been flagged for immediate termination. Proceed with caution. /j`,
+			content: 'ALERT: Unauthorized system override detected. Your device and account have been flagged for immediate termination. Proceed with caution. /j',
 			components: [row],
 		});
 
@@ -45,7 +45,8 @@ module.exports = {
 						'Override aborted. Security protocols re-engaged. Your system remains intact, but further attempts may result in permanent lockout.',
 					components: [],
 				});
-			} else {
+			}
+			else {
 				await i.update({
 					content:
 						'WARNING: System override confirmed. Initiating complete data wipe and hardware deactivation. This process cannot be reversed. /j',

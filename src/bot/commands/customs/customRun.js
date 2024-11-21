@@ -16,7 +16,7 @@ module.exports = {
 		),
 	category: 'customs',
 	description_full:
-		"Runs a specified custom command stored in the bot's database.",
+		'Runs a specified custom command stored in the bot\'s database.',
 	usage: '/custom_run <name_or_alias>',
 	examples: ['/custom_run greet', '/custom_run hello'],
 	/**
@@ -54,7 +54,8 @@ module.exports = {
 				content: customCommand.message,
 				ephemeral: false,
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

@@ -260,7 +260,8 @@ module.exports = {
 							embeds: [guideEmbed],
 							components: [backRow],
 						});
-					} else if (i.customId === 'faq') {
+					}
+					else if (i.customId === 'faq') {
 						const faqEmbed = new EmbedBuilder()
 							.setColor('#2F3136')
 							.setTitle('❓ Frequently Asked Questions')
@@ -302,13 +303,15 @@ module.exports = {
 							embeds: [faqEmbed],
 							components: [backRow],
 						});
-					} else if (i.customId === 'commands' && pages.length > 0) {
+					}
+					else if (i.customId === 'commands' && pages.length > 0) {
 						const navigationRow = getNavigationRow();
 						await i.update({
 							embeds: [pages[currentPage]],
 							components: [navigationRow],
 						});
-					} else if (
+					}
+					else if (
 						i.customId === 'next' &&
 						currentPage < pages.length - 1
 					) {
@@ -318,20 +321,23 @@ module.exports = {
 							embeds: [pages[currentPage]],
 							components: [navigationRow],
 						});
-					} else if (i.customId === 'prev' && currentPage > 0) {
+					}
+					else if (i.customId === 'prev' && currentPage > 0) {
 						currentPage--;
 						const navigationRow = getNavigationRow();
 						await i.update({
 							embeds: [pages[currentPage]],
 							components: [navigationRow],
 						});
-					} else if (i.customId === 'back') {
+					}
+					else if (i.customId === 'back') {
 						await i.update({
 							embeds: [mainEmbed],
 							components: [mainRow],
 						});
 					}
-				} catch (error) {
+				}
+				catch (error) {
 					console.error('Error handling button interaction:', error);
 					await i.update({
 						content:
@@ -350,7 +356,8 @@ module.exports = {
 						'> ⏰ This help menu has expired. Please use `/help` again.',
 				});
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error executing help command:', error);
 			await interaction.editReply({
 				content: 'An error occurred while processing your request.',

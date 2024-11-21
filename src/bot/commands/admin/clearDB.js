@@ -68,23 +68,25 @@ module.exports = {
 							await mongoose.connection.db.collections();
 
 						// Drop each collection
-						for (let collection of collections) {
+						for (const collection of collections) {
 							await collection.drop();
 						}
 
 						await message.editReply(
 							'✅ Database has been completely wiped.',
 						);
-					} catch (error) {
+					}
+					catch (error) {
 						console.error('Database clear error:', error);
 						await message.editReply(
 							'❌ An error occurred while clearing the database.',
 						);
 					}
-				} else {
+				}
+				else {
 					await message.editReply('❌ Database wipe cancelled.');
 				}
-				message.delete().catch(() => {});
+				message.delete().catch(error => console.error('Failed to delete message:', error));
 			});
 
 			collector.on('end', collected => {
@@ -96,7 +98,8 @@ module.exports = {
 					});
 				}
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Command error:', error);
 			await interaction.followUp({
 				content: '❌ An error occurred while executing the command.',

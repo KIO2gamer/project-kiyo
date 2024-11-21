@@ -50,7 +50,8 @@ module.exports = {
 				messages = messages
 					.filter(m => m.author.id === user.id)
 					.first(amount);
-			} else {
+			}
+			else {
 				messages = await interaction.channel.messages.fetch({
 					limit: amount,
 				});
@@ -111,7 +112,8 @@ module.exports = {
 
 				await logChannel.send({ embeds: [logEmbed] });
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error purging messages:', error);
 			await interaction.followUp({
 				embeds: [

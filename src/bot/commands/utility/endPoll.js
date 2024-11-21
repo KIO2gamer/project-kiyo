@@ -38,7 +38,8 @@ module.exports = {
 			// End the poll
 			message.poll.end();
 			await interaction.reply('Poll ended successfully!');
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply(
 				'An error occurred while trying to end the poll.',

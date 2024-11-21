@@ -37,7 +37,8 @@ module.exports = {
 
 			// Execute the command
 			await command.execute(interaction);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(`Error executing ${interaction.commandName}`);
 			console.error(error);
 
@@ -47,7 +48,8 @@ module.exports = {
 					content: 'There was an error executing this command!',
 					ephemeral: true,
 				});
-			} catch (editError) {
+			}
+			catch (editError) {
 				console.error('Failed to edit reply: ', editError);
 			}
 		}

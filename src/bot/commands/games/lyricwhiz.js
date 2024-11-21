@@ -51,7 +51,7 @@ module.exports = {
 					randomTrack =
 						tracks.length > 0
 							? tracks[Math.floor(Math.random() * tracks.length)]
-									.track
+								.track
 							: null;
 
 					const lyricsResponse = await axios.get(
@@ -161,13 +161,14 @@ module.exports = {
 					if (reason === 'time') {
 						const timeUpEmbed = new EmbedBuilder()
 							.setColor('#ff0000')
-							.setTitle("Time's up!")
+							.setTitle('Time\'s up!')
 							.setDescription(
 								`The correct answer was "${title}" by ${artist}.\nYour current score: ${score}/${currentRound}`,
 							);
 
 						await interaction.followUp({ embeds: [timeUpEmbed] });
-					} else if (reason === 'skipped') {
+					}
+					else if (reason === 'skipped') {
 						const skippedEmbed = new EmbedBuilder()
 							.setColor('#ffa500')
 							.setTitle('Skipped!')
@@ -180,7 +181,8 @@ module.exports = {
 
 					if (currentRound < rounds) {
 						setTimeout(playRound, 5000);
-					} else {
+					}
+					else {
 						const finalEmbed = new EmbedBuilder()
 							.setColor('#9932cc')
 							.setTitle('Game Over!')
@@ -191,7 +193,8 @@ module.exports = {
 						await interaction.followUp({ embeds: [finalEmbed] });
 					}
 				});
-			} catch (error) {
+			}
+			catch (error) {
 				console.error('Error in lyricwhiz command:', error);
 				const errorEmbed = new EmbedBuilder()
 					.setColor('#ff0000')
@@ -210,13 +213,10 @@ module.exports = {
 
 function getFinalMessage(score, rounds) {
 	const percentage = (score / rounds) * 100;
-	if (percentage === 100)
-		return "Perfect score! You're a true Lyric Whiz! 🎵🏆";
-	if (percentage >= 80) return "Wow! You're a lyrical genius! 🎶😎";
-	if (percentage >= 60)
-		return "Great job! You've got some serious music knowledge! 🎸👍";
+	if (percentage === 100) {return 'Perfect score! You\'re a true Lyric Whiz! 🎵🏆';}
+	if (percentage >= 80) return 'Wow! You\'re a lyrical genius! 🎶😎';
+	if (percentage >= 60) {return 'Great job! You\'ve got some serious music knowledge! 🎸👍';}
 	if (percentage >= 40) return 'Not bad! Keep listening to more music! 🎧😊';
-	if (percentage >= 20)
-		return 'Room for improvement! Time to update your playlist! 📻🔍';
-	return "Don't worry, even the greatest musicians started somewhere! Keep practicing! 🎹🌟";
+	if (percentage >= 20) {return 'Room for improvement! Time to update your playlist! 📻🔍';}
+	return 'Don\'t worry, even the greatest musicians started somewhere! Keep practicing! 🎹🌟';
 }

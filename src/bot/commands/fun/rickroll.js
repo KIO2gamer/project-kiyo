@@ -25,12 +25,14 @@ module.exports = {
 				await interaction.reply(
 					`***You've been rickrolled!***\n${rickrollGif}`,
 				);
-			} else {
+			}
+			else {
 				await interaction.reply(
 					'Sorry, I could not find a rickroll GIF.',
 				);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching rickroll GIF:', error);
 			await interaction.reply(
 				'There was an error trying to fetch a rickroll GIF.',

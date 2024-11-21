@@ -25,7 +25,7 @@ module.exports = {
 				.setRequired(false),
 		),
 	category: 'customs',
-	description_full: "Adds a custom command to the bot's database.",
+	description_full: 'Adds a custom command to the bot\'s database.',
 	usage: '/custom_add <name:command_name> <message:response_message> [alias_name:alternate_name]',
 	examples: [
 		'/custom_add name:hello message:Hello!',
@@ -57,7 +57,8 @@ module.exports = {
 				content: `Custom command "${name}" added successfully!`,
 				ephemeral: true,
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

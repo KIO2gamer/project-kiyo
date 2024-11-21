@@ -12,11 +12,11 @@ const hangmanImages = [
 ];
 
 const funnyMessages = [
-	"Oops! That letter's not hanging around here!",
-	"Nice try, but that letter's playing hide and seek!",
-	"Sorry, that letter's on vacation today!",
+	'Oops! That letter\'s not hanging around here!',
+	'Nice try, but that letter\'s playing hide and seek!',
+	'Sorry, that letter\'s on vacation today!',
 	'Nope! That letter must be invisible!',
-	"Uh-oh! That letter's social distancing from this word!",
+	'Uh-oh! That letter\'s social distancing from this word!',
 ];
 
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
 			}
 
 			const word = words[Math.floor(Math.random() * words.length)];
-			let guessedLetters = [];
+			const guessedLetters = [];
 			let remainingGuesses = 6;
 			let wordState = '_ '.repeat(word.length).trim();
 
@@ -89,7 +89,7 @@ module.exports = {
 				const letter = m.content.toLowerCase();
 				if (guessedLetters.includes(letter)) {
 					const reply = await m.reply(
-						"You've already guessed that letter! Try another one.",
+						'You\'ve already guessed that letter! Try another one.',
 					);
 					setTimeout(() => reply.delete(), 3000);
 					m.delete();
@@ -111,7 +111,8 @@ module.exports = {
 						`🎉 Great guess! '${letter.toUpperCase()}' is in the word!`,
 					);
 					setTimeout(() => reply.delete(), 3000);
-				} else {
+				}
+				else {
 					remainingGuesses--;
 					const funnyMessage =
 						funnyMessages[
@@ -155,7 +156,7 @@ module.exports = {
 							`Oh no! The word was **${word}**. Better luck next time!`,
 						)
 						.setFooter({
-							text: "Don't worry, it's just a game... right?",
+							text: 'Don\'t worry, it\'s just a game... right?',
 						});
 					await msg.edit({ embeds: [gameEmbed] });
 					collector.stop();
@@ -170,7 +171,7 @@ module.exports = {
 							`Congratulations! You guessed the word **${word}**!`,
 						)
 						.setFooter({
-							text: "You're officially a word wizard!",
+							text: 'You\'re officially a word wizard!',
 						});
 					await msg.edit({ embeds: [gameEmbed] });
 					collector.stop();
@@ -184,17 +185,18 @@ module.exports = {
 				if (reason === 'time') {
 					gameEmbed
 						.setColor(0xff0000)
-						.setTitle("⏰ Time's Up! ⏰")
+						.setTitle('⏰ Time\'s Up! ⏰')
 						.setDescription(
 							`Looks like the clock won this round! The word was **${word}**.`,
 						)
 						.setFooter({
-							text: "Time flies when you're having fun... or trying to guess words!",
+							text: 'Time flies when you\'re having fun... or trying to guess words!',
 						});
 					msg.edit({ embeds: [gameEmbed] });
 				}
 			});
-		} catch (err) {
+		}
+		catch (err) {
 			console.error('Failed to read the word list:', err);
 			await interaction.reply(
 				'Oops! An error occurred while setting up the game. Maybe the hangman took a coffee break?',

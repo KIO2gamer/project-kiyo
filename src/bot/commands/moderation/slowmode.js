@@ -64,7 +64,8 @@ module.exports = {
 			let description;
 			if (duration === 0) {
 				description = `The slowmode for <#${channel.id}> has been disabled.`;
-			} else {
+			}
+			else {
 				description = `The slowmode for <#${channel.id}> has been set to ${durationInput}.`;
 			}
 
@@ -80,7 +81,8 @@ module.exports = {
 						}),
 				],
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

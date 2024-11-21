@@ -30,12 +30,14 @@ module.exports = {
 					.setImage(quokkaGif);
 
 				await interaction.editReply({ embeds: [embed] });
-			} else {
+			}
+			else {
 				await interaction.editReply(
 					'Sorry, I could not find a quokka GIF.',
 				);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching quokka GIF:', error);
 			await interaction.editReply(
 				'There was an error trying to fetch a quokka GIF.',

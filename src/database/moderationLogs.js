@@ -11,7 +11,7 @@ const moderationLogSchema = new mongoose.Schema({
 });
 
 // Auto-increment logNumber
-moderationLogSchema.pre('save', async function (next) {
+moderationLogSchema.pre('save', async function(next) {
 	if (this.isNew) {
 		const highestLog = await this.constructor.findOne().sort('-logNumber');
 		console.log('Highest Log:', highestLog); // Debugging log

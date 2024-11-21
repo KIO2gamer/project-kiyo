@@ -16,7 +16,8 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
 	? process.env.DISCORD_GUILD_IDS.split(',')
 	: [];
 
-console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...'); // Cyan color for starting message
+// Cyan color for starting message
+console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...');
 
 const client = new Client({
 	intents: [
@@ -40,7 +41,8 @@ const loadFiles = (dir, fileAction) => {
 		const stat = fs.statSync(filePath);
 		if (stat.isDirectory()) {
 			loadFiles(filePath, fileAction); // Recursively go into subfolders
-		} else if (file.endsWith('.js')) {
+		}
+		else if (file.endsWith('.js')) {
 			fileAction(filePath);
 		}
 	});
@@ -90,7 +92,8 @@ const connectToMongoDB = async () => {
 		mongoose.set('strictQuery', false);
 		await mongoose.connect(MONGODB_URI);
 		console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB'); // Green color for successful connection
-	} catch (error) {
+	}
+	catch (error) {
 		console.error(
 			'\x1b[31m%s\x1b[0m',
 			`[DATABASE] MongoDB connection failed: ${error.message}`,
@@ -140,7 +143,8 @@ const deployCommands = async () => {
 					'\x1b[32m%s\x1b[0m',
 					`[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`,
 				); // Green color for success
-			} catch (error) {
+			}
+			catch (error) {
 				console.error(
 					'\x1b[31m%s\x1b[0m',
 					`[DEPLOY] Failed to deploy commands to guild ${guildId}:`,
@@ -148,7 +152,8 @@ const deployCommands = async () => {
 				); // Red color for error
 			}
 		}
-	} catch (error) {
+	}
+	catch (error) {
 		console.error(
 			'\x1b[31m%s\x1b[0m',
 			'[DEPLOY] Command deployment failed:',
@@ -172,7 +177,8 @@ process.on('SIGINT', async () => {
 		await deployCommands();
 		await client.login(DISCORD_TOKEN);
 		console.log('\x1b[32m%s\x1b[0m', '[BOT] Bot is running!'); // Green color for success
-	} catch (error) {
+	}
+	catch (error) {
 		console.error(
 			'\x1b[31m%s\x1b[0m',
 			`[BOT] Failed to start the bot: ${error.message}`,

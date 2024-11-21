@@ -142,7 +142,8 @@ module.exports = {
 						}),
 				],
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error banning user:', error);
 			await interaction.editReply({
 				embeds: [

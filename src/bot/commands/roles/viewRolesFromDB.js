@@ -37,7 +37,8 @@ module.exports = {
 				);
 
 			await interaction.editReply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

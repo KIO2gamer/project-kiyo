@@ -43,7 +43,8 @@ module.exports = {
 				.setTimestamp();
 
 			await interaction.reply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(interaction, error);
 		}
 	},

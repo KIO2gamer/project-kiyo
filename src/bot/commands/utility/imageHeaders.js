@@ -5,9 +5,9 @@ module.exports = {
 		'Posts a predefined image header to the channel. Useful for sending visual guides or announcements related to specific server sections (like welcome, rules, etc.).',
 	usage: '/image_headers <options> [caption]',
 	examples: [
-		"/image_headers welcome 'Welcome to our server!'",
+		'/image_headers welcome \'Welcome to our server!\'',
 		'/image_headers rules',
-		"/image_headers forms 'Check out our new application form!'",
+		'/image_headers forms \'Check out our new application form!\'',
 	],
 	category: 'utility',
 	data: new SlashCommandBuilder()
@@ -61,13 +61,15 @@ module.exports = {
 					content: `Image successfully posted: ${options}`,
 					ephemeral: true,
 				});
-			} else {
+			}
+			else {
 				await interaction.reply({
 					content: 'There is no such option available',
 					ephemeral: true,
 				});
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error posting image:', error);
 			await interaction.reply({
 				content: `An error occurred: ${error.message}`,

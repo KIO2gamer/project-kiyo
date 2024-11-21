@@ -28,7 +28,8 @@ module.exports = {
 			await interaction.channel.send(
 				'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344',
 			);
-		} else {
+		}
+		else {
 			await interaction.reply(
 				'***You are not worthy enough to wield the powers, mortal***',
 			);

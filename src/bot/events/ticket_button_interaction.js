@@ -78,7 +78,8 @@ module.exports = {
 					content: `Your ticket has been created in <#${ticketChannel.id}>.`,
 					ephemeral: true,
 				});
-			} catch (error) {
+			}
+			catch (error) {
 				console.error('Error creating ticket channel:', error);
 				await interaction.reply({
 					content:

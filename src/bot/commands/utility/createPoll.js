@@ -55,7 +55,7 @@ module.exports = {
 				.map(option => option.trim())
 				.filter(option => option !== ''); // Remove empty options
 			const multiSelect = interaction.options.getBoolean('multi_select');
-			let durationHours = interaction.options.getInteger('duration');
+			const durationHours = interaction.options.getInteger('duration');
 
 			if (options.length < 2) {
 				return interaction.reply({
@@ -99,7 +99,8 @@ module.exports = {
 					layoutType: PollLayoutType.Default,
 				},
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply({
 				content: 'An error occurred while creating the poll.',

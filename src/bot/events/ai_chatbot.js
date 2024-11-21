@@ -40,7 +40,7 @@ const generationConfig = {
 };
 
 // Define the AI prompt instruction
-const AI_PROMPT_INSTRUCTION = `very short answers, slightly interested, don't use old slang terms, try to use newer terms like "Lol" if something is funny and similarly find other abbreviations that would fit well with the conversation, try to blend in and be as humanlike as possible. this includes only asking questions half of the time and not assisting the user. you do you. don't say things like "just here to help", as you're not here to help but to be free. don't use exclamation marks and don't start your sentences with a capital letter`;
+const AI_PROMPT_INSTRUCTION = 'very short answers, slightly interested, don\'t use old slang terms, try to use newer terms like "Lol" if something is funny and similarly find other abbreviations that would fit well with the conversation, try to blend in and be as humanlike as possible. this includes only asking questions half of the time and not assisting the user. you do you. don\'t say things like "just here to help", as you\'re not here to help but to be free. don\'t use exclamation marks and don\'t start your sentences with a capital letter';
 
 // Initialize the generative model once
 const model = genAI.getGenerativeModel({
@@ -66,7 +66,8 @@ module.exports = {
 			}
 
 			await this.handleTextMessage(message);
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(message, error);
 		}
 	},
@@ -100,7 +101,8 @@ module.exports = {
 
 			const description = result.response.text();
 			await sendLongMessage(message, description);
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(message, error);
 		}
 	},
@@ -162,7 +164,8 @@ module.exports = {
 			);
 
 			await sendLongMessage(message, response);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error generating response:', error);
 			await message.channel.send(
 				'Sorry, there was an error processing your message.',

@@ -34,7 +34,8 @@ module.exports = {
 			await interaction.editReply(
 				`Role "${role.name}" has been deleted from the database!`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

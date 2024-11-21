@@ -61,7 +61,8 @@ module.exports = {
 			await interaction.editReply(
 				`Role "${role.name}" has been updated in the database!`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

@@ -117,7 +117,8 @@ module.exports = {
 						}),
 				],
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(
 				'An error occurred while trying to warn the user:',
 				error,

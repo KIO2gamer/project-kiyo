@@ -164,7 +164,8 @@ module.exports = {
 							}),
 					],
 				});
-			} else if (newTimeoutDuration > ms('28d')) {
+			}
+			else if (newTimeoutDuration > ms('28d')) {
 				await interaction.editReply({
 					embeds: [
 						new EmbedBuilder()
@@ -179,7 +180,8 @@ module.exports = {
 							}),
 					],
 				});
-			} else {
+			}
+			else {
 				const logEntry = new moderationLogs({
 					action: 'timeout',
 					duration: newTimeoutDuration,
@@ -206,7 +208,8 @@ module.exports = {
 					],
 				});
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Failed to timeout user:', error);
 			await interaction.editReply({
 				embeds: [

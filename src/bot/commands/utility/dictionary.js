@@ -39,12 +39,14 @@ module.exports = {
 					})
 					.setTimestamp();
 				await interaction.reply({ embeds: [embed] });
-			} else {
+			}
+			else {
 				await interaction.reply(
 					`Sorry, I couldn't find a definition for "${word}".`,
 				);
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			// Use the errorHandler to handle and log the error
 			await handleError(interaction, error);
 		}

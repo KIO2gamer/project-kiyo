@@ -10,7 +10,8 @@ module.exports = {
 		'This command allows you to modify the properties of an existing text or voice channel. You can change the channel name and manage channel permissions for specific roles or everyone.  Choose either the "text" or "voice" subcommand to specify the channel type.',
 	usage: '/modify_channel [text/voice] [channel] <newname> <permissions> <toggle> <role>',
 	examples: [
-		'/modify_channel text channel:text_old newname:text_new', // Changes the name of a text channel
+		// Changes the name of a text channel
+		'/modify_channel text channel:text_old newname:text_new',
 		'\n',
 		'/modify_channel text channel:text_old permissions:View Channel toggle:Off', // Disables "View Channel" permission for everyone in a text channel
 		'\n',
@@ -238,7 +239,7 @@ module.exports = {
 		if (!newChannelName && !permissionChoice) {
 			return interaction.reply({
 				content:
-					"Please specify what you'd like to modify (channel name or permissions).",
+					'Please specify what you\'d like to modify (channel name or permissions).',
 				ephemeral: true,
 			});
 		}
@@ -309,7 +310,8 @@ module.exports = {
 
 				if (permissionResponse.startsWith('The permission')) {
 					return { response: permissionResponse, updated: false };
-				} else {
+				}
+				else {
 					response += permissionResponse;
 					return { response, updated: true };
 				}
@@ -330,7 +332,8 @@ module.exports = {
 						content: channelResponse,
 						ephemeral: true,
 					});
-				} else {
+				}
+				else {
 					response += channelResponse;
 					updated = true;
 				}
@@ -342,7 +345,8 @@ module.exports = {
 					ephemeral: true,
 				});
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error modifying channel:', error);
 			await handleError(
 				interaction,

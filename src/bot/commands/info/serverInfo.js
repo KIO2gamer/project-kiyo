@@ -101,18 +101,18 @@ async function sendServerInfo(interaction) {
 
 function getVerificationLevelText(level) {
 	switch (level) {
-		case 0:
-			return 'None';
-		case 1:
-			return 'Low';
-		case 2:
-			return 'Medium';
-		case 3:
-			return 'High';
-		case 4:
-			return 'Very High';
-		default:
-			return 'Unknown';
+	case 0:
+		return 'None';
+	case 1:
+		return 'Low';
+	case 2:
+		return 'Medium';
+	case 3:
+		return 'High';
+	case 4:
+		return 'Very High';
+	default:
+		return 'Unknown';
 	}
 }
 

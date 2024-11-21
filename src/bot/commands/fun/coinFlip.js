@@ -25,7 +25,8 @@ module.exports = {
 		let imageMedia = '';
 		if (result === 'heads') {
 			imageMedia = 'https://i.imgur.com/HavOS7J.png';
-		} else {
+		}
+		else {
 			imageMedia = 'https://i.imgur.com/u1pmQMV.png';
 		}
 
@@ -36,7 +37,8 @@ module.exports = {
 		if (bet) {
 			if (bet === result) {
 				description += '\n\nCongratulations! You guessed correctly! 🎉';
-			} else {
+			}
+			else {
 				description += '\n\nSorry, better luck next time! 😔';
 			}
 		}

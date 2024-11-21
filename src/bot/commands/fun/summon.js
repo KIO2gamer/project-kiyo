@@ -48,14 +48,15 @@ module.exports = {
 
 		try {
 			await interaction.channel.send({
-				content: `https://tenor.com/view/cat-spiritus-summon-vintage-fountain-pen-gif-22872604`,
+				content: 'https://tenor.com/view/cat-spiritus-summon-vintage-fountain-pen-gif-22872604',
 			});
 			await interaction.channel.send({ embeds: [embed] });
 			cooldowns.set(interaction.user.id, now);
 			console.log(
 				`${interaction.user.tag} summoned ${userOption.tag} at ${new Date(now).toISOString()}`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error executing summon command:', error);
 			interaction.reply(
 				'There was an error while executing this command.',

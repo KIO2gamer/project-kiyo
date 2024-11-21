@@ -16,7 +16,7 @@ module.exports = {
 		let gameWon = false;
 
 		await interaction.reply(
-			`I've chosen a secret number between 1 and 100. You have 7 guesses!`,
+			'I\'ve chosen a secret number between 1 and 100. You have 7 guesses!',
 		);
 
 		// Timer message
@@ -63,12 +63,14 @@ module.exports = {
 				interaction.followUp(
 					`🎉 <@${msg.author.id}> guessed the number! It was ${randomNumber}!`,
 				);
-			} else if (guess < randomNumber) {
+			}
+			else if (guess < randomNumber) {
 				guessesLeft--;
 				interaction.followUp(
 					`Too low! You have ${guessesLeft} guesses left.`,
 				);
-			} else {
+			}
+			else {
 				guessesLeft--;
 				interaction.followUp(
 					`Too high! You have ${guessesLeft} guesses left.`,

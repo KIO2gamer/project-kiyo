@@ -37,7 +37,8 @@ module.exports = {
 					// After sending the reminder, delete it from the database
 					await Reminder.findByIdAndDelete(reminder._id);
 				}, timeLeft);
-			} else {
+			}
+			else {
 				// If the time has passed while the bot was offline, send it immediately
 				const channel = await client.channels.fetch(reminder.channelId);
 				await channel.send(

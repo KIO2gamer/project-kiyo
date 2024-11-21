@@ -53,7 +53,8 @@ module.exports = {
 				.setTimestamp();
 
 			await interaction.reply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error calculating expression:', error);
 			await interaction.reply({
 				content:

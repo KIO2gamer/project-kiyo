@@ -33,22 +33,22 @@ module.exports = {
 
 		function getActivityName(activity) {
 			switch (activity.type) {
-				case ActivityType.Playing:
-					return `Playing ${activity.name}`;
-				case ActivityType.Streaming:
-					return `Streaming ${activity.name}`;
-				case ActivityType.Listening:
-					return `Listening to ${activity.name}`;
-				case ActivityType.Watching:
-					return `Watching ${activity.name}`;
-				case ActivityType.Competing:
-					return `Competing in ${activity.name}`;
-				case ActivityType.Custom:
-					return activity.state
-						? `${activity.emoji} ${activity.state}`
-						: 'Custom Status';
-				default:
-					return 'Unknown Activity';
+			case ActivityType.Playing:
+				return `Playing ${activity.name}`;
+			case ActivityType.Streaming:
+				return `Streaming ${activity.name}`;
+			case ActivityType.Listening:
+				return `Listening to ${activity.name}`;
+			case ActivityType.Watching:
+				return `Watching ${activity.name}`;
+			case ActivityType.Competing:
+				return `Competing in ${activity.name}`;
+			case ActivityType.Custom:
+				return activity.state
+					? `${activity.emoji} ${activity.state}`
+					: 'Custom Status';
+			default:
+				return 'Unknown Activity';
 			}
 		}
 
@@ -82,12 +82,12 @@ module.exports = {
 				value:
 					member.roles.cache.size > 1 // Show roles only if there's more than @everyone
 						? member.roles.cache
-								.filter(
-									role => role.id !== interaction.guild.id,
-								)
-								.sort((a, b) => b.position - a.position)
-								.map(role => role.toString())
-								.join(', ')
+							.filter(
+								role => role.id !== interaction.guild.id,
+							)
+							.sort((a, b) => b.position - a.position)
+							.map(role => role.toString())
+							.join(', ')
 						: 'None',
 			},
 			{

@@ -83,7 +83,8 @@ module.exports = {
 				output = require('util').inspect(result);
 			}
 			await interaction.editReply(`\`\`\`js\n${output}\n\`\`\``);
-		} catch (error) {
+		}
+		catch (error) {
 			await interaction.editReply(`\`\`\`js\n${error}\n\`\`\``);
 		}
 	},

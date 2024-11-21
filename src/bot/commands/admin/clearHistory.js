@@ -28,7 +28,8 @@ module.exports = {
 			await interaction.editReply(
 				'Your AI chat history has been cleared.',
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(interaction, error);
 		}
 	},

@@ -28,7 +28,7 @@ module.exports = {
 
 			const embed = createEmbed(
 				'🎥 YouTube Subscriber Role Verification',
-				"Let's get you verified and assign you a special role based on your YouTube subscriber count!",
+				'Let\'s get you verified and assign you a special role based on your YouTube subscriber count!',
 				[
 					{
 						name: '📋 What to do:',
@@ -57,7 +57,7 @@ module.exports = {
 			) {
 				const errorEmbed = createEmbed(
 					'❌ No YouTube Connections Found',
-					"We couldn't find any YouTube connections associated with your account.",
+					'We couldn\'t find any YouTube connections associated with your account.',
 					[
 						{
 							name: '🔄 What to do next',
@@ -89,7 +89,7 @@ module.exports = {
 				const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
 				const successEmbed = createEmbed(
 					'🎉 YouTube Channel Verified Successfully! 🎉',
-					`Great news! We've successfully verified your YouTube channel. Here's what you need to know:`,
+					'Great news! We\'ve successfully verified your YouTube channel. Here\'s what you need to know:',
 					[
 						{
 							name: '🏆 Your New Role',
@@ -114,10 +114,12 @@ module.exports = {
 					embeds: [successEmbed],
 					ephemeral: true,
 				});
-			} else {
+			}
+			else {
 				throw new Error('Failed to retrieve YouTube subscriber count.');
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.log(error);
 			const errorEmbed = createEmbed(
 				'❌ Oops! Something went wrong',
@@ -213,7 +215,8 @@ async function getYouTubeSubscriberCount(youtubeChannelId) {
 
 		const channelData = response.data.items[0];
 		return parseInt(channelData.statistics.subscriberCount, 10);
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('YouTube API error:', error.message);
 		return null;
 	}
@@ -237,16 +240,15 @@ async function assignSubscriberRole(member, subscriberCount) {
 
 	try {
 		const subscriberRoleData = await RoleSchema.findOne({ roleName });
-		if (!subscriberRoleData)
-			throw new Error(`Role "${roleName}" not found in the database.`);
+		if (!subscriberRoleData) {throw new Error(`Role "${roleName}" not found in the database.`);}
 
 		const role = member.guild.roles.cache.get(subscriberRoleData.roleID);
-		if (!role)
-			throw new Error(`Role "${roleName}" not found in the guild.`);
+		if (!role) {throw new Error(`Role "${roleName}" not found in the guild.`);}
 
 		await member.roles.add(role);
 		return roleName;
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Failed to assign role:', error.message);
 		throw new Error(`Failed to assign subscriber role: ${error.message}`);
 	}

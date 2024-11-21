@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	description_full:
-		"Displays the user's avatar (profile picture). You can get the avatar of another user by mentioning them.  Customize the size and format (PNG, JPEG, WebP) of the avatar.",
+		'Displays the user\'s avatar (profile picture). You can get the avatar of another user by mentioning them.  Customize the size and format (PNG, JPEG, WebP) of the avatar.',
 	usage: '/avatar [target:user] [size:pixels] [format:png/jpg/webp]',
 	examples: ['/avatar', '/avatar target:@username size:1024 format:png'],
 	category: 'info',
@@ -12,7 +12,7 @@ module.exports = {
 		.addUserOption(option =>
 			option
 				.setName('target')
-				.setDescription("The user's avatar to show")
+				.setDescription('The user\'s avatar to show')
 				.setRequired(false),
 		)
 		.addIntegerOption(option =>

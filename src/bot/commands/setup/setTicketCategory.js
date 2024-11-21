@@ -35,7 +35,8 @@ module.exports = {
 			);
 
 			await interaction.reply(`Ticket category set to: ${category}`);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error updating ticket category:', error);
 			await interaction.reply(
 				'An error occurred while setting the ticket category.',

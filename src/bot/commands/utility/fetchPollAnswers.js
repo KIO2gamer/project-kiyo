@@ -52,7 +52,8 @@ module.exports = {
 			reply += '```';
 
 			await interaction.reply(reply);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply(
 				'An error occurred while fetching the poll answers.',

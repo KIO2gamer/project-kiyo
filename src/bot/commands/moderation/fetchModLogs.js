@@ -98,7 +98,8 @@ module.exports = {
 					.map(num => parseInt(num.trim()));
 				if (!isNaN(start) && !isNaN(end) && start <= end) {
 					query.logNumber = { $gte: start, $lte: end };
-				} else {
+				}
+				else {
 					return interaction.reply({
 						content:
 							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
@@ -200,7 +201,8 @@ module.exports = {
 			collector.on('collect', async i => {
 				if (i.customId === 'prevPage') {
 					currentPage--;
-				} else if (i.customId === 'nextPage') {
+				}
+				else if (i.customId === 'nextPage') {
 					currentPage++;
 				}
 				const newEmbed = createEmbed(currentPage);
@@ -212,7 +214,8 @@ module.exports = {
 			collector.on('end', () => {
 				message.edit({ components: [] }); // Update, not reply
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error retrieving logs:', error);
 			// Only one reply if an error occurs:
 			await interaction.reply({

@@ -12,14 +12,15 @@ async function connectToDatabase() {
 			await mongoose.connect(mongoUri, { bufferCommands: false });
 			isConnected = true;
 			console.log('✅ MongoDB connection established successfully');
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('❌ MongoDB connection error:', error);
 			throw error;
 		}
 	}
 }
 
-exports.handler = async function (event) {
+exports.handler = async function(event) {
 	await connectToDatabase();
 	const { code, state } = getCodeAndState(event);
 
@@ -44,7 +45,8 @@ exports.handler = async function (event) {
 		await saveOAuthRecord(state, code, youtubeConnections);
 
 		return createSuccessResponse(youtubeConnections.length);
-	} catch (error) {
+	}
+	catch (error) {
 		console.error(
 			'❌ Error fetching Discord connections or saving to MongoDB:',
 			error,
@@ -132,7 +134,7 @@ function createSuccessResponse(connectionsLength) {
 		body: generateHtmlResponse(
 			'Success',
 			'Authorization successful!',
-			`Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.`,
+			'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
 			`Number of connections: ${connectionsLength}`,
 			'Return to Discord',
 			'discord://',

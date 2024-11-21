@@ -197,13 +197,15 @@ module.exports = {
 					console.log(
 						`Successfully unbanned ${targetUser.tag} after ${duration}`,
 					);
-				} catch (error) {
+				}
+				catch (error) {
 					console.error(
 						`Failed to unban ${targetUser.tag}: ${error}`,
 					);
 				}
 			}, durationMs);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error banning user:', error);
 			await interaction.editReply({
 				embeds: [

@@ -67,7 +67,8 @@ module.exports = {
 			});
 
 			await interaction.editReply({ embeds: [embed], ephemeral: true });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error performing Google search:', error);
 			await interaction.editReply({
 				content:

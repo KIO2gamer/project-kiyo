@@ -65,7 +65,8 @@ module.exports = {
 					.setTimestamp();
 
 				await channel.send({ embeds: [echoEmbed] });
-			} else {
+			}
+			else {
 				await channel.send(
 					`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`,
 				);
@@ -75,7 +76,8 @@ module.exports = {
 				content: `Message echoed successfully in ${channel}.`,
 				ephemeral: true,
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(
 				interaction,
 				error,

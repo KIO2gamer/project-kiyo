@@ -34,7 +34,8 @@ module.exports = {
 			await interaction.editReply(
 				`AI chat channel has been set to ${channel}`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			await handleError(interaction, error);
 		}
 	},

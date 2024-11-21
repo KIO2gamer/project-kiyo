@@ -61,12 +61,14 @@ module.exports = {
 		let action = '';
 
 		if (userChoice === botChoice) {
-			result = "It's a tie! Great minds think alike! 🤝";
-		} else if (winConditions[userChoice].includes(botChoice)) {
-			result = `You win! 🎉`;
+			result = 'It\'s a tie! Great minds think alike! 🤝';
+		}
+		else if (winConditions[userChoice].includes(botChoice)) {
+			result = 'You win! 🎉';
 			action = `${emojis[userChoice]} ${actionDescriptions[userChoice][botChoice]} ${emojis[botChoice]}`;
-		} else {
-			result = `You lose! Better luck next time! 😢`;
+		}
+		else {
+			result = 'You lose! Better luck next time! 😢';
 			action = `${emojis[botChoice]} ${actionDescriptions[botChoice][userChoice]} ${emojis[userChoice]}`;
 		}
 

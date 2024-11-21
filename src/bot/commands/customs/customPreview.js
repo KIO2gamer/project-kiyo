@@ -15,7 +15,7 @@ module.exports = {
 				.setRequired(true),
 		),
 	category: 'customs',
-	description_full: "Previews a custom command stored in the bot's database.",
+	description_full: 'Previews a custom command stored in the bot\'s database.',
 	usage: '/custom_preview <name_or_alias>',
 	examples: ['/custom_preview hello'],
 	/**
@@ -62,7 +62,8 @@ module.exports = {
 				embeds: [embed],
 				ephemeral: true,
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

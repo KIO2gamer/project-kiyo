@@ -61,10 +61,12 @@ module.exports = {
 				cache.set(username, infoEmbed);
 
 				await interaction.reply({ embeds: [infoEmbed] });
-			} else {
+			}
+			else {
 				await interaction.reply('Player not found on Mojang API.');
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching Minecraft player data:', error);
 			await interaction.reply(
 				'An error occurred while fetching player information.',

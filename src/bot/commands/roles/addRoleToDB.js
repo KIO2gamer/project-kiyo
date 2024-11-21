@@ -44,7 +44,8 @@ module.exports = {
 			await interaction.editReply(
 				'Role data successfully added to the database!',
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

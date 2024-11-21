@@ -14,7 +14,7 @@ module.exports = {
 		),
 	category: 'customs',
 	description_full:
-		"Deletes an existing custom command from the bot's database.",
+		'Deletes an existing custom command from the bot\'s database.',
 	usage: '/custom_delete <name:command_name_or_alias>',
 	examples: ['/custom_delete name:hello', '/custom_delete name:greet'],
 	/**
@@ -103,13 +103,15 @@ module.exports = {
 					} deleted successfully!`,
 					components: [],
 				});
-			} else {
+			}
+			else {
 				await interaction.editReply({
 					content: 'Command deletion cancelled.',
 					components: [],
 				});
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

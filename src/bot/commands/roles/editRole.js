@@ -11,7 +11,7 @@ module.exports = {
 	category: 'roles',
 	data: new SlashCommandBuilder()
 		.setName('edit_role')
-		.setDescription("Edits a role's properties.")
+		.setDescription('Edits a role\'s properties.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
 		.addRoleOption(option =>
 			option
@@ -58,7 +58,8 @@ module.exports = {
 			});
 
 			return interaction.reply(`Role ${role} updated successfully!`);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error editing role:', error);
 			return interaction.reply(
 				'An error occurred while updating the role.',

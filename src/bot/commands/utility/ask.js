@@ -13,7 +13,7 @@ module.exports = {
 		),
 
 	description_full:
-		"Ask any question to Google's Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.",
+		'Ask any question to Google\'s Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.',
 	category: 'utility',
 	usage: '/ask_gemini <question>',
 	examples: [
@@ -39,7 +39,8 @@ module.exports = {
 			const text = response.text();
 
 			await interaction.editReply(text);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error in ask-gemini command:', error);
 			await interaction.editReply(
 				'Sorry, there was an error processing your request.',

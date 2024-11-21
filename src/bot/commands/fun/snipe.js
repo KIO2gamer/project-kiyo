@@ -48,14 +48,15 @@ module.exports = {
 
 		try {
 			await interaction.channel.send({
-				content: `https://tenor.com/view/family-guy-peter-griffin-gun-point-sniper-rifle-gif-16445332`,
+				content: 'https://tenor.com/view/family-guy-peter-griffin-gun-point-sniper-rifle-gif-16445332',
 			});
 			await interaction.channel.send({ embeds: [embed] });
 			cooldowns.set(interaction.user.id, now);
 			console.log(
 				`${interaction.user.tag} sniped ${userOption.tag} at ${new Date(now).toISOString()}`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error executing snipe command:', error);
 			interaction.reply(
 				'There was an error while executing this command.',

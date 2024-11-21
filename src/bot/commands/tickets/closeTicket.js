@@ -58,11 +58,12 @@ module.exports = {
 			}
 
 			await interaction.editReply({
-				content: `Ticket closed successfully.`,
+				content: 'Ticket closed successfully.',
 				ephemeral: true,
 			});
 			await interaction.channel.delete();
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error closing ticket channel:', error.message);
 			if (error.message.includes('Cannot send messages')) {
 				interaction.editReply({
@@ -71,7 +72,8 @@ module.exports = {
 					ephemeral: true,
 				});
 				return;
-			} else {
+			}
+			else {
 				interaction.editReply({
 					content: 'An error occurred while closing the ticket.',
 					ephemeral: true,

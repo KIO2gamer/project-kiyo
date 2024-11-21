@@ -3,7 +3,7 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	description_full:
-		"Shows details about a specific emoji from the server, including its name, ID, image URL, creation date, whether it's animated, and whether it's managed. Can also display all emojis in the server.",
+		'Shows details about a specific emoji from the server, including its name, ID, image URL, creation date, whether it\'s animated, and whether it\'s managed. Can also display all emojis in the server.',
 	usage: '/emoji_info [emoji]',
 	examples: ['/emoji_info 😄', '/emoji_info MyCustomEmoji', '/emoji_info'],
 	category: 'info',
@@ -42,7 +42,7 @@ module.exports = {
 		}
 
 		const embed = new EmbedBuilder()
-			.setTitle(`Emoji Info`)
+			.setTitle('Emoji Info')
 			.setThumbnail(emoji.imageURL())
 			.addFields(
 				{ name: 'Emoji Name', value: emoji.name, inline: true },

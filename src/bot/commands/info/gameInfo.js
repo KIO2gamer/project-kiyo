@@ -41,10 +41,12 @@ module.exports = {
 				);
 				const embed = this.createGameEmbed(game, interaction.user);
 				await interaction.editReply({ embeds: [embed] });
-			} else {
+			}
+			else {
 				await interaction.editReply('Game not found.');
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.editReply('Error fetching game info.');
 		}
@@ -110,8 +112,8 @@ module.exports = {
 					name: 'Release Date',
 					value: game.first_release_date
 						? new Date(
-								game.first_release_date * 1000,
-							).toLocaleDateString()
+							game.first_release_date * 1000,
+						).toLocaleDateString()
 						: 'Unknown',
 					inline: true,
 				},

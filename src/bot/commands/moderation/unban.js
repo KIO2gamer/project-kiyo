@@ -94,7 +94,8 @@ module.exports = {
 						}),
 				],
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error unbanning user:', error);
 			await interaction.editReply({
 				embeds: [

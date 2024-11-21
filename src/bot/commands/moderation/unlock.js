@@ -82,7 +82,8 @@ module.exports = {
 				await interaction.editReply({
 					embeds: [embed],
 				});
-			} else {
+			}
+			else {
 				await interaction.editReply({
 					content: '**Unlocked Successfully**',
 				});
@@ -90,7 +91,8 @@ module.exports = {
 					embeds: [embed],
 				});
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

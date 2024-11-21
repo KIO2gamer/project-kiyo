@@ -23,7 +23,8 @@ module.exports = {
 				if (isValidMeme(meme)) {
 					break;
 				}
-			} catch (error) {
+			}
+			catch (error) {
 				console.error('Error fetching meme:', error);
 			}
 			attempts++;
@@ -41,7 +42,8 @@ module.exports = {
 				.setTimestamp();
 
 			await interaction.reply({ embeds: [memeEmbed] });
-		} else {
+		}
+		else {
 			await interaction.reply(
 				'Could not fetch a non-NSFW meme at this time. Please try again later.',
 			);

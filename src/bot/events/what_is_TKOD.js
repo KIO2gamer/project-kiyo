@@ -14,7 +14,7 @@ module.exports = {
 	 * @returns {Promise<void>} - A promise that resolves when the message is sent.
 	 */
 	async execute(message) {
-		let msg = message.content.toLowerCase();
+		const msg = message.content.toLowerCase();
 		if (msg.includes('tkod') && !message.author.bot) {
 			await message.channel.send(
 				'**T**he\n**K**IO2gamer\n**O**fficial\n**D**iscord',

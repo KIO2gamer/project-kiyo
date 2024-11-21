@@ -13,7 +13,7 @@ module.exports = {
 		.setName('custom_list')
 		.setDescription('Lists all custom commands'),
 	category: 'customs',
-	description_full: "Lists all custom commands stored in the bot's database.",
+	description_full: 'Lists all custom commands stored in the bot\'s database.',
 	usage: '/custom_list',
 	examples: ['/custom_list'],
 	/**
@@ -88,7 +88,8 @@ module.exports = {
 				if (i.user.id === interaction.user.id) {
 					if (i.customId === 'previous') {
 						currentPage = Math.max(0, currentPage - 1);
-					} else if (i.customId === 'next') {
+					}
+					else if (i.customId === 'next') {
 						currentPage = Math.min(pages - 1, currentPage + 1);
 					}
 
@@ -99,7 +100,8 @@ module.exports = {
 						embeds: [generateEmbed(currentPage)],
 						components: [row],
 					});
-				} else {
+				}
+				else {
 					i.editReply({
 						content: 'You cannot use these buttons.',
 						ephemeral: true,
@@ -111,7 +113,8 @@ module.exports = {
 				row.components.forEach(button => button.setDisabled(true));
 				initialMessage.edit({ components: [row] });
 			});
-		} catch (error) {
+		}
+		catch (error) {
 			handleError(interaction, error);
 		}
 	},

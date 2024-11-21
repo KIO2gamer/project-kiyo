@@ -50,7 +50,8 @@ module.exports = {
 
 			const embed = createEmbed(channelData, latestVideoData, channelId);
 			await interaction.editReply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching YouTube stats:', error);
 			await interaction.editReply(
 				'An error occurred while fetching YouTube statistics. Please try again later.',
@@ -113,7 +114,8 @@ async function extractChannelIdFromVideo(input) {
 			if (response.data.items.length > 0) {
 				return response.data.items[0].snippet.channelId;
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching video details:', error);
 		}
 	}
@@ -138,7 +140,8 @@ async function extractChannelIdFromHandle(input) {
 			if (response.data.items.length > 0) {
 				return response.data.items[0].snippet.channelId;
 			}
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error fetching channel details:', error);
 		}
 	}

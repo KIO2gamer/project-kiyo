@@ -19,7 +19,8 @@ module.exports = {
 			await interaction.editReply({ embeds: [embed] });
 			const result = await handleGuessing(interaction, chosenWord);
 			await updateEmbed(interaction, embed, result, chosenWord);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error in unscramble command:', error);
 			await interaction.editReply(
 				'An error occurred while running the game.',
@@ -78,7 +79,8 @@ async function handleGuessing(interaction, chosenWord) {
 		collector.on('collect', msg => {
 			if (msg.content.toLowerCase() === chosenWord.toLowerCase()) {
 				collector.stop('correct');
-			} else {
+			}
+			else {
 				msg.reply('Incorrect, try again!');
 			}
 		});
@@ -100,7 +102,8 @@ async function updateEmbed(interaction, embed, result, chosenWord) {
 			.setFooter({
 				text: `You completed in ${Date.now() - interaction.createdTimestamp}ms!`,
 			});
-	} else {
+	}
+	else {
 		embed
 			.setColor(0xff0000)
 			.setTitle('Time Up!')

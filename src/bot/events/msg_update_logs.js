@@ -9,7 +9,8 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 		try {
 			await oldMessage.fetch();
 			await newMessage.fetch();
-		} catch (err) {
+		}
+		catch (err) {
 			console.error('Error fetching partial messages:', err);
 			return false;
 		}
@@ -128,7 +129,8 @@ async function execute(oldMessage, newMessage) {
 		await addAuditLogInfo(newMessage, logEmbed);
 
 		await logChannel.send({ embeds: [logEmbed] });
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Error in MessageUpdate event:', error);
 	}
 }

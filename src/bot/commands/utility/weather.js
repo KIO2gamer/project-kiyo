@@ -24,7 +24,7 @@ module.exports = {
 
 		try {
 			const response = await axios.get(
-				`https://api.weatherapi.com/v1/current.json`,
+				'https://api.weatherapi.com/v1/current.json',
 				{
 					params: {
 						key: apiKey,
@@ -107,7 +107,8 @@ module.exports = {
 				.setColor('#00aaff');
 
 			await interaction.reply({ embeds: [embed] });
-		} catch (error) {
+		}
+		catch (error) {
 			console.error(error);
 			await interaction.reply(
 				'Could not fetch the weather. Please make sure the city name is correct.',

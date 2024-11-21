@@ -38,7 +38,8 @@ module.exports = {
 			await interaction.editReply(
 				`Message logs channel set to: ${channel}`,
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Error setting message logs channel:', error);
 			await interaction.editReply({
 				content:
