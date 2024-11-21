@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const msgLogsConfigSchema = new mongoose.Schema({
-  channelId: { type: String, required: true },
-  guildId: { type: String, required: true },
+	channelId: { type: String, required: true },
+	guildId: { type: String, required: true },
 });
 
-const MsgLogsConfig = mongoose.model("MsgLogsConfig", msgLogsConfigSchema);
+const MsgLogsConfig = mongoose.model('MsgLogsConfig', msgLogsConfigSchema);
 
 module.exports = MsgLogsConfig;

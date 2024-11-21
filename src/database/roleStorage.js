@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const RoleSchema = new mongoose.Schema({
-  roleID: String,
-  roleName: String,
-  roleColor: String,
+	roleID: String,
+	roleName: String,
+	roleColor: String,
 });
 
-module.exports = mongoose.model("Role", RoleSchema);
+module.exports = mongoose.model('Role', RoleSchema);
