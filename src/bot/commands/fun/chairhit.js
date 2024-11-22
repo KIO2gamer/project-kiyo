@@ -14,6 +14,5 @@ module.exports = {
 		await interaction.reply(
 			'https://tenor.com/view/chair-hit-throw-rigby-gif-17178150',
 		);
-		console.log(interaction.channel.type);
 	},
 };

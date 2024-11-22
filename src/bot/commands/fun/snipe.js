@@ -53,9 +53,6 @@ module.exports = {
 			});
 			await interaction.channel.send({ embeds: [embed] });
 			cooldowns.set(interaction.user.id, now);
-			console.log(
-				`${interaction.user.tag} sniped ${userOption.tag} at ${new Date(now).toISOString()}`,
-			);
 		} catch (error) {
 			console.error('Error executing snipe command:', error);
 			interaction.reply(

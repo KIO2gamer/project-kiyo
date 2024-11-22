@@ -14,9 +14,7 @@ const moderationLogSchema = new mongoose.Schema({
 moderationLogSchema.pre('save', async function (next) {
 	if (this.isNew) {
 		const highestLog = await this.constructor.findOne().sort('-logNumber');
-		console.log('Highest Log:', highestLog); // Debugging log
 		this.logNumber = highestLog ? highestLog.logNumber + 1 : 1;
-		console.log('Assigned Log Number:', this.logNumber); // Debugging log
 	}
 	next();
 });

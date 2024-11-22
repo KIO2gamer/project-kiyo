@@ -194,9 +194,6 @@ module.exports = {
 			setTimeout(async () => {
 				try {
 					await interaction.guild.members.unban(targetUser.id);
-					console.log(
-						`Successfully unbanned ${targetUser.tag} after ${duration}`,
-					);
 				} catch (error) {
 					console.error(
 						`Failed to unban ${targetUser.tag}: ${error}`,
