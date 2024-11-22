@@ -6,11 +6,10 @@
 	"scripts": {
 		"start": "node src/index.js",
 		"dev": "nodemon src/index.js",
-		"prestart": "npm install",
-		"format": "prettier --write .",
-		"format:check": "prettier --check .",
-		"lint": "eslint .",
-		"lint:fix": "eslint --fix ."
+		"prettier:write": "prettier --config .prettierrc.json --write .",
+		"prettier:check": "prettier --config .prettierrc.json --check .",
+		"eslint": "eslint .",
+		"eslint:fix": "eslint --fix ."
 	},
 	"repository": {
 		"type": "git",
