@@ -37,5 +37,5 @@ jobs:
               run: npm ci
 
             - name: Lint code
-              run: npm run lint
+              run: npm run eslint
               continue-on-error: false
