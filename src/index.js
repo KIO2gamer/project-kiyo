@@ -34,25 +34,41 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Function to recursively load files in sub-categories as well
-const loadFiles = (dir, fileAction) => {
+/**
+ * Recursively loads files from a directory and applies a given action to each file.
+ *
+ * @param {string} dir - The directory to load files from.
+ * @param {function} callback - The action to apply to each file. This function receives the file path as an argument.
+ */
+const loadFiles = (dir, callback) => {
 	fs.readdirSync(dir).forEach((file) => {
 		const filePath = path.join(dir, file);
 		const stat = fs.statSync(filePath);
 		if (stat.isDirectory()) {
-			loadFiles(filePath, fileAction); // Recursively go into subfolders
+			loadFiles(filePath, callback); // Recursively loads files from a directory and its subdirectories, and applies a given action to each file.
 		} else if (file.endsWith('.js')) {
-			fileAction(filePath);
+			callback(filePath); // Only process .js files to ensure we are loading JavaScript modules
 		}
 	});
 };
 
-// Function to load commands from all sub-categories
+/**
+ * Loads commands from a specified directory and its subdirectories.
+ *
+ * This function reads all JavaScript files in the given directory and its subdirectories,
+ * and registers the commands found in those files with the Discord client.
+ *
+ * @param {string} dir - The directory to load commands from.
+ */
 const loadCommands = (dir) => {
 	console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...'); // Yellow color for command loading
+	const commandCache = new Map();
 	loadFiles(dir, (filePath) => {
-		const command = require(filePath);
-		if (command?.data && command?.execute) {
+		if (!commandCache.has(filePath)) {
+			commandCache.set(filePath, require(filePath));
+		}
+		const command = commandCache.get(filePath);
+		if (command?.data?.name && command.execute) {
 			client.commands.set(command.data.name, command);
 			if (command.data.aliases) {
 				command.data.aliases.forEach((alias) => {
