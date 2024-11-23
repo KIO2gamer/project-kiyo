@@ -32,6 +32,6 @@ module.exports = {
 				`**Here is your random hex color code:** \n \`#${randomHex}\``,
 			)
 			.setThumbnail(`https://www.colorhexa.com/${randomHex}.png`);
-		await interaction.reply({ embeds: [embed], ephemeral: true });
+		await interaction.editReply({ embeds: [embed], ephemeral: true });
 	},
 };

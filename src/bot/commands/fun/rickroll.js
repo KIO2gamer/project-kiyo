@@ -22,17 +22,17 @@ module.exports = {
 					Math.random() * data.results.length,
 				);
 				const rickrollGif = data.results[randomIndex].url;
-				await interaction.reply(
+				await interaction.editReply(
 					`***You've been rickrolled!***\n${rickrollGif}`,
 				);
 			} else {
-				await interaction.reply(
+				await interaction.editReply(
 					'Sorry, I could not find a rickroll GIF.',
 				);
 			}
 		} catch (error) {
 			console.error('Error fetching rickroll GIF:', error);
-			await interaction.reply(
+			await interaction.editReply(
 				'There was an error trying to fetch a rickroll GIF.',
 			);
 		}

@@ -15,7 +15,7 @@ module.exports = {
 		let guessesLeft = 7;
 		let gameWon = false;
 
-		await interaction.reply(
+		await interaction.editReply(
 			"I've chosen a secret number between 1 and 100. You have 7 guesses!",
 		);
 

@@ -12,7 +12,7 @@ module.exports = {
 	 * @param {Object} interaction.guild - The guild object where the interaction took place.
 	 * @param {Object} interaction.user - The user who initiated the interaction.
 	 * @param {Object} interaction.client - The client object representing the bot.
-	 * @param {Function} interaction.reply - Sends a reply to the interaction.
+	 * @param {Function} interaction.editReply - Sends a reply to the interaction.
 	 *
 	 * @returns {Promise<void>} - A promise that resolves when the interaction is handled.
 	 *
@@ -31,7 +31,7 @@ module.exports = {
 
 				// Check if the category ID is set
 				if (!ticketCategoryId) {
-					return interaction.reply({
+					return interaction.editReply({
 						content:
 							'A ticket category has not been set yet. Please use the `/set_ticket_category` command to set one.',
 						ephemeral: true,
@@ -74,13 +74,13 @@ module.exports = {
 				);
 
 				// Send a message to the user
-				await interaction.reply({
+				await interaction.editReply({
 					content: `Your ticket has been created in <#${ticketChannel.id}>.`,
 					ephemeral: true,
 				});
 			} catch (error) {
 				console.error('Error creating ticket channel:', error);
-				await interaction.reply({
+				await interaction.editReply({
 					content:
 						'There was an error creating your ticket. Please try again later.',
 					ephemeral: true,

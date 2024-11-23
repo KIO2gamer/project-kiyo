@@ -27,13 +27,13 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(target.id);
 
 		if (!member.roles.cache.has(role.id)) {
-			return interaction.reply(
+			return interaction.editReply(
 				`${target} does not have the ${role} role.`,
 			);
 		}
 
 		await member.roles.remove(role);
-		return interaction.reply(
+		return interaction.editReply(
 			`${target} has been removed from the ${role} role.`,
 		);
 	},

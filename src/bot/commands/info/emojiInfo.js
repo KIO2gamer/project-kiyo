@@ -38,7 +38,7 @@ module.exports = {
 		);
 
 		if (!emoji) {
-			return interaction.reply('Emoji not found.');
+			return interaction.editReply('Emoji not found.');
 		}
 
 		const embed = new EmbedBuilder()
@@ -60,6 +60,6 @@ module.exports = {
 				},
 			);
 
-		await interaction.reply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embed] });
 	},
 };

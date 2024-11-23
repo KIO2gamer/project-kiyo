@@ -47,6 +47,6 @@ module.exports = {
 			.setDescription(description)
 			.setThumbnail(imageMedia);
 
-		await interaction.reply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embed] });
 	},
 };

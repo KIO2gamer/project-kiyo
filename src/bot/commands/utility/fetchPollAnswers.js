@@ -32,7 +32,7 @@ module.exports = {
 			// Fetch the message
 			const message = await channel.messages.fetch(messageId);
 			if (message?.poll) {
-				return interaction.reply(
+				return interaction.editReply(
 					'Poll not found or message does not contain a poll.',
 				);
 			}
@@ -51,10 +51,10 @@ module.exports = {
 			// Close the code block
 			reply += '```';
 
-			await interaction.reply(reply);
+			await interaction.editReply(reply);
 		} catch (error) {
 			console.error(error);
-			await interaction.reply(
+			await interaction.editReply(
 				'An error occurred while fetching the poll answers.',
 			);
 		}

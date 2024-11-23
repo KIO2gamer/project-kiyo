@@ -30,17 +30,17 @@ module.exports = {
 			// Fetch the message
 			const message = await channel.messages.fetch(messageId);
 			if (!message?.poll) {
-				return interaction.reply(
+				return interaction.editReply(
 					'Poll not found or message does not contain a poll.',
 				);
 			}
 
 			// End the poll
 			message.poll.end();
-			await interaction.reply('Poll ended successfully!');
+			await interaction.editReply('Poll ended successfully!');
 		} catch (error) {
 			console.error(error);
-			await interaction.reply(
+			await interaction.editReply(
 				'An error occurred while trying to end the poll.',
 			);
 		}

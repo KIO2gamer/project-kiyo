@@ -9,7 +9,7 @@ module.exports = {
 	data: new SlashCommandBuilder().setName('koifish').setDescription('Fish'),
 
 	async execute(interaction) {
-		interaction.reply(
+		interaction.editReply(
 			'https://tenor.com/view/schizoaz-lil-koi-big-nuts-lil-gif-18596477',
 		);
 	},

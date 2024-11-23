@@ -121,7 +121,7 @@ module.exports = {
 						)
 						.setFooter({ text: 'Better luck next time!' });
 
-					await interaction.reply({
+					await interaction.editReply({
 						embeds: [timeoutEmbed],
 						components: [],
 					});

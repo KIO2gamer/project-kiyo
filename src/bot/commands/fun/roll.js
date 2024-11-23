@@ -34,6 +34,6 @@ module.exports = {
 			})
 			.setTimestamp();
 
-		await interaction.reply({ embeds: [rollEmbed] });
+		await interaction.editReply({ embeds: [rollEmbed] });
 	},
 };

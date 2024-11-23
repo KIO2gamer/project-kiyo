@@ -72,17 +72,17 @@ module.exports = {
 							await collection.drop();
 						}
 
-						await message.editReply(
+						await interaction.editReply(
 							'✅ Database has been completely wiped.',
 						);
 					} catch (error) {
 						console.error('Database clear error:', error);
-						await message.editReply(
+						await interaction.editReply(
 							'❌ An error occurred while clearing the database.',
 						);
 					}
 				} else {
-					await message.editReply('❌ Database wipe cancelled.');
+					await interaction.editReply('❌ Database wipe cancelled.');
 				}
 				message
 					.delete()

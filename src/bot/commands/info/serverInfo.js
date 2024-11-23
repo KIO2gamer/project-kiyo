@@ -96,7 +96,7 @@ async function sendServerInfo(interaction) {
 			iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 		});
 
-	await interaction.reply({ embeds: [serverInfoEmbed] });
+	await interaction.editReply({ embeds: [serverInfoEmbed] });
 }
 
 function getVerificationLevelText(level) {

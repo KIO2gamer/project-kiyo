@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder().setName('steel').setDescription('steel'),
 
 	async execute(interaction) {
-		await interaction.reply(
+		await interaction.editReply(
 			'Guess wat? you just got steeled.\n*metal pipe drop sound*',
 		);
 	},

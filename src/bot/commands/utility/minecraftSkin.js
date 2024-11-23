@@ -26,7 +26,7 @@ module.exports = {
 		// Check Cache
 		const cachedData = cache.get(username);
 		if (cachedData) {
-			await interaction.reply({ embeds: [cachedData] });
+			await interaction.editReply({ embeds: [cachedData] });
 			return;
 		}
 
@@ -60,13 +60,13 @@ module.exports = {
 				// Cache the embed
 				cache.set(username, infoEmbed);
 
-				await interaction.reply({ embeds: [infoEmbed] });
+				await interaction.editReply({ embeds: [infoEmbed] });
 			} else {
-				await interaction.reply('Player not found on Mojang API.');
+				await interaction.editReply('Player not found on Mojang API.');
 			}
 		} catch (error) {
 			console.error('Error fetching Minecraft player data:', error);
-			await interaction.reply(
+			await interaction.editReply(
 				'An error occurred while fetching player information.',
 			);
 		}

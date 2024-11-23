@@ -99,7 +99,7 @@ module.exports = {
 				if (!isNaN(start) && !isNaN(end) && start <= end) {
 					query.logNumber = { $gte: start, $lte: end };
 				} else {
-					return interaction.reply({
+					return interaction.editReply({
 						content:
 							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
 						ephemeral: true,
@@ -122,7 +122,7 @@ module.exports = {
 			});
 
 			if (logs.length === 0) {
-				return interaction.reply({
+				return interaction.editReply({
 					content: 'No moderation logs found.',
 					ephemeral: true,
 				});
@@ -185,7 +185,7 @@ module.exports = {
 			const initialEmbed = createEmbed(currentPage);
 			const initialButtons = createButtons(currentPage);
 
-			const message = await interaction.reply({
+			const message = await interaction.editReply({
 				embeds: [initialEmbed],
 				components: initialButtons,
 				fetchReply: true,
@@ -215,7 +215,7 @@ module.exports = {
 		} catch (error) {
 			console.error('Error retrieving logs:', error);
 			// Only one reply if an error occurs:
-			await interaction.reply({
+			await interaction.editReply({
 				content: 'Failed to retrieve logs.',
 				ephemeral: true,
 			});

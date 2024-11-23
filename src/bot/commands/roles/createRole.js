@@ -123,6 +123,6 @@ module.exports = {
 			permissions: permissions,
 		});
 
-		return interaction.reply(`Created new role: ${role}`);
+		return interaction.editReply(`Created new role: ${role}`);
 	},
 };

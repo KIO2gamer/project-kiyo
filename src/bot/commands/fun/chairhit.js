@@ -11,7 +11,7 @@ module.exports = {
 		.setDescription('yeet the chair fr'),
 
 	async execute(interaction) {
-		await interaction.reply(
+		await interaction.editReply(
 			'https://tenor.com/view/chair-hit-throw-rigby-gif-17178150',
 		);
 	},

@@ -51,6 +51,6 @@ module.exports = {
 				},
 			);
 
-		await interaction.reply({ embeds: [embed] });
+		await interaction.editReply({ embeds: [embed] });
 	},
 };

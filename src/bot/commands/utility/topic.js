@@ -48,14 +48,14 @@ module.exports = {
 		if (user3) userMentions += `${user3}\n`;
 
 		if (!userMentions) {
-			return interaction.reply({
+			return interaction.editReply({
 				content:
 					'No users provided. Please specify at least one user to change the topic.',
 				ephemeral: true,
 			});
 		}
 
-		await interaction.reply({
+		await interaction.editReply({
 			content: 'Topic change message sent.',
 			ephemeral: true,
 		});

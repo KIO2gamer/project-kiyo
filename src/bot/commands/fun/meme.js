@@ -40,9 +40,9 @@ module.exports = {
 				})
 				.setTimestamp();
 
-			await interaction.reply({ embeds: [memeEmbed] });
+			await interaction.editReply({ embeds: [memeEmbed] });
 		} else {
-			await interaction.reply(
+			await interaction.editReply(
 				'Could not fetch a non-NSFW meme at this time. Please try again later.',
 			);
 		}

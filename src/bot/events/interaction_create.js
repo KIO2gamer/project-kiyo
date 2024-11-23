@@ -43,7 +43,7 @@ module.exports = {
 
 			// Send a failure message if something goes wrong
 			try {
-				await interaction.reply({
+				await interaction.editReply({
 					content: 'There was an error executing this command!',
 					ephemeral: true,
 				});

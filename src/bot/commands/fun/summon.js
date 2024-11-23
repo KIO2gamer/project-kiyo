@@ -24,7 +24,7 @@ module.exports = {
 
 		if (timestamps && now < timestamps + cooldownAmount) {
 			const timeLeft = (timestamps + cooldownAmount - now) / 1000;
-			return interaction.reply(
+			return interaction.editReply(
 				`Please wait ${timeLeft.toFixed(1)} more seconds before using the \`summon\` command again.`,
 			);
 		}
@@ -33,7 +33,7 @@ module.exports = {
 		const userId = userOption.id;
 
 		if (!userOption) {
-			return interaction.reply('You need to mention a user to summon!');
+			return interaction.editReply('You need to mention a user to summon!');
 		}
 
 		const embed = new EmbedBuilder()
@@ -55,7 +55,7 @@ module.exports = {
 			cooldowns.set(interaction.user.id, now);
 		} catch (error) {
 			console.error('Error executing summon command:', error);
-			interaction.reply(
+			interaction.editReply(
 				'There was an error while executing this command.',
 			);
 		}

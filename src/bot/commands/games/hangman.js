@@ -39,7 +39,7 @@ module.exports = {
 				.filter((word) => word);
 
 			if (words.length === 0) {
-				await interaction.reply(
+				await interaction.editReply(
 					'Oops! The word list is as empty as a ghost town!',
 				);
 				return;
@@ -196,7 +196,7 @@ module.exports = {
 			});
 		} catch (err) {
 			console.error('Failed to read the word list:', err);
-			await interaction.reply(
+			await interaction.editReply(
 				'Oops! An error occurred while setting up the game. Maybe the hangman took a coffee break?',
 			);
 		}

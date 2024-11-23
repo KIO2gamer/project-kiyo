@@ -58,7 +58,7 @@ module.exports = {
 			const durationHours = interaction.options.getInteger('duration');
 
 			if (options.length < 2) {
-				return interaction.reply({
+				return interaction.editReply({
 					content:
 						'Please provide at least two options for the poll.',
 					ephemeral: true,
@@ -66,7 +66,7 @@ module.exports = {
 			}
 
 			if (durationHours <= 0 || durationHours > MAX_POLL_DURATION_HOURS) {
-				return interaction.reply({
+				return interaction.editReply({
 					content: `Duration must be between 1 and ${MAX_POLL_DURATION_HOURS} hours.`,
 					ephemeral: true,
 				});
@@ -89,7 +89,7 @@ module.exports = {
 				});
 			});
 
-			await interaction.reply({
+			await interaction.editReply({
 				embeds: [pollEmbed],
 				poll: {
 					question: { text: 'Vote for your choices!' }, // Placeholder question
@@ -101,7 +101,7 @@ module.exports = {
 			});
 		} catch (error) {
 			console.error(error);
-			await interaction.reply({
+			await interaction.editReply({
 				content: 'An error occurred while creating the poll.',
 				ephemeral: true,
 			});

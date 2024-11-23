@@ -48,7 +48,7 @@ module.exports = {
 
 		// Validation (ensure it's a text channel)
 		if (channel.type !== 0) {
-			return interaction.reply({
+			return interaction.editReply({
 				content: 'This command can only be used in text channels.',
 				ephemeral: true,
 			});

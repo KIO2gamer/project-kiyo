@@ -24,7 +24,7 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(user.id);
 		// Early return if member is not found (e.g., left the server)
 		if (!member) {
-			return interaction.reply({
+			return interaction.editReply({
 				content: 'That user is not a member of this server.',
 				ephemeral: true,
 			});
@@ -125,6 +125,6 @@ module.exports = {
 			.setColor(member.displayHexColor) // Use member's display color
 			.addFields(fields);
 
-		await interaction.reply({ embeds: [user_InfoEmbed] });
+		await interaction.editReply({ embeds: [user_InfoEmbed] });
 	},
 };

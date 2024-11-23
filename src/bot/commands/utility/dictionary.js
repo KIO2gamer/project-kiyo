@@ -38,9 +38,9 @@ module.exports = {
 						iconURL: 'https://i.imgur.com/AfFp7pu.png',
 					})
 					.setTimestamp();
-				await interaction.reply({ embeds: [embed] });
+				await interaction.editReply({ embeds: [embed] });
 			} else {
-				await interaction.reply(
+				await interaction.editReply(
 					`Sorry, I couldn't find a definition for "${word}".`,
 				);
 			}

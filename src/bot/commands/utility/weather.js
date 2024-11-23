@@ -106,10 +106,10 @@ module.exports = {
 				})
 				.setColor('#00aaff');
 
-			await interaction.reply({ embeds: [embed] });
+			await interaction.editReply({ embeds: [embed] });
 		} catch (error) {
 			console.error(error);
-			await interaction.reply(
+			await interaction.editReply(
 				'Could not fetch the weather. Please make sure the city name is correct.',
 			);
 		}
