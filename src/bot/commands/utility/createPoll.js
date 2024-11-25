@@ -77,22 +77,9 @@ module.exports = {
 				MAX_POLL_DURATION_MINUTES,
 			);
 
-			const pollEmbed = new EmbedBuilder()
-				.setColor(0x0099ff)
-				.setTitle(question);
-
-			options.forEach((option, index) => {
-				pollEmbed.addFields({
-					name: `Option ${index + 1}`,
-					value: option,
-					inline: true,
-				});
-			});
-
 			await interaction.editReply({
-				embeds: [pollEmbed],
 				poll: {
-					question: { text: 'Vote for your choices!' }, // Placeholder question
+					question: { text: question }, // Placeholder question
 					answers: options.map((option) => ({ text: option })),
 					allowMultiselect: multiSelect,
 					duration: durationMinutes,

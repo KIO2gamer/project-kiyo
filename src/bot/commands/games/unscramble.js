@@ -29,14 +29,7 @@ module.exports = {
 };
 
 async function loadWords() {
-	const filePath = path.join(
-		__dirname,
-		'..',
-		'..',
-		'assets',
-		'texts',
-		'hangmanWords.txt',
-	);
+	const filePath = `assets/texts/hangmanWords.txt`;
 	const data = await fs.readFile(filePath, 'utf-8');
 	const words = data
 		.split('\n')

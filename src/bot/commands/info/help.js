@@ -95,13 +95,6 @@ module.exports = {
 					.setEmoji('🔗'),
 			);
 
-			// Send initial editReply with the main help menu
-			await interaction.editReply({
-				embeds: [mainEmbed],
-				components: [mainRow],
-				ephemeral: true,
-			});
-
 			let currentPage = 0;
 			const ITEMS_PER_PAGE = 5;
 			const pages = [];
@@ -117,9 +110,6 @@ module.exports = {
 						cmd.data.name.toLowerCase().includes(searchQuery) ||
 						cmd.data.description
 							.toLowerCase()
-							.includes(searchQuery) ||
-						cmd.description_full
-							?.toLowerCase()
 							.includes(searchQuery),
 				);
 
@@ -130,6 +120,45 @@ module.exports = {
 					});
 					return;
 				}
+
+				// Create search results embed
+				const searchEmbed = new EmbedBuilder()
+					.setColor('#2F3136')
+					.setTitle('🔍 Search Results')
+					.setDescription(
+						'Here are the commands matching your search:',
+					)
+					.addFields(
+						commands.map((cmd) => ({
+							name: `/${cmd.data.name}`,
+							value: `**Description:** ${cmd.data.description || 'No description'}\n**Usage:** ${cmd.usage || 'No usage info'}`,
+							inline: false,
+						})),
+					)
+					.setThumbnail(
+						interaction.client.user.displayAvatarURL({
+							dynamic: true,
+							size: 256,
+						}),
+					)
+					.setFooter({
+						text: 'Use the buttons below to navigate',
+						iconURL: interaction.user.displayAvatarURL({
+							dynamic: true,
+						}),
+					});
+
+				await interaction.followUp({
+					embeds: [searchEmbed],
+					ephemeral: true,
+				});
+				return;
+			} else {
+				await interaction.editReply({
+					embeds: [mainEmbed],
+					components: [mainRow],
+					ephemeral: true,
+				});
 			}
 
 			// Categorize commands

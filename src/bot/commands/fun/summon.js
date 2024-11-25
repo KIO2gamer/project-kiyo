@@ -33,7 +33,9 @@ module.exports = {
 		const userId = userOption.id;
 
 		if (!userOption) {
-			return interaction.editReply('You need to mention a user to summon!');
+			return interaction.editReply(
+				'You need to mention a user to summon!',
+			);
 		}
 
 		const embed = new EmbedBuilder()

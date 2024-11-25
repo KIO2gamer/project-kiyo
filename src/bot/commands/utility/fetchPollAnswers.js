@@ -31,7 +31,7 @@ module.exports = {
 
 			// Fetch the message
 			const message = await channel.messages.fetch(messageId);
-			if (message?.poll) {
+			if (!message.poll) {
 				return interaction.editReply(
 					'Poll not found or message does not contain a poll.',
 				);

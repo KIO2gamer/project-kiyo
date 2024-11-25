@@ -19,7 +19,7 @@ module.exports = {
 		),
 
 	async execute(interaction) {
-		const city = interaction.options.getString('city');
+		const city = interaction.options.getString('location');
 		const apiKey = process.env.WEATHER_API_KEY; // Replace with your WeatherAPI key
 
 		try {

@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const fetch = require('node-fetch');
 
 module.exports = {
 	description_full:
@@ -17,11 +18,11 @@ module.exports = {
 			);
 			const data = await response.json();
 
-			if (data.results && data.results.length > 0) {
+			if (data.data && data.data.length > 0) {
 				const randomIndex = Math.floor(
 					Math.random() * data.data.length,
 				);
-				const quokkaGif = data.data[randomIndex].images.original.url; // Adjust as necessary for the correct URL
+				const quokkaGif = data.data[randomIndex].images.original.url;
 
 				const embed = new EmbedBuilder()
 					.setTitle(

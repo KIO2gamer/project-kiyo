@@ -24,7 +24,9 @@ module.exports = {
 		const option = interaction.options.getString('option');
 
 		if (option === 'yes') {
-			await interaction.editReply('Skibidi powers activated successfully ✅');
+			await interaction.editReply(
+				'Skibidi powers activated successfully ✅',
+			);
 			await interaction.channel.send(
 				'https://tenor.com/view/eeeeeehmazin-ehmazing-amazing-gif-1173311831093611344',
 			);
