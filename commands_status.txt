@@ -1,1 +1,0 @@
-help (only "help" works but search function does not work)
