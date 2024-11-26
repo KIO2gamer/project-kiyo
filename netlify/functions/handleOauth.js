@@ -116,27 +116,25 @@ async function getYouTubeConnections(accessToken) {
 async function saveOAuthRecord(state, code, youtubeConnections) {
     const { interactionId, guildId, channelId } = JSON.parse(state);
     const oauthRecord = new OAuthCode({
-        interactionId: state,
+        interactionId,
         code,
         youtubeConnections: youtubeConnections.map((conn) => ({
             id: conn.id,
             name: conn.name,
         })),
-        guildId: state,
-        channelId: state,
+        guildId,
+        channelId,
     });
     await oauthRecord.save();
 }
 
 function createSuccessResponse(connectionsLength, state) {
     const { guildId, channelId } = JSON.parse(state);
-	console.log('guildId:', guildId); // Add logging
-	console.log('channelId:', channelId); // Add logging
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
     return {
         statusCode: 200,
         headers: { 'Content-Type': 'text/html' },
-    	body: generateHtmlResponse(
+        body: generateHtmlResponse(
             'Success',
             'Authorization successful!',
             'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
