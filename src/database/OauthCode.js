@@ -9,6 +9,8 @@ const oauthCodeSchema = new mongoose.Schema({
 			name: { type: String, required: true }, // Optional: YouTube channel name
 		},
 	],
+	guildId: { type: String, required: true }, // Discord guild ID
+    channelId: { type: String, required: true }, // Discord channel ID
 	createdAt: { type: Date, default: Date.now, expires: 600 },
 });
 

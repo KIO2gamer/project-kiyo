@@ -114,19 +114,23 @@ async function getYouTubeConnections(accessToken) {
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {
-	const oauthRecord = new OAuthCode({
-		interactionId: state,
-		code,
-		youtubeConnections: youtubeConnections.map((conn) => ({
-			id: conn.id,
-			name: conn.name,
-		})),
-	});
-	await oauthRecord.save();
+    const { interactionId, guildId, channelId } = JSON.parse(state);
+    const oauthRecord = new OAuthCode({
+        interactionId,
+        code,
+        youtubeConnections: youtubeConnections.map((conn) => ({
+            id: conn.id,
+            name: conn.name,
+        })),
+        guildId,
+        channelId,
+    });
+    await oauthRecord.save();
 }
 
 function createSuccessResponse(connectionsLength, state) {
-	const discordDeepLink = `discord://discord.com/channels/@me/${state}`;
+	const { guildId, channelId } = JSON.parse(state);
+	const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 	return {
 		statusCode: 200,
 		headers: { 'Content-Type': 'text/html' },
