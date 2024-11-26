@@ -130,6 +130,8 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
 
 function createSuccessResponse(connectionsLength, state) {
     const { guildId, channelId } = JSON.parse(state);
+	console.log('guildId:', guildId); // Add logging
+	console.log('channelId:', channelId); // Add logging
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
     return {
         statusCode: 200,
