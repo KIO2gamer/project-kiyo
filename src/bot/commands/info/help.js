@@ -47,7 +47,7 @@ module.exports = {
                 );
 
                 if (!command) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `No command found with the name \`${commandQuery}\`.`,
                         ephemeral: true,
                     });
@@ -70,7 +70,7 @@ module.exports = {
                         }),
                     });
 
-                await interaction.reply({
+                await interaction.editReply({
                     embeds: [commandEmbed],
                     ephemeral: true,
                 });
@@ -185,7 +185,7 @@ module.exports = {
                     .setEmoji('🔗'),
             );
 
-            await interaction.reply({
+            await interaction.editReply({
                 embeds: [mainEmbed],
                 components: [mainRow],
                 ephemeral: true,

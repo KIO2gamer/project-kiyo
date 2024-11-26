@@ -54,7 +54,7 @@ module.exports = {
 	 * @param {Map} interaction.client.commands - The collection of commands.
 	 * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
 	 *
-	 * @returns {Promise<void>} - A promise that resolves when the interaction reply is edited.
+	 * @returns {Promise<void>} - A promise that resolves when the interaction.editReply is edited.
 	 */
 	async execute(interaction) {
 		// Check if user is bot owner
