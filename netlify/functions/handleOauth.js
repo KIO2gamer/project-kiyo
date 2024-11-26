@@ -43,7 +43,7 @@ exports.handler = async function (event) {
 
 		await saveOAuthRecord(state, code, youtubeConnections);
 
-		return createSuccessResponse(youtubeConnections.length);
+		return createSuccessResponse(youtubeConnections.length, state);
 	} catch (error) {
 		console.error(
 			'❌ Error fetching Discord connections or saving to MongoDB:',
@@ -125,7 +125,8 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
 	await oauthRecord.save();
 }
 
-function createSuccessResponse(connectionsLength) {
+function createSuccessResponse(connectionsLength, state) {
+	const discordDeepLink = `discord://discord.com/channels/@me/${state}`;
 	return {
 		statusCode: 200,
 		headers: { 'Content-Type': 'text/html' },
@@ -135,7 +136,7 @@ function createSuccessResponse(connectionsLength) {
 			'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
 			`Number of connections: ${connectionsLength}`,
 			'Return to Discord',
-			'discord://',
+			discordDeepLink,
 		),
 	};
 }
