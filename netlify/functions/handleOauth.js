@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const OAuthCode = require('./../../bot_utils/OauthCode');
+const OAuthCode = require('src/database/OauthCode.js')
 
 // MongoDB connection URI from environment variables
 const mongoUri = process.env.MONGODB_URI;
