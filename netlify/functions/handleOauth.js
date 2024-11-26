@@ -7,116 +7,116 @@ const mongoUri = process.env.MONGODB_URI;
 let isConnected = false;
 
 async function connectToDatabase() {
-	if (!isConnected) {
-		try {
-			await mongoose.connect(mongoUri, { bufferCommands: false });
-			isConnected = true;
-			console.log('✅ MongoDB connection established successfully');
-		} catch (error) {
-			console.error('❌ MongoDB connection error:', error);
-			throw error;
-		}
-	}
+    if (!isConnected) {
+        try {
+            await mongoose.connect(mongoUri, { bufferCommands: false });
+            isConnected = true;
+            console.log('✅ MongoDB connection established successfully');
+        } catch (error) {
+            console.error('❌ MongoDB connection error:', error);
+            throw error;
+        }
+    }
 }
 
 exports.handler = async function (event) {
-	await connectToDatabase();
-	const { code, state } = getCodeAndState(event);
+    await connectToDatabase();
+    const { code, state } = getCodeAndState(event);
 
-	if (!code || !state) {
-		return createErrorResponse(
-			400,
-			'Missing authorization code or state parameter.',
-		);
-	}
+    if (!code || !state) {
+        return createErrorResponse(
+            400,
+            'Missing authorization code or state parameter.',
+        );
+    }
 
-	try {
-		const accessToken = await exchangeCodeForToken(code);
-		const youtubeConnections = await getYouTubeConnections(accessToken);
+    try {
+        const accessToken = await exchangeCodeForToken(code);
+        const youtubeConnections = await getYouTubeConnections(accessToken);
 
-		if (youtubeConnections.length === 0) {
-			return createErrorResponse(
-				404,
-				'No YouTube connections found for this Discord account.',
-			);
-		}
+        if (youtubeConnections.length === 0) {
+            return createErrorResponse(
+                404,
+                'No YouTube connections found for this Discord account.',
+            );
+        }
 
-		await saveOAuthRecord(state, code, youtubeConnections);
+        await saveOAuthRecord(state, code, youtubeConnections);
 
-		return createSuccessResponse(youtubeConnections.length, state);
-	} catch (error) {
-		console.error(
-			'❌ Error fetching Discord connections or saving to MongoDB:',
-			error,
-		);
-		return createErrorResponse(
-			500,
-			'An unexpected error occurred while processing your request.',
-		);
-	}
+        return createSuccessResponse(youtubeConnections.length, state);
+    } catch (error) {
+        console.error(
+            '❌ Error fetching Discord connections or saving to MongoDB:',
+            error,
+        );
+        return createErrorResponse(
+            500,
+            'An unexpected error occurred while processing your request.',
+        );
+    }
 };
 
 function getCodeAndState(event) {
-	const urlParams = new URLSearchParams(event.queryStringParameters);
-	return {
-		code: urlParams.get('code'),
-		state: urlParams.get('state'),
-	};
+    const urlParams = new URLSearchParams(event.queryStringParameters);
+    return {
+        code: urlParams.get('code'),
+        state: urlParams.get('state'),
+    };
 }
 
 function createErrorResponse(statusCode, message) {
-	return {
-		statusCode,
-		headers: { 'Content-Type': 'text/html' },
-		body: generateHtmlResponse(
-			'Error',
-			statusCode,
-			message,
-			'Please ensure both code and state are provided in the request.',
-		),
-	};
+    return {
+        statusCode,
+        headers: { 'Content-Type': 'text/html' },
+        body: generateHtmlResponse(
+            'Error',
+            statusCode,
+            message,
+            'Please ensure both code and state are provided in the request.',
+        ),
+    };
 }
 
 async function exchangeCodeForToken(code) {
-	const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-		},
-		body: new URLSearchParams({
-			client_id: process.env.DISCORD_CLIENT_ID,
-			client_secret: process.env.DISCORD_CLIENT_SECRET,
-			grant_type: 'authorization_code',
-			code,
-			redirect_uri: process.env.DISCORD_REDIRECT_URI,
-		}),
-	});
+    const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            client_id: process.env.DISCORD_CLIENT_ID,
+            client_secret: process.env.DISCORD_CLIENT_SECRET,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: process.env.DISCORD_REDIRECT_URI,
+        }),
+    });
 
-	const tokenData = await tokenResponse.json();
-	return tokenData.access_token;
+    const tokenData = await tokenResponse.json();
+    return tokenData.access_token;
 }
 
 async function getYouTubeConnections(accessToken) {
-	const connectionsResponse = await fetch(
-		'https://discord.com/api/users/@me/connections',
-		{
-			headers: { Authorization: `Bearer ${accessToken}` },
-		},
-	);
+    const connectionsResponse = await fetch(
+        'https://discord.com/api/users/@me/connections',
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        },
+    );
 
-	const connectionsData = await connectionsResponse.json();
-	console.log('Fetched connections:', connectionsData); // Add logging
-	const youtubeConnections = connectionsData.filter(
-		(connection) => connection.type === 'youtube',
-	);
-	console.log('Filtered YouTube connections:', youtubeConnections); // Add logging
-	return youtubeConnections;
+    const connectionsData = await connectionsResponse.json();
+    console.log('Fetched connections:', connectionsData); // Add logging
+    const youtubeConnections = connectionsData.filter(
+        (connection) => connection.type === 'youtube',
+    );
+    console.log('Filtered YouTube connections:', youtubeConnections); // Add logging
+    return youtubeConnections;
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {
-    const { guildId, channelId } = JSON.parse(state);
+    const { interactionId, guildId, channelId } = JSON.parse(state);
     const oauthRecord = new OAuthCode({
-        interactionId: state,
+        interactionId,
         code,
         youtubeConnections: youtubeConnections.map((conn) => ({
             id: conn.id,
@@ -129,31 +129,31 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
 }
 
 function createSuccessResponse(connectionsLength, state) {
-	const { guildId, channelId } = JSON.parse(state);
-	const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
-	return {
-		statusCode: 200,
-		headers: { 'Content-Type': 'text/html' },
-		body: generateHtmlResponse(
-			'Success',
-			'Authorization successful!',
-			'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
-			`Number of connections: ${connectionsLength}`,
-			'Return to Discord',
-			discordDeepLink,
-		),
-	};
+    const { guildId, channelId } = JSON.parse(state);
+    const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
+    return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+    	body: generateHtmlResponse(
+            'Success',
+            'Authorization successful!',
+            'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
+            `Number of connections: ${connectionsLength}`,
+            'Return to Discord',
+            discordDeepLink,
+        ),
+    };
 }
 
 function generateHtmlResponse(
-	title,
-	heading,
-	message,
-	additionalMessage,
-	buttonText = '',
-	buttonLink = '',
+    title,
+    heading,
+    message,
+    additionalMessage,
+    buttonText = '',
+    buttonLink = '',
 ) {
-	return `
+    return `
         <html>
             <head>
                 <title>${title}</title>
