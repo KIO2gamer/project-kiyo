@@ -57,18 +57,22 @@ module.exports = {
                 const commandEmbed = new EmbedBuilder()
                     .setColor('#2F3136')
                     .setTitle(`Command: /${command.data.name}`)
-                    .setDescription(command.description_full || 'No description available.')
-                    .addFields(
-                        { name: 'Usage', value: command.usage || 'No usage info available.' },
-                        { name: 'Examples', value: command.examples.join('\n') || 'No examples available.' },
-                    )
-                    .setTimestamp()
-                    .setFooter({
-                        text: 'Use the buttons below to navigate',
-                        iconURL: interaction.user.displayAvatarURL({
-                            dynamic: true,
-                        }),
-                    });
+                    .setDescription(command.description_full || 'No description available.');
+
+                if (command.usage) {
+                    commandEmbed.addFields({ name: 'Usage', value: command.usage });
+                }
+
+                if (command.examples && command.examples.join('\n') !== command.usage) {
+                    commandEmbed.addFields({ name: 'Examples', value: command.examples.join('\n') });
+                }
+
+                commandEmbed.setTimestamp().setFooter({
+                    text: 'Use the buttons below to navigate',
+                    iconURL: interaction.user.displayAvatarURL({
+                        dynamic: true,
+                    }),
+                });
 
                 await interaction.editReply({
                     embeds: [commandEmbed],
