@@ -10,17 +10,11 @@ module.exports = {
 		'This command allows you to modify the properties of an existing text or voice channel. You can change the channel name and manage channel permissions for specific roles or everyone.  Choose either the "text" or "voice" subcommand to specify the channel type.',
 	usage: '/modify_channel [text/voice] [channel] <newname> <permissions> <toggle> <role>',
 	examples: [
-		// Changes the name of a text channel
 		'/modify_channel text channel:text_old newname:text_new',
-		'\n',
-		'/modify_channel text channel:text_old permissions:View Channel toggle:Off', // Disables "View Channel" permission for everyone in a text channel
-		'\n',
-		'/modify_channel voice channel:voice_channel permissions:Speak toggle:On role:@role', // Enables "Speak" permission for a specific role in a voice channel
-		'\n',
-		'/modify_channel voice channel:voice_channel newname:voice_new permissions:Speak toggle:On role:@role', // Combines name change and permission modification
-		'\n',
-		'/modify_channel voice channel:text_old newname:text_new permissions:Manage Messages toggle:Off role:@everyone', // Disables "Manage Messages" for everyone in a text channel
-		'\n',
+		'/modify_channel text channel:text_old permissions:View Channel toggle:Off',
+		'/modify_channel voice channel:voice_channel permissions:Speak toggle:On role:@role',
+		'/modify_channel voice channel:voice_channel newname:voice_new permissions:Speak toggle:On role:@role',
+		'/modify_channel voice channel:text_old newname:text_new permissions:Manage Messages toggle:Off role:@everyone',
 	],
 	category: 'utility',
 	data: new SlashCommandBuilder()
