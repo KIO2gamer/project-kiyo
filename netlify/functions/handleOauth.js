@@ -116,14 +116,14 @@ async function getYouTubeConnections(accessToken) {
 async function saveOAuthRecord(state, code, youtubeConnections) {
     const { interactionId, guildId, channelId } = JSON.parse(state);
     const oauthRecord = new OAuthCode({
-        interactionId,
+        interactionId: state,
         code,
         youtubeConnections: youtubeConnections.map((conn) => ({
             id: conn.id,
             name: conn.name,
         })),
-        guildId,
-        channelId,
+        guildId: state,
+        channelId: state,
     });
     await oauthRecord.save();
 }
