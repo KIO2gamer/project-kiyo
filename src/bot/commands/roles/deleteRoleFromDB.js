@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { handleError } = require('./../../utils/errorHandler.js');
-const Role = require('././../../../database/roleStorage.js');
+const { handleError } = require('../../utils/errorHandler.js');
+const Role = require('../../../database/roleStorage.js');
 
 module.exports = {
 	description_full: 'Removes a role from the database.',

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const moderationLogs = require('./../../../database/moderationLogs');
+const moderationLogs = require('../../../database/moderationLogs');
 
 module.exports = {
 	description_full:

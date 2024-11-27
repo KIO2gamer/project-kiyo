@@ -3,7 +3,7 @@ const {
 	PermissionsBitField,
 	ChannelType,
 } = require('discord.js');
-const { handleError } = require('./../../utils/errorHandler.js');
+const { handleError } = require('../../utils/errorHandler.js');
 
 module.exports = {
 	description_full:
@@ -271,17 +271,15 @@ module.exports = {
 						(toggleChoice === 'on' && isPermissionSet) ||
 						(toggleChoice === 'off' && !isPermissionSet)
 					) {
-						return `The permission \`${permissionChoice}\` is already set to \`${toggleChoice.toUpperCase()}\` for role \`${
-							role.name
-						}\`.`;
+						return `The permission \`${permissionChoice}\` is already set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name
+							}\`.`;
 					}
 
 					await channel.permissionOverwrites.edit(role, {
 						[permissionFlag]: toggleChoice === 'on',
 					});
-					return `Permission \`${permissionChoice}\` set to \`${toggleChoice.toUpperCase()}\` for role \`${
-						role.name
-					}\`, `;
+					return `Permission \`${permissionChoice}\` set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name
+						}\`, `;
 				}
 				return '';
 			}

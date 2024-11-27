@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const OAuthCode = require('./../../../database/OauthCode.js');
-const RoleSchema = require('./../../../database/roleStorage.js');
+const OAuthCode = require('../../../database/OauthCode.js');
+const RoleSchema = require('../../../database/roleStorage.js');
 const { google } = require('googleapis');
 const crypto = require('crypto');
 

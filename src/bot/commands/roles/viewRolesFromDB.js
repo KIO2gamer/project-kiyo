@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { handleError } = require('./../../utils/errorHandler.js');
-const Role = require('././../../../database/roleStorage.js');
+const { handleError } = require('../../utils/errorHandler.js');
+const Role = require('../../../database/roleStorage.js');
 
 module.exports = {
 	description_full:
@@ -29,8 +29,7 @@ module.exports = {
 					roles
 						.map(
 							(role, index) =>
-								`${index + 1}. **${role.roleName}** (ID: \`${
-									role.roleID
+								`${index + 1}. **${role.roleName}** (ID: \`${role.roleID
 								}\`, Color: \`${role.roleColor}\`)`,
 						)
 						.join('\n'),
