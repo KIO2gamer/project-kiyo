@@ -1,4 +1,9 @@
-const { Events } = require('discord.js');
+const {
+	Events,
+	ChannelType,
+	PermissionsBitField,
+	EmbedBuilder,
+} = require('discord.js');
 const TicketConfig = require('./../../database/ticketConfig');
 
 module.exports = {
@@ -6,84 +11,89 @@ module.exports = {
 	/**
 	 * Handles the interaction when a button is clicked.
 	 *
-	 * @param {Object} interaction - The interaction object from Discord.
-	 * @param {Function} interaction.isButton - Checks if the interaction is a button.
-	 * @param {string} interaction.customId - The custom ID of the button.
-	 * @param {Object} interaction.guild - The guild object where the interaction took place.
-	 * @param {Object} interaction.user - The user who initiated the interaction.
-	 * @param {Object} interaction.client - The client object representing the bot.
-	 * @param {Function} interaction.editReply - Sends a reply to the interaction.
-	 *
-	 * @returns {Promise<void>} - A promise that resolves when the interaction is handled.
-	 *
-	 * @throws Will throw an error if there is an issue creating the ticket channel.
+	 * @param {import('discord.js').Interaction} interaction - The interaction object from Discord.
+	 * @returns {Promise<void>}
 	 */
 	async execute(interaction) {
 		if (!interaction.isButton()) return;
 
 		if (interaction.customId === 'open-ticket') {
 			try {
+				await interaction.deferReply({ ephemeral: true });
+
 				// Fetch the ticket category ID from the database
 				const config = await TicketConfig.findOne();
-				const ticketCategoryId = config
-					? config.ticketCategoryId
-					: null;
+				const ticketCategoryId = config?.ticketCategoryId;
 
 				// Check if the category ID is set
 				if (!ticketCategoryId) {
 					return interaction.editReply({
 						content:
 							'A ticket category has not been set yet. Please use the `/set_ticket_category` command to set one.',
-						ephemeral: true,
+					});
+				}
+
+				// Check if the user already has an open ticket
+				const existingChannel = interaction.guild.channels.cache.find(
+					(channel) => channel.name === `ticket-${interaction.user.id}`,
+				);
+
+				if (existingChannel) {
+					return interaction.editReply({
+						content: `You already have an open ticket: <#${existingChannel.id}>.`,
 					});
 				}
 
 				// Create a new ticket channel
 				const ticketChannel = await interaction.guild.channels.create({
 					name: `ticket-${interaction.user.id}`,
-					type: 0, // Text channel
+					type: ChannelType.GuildText,
 					parent: ticketCategoryId,
 					permissionOverwrites: [
 						{
-							id: interaction.guild.roles.everyone.id,
-							deny: ['ViewChannel'],
+							id: interaction.guild.id,
+							deny: [PermissionsBitField.Flags.ViewChannel],
 						},
 						{
 							id: interaction.user.id,
 							allow: [
-								'ViewChannel',
-								'SendMessages',
-								'ReadMessageHistory',
+								PermissionsBitField.Flags.ViewChannel,
+								PermissionsBitField.Flags.SendMessages,
+								PermissionsBitField.Flags.ReadMessageHistory,
 							],
 						},
 						{
 							id: interaction.client.user.id,
 							allow: [
-								'ViewChannel',
-								'SendMessages',
-								'ReadMessageHistory',
-								'ManageChannels',
+								PermissionsBitField.Flags.ViewChannel,
+								PermissionsBitField.Flags.SendMessages,
+								PermissionsBitField.Flags.ReadMessageHistory,
+								PermissionsBitField.Flags.ManageChannels,
 							],
 						},
 					],
 				});
 
 				// Send a message to the ticket channel
-				await ticketChannel.send(
-					`<@${interaction.user.id}>, your ticket has been created!`,
-				);
+				const embed = new EmbedBuilder()
+					.setColor(0x00ff00)
+					.setTitle('Ticket Created')
+					.setDescription(
+						`Hello <@${interaction.user.id}>, a staff member will be with you shortly.\n\nTo close this ticket, use the \`/close_ticket\` command.`,
+					)
+					.setTimestamp();
 
-				// Send a message to the user
+				await ticketChannel.send({ embeds: [embed] });
+
+				// Send a confirmation to the user
 				await interaction.editReply({
-					content: `Your ticket has been created in <#${ticketChannel.id}>.`,
-					ephemeral: true,
+					content: `Your ticket has been created: <#${ticketChannel.id}>.`,
 				});
 			} catch (error) {
 				console.error('Error creating ticket channel:', error);
 				await interaction.editReply({
 					content:
 						'There was an error creating your ticket. Please try again later.',
-					ephemeral: true,
 				});
 			}
 		}

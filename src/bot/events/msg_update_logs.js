@@ -1,14 +1,11 @@
-const { Events, AuditLogEvent } = require('discord.js');
+const { Events, AuditLogEvent, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 
 async function fetchPartialMessages(oldMessage, newMessage) {
 	if (oldMessage.partial || newMessage.partial) {
-		console.error(
-			'One or both messages are partial, unable to fetch content.',
-		);
 		try {
-			await oldMessage.fetch();
-			await newMessage.fetch();
+			oldMessage = await oldMessage.fetch();
+			newMessage = await newMessage.fetch();
 		} catch (err) {
 			console.error('Error fetching partial messages:', err);
 			return false;
@@ -19,28 +16,30 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 
 async function getLogChannel(newMessage) {
 	const config = await MsgLogsConfig.findOne();
-	if (!config) {
-		console.error('No configuration found in the database.');
-		return null;
-	}
-	const logChannelId = config.channelId;
-	if (!logChannelId) {
+	if (!config?.channelId) {
 		console.error('Log channel ID is not set.');
 		return null;
 	}
 
-	const logChannel = await newMessage.guild.channels.fetch(logChannelId);
+	const logChannel = await newMessage.guild.channels.fetch(config.channelId);
 	if (!logChannel) {
-		console.error(`Log channel with ID ${logChannelId} not found.`);
+		console.error(`Log channel with ID ${config.channelId} not found.`);
 		return null;
 	}
 
 	const botMember = await newMessage.guild.members.fetch(
 		newMessage.client.user.id,
 	);
-	if (!botMember.permissionsIn(logChannel).has('SEND_MESSAGES')) {
+	const permissions = botMember.permissionsIn(logChannel);
+
+	if (
+		!permissions.has([
+			PermissionsBitField.Flags.SendMessages,
+			PermissionsBitField.Flags.EmbedLinks,
+		])
+	) {
 		console.error(
-			`Bot doesn't have permission to send messages to the channel: ${logChannelId}`,
+			`Bot lacks permission to send messages or embed links in the channel: ${config.channelId}`,
 		);
 		return null;
 	}
@@ -53,27 +52,22 @@ async function getLogChannel(newMessage) {
  *
  * @param {Object} oldMessage - The original message object before the update.
  * @param {Object} newMessage - The updated message object.
- * @param {Object} newMessage.author - The author of the updated message.
- * @param {string} newMessage.author.id - The ID of the author.
- * @param {Object} newMessage.channel - The channel where the message was updated.
- * @param {string} newMessage.channel.id - The ID of the channel.
- * @param {string} [oldMessage.content] - The content of the original message.
- * @param {string} [newMessage.content] - The content of the updated message.
- * @param {Map} newMessage.attachments - A collection of attachments in the updated message.
- * @returns {Object} An embed object containing the log information.
+ * @returns {EmbedBuilder} An embed object containing the log information.
  */
 async function createLogEmbed(oldMessage, newMessage) {
-	const logEmbed = {
-		color: 0x0099ff,
-		title: 'Message Updated',
-		fields: [
+	const logEmbed = new EmbedBuilder()
+		.setColor(0x0099ff)
+		.setTitle('Message Updated')
+		.addFields(
 			{
 				name: 'Author',
-				value: `<@${newMessage.author.id}> (${newMessage.author.id})`,
+				value: `${newMessage.author.tag} (${newMessage.author.id})`,
+				inline: true,
 			},
 			{
 				name: 'Channel',
-				value: `<#${newMessage.channel.id}> (${newMessage.channel.id})`,
+				value: `${newMessage.channel.name} (${newMessage.channel.id})`,
+				inline: true,
 			},
 			{
 				name: 'Old Content',
@@ -83,12 +77,11 @@ async function createLogEmbed(oldMessage, newMessage) {
 				name: 'New Content',
 				value: newMessage.content || 'No text content',
 			},
-		],
-		timestamp: new Date(),
-	};
+		)
+		.setTimestamp();
 
 	if (newMessage.attachments.size > 0) {
-		logEmbed.fields.push({
+		logEmbed.addFields({
 			name: 'Attachments',
 			value: newMessage.attachments.map((a) => a.url).join('\n'),
 		});
@@ -107,7 +100,7 @@ async function addAuditLogInfo(newMessage, logEmbed) {
 	if (auditEntry && auditEntry.target.id === newMessage.author.id) {
 		const timeDifference = Date.now() - auditEntry.createdTimestamp;
 		if (timeDifference < 5000) {
-			logEmbed.fields.push({
+			logEmbed.addFields({
 				name: 'Audit Log',
 				value: `Executor: ${auditEntry.executor.tag} (${auditEntry.executor.id})`,
 			});
@@ -115,21 +108,35 @@ async function addAuditLogInfo(newMessage, logEmbed) {
 	}
 }
 
+/**
+ * Handles the message update event and logs the details to a specified log channel.
+ *
+ * @async
+ * @function execute
+ * @param {Message} oldMessage - The message before the update.
+ * @param {Message} newMessage - The message after the update.
+ * @returns {Promise<void>}
+ */
 async function execute(oldMessage, newMessage) {
+	// Ignore bot messages
 	if (newMessage.author.bot) return;
 
+	// Fetch partial messages if necessary
 	if (!(await fetchPartialMessages(oldMessage, newMessage))) return;
 
 	try {
 		const logChannel = await getLogChannel(newMessage);
 		if (!logChannel) return;
 
+		// **Ignore edits in the log channel to prevent recursive logging**
+		if (newMessage.channel.id === logChannel.id) return;
+
 		const logEmbed = await createLogEmbed(oldMessage, newMessage);
 		await addAuditLogInfo(newMessage, logEmbed);
 
 		await logChannel.send({ embeds: [logEmbed] });
 	} catch (error) {
-		console.error('Error in MessageUpdate event:', error);
+		console.error('Error in MessageUpdate event handler:', error);
 	}
 }
 

@@ -1,4 +1,5 @@
 const { Events } = require('discord.js');
+const { handleError } = require('./../utils/errorHandler');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -16,22 +17,20 @@ module.exports = {
 	async execute(interaction) {
 		if (!interaction.isCommand()) return;
 
-		const command = interaction.client.commands.get(
-			interaction.commandName,
-		);
+		const command = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {
-			console.error(
-				`No command matching ${interaction.commandName} was found.`,
-			);
+			console.error(`No command matching ${interaction.commandName} was found.`);
 			return;
 		}
 
 		try {
+			// Special handling for 'get_yt_sub_role' command
 			if (interaction.commandName === 'get_yt_sub_role') {
 				await command.execute(interaction);
 				return;
 			}
+
 			// Defer reply to ensure response time is handled within the 3-second window
 			await interaction.deferReply();
 
@@ -39,17 +38,24 @@ module.exports = {
 			await command.execute(interaction);
 		} catch (error) {
 			console.error(`Error executing ${interaction.commandName}`);
-			console.error(error);
-
-			// Send a failure message if something goes wrong
-			try {
-				await interaction.editReply({
-					content: 'There was an error executing this command!',
-					ephemeral: true,
-				});
-			} catch (editError) {
-				console.error('Failed to edit reply: ', editError);
-			}
+			await handleError(interaction, error);
 		}
 	},
 };
+
+/**
+ * Handles command execution errors by sending an error message to the user.
+ *
+ * @param {Object} interaction - The interaction object.
+ * @returns {Promise<void>} - A promise that resolves when the error message is sent.
+ */
+async function handleCommandError(interaction) {
+	try {
+		await interaction.editReply({
+			content: 'There was an error executing this command!',
+			ephemeral: true,
+		});
+	} catch (editError) {
+		console.error('Failed to edit reply: ', editError);
+	}
+}

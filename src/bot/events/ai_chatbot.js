@@ -56,14 +56,9 @@ module.exports = {
 	async execute(message) {
 		if (message.author.bot || message.content.startsWith('!')) return;
 
-		console.log(`Received message: ${message.content}`);
-
 		try {
 			const aiChannelDoc = await this.checkAIChannel(message);
-			if (!aiChannelDoc) {
-				console.log('Message is not in the AI channel.');
-				return;
-			}
+			if (!aiChannelDoc) return;
 
 			const imageAttachment = message.attachments.first();
 			if (imageAttachment) {
@@ -73,7 +68,7 @@ module.exports = {
 
 			await this.handleTextMessage(message);
 		} catch (error) {
-			await console.error(error);
+			await handleError(message, error);
 		}
 	},
 
@@ -81,13 +76,7 @@ module.exports = {
 		const aiChannelDoc = await AIChatChannel.findOne({
 			guildId: message.guild.id,
 		});
-		if (!aiChannelDoc) {
-			console.log(`No AI channel set for guild: ${message.guild.id}`);
-			return null;
-		}
-		if (message.channel.id !== aiChannelDoc.channelId) {
-			console.log(`Message channel ID: ${message.channel.id}`);
-			console.log(`AI channel ID: ${aiChannelDoc.channelId}`);
+		if (!aiChannelDoc || message.channel.id !== aiChannelDoc.channelId) {
 			return null;
 		}
 		return aiChannelDoc;
@@ -158,8 +147,6 @@ module.exports = {
 				message.content,
 			);
 
-			console.log(`AI response: ${response}`);
-
 			conversationHistory = this.storeModelResponse(
 				conversationHistory,
 				response,
@@ -178,7 +165,7 @@ module.exports = {
 
 			await sendLongMessage(message, response);
 		} catch (error) {
-			await console.error(error);
+			await handleError(message, error);
 		}
 	},
 

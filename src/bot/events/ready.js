@@ -1,46 +1,40 @@
 const { Events } = require('discord.js');
+const chalk = require('chalk'); // Install chalk with: npm install chalk
 
 module.exports = {
 	name: Events.ClientReady,
 	once: true,
 	/**
-	 * Executes the ready event when the bot is fully operational.
-	 * Logs various details about the bot's status, including the number of guilds, channels, and users it is serving.
-	 * Additionally, logs detailed information about each guild the bot is connected to.
+	 * Executes when the client becomes ready.
+	 * Logs the bot's status, including the number of guilds, channels, and users.
 	 *
 	 * @param {object} client - The Discord client instance.
 	 */
 	execute(client) {
-		try {
-			console.log(
-				'\x1b[32m%s\x1b[0m',
-				`Bot is ready and operational. Logged in as ${client.user.tag}`,
-			);
-			console.log(
-				'\x1b[32m%s\x1b[0m',
-				`Serving ${client.guilds.cache.size} guilds`,
-			);
-			console.log(
-				'\x1b[32m%s\x1b[0m',
-				`Watching ${client.channels.cache.size} channels`,
-			);
-			console.log(
-				'\x1b[32m%s\x1b[0m',
-				`Observing ${client.users.cache.size} users`,
-			);
+		const { user, guilds, channels, users } = client;
 
-			// Additional logging for more detailed information
-			client.guilds.cache.forEach((guild) => {
-				console.log(
-					'\x1b[34m%s\x1b[0m',
-					`- ${guild.name} (ID: ${guild.id})`,
-				);
-			});
-		} catch (error) {
-			console.error(
-				'\x1b[31m%s\x1b[0m',
-				`Error during ready event: ${error.message}`,
-			);
-		}
+		console.log(chalk.green(`Bot is ready and operational. Logged in as ${user.tag}`));
+		console.log(
+			chalk.green(
+				`Serving ${guilds.cache.size} guild${guilds.cache.size !== 1 ? 's' : ''}`,
+			),
+		);
+		console.log(
+			chalk.green(
+				`Watching ${channels.cache.size} channel${channels.cache.size !== 1 ? 's' : ''}`,
+			),
+		);
+		console.log(
+			chalk.green(
+				`Observing ${users.cache.size} user${users.cache.size !== 1 ? 's' : ''}`,
+			),
+		);
+
+		// Uncomment the following lines to log detailed guild information
+
+		guilds.cache.forEach((guild) => {
+			console.log(chalk.blue(`- ${guild.name} (ID: ${guild.id})`));
+		});
+
 	},
 };

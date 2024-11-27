@@ -15,38 +15,44 @@ module.exports = {
 	 * @returns {Promise<void>} - A promise that resolves when the reminder check process is complete.
 	 */
 	async execute(client) {
-		// Fetch all pending reminders from MongoDB
-		const pendingReminders = await Reminder.find({
-			reminderTime: { $gt: new Date() },
-		});
+		try {
+			// Fetch all pending reminders from MongoDB
+			const pendingReminders = await Reminder.find();
 
-		pendingReminders.forEach(async (reminder) => {
-			const timeLeft =
-				new Date(reminder.reminderTime).getTime() - Date.now();
+			for (const reminder of pendingReminders) {
+				const timeLeft = new Date(reminder.reminderTime).getTime() - Date.now();
 
-			// If the reminder time is still in the future, schedule it
-			if (timeLeft > 0) {
-				setTimeout(async () => {
-					const channel = await client.channels.fetch(
-						reminder.channelId,
-					);
-					await channel.send(
-						`⏰ <@${reminder.userId}> Reminder: ${reminder.reminderMessage}`,
-					);
+				// Function to send the reminder
+				const sendReminder = async () => {
+					try {
+						const channel = await client.channels.fetch(reminder.channelId);
+						if (!channel) {
+							// If the channel doesn't exist, delete the reminder
+							await Reminder.findByIdAndDelete(reminder._id);
+							return;
+						}
+						await channel.send(
+							`⏰ <@${reminder.userId}> Reminder: ${reminder.reminderMessage}`
+						);
+						// After sending the reminder, delete it from the database
+						await Reminder.findByIdAndDelete(reminder._id);
+					} catch (error) {
+						console.error(`Error sending reminder: ${error.message}`);
+						// Optionally, update the reminder status to 'failed'
+						await Reminder.findByIdAndUpdate(reminder._id, { status: 'failed' });
+					}
+				};
 
-					// After sending the reminder, delete it from the database
-					await Reminder.findByIdAndDelete(reminder._id);
-				}, timeLeft);
-			} else {
-				// If the time has passed while the bot was offline, send it immediately
-				const channel = await client.channels.fetch(reminder.channelId);
-				await channel.send(
-					`⏰ <@${reminder.userId}> Reminder: ${reminder.reminderMessage}`,
-				);
-
-				// Delete the reminder from the database after sending
-				await Reminder.findByIdAndDelete(reminder._id);
+				if (timeLeft > 0) {
+					// Schedule the reminder
+					setTimeout(sendReminder, timeLeft);
+				} else {
+					// If the time has passed while the bot was offline, send it immediately
+					await sendReminder();
+				}
 			}
-		});
+		} catch (error) {
+			console.error(`Error in reminder check: ${error.message}`);
+		}
 	},
 };
