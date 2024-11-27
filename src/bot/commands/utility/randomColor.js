@@ -15,7 +15,7 @@ module.exports = {
 		'Generates a random color and displays it along with its hexadecimal code.',
 	usage: '/random_color',
 	examples: ['/random_color'],
-	category: 'fun',
+	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('random_color')
 		.setDescription('Get a random color'),

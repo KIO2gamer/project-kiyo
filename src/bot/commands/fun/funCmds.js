@@ -105,10 +105,10 @@ module.exports = {
 				await handleGifCommand(interaction, 'chairhit', 'Chair Hit!');
 				break;
 			case 'skibidi':
-				await handleGifCommand(interaction, 'skibidi', 'Skibidi Meme');
+				await handleGifCommand(interaction, 'skibidi', 'Skibidi (dont hate me on why i made this cmd, someone forced me to :sob: )');
 				break;
 			case 'koifish':
-				await handleGifCommand(interaction, 'koifish', 'Koifish Meme');
+				await handleGifCommand(interaction, 'koifish meme', 'Koifish Meme');
 				break;
 			case 'summon':
 				await handleSummon(interaction);
@@ -117,10 +117,10 @@ module.exports = {
 				await handleGifCommand(interaction, 'quokka', 'You have been blessed by the powers of a quokka!');
 				break;
 			case 'steel':
-				await handleGifCommand(interaction, 'steel', 'Steel Meme');
+				await handleGifCommand(interaction, 'steel metal pipe', 'you just got steeled');
 				break;
 			case 'snipe':
-				await handleGifCommand(interaction, 'snipe', 'Snipe');
+				await handleGifCommand(interaction, 'snipe', 'sniped 360 no scope');
 				break;
 			case 'yeet':
 				await handleGifCommand(interaction, 'yeet', 'Yeet!');

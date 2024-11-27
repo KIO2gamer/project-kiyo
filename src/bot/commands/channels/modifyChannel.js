@@ -16,7 +16,7 @@ module.exports = {
 		'/modify_channel voice channel:voice_channel newname:voice_new permissions:Speak toggle:On role:@role',
 		'/modify_channel voice channel:text_old newname:text_new permissions:Manage Messages toggle:Off role:@everyone',
 	],
-	category: 'utility',
+	category: 'channels',
 	data: new SlashCommandBuilder()
 		.setName('modify_channel')
 		.setDescription('Modify a text or voice channel.')

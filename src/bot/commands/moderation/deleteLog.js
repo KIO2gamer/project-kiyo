@@ -6,7 +6,7 @@ module.exports = {
 		'Deletes a moderation log or a range of logs by log number or range.',
 	usage: '/delete_log [lognumber] [logrange]',
 	examples: ['/delete_log lognumber:5', '/delete_log logrange:1-5'],
-	category: 'utility',
+	category: 'moderation',
 	data: new SlashCommandBuilder()
 		.setName('delete_log')
 		.setDescription('Delete a moderation log/logs by log number/range.')

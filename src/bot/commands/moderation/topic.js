@@ -8,14 +8,14 @@ module.exports = {
 		'/topic user1:@user123',
 		'/topic user1:@user123 user2:@user456 user3:@user789',
 	],
-	category: 'utility',
+	category: 'moderation',
 	data: new SlashCommandBuilder()
 		.setName('topic')
 		.setDescription('Sends a message about changing the topic.')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers |
-				PermissionFlagsBits.KickMembers |
-				PermissionFlagsBits.ManageChannels,
+			PermissionFlagsBits.KickMembers |
+			PermissionFlagsBits.ManageChannels,
 		)
 		.addUserOption((option) =>
 			option
