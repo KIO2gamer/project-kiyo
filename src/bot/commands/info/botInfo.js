@@ -3,6 +3,7 @@ const {
 	EmbedBuilder,
 	version: djsVersion,
 } = require('discord.js');
+const { handleError } = require('../../utils/errorHandler.js');
 
 module.exports = {
 	description_full:
@@ -15,67 +16,54 @@ module.exports = {
 		.setDescription('Retrieve detailed information about the bot.'),
 
 	async execute(interaction) {
-		const sent = await interaction.editReply({ content: 'Pinging...' });
-		await sendBotInfo(sent, interaction);
+		try {
+			const sent = await interaction.deferReply({ fetchReply: true });
+			await sendBotInfo(sent, interaction);
+		} catch (error) {
+			console.error('Error executing bot_info command:', error);
+			await handleError(interaction, error);
+		}
 	},
 };
 
 async function sendBotInfo(sent, interaction) {
 	try {
 		const uptime = formatUptime(interaction.client.uptime);
-		const description = `\`\`\`fix
-Developer: kio2gamer
-Status: In Development
-Language: JavaScript
-Creation Date: ${interaction.client.user.createdAt.toUTCString()}
-\`\`\``;
 
-		const performanceMetrics = `\`\`\`fix
-Latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms
-WebSocket: ${interaction.client.ws.ping}ms
-Uptime: ${uptime}
-Node.js Version: ${process.version}
-discord.js Version: v${djsVersion}
-\`\`\``;
+		const description = `\`\`\`fix\nDeveloper: kio2gamer\nStatus: In Development\nLanguage: JavaScript\nCreation Date: ${interaction.client.user.createdAt.toUTCString()}\n\`\`\``;
 
-		const systemSpecs = `\`\`\`fix 
-Bot ID: ${interaction.client.user.id}
-Type: Private
-Command Count: ${interaction.client.commands.size}
-Command Type: Slash Commands
-Memory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
-\`\`\``;
+		const performanceMetrics = `\`\`\`fix\nLatency: ${sent.createdTimestamp - interaction.createdTimestamp}ms\nWebSocket: ${interaction.client.ws.ping}ms\nUptime: ${uptime}\nNode.js Version: ${process.version}\ndiscord.js Version: v${djsVersion}\n\`\`\``;
+
+		const systemSpecs = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommand Count: ${interaction.client.commands.size}\nCommand Type: Slash Commands\nMemory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB\n\`\`\``;
 
 		const embed = new EmbedBuilder()
-			.setTitle('Bot Information')
+			.setTitle('🤖 Bot Information')
 			.setURL(process.env.DISCORD_INVITE)
 			.setColor('#8A2BE2')
 			.setDescription(description)
 			.addFields(
 				{
-					name: 'Performance Metrics',
+					name: '📊 Performance Metrics',
 					value: performanceMetrics,
-					inline: true,
+					inline: false,
 				},
 				{
-					name: 'System Specifications',
+					name: '💻 System Specifications',
 					value: systemSpecs,
-					inline: true,
+					inline: false,
 				},
 			)
+			.setThumbnail(interaction.client.user.displayAvatarURL())
 			.setFooter({
 				text: 'Note: Invite link is restricted to bot owner only.',
+				iconURL: interaction.client.user.displayAvatarURL(),
 			})
 			.setTimestamp();
 
 		await interaction.editReply({ content: ' ', embeds: [embed] });
 	} catch (error) {
 		console.error('Error retrieving bot information:', error);
-		await interaction.editReply({
-			content:
-				'An unexpected error occurred while fetching bot information. Please try again later.',
-			ephemeral: true,
-		});
+		await handleError(interaction, error);
 	}
 }
 
