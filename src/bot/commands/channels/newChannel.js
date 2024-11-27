@@ -75,7 +75,8 @@ module.exports = {
 				.setTitle('Channel Created!')
 				.setColor('Green')
 				.setDescription(
-					`The ${getChannelType(newChannel)} channel <#${newChannel.id
+					`The ${getChannelType(newChannel)} channel <#${
+						newChannel.id
 					}> has been successfully created.`,
 				)
 				.setTimestamp();

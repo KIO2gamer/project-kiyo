@@ -36,7 +36,8 @@ module.exports = {
 				.setTitle('Channel Deleted!')
 				.setColor('Red')
 				.setDescription(
-					`The ${getChannelType(channel)} ${channel.id
+					`The ${getChannelType(channel)} ${
+						channel.id
 					} has been successfully deleted.`,
 				)
 				.setTimestamp();

@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+} = require('discord.js');
 const fetch = require('node-fetch');
 require('dotenv').config();
 
@@ -61,9 +67,7 @@ module.exports = {
 				.setDescription('Send a pic of a quokka because it is cute.'),
 		)
 		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('steel')
-				.setDescription('Send a steel meme.'),
+			subcommand.setName('steel').setDescription('Send a steel meme.'),
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
@@ -71,19 +75,13 @@ module.exports = {
 				.setDescription('Snipe a deleted message.'),
 		)
 		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('yeet')
-				.setDescription('Yeet someone!'),
+			subcommand.setName('yeet').setDescription('Yeet someone!'),
 		)
 		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('kill')
-				.setDescription('Kill someone!'),
+			subcommand.setName('kill').setDescription('Kill someone!'),
 		)
 		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('uwu')
-				.setDescription('Send an uwu message.'),
+			subcommand.setName('uwu').setDescription('Send an uwu message.'),
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
@@ -99,28 +97,52 @@ module.exports = {
 				await handleGifCommand(interaction, 'boba', 'Enjoy your Boba!');
 				break;
 			case 'rickroll':
-				await handleGifCommand(interaction, 'rickroll', '***You\'ve been rickrolled!***');
+				await handleGifCommand(
+					interaction,
+					'rickroll',
+					"***You've been rickrolled!***",
+				);
 				break;
 			case 'chairhit':
 				await handleGifCommand(interaction, 'chairhit', 'Chair Hit!');
 				break;
 			case 'skibidi':
-				await handleGifCommand(interaction, 'skibidi', 'Skibidi (dont hate me on why i made this cmd, someone forced me to :sob: )');
+				await handleGifCommand(
+					interaction,
+					'skibidi',
+					'Skibidi (dont hate me on why i made this cmd, someone forced me to :sob: )',
+				);
 				break;
 			case 'koifish':
-				await handleGifCommand(interaction, 'koifish meme', 'Koifish Meme');
+				await handleGifCommand(
+					interaction,
+					'koifish meme',
+					'Koifish Meme',
+				);
 				break;
 			case 'summon':
 				await handleSummon(interaction);
 				break;
 			case 'quokka':
-				await handleGifCommand(interaction, 'quokka', 'You have been blessed by the powers of a quokka!');
+				await handleGifCommand(
+					interaction,
+					'quokka',
+					'You have been blessed by the powers of a quokka!',
+				);
 				break;
 			case 'steel':
-				await handleGifCommand(interaction, 'steel metal pipe', 'you just got steeled');
+				await handleGifCommand(
+					interaction,
+					'steel metal pipe',
+					'you just got steeled',
+				);
 				break;
 			case 'snipe':
-				await handleGifCommand(interaction, 'snipe', 'sniped 360 no scope');
+				await handleGifCommand(
+					interaction,
+					'snipe',
+					'sniped 360 no scope',
+				);
 				break;
 			case 'yeet':
 				await handleGifCommand(interaction, 'yeet', 'Yeet!');
@@ -129,7 +151,11 @@ module.exports = {
 				await handleKill(interaction);
 				break;
 			case 'uwu':
-				await handleGifCommand(interaction, 'uwu', '***Notice me, senpai!***');
+				await handleGifCommand(
+					interaction,
+					'uwu',
+					'***Notice me, senpai!***',
+				);
 				break;
 			case 'do_not_touch':
 				await handleDoNotTouch(interaction);
@@ -152,17 +178,19 @@ async function handleGifCommand(interaction, query, title) {
 			const randomIndex = Math.floor(Math.random() * data.results.length);
 			const gifUrl = data.results[randomIndex].media_formats.gif.url;
 
-			const embed = new EmbedBuilder()
-				.setTitle(title)
-				.setImage(gifUrl);
+			const embed = new EmbedBuilder().setTitle(title).setImage(gifUrl);
 
 			await interaction.editReply({ embeds: [embed] });
 		} else {
-			await interaction.editReply(`Sorry, I could not find a ${query} GIF.`);
+			await interaction.editReply(
+				`Sorry, I could not find a ${query} GIF.`,
+			);
 		}
 	} catch (error) {
 		console.error(`Error fetching ${query} GIF:`, error);
-		await interaction.editReply(`There was an error trying to fetch a ${query} GIF.`);
+		await interaction.editReply(
+			`There was an error trying to fetch a ${query} GIF.`,
+		);
 	}
 }
 
@@ -171,9 +199,7 @@ async function handleSummon(interaction) {
 	const userId = userOption.id;
 
 	if (!userOption) {
-		return interaction.editReply(
-			'You need to mention a user to summon!',
-		);
+		return interaction.editReply('You need to mention a user to summon!');
 	}
 
 	const embed = new EmbedBuilder()
@@ -184,7 +210,9 @@ async function handleSummon(interaction) {
 			text: `Executed by ${interaction.user.tag}`,
 			iconURL: interaction.user.displayAvatarURL(),
 		})
-		.setImage('https://tenor.com/view/cat-spiritus-summon-vintage-fountain-pen-gif-22872604')
+		.setImage(
+			'https://tenor.com/view/cat-spiritus-summon-vintage-fountain-pen-gif-22872604',
+		)
 		.setTimestamp();
 
 	try {
@@ -208,9 +236,7 @@ async function handleKill(interaction) {
 	];
 
 	const randomMessage =
-		assassinMessages[
-		Math.floor(Math.random() * assassinMessages.length)
-		];
+		assassinMessages[Math.floor(Math.random() * assassinMessages.length)];
 
 	const embed = new EmbedBuilder()
 		.setColor('#FF0000')
@@ -245,8 +271,7 @@ async function handleDoNotTouch(interaction) {
 		components: [row],
 	});
 
-	const filter = (i) =>
-		i.customId === 'abort' || i.customId === 'confirm';
+	const filter = (i) => i.customId === 'abort' || i.customId === 'confirm';
 	const collector = interaction.channel.createMessageComponentCollector({
 		filter,
 		time: 15000,

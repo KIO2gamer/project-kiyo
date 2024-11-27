@@ -36,11 +36,31 @@ module.exports = {
 				.setTitle('Server Status')
 				.setDescription(`Status of ${url}`)
 				.addFields(
-					{ name: 'Status Code', value: response.status.toString(), inline: true },
-					{ name: 'Status Text', value: response.statusText, inline: true },
-					{ name: 'Content Type', value: response.headers['content-type'], inline: true },
-					{ name: 'Server', value: response.headers.server || 'N/A', inline: true },
-					{ name: 'Response Time', value: `${responseTime} ms`, inline: true },
+					{
+						name: 'Status Code',
+						value: response.status.toString(),
+						inline: true,
+					},
+					{
+						name: 'Status Text',
+						value: response.statusText,
+						inline: true,
+					},
+					{
+						name: 'Content Type',
+						value: response.headers['content-type'],
+						inline: true,
+					},
+					{
+						name: 'Server',
+						value: response.headers.server || 'N/A',
+						inline: true,
+					},
+					{
+						name: 'Response Time',
+						value: `${responseTime} ms`,
+						inline: true,
+					},
 				)
 				.setTimestamp()
 				.setFooter({

@@ -6,77 +6,88 @@ This document provides an overview of all the slash commands available in the Ki
 
 ### Moderation Commands
 
-- **/ban**
-	- **Description:** Bans a user from the server.
-	- **Usage:** `/ban @user [reason]`
+-   **/ban**
 
-- **/kick**
-	- **Description:** Kicks a user from the server.
-	- **Usage:** `/kick @user [reason]`
+    -   **Description:** Bans a user from the server.
+    -   **Usage:** `/ban @user [reason]`
 
-- **/mute**
-	- **Description:** Mutes a user in the server.
-	- **Usage:** `/mute @user [duration]`
+-   **/kick**
 
-- **/unmute**
-	- **Description:** Unmutes a user in the server.
-	- **Usage:** `/unmute @user`
+    -   **Description:** Kicks a user from the server.
+    -   **Usage:** `/kick @user [reason]`
+
+-   **/mute**
+
+    -   **Description:** Mutes a user in the server.
+    -   **Usage:** `/mute @user [duration]`
+
+-   **/unmute**
+    -   **Description:** Unmutes a user in the server.
+    -   **Usage:** `/unmute @user`
 
 ### Entertainment Commands
 
-- **/meme**
-	- **Description:** Fetches a random meme.
-	- **Usage:** `/meme`
+-   **/meme**
 
-- **/joke**
-	- **Description:** Tells a random joke.
-	- **Usage:** `/joke`
+    -   **Description:** Fetches a random meme.
+    -   **Usage:** `/meme`
 
-- **/quote**
-	- **Description:** Provides a random inspirational quote.
-	- **Usage:** `/quote`
+-   **/joke**
+
+    -   **Description:** Tells a random joke.
+    -   **Usage:** `/joke`
+
+-   **/quote**
+    -   **Description:** Provides a random inspirational quote.
+    -   **Usage:** `/quote`
 
 ### Utility Commands
 
-- **/ping**
-	- **Description:** Checks the bot's latency.
-	- **Usage:** `/ping`
+-   **/ping**
 
-- **/userinfo**
-	- **Description:** Displays information about a user.
-	- **Usage:** `/userinfo @user`
+    -   **Description:** Checks the bot's latency.
+    -   **Usage:** `/ping`
 
-- **/serverinfo**
-	- **Description:** Displays information about the server.
-	- **Usage:** `/serverinfo`
+-   **/userinfo**
+
+    -   **Description:** Displays information about a user.
+    -   **Usage:** `/userinfo @user`
+
+-   **/serverinfo**
+    -   **Description:** Displays information about the server.
+    -   **Usage:** `/serverinfo`
 
 ### Music Commands
 
-- **/play**
-	- **Description:** Plays a song from YouTube.
-	- **Usage:** `/play [song name or URL]`
+-   **/play**
 
-- **/skip**
-	- **Description:** Skips the current song.
-	- **Usage:** `/skip`
+    -   **Description:** Plays a song from YouTube.
+    -   **Usage:** `/play [song name or URL]`
 
-- **/stop**
-	- **Description:** Stops the music and clears the queue.
-	- **Usage:** `/stop`
+-   **/skip**
+
+    -   **Description:** Skips the current song.
+    -   **Usage:** `/skip`
+
+-   **/stop**
+    -   **Description:** Stops the music and clears the queue.
+    -   **Usage:** `/stop`
 
 ### Fun Commands
 
-- **/8ball**
-	- **Description:** Answers a yes/no question.
-	- **Usage:** `/8ball [question]`
+-   **/8ball**
 
-- **/roll**
-	- **Description:** Rolls a dice.
-	- **Usage:** `/roll [number of sides]`
+    -   **Description:** Answers a yes/no question.
+    -   **Usage:** `/8ball [question]`
 
-- **/flip**
-	- **Description:** Flips a coin.
-	- **Usage:** `/flip`
+-   **/roll**
+
+    -   **Description:** Rolls a dice.
+    -   **Usage:** `/roll [number of sides]`
+
+-   **/flip**
+    -   **Description:** Flips a coin.
+    -   **Usage:** `/flip`
 
 ## Adding New Commands
 

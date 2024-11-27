@@ -14,8 +14,8 @@ module.exports = {
 		.setDescription('Sends a message about changing the topic.')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers |
-			PermissionFlagsBits.KickMembers |
-			PermissionFlagsBits.ManageChannels,
+				PermissionFlagsBits.KickMembers |
+				PermissionFlagsBits.ManageChannels,
 		)
 		.addUserOption((option) =>
 			option
