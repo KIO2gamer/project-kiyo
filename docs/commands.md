@@ -1,97 +1,88 @@
-# Kiyo Discord Bot Commands
+# Slash Commands
 
-This document provides an overview of all the slash commands available in the Kiyo Discord Bot. Each command is located in the `src/bot/commands` folder.
+This document provides an overview of 100 slash commands available in this discord bot. Each command is located in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder.
 
-## Commands
+## Some Common Commands Information
 
 ### Moderation Commands
 
 -   **/ban**
 
-    -   **Description:** Bans a user from the server.
-    -   **Usage:** `/ban @user [reason]`
+    -   **Description:** Bans a member from the server with the specified reason.
+    -   **Usage:** `/ban target:@user [reason:"ban reason"]`
+    -   **Examples:**
+        -   `/ban target:@user123`
+        -   `/ban target:@user123 reason:"Severe rule violation"`
 
 -   **/kick**
 
-    -   **Description:** Kicks a user from the server.
-    -   **Usage:** `/kick @user [reason]`
+    -   **Description:** Kicks a member from the server with the specified reason.
+    -   **Usage:** `/kick target:@user [reason:"kick reason"]`
+    -   **Examples:**
+        -   `/kick target:@user123`
+        -   `/kick target:@user123 reason:"Violating server rules"`
 
--   **/mute**
+-   **/timeout**
 
-    -   **Description:** Mutes a user in the server.
-    -   **Usage:** `/mute @user [duration]`
-
--   **/unmute**
-    -   **Description:** Unmutes a user in the server.
-    -   **Usage:** `/unmute @user`
-
-### Entertainment Commands
-
--   **/meme**
-
-    -   **Description:** Fetches a random meme.
-    -   **Usage:** `/meme`
-
--   **/joke**
-
-    -   **Description:** Tells a random joke.
-    -   **Usage:** `/joke`
-
--   **/quote**
-    -   **Description:** Provides a random inspirational quote.
-    -   **Usage:** `/quote`
+    -   **Description:** Timeouts a member for the specified duration and reason.
+    -   **Usage:** `/timeout target:@user amount:"duration" [reason:"timeout reason"]`
+    -   **Examples:**
+        -   `/timeout target:@user123 amount:"1h"`
+        -   `/timeout target:@user123 amount:"30m" reason:"Being disruptive"`
 
 ### Utility Commands
 
--   **/ping**
+-   **/photo**
 
-    -   **Description:** Checks the bot's latency.
-    -   **Usage:** `/ping`
+    -   **Description:** Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.
+    -   **Usage:** `/photo <query:search_term> [count:1-5] [orientation:landscape/portrait/square] [size:small/medium/large] [random:true/false]`
+    -   **Examples:**
+        -   `/photo sunset count:3 orientation:landscape`
+        -   `/photo cat random:true`
 
 -   **/userinfo**
 
-    -   **Description:** Displays information about a user.
-    -   **Usage:** `/userinfo @user`
+    -   **Description:** Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.
+    -   **Usage:** `/user_info [target]`
+    -   **Examples:**
+        -   `/user_info`
+        -   `/user_info target:@user123`
 
 -   **/serverinfo**
-    -   **Description:** Displays information about the server.
-    -   **Usage:** `/serverinfo`
 
-### Music Commands
-
--   **/play**
-
-    -   **Description:** Plays a song from YouTube.
-    -   **Usage:** `/play [song name or URL]`
-
--   **/skip**
-
-    -   **Description:** Skips the current song.
-    -   **Usage:** `/skip`
-
--   **/stop**
-    -   **Description:** Stops the music and clears the queue.
-    -   **Usage:** `/stop`
+    -   **Description:** Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.
+    -   **Usage:** `/server_info`
 
 ### Fun Commands
 
 -   **/8ball**
 
-    -   **Description:** Answers a yes/no question.
-    -   **Usage:** `/8ball [question]`
+    -   **Description:** Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.
+    -   **Usage:** `/8ball <question>`
+    -   **Examples:**
+        -   `/8ball Will I win the lottery?`
 
 -   **/roll**
 
-    -   **Description:** Rolls a dice.
-    -   **Usage:** `/roll [number of sides]`
+    -   **Description:** Simulates a dice roll and displays the corresponding dice face.
+    -   **Usage:** `/roll`
 
--   **/flip**
-    -   **Description:** Flips a coin.
-    -   **Usage:** `/flip`
+-   **/coin_flip**
+
+    -   **Description:** Flips a coin and optionally places a bet on heads or tails.
+    -   **Usage:** `/coin_flip [bet]`
+    -   **Examples:**
+        -   `/coin_flip`
+        -   `/coin_flip bet:heads`
+
+-   **/meme**
+
+    -   **Description:** Fetches and displays a random, SFW meme from the internet.
+    -   **Usage:** `/meme`
 
 ## Adding New Commands
 
-To add a new command, create a new file in the `src/bot/commands` folder and follow the existing command structure.
+To add a new command, create a new file in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder and follow the existing command structure.
 
 ## Contributing
 
