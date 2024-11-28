@@ -40,7 +40,7 @@ This document provides an overview of 100 slash commands available in this disco
         -   `/photo sunset count:3 orientation:landscape`
         -   `/photo cat random:true`
 
--   **/userinfo**
+-   **/user_info**
 
     -   **Description:** Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.
     -   **Usage:** `/user_info [target]`
@@ -48,7 +48,7 @@ This document provides an overview of 100 slash commands available in this disco
         -   `/user_info`
         -   `/user_info target:@user123`
 
--   **/serverinfo**
+-   **/server_info**
 
     -   **Description:** Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.
     -   **Usage:** `/server_info`
