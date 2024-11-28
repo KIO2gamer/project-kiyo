@@ -83,7 +83,7 @@ This document provides an overview of 100 slash commands available in this disco
 ## Command Categories
 
 - [Admin Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
-- [Discord Channels Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
+- [Discord Channels Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/channels)
 - [Custom Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/customs)
 - [Fun Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/fun)
 - [Games Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/games)
