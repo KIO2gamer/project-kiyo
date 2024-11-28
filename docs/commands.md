@@ -80,6 +80,22 @@ This document provides an overview of 100 slash commands available in this disco
     -   **Description:** Fetches and displays a random, SFW meme from the internet.
     -   **Usage:** `/meme`
 
+## Command Categories
+
+- [Admin Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
+- [Discord Channels Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
+- [Custom Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/customs)
+- [Fun Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/fun)
+- [Games Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/games)
+- [Info Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/info)
+- [Moderation Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/moderation)
+- [Music Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/music)
+- [Roles Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/roles)
+- [Setup Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/setup)
+- [Ticket Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/tickets)
+- [Utility Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/utility)
+- [Youtube Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/youtube)
+
 ## Adding New Commands
 
 To add a new command, create a new file in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder and follow the existing command structure.
