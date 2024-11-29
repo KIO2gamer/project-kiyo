@@ -1,0 +1,18 @@
+2024-11-29 15:50:51 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\chalk\source\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js:2:15)
+2024-11-29 15:50:51 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:50:52 [[31merror[39m]: [BOT] Failed to start: Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:51:34 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\chalk\source\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js:2:15)
+2024-11-29 15:51:34 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:51:48 [[31merror[39m]: [BOT] Failed to start: Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)

@@ -1,0 +1,123 @@
+2024-11-29 15:50:50 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 15:50:50 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 15:50:50 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 15:50:51 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\chalk\source\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js:2:15)
+2024-11-29 15:50:51 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:50:52 [[31merror[39m]: [BOT] Failed to start: Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:51:34 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 15:51:34 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 15:51:34 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 15:51:34 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\chalk\source\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\events\ready.js:2:15)
+2024-11-29 15:51:34 [[31merror[39m]: [UNHANDLED REJECTION] Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:51:48 [[31merror[39m]: [BOT] Failed to start: Error [ERR_REQUIRE_ESM]: require() of ES Module C:\Users\KIO2gamer\github_projects\project-kiyo\node_modules\node-fetch\src\index.js from C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js not supported.
+Instead change the require of index.js in C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js to a dynamic import() which is available in all CommonJS modules.
+    at Object.<anonymous> (C:\Users\KIO2gamer\github_projects\project-kiyo\src\bot\commands\fun\funCmds.js:8:15)
+2024-11-29 15:58:02 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 15:58:02 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 15:58:02 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 15:58:02 [[32minfo[39m]: [EVENTS] Events loaded successfully!!!
+2024-11-29 15:58:05 [[32minfo[39m]: [COMMANDS] All Commands Loaded Successfully!!!
+2024-11-29 15:58:10 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 15:58:10 [[32minfo[39m]: [COMMANDS] All Commands Loaded Successfully!!!
+2024-11-29 15:58:10 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 15:58:10 [[32minfo[39m]: [EVENTS] Events loaded successfully!!!
+2024-11-29 16:04:46 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 16:04:46 [[32minfo[39m]: [DATABASE] Connecting to MongoDB...
+2024-11-29 16:04:47 [[32minfo[39m]: [DATABASE] Connected to MongoDB
+2024-11-29 16:04:47 [[32minfo[39m]: [DEPLOY] Deploying commands...
+2024-11-29 16:04:47 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 16:04:47 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 16:04:55 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 16:04:55 [[32minfo[39m]: [DATABASE] Connecting to MongoDB...
+2024-11-29 16:04:57 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 16:04:57 [[32minfo[39m]: [DATABASE] Connecting to MongoDB...
+2024-11-29 16:04:58 [[32minfo[39m]: [DATABASE] Connected to MongoDB
+2024-11-29 16:04:58 [[32minfo[39m]: [DEPLOY] Deploying commands...
+2024-11-29 16:04:58 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 16:04:58 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 16:05:19 [[32minfo[39m]: [BOT] Starting bot...
+2024-11-29 16:05:19 [[32minfo[39m]: [DATABASE] Connecting to MongoDB...
+2024-11-29 16:05:20 [[32minfo[39m]: [DATABASE] Connected to MongoDB
+2024-11-29 16:05:20 [[32minfo[39m]: [DEPLOY] Deploying commands...
+2024-11-29 16:05:20 [[32minfo[39m]: [COMMANDS] Loading commands...
+2024-11-29 16:05:20 [[32minfo[39m]: [EVENTS] Loading events...
+2024-11-29 16:06:31 [[32minfo[39m]: [BOT] Logged in as Kiyo#5941
+2024-11-29 16:06:31 [[32minfo[39m]: Bot is ready and operational. Logged in as Kiyo#5941
+2024-11-29 16:06:31 [[32minfo[39m]: Serving 1 guild
+2024-11-29 16:06:31 [[32minfo[39m]: Watching 5 channels
+2024-11-29 16:06:31 [[32minfo[39m]: Observing 1 user
+2024-11-29 16:06:31 [[32minfo[39m]: - testing server (ID: 1211207812328460308)
+2024-11-29 16:07:17 [[32minfo[39m]: [BOT] Logged in as Kiyo#5941
+2024-11-29 16:07:17 [[32minfo[39m]: Bot is ready and operational. Logged in as Kiyo#5941
+2024-11-29 16:07:17 [[32minfo[39m]: Serving 1 guild
+2024-11-29 16:07:17 [[32minfo[39m]: Watching 5 channels
+2024-11-29 16:07:17 [[32minfo[39m]: Observing 1 user
+2024-11-29 16:07:17 [[32minfo[39m]: - testing server (ID: 1211207812328460308)
+2024-11-29 16:11:06 [[32minfo[39m]: [0m[36m%s[0m[0m
+2024-11-29 16:11:06 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:11:09 [[32minfo[39m]: [0m[32m%s[0m[0m
+2024-11-29 16:11:09 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:11:09 [[32minfo[39m]: [0m[32m%s[0m[0m
+2024-11-29 16:11:09 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:11:10 [[32minfo[39m]: [0m[32m%s[0m[0m
+2024-11-29 16:11:10 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:11:11 [[32minfo[39m]: [0m[32m%s[0m[0m
+2024-11-29 16:12:38 [[32minfo[39m]: [0m[36m%s[0m[0m
+2024-11-29 16:12:38 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[COMMANDS] All Commands Loaded Successfully!!![0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[EVENTS] Events loaded successfully!!![0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[DATABASE] Connected to MongoDB[0m
+2024-11-29 16:12:42 [[32minfo[39m]: [0m[33m%s[0m[0m
+2024-11-29 16:12:44 [[32minfo[39m]: [0m[DEPLOY] Successfully deployed 88 commands to guild 1211207812328460308[0m
+2024-11-29 16:15:01 [[32minfo[39m]: [0m[BOT] Starting bot...[0m
+2024-11-29 16:15:01 [[32minfo[39m]: [0m[COMMANDS] Loading commands...[0m
+2024-11-29 16:15:04 [[32minfo[39m]: [0m[COMMANDS] All Commands Loaded Successfully!!![0m
+2024-11-29 16:15:04 [[32minfo[39m]: [0m[EVENTS] Loading events...[0m
+2024-11-29 16:15:04 [[32minfo[39m]: [0m[EVENTS] Events loaded successfully!!![0m
+2024-11-29 16:15:04 [[32minfo[39m]: [0m[DATABASE] Connecting to MongoDB...[0m
+2024-11-29 16:15:05 [[32minfo[39m]: [0m[DATABASE] Connected to MongoDB[0m
+2024-11-29 16:15:05 [[32minfo[39m]: [0m[DEPLOY] Deploying commands...[0m
+2024-11-29 16:15:07 [[32minfo[39m]: [0m[DEPLOY] Successfully deployed 88 commands to guild 1211207812328460308[0m
+2024-11-29 16:15:31 [[32minfo[39m]: [0m[BOT] Starting bot...[0m
+2024-11-29 16:15:31 [[32minfo[39m]: [0m[COMMANDS] Loading commands...[0m
+2024-11-29 16:15:34 [[32minfo[39m]: [0m[COMMANDS] All Commands Loaded Successfully!!![0m
+2024-11-29 16:15:34 [[32minfo[39m]: [0m[EVENTS] Loading events...[0m
+2024-11-29 16:15:34 [[32minfo[39m]: [0m[EVENTS] Events loaded successfully!!![0m
+2024-11-29 16:15:34 [[32minfo[39m]: [0m[DATABASE] Connecting to MongoDB...[0m
+2024-11-29 16:15:35 [[32minfo[39m]: [0m[DATABASE] Connected to MongoDB[0m
+2024-11-29 16:15:35 [[32minfo[39m]: [0m[DEPLOY] Deploying commands...[0m
+2024-11-29 16:15:36 [[32minfo[39m]: [0m[DEPLOY] Successfully deployed 88 commands to guild 1211207812328460308[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0m[BOT] Logged in as Kiyo#5941[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0mBot is ready and operational. Logged in as Kiyo#5941[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0mServing 1 guild[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0mWatching 5 channels[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0mObserving 1 user[0m
+2024-11-29 16:15:38 [[32minfo[39m]: [0m- testing server (ID: 1211207812328460308)[0m
+2024-11-29 16:15:49 [[32minfo[39m]: [0m[BOT] Starting bot...[0m
+2024-11-29 16:15:49 [[32minfo[39m]: [0m[COMMANDS] Loading commands...[0m
+2024-11-29 16:15:52 [[32minfo[39m]: [0m[COMMANDS] All Commands Loaded Successfully!!![0m
+2024-11-29 16:15:52 [[32minfo[39m]: [0m[EVENTS] Loading events...[0m
+2024-11-29 16:15:52 [[32minfo[39m]: [0m[EVENTS] Events loaded successfully!!![0m
+2024-11-29 16:15:52 [[32minfo[39m]: [0m[DATABASE] Connecting to MongoDB...[0m
+2024-11-29 16:15:53 [[32minfo[39m]: [0m[DATABASE] Connected to MongoDB[0m
+2024-11-29 16:15:53 [[32minfo[39m]: [0m[DEPLOY] Deploying commands...[0m
+2024-11-29 16:15:54 [[32minfo[39m]: [0m[DEPLOY] Successfully deployed 88 commands to guild 1211207812328460308[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0m[BOT] Logged in as Kiyo#5941[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0mBot is ready and operational. Logged in as Kiyo#5941[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0mServing 1 guild[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0mWatching 5 channels[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0mObserving 1 user[0m
+2024-11-29 16:15:56 [[32minfo[39m]: [0m- testing server (ID: 1211207812328460308)[0m
+2024-11-29 16:21:07 [[32minfo[39m]: [0m[BOT] Shutting down gracefully...[0m
