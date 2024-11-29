@@ -9,7 +9,6 @@ const {
 	REST,
 	Routes,
 } = require('discord.js');
-const { logInfo, logError } = require('./../logger');
 require('dotenv').config();
 
 const { DISCORD_CLIENT_ID, DISCORD_TOKEN, MONGODB_URI } = process.env;
@@ -18,7 +17,7 @@ const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
 	: [];
 
 // Cyan color for starting message
-logInfo('[BOT] Starting bot...');
+console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...');
 
 const client = new Client({
 	intents: [
@@ -62,7 +61,7 @@ const loadFiles = (dir, callback) => {
  * @param {string} dir - The directory to load commands from.
  */
 const loadCommands = (dir) => {
-	logInfo('[COMMANDS] Loading commands...'); // Yellow color for command loading
+	console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...'); // Yellow color for command loading
 	const commandCache = new Map();
 	loadFiles(dir, (filePath) => {
 		if (!commandCache.has(filePath)) {
@@ -78,12 +77,15 @@ const loadCommands = (dir) => {
 			}
 		}
 	});
-	logInfo('[COMMANDS] All Commands Loaded Successfully!!!'); // Green color for success
+	console.log(
+		'\x1b[32m%s\x1b[0m',
+		'[COMMANDS] All Commands Loaded Successfully!!!',
+	); // Green color for success
 };
 
 // Function to load events
 const loadEvents = (dir) => {
-	logInfo('[EVENTS] Loading events...'); // Yellow color for event loading
+	console.log('\x1b[33m%s\x1b[0m', '[EVENTS] Loading events...'); // Yellow color for event loading
 	loadFiles(dir, (filePath) => {
 		const event = require(filePath);
 		const execute = (...args) => event.execute(...args);
@@ -91,7 +93,7 @@ const loadEvents = (dir) => {
 			? client.once(event.name, execute)
 			: client.on(event.name, execute);
 	});
-	logInfo('[EVENTS] Events loaded successfully!!!'); // Green color for success
+	console.log('\x1b[32m%s\x1b[0m', '[EVENTS] Events loaded successfully!!!'); // Green color for success
 };
 
 // Load commands and events from their respective directories
@@ -100,13 +102,16 @@ loadEvents(path.join(__dirname, 'bot/events')); // Loads all events
 
 // Function to connect to MongoDB
 const connectToMongoDB = async () => {
-	logInfo('[DATABASE] Connecting to MongoDB...'); // Yellow color for connection attempt
+	console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...'); // Yellow color for connection attempt
 	try {
 		mongoose.set('strictQuery', false);
 		await mongoose.connect(MONGODB_URI);
-		logInfo('[DATABASE] Connected to MongoDB'); // Green color for successful connection
+		console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB'); // Green color for successful connection
 	} catch (error) {
-		logError(`[DATABASE] MongoDB connection failed: ${error.message}`); // Red color for error
+		console.error(
+			'\x1b[31m%s\x1b[0m',
+			`[DATABASE] MongoDB connection failed: ${error.message}`,
+		); // Red color for error
 		process.exit(1);
 	}
 };
@@ -124,13 +129,13 @@ const connectToMongoDB = async () => {
  *
  * @example
  * deployCommands().then(() => {
- *   logInfo('Commands deployed successfully.');
+ *   console.log('Commands deployed successfully.');
  * }).catch((error) => {
- *   logError('Failed to deploy commands:', error);
+ *   console.error('Failed to deploy commands:', error);
  * });
  */
 const deployCommands = async () => {
-	logInfo('[DEPLOY] Deploying commands...'); // Yellow color for deployment start
+	console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
 	const commands = [];
 	loadFiles(path.join(__dirname, 'bot/commands'), (filePath) => {
 		const command = require(filePath);
@@ -148,19 +153,30 @@ const deployCommands = async () => {
 					Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
 					{ body: commands },
 				);
-				logInfo(`[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`); // Green color for success
+				console.log(
+					'\x1b[32m%s\x1b[0m',
+					`[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`,
+				); // Green color for success
 			} catch (error) {
-				logError(`[DEPLOY] Failed to deploy commands to guild ${guildId}: ${error.message}`); // Red color for error
+				console.error(
+					'\x1b[31m%s\x1b[0m',
+					`[DEPLOY] Failed to deploy commands to guild ${guildId}:`,
+					error,
+				); // Red color for error
 			}
 		}
 	} catch (error) {
-		logError(`[DEPLOY] Command deployment failed: ${error.message}`); // Red color for error
+		console.error(
+			'\x1b[31m%s\x1b[0m',
+			'[DEPLOY] Command deployment failed:',
+			error,
+		); // Red color for error
 	}
 };
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-	logInfo('[BOT] Shutting down gracefully...'); // Cyan color for shutdown message
+	console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...'); // Cyan color for shutdown message
 	await mongoose.connection.close();
 	client.destroy();
 	process.exit(0);
@@ -173,7 +189,10 @@ process.on('SIGINT', async () => {
 		await deployCommands();
 		await client.login(DISCORD_TOKEN);
 	} catch (error) {
-		logError(`[BOT] Failed to start the bot: ${error.message}`); // Red color for error
+		console.error(
+			'\x1b[31m%s\x1b[0m',
+			`[BOT] Failed to start the bot: ${error.message}`,
+		); // Red color for error
 		process.exit(1);
 	}
 })();
