@@ -6,79 +6,79 @@ This document provides an overview of 100 slash commands available in this disco
 
 ### Moderation Commands
 
--   **/ban**
+- **/ban**
 
-    -   **Description:** Bans a member from the server with the specified reason.
-    -   **Usage:** `/ban target:@user [reason:"ban reason"]`
-    -   **Examples:**
-        -   `/ban target:@user123`
-        -   `/ban target:@user123 reason:"Severe rule violation"`
+    - **Description:** Bans a member from the server with the specified reason.
+    - **Usage:** `/ban target:@user [reason:"ban reason"]`
+    - **Examples:**
+        - `/ban target:@user123`
+        - `/ban target:@user123 reason:"Severe rule violation"`
 
--   **/kick**
+- **/kick**
 
-    -   **Description:** Kicks a member from the server with the specified reason.
-    -   **Usage:** `/kick target:@user [reason:"kick reason"]`
-    -   **Examples:**
-        -   `/kick target:@user123`
-        -   `/kick target:@user123 reason:"Violating server rules"`
+    - **Description:** Kicks a member from the server with the specified reason.
+    - **Usage:** `/kick target:@user [reason:"kick reason"]`
+    - **Examples:**
+        - `/kick target:@user123`
+        - `/kick target:@user123 reason:"Violating server rules"`
 
--   **/timeout**
+- **/timeout**
 
-    -   **Description:** Timeouts a member for the specified duration and reason.
-    -   **Usage:** `/timeout target:@user amount:"duration" [reason:"timeout reason"]`
-    -   **Examples:**
-        -   `/timeout target:@user123 amount:"1h"`
-        -   `/timeout target:@user123 amount:"30m" reason:"Being disruptive"`
+    - **Description:** Timeouts a member for the specified duration and reason.
+    - **Usage:** `/timeout target:@user amount:"duration" [reason:"timeout reason"]`
+    - **Examples:**
+        - `/timeout target:@user123 amount:"1h"`
+        - `/timeout target:@user123 amount:"30m" reason:"Being disruptive"`
 
 ### Utility Commands
 
--   **/photo**
+- **/photo**
 
-    -   **Description:** Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.
-    -   **Usage:** `/photo <query:search_term> [count:1-5] [orientation:landscape/portrait/square] [size:small/medium/large] [random:true/false]`
-    -   **Examples:**
-        -   `/photo sunset count:3 orientation:landscape`
-        -   `/photo cat random:true`
+    - **Description:** Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.
+    - **Usage:** `/photo <query:search_term> [count:1-5] [orientation:landscape/portrait/square] [size:small/medium/large] [random:true/false]`
+    - **Examples:**
+        - `/photo sunset count:3 orientation:landscape`
+        - `/photo cat random:true`
 
--   **/user_info**
+- **/user_info**
 
-    -   **Description:** Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.
-    -   **Usage:** `/user_info [target]`
-    -   **Examples:**
-        -   `/user_info`
-        -   `/user_info target:@user123`
+    - **Description:** Shows information about a user, either the user who executed the command or a specified user. This includes their username, ID, roles, join date, status, activity, and more.
+    - **Usage:** `/user_info [target]`
+    - **Examples:**
+        - `/user_info`
+        - `/user_info target:@user123`
 
--   **/server_info**
+- **/server_info**
 
-    -   **Description:** Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.
-    -   **Usage:** `/server_info`
+    - **Description:** Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.
+    - **Usage:** `/server_info`
 
 ### Fun Commands
 
--   **/8ball**
+- **/8ball**
 
-    -   **Description:** Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.
-    -   **Usage:** `/8ball <question>`
-    -   **Examples:**
-        -   `/8ball Will I win the lottery?`
+    - **Description:** Ask a question to the magic 8-ball and receive a mystical (and often hilarious) response.
+    - **Usage:** `/8ball <question>`
+    - **Examples:**
+        - `/8ball Will I win the lottery?`
 
--   **/roll**
+- **/roll**
 
-    -   **Description:** Simulates a dice roll and displays the corresponding dice face.
-    -   **Usage:** `/roll`
+    - **Description:** Simulates a dice roll and displays the corresponding dice face.
+    - **Usage:** `/roll`
 
--   **/coin_flip**
+- **/coin_flip**
 
-    -   **Description:** Flips a coin and optionally places a bet on heads or tails.
-    -   **Usage:** `/coin_flip [bet]`
-    -   **Examples:**
-        -   `/coin_flip`
-        -   `/coin_flip bet:heads`
+    - **Description:** Flips a coin and optionally places a bet on heads or tails.
+    - **Usage:** `/coin_flip [bet]`
+    - **Examples:**
+        - `/coin_flip`
+        - `/coin_flip bet:heads`
 
--   **/meme**
+- **/meme**
 
-    -   **Description:** Fetches and displays a random, SFW meme from the internet.
-    -   **Usage:** `/meme`
+    - **Description:** Fetches and displays a random, SFW meme from the internet.
+    - **Usage:** `/meme`
 
 ## Command Categories
 

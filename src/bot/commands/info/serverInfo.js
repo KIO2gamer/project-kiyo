@@ -41,7 +41,11 @@ async function sendServerInfo(interaction) {
 					value: `${owner.user.tag}`,
 					inline: true,
 				},
-				{ name: '🆔 Server ID', value: `\`${guild.id}\``, inline: true },
+				{
+					name: '🆔 Server ID',
+					value: `\`${guild.id}\``,
+					inline: true,
+				},
 				{
 					name: '📅 Created',
 					value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,

@@ -35,7 +35,8 @@ module.exports = {
 
 				// Check if the user already has an open ticket
 				const existingChannel = interaction.guild.channels.cache.find(
-					(channel) => channel.name === `ticket-${interaction.user.id}`,
+					(channel) =>
+						channel.name === `ticket-${interaction.user.id}`,
 				);
 
 				if (existingChannel) {

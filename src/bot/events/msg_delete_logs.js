@@ -38,7 +38,9 @@ module.exports = {
 			const config = await MsgLogsConfig.findOne();
 			if (!config?.channelId) return;
 
-			const logChannel = await message.guild.channels.fetch(config.channelId);
+			const logChannel = await message.guild.channels.fetch(
+				config.channelId,
+			);
 			if (!logChannel) return;
 
 			// **Ignore deletions in the log channel to prevent recursive logging**
@@ -118,7 +120,10 @@ module.exports = {
 						const response = await fetch(attachment.url);
 						const arrayBuffer = await response.arrayBuffer();
 						const buffer = Buffer.from(arrayBuffer);
-						files.push({ attachment: buffer, name: attachment.name });
+						files.push({
+							attachment: buffer,
+							name: attachment.name,
+						});
 					} catch (error) {
 						console.error('Error fetching attachment:', error);
 					}

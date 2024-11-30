@@ -41,7 +41,9 @@ module.exports = {
 
 			if (commandQuery) {
 				const command = commands.find(
-					(cmd) => cmd.data.name.toLowerCase() === commandQuery.toLowerCase(),
+					(cmd) =>
+						cmd.data.name.toLowerCase() ===
+						commandQuery.toLowerCase(),
 				);
 
 				if (!command) {
@@ -53,10 +55,17 @@ module.exports = {
 				const commandEmbed = new EmbedBuilder()
 					.setColor('#00AAFF')
 					.setTitle(`✨ Command: /${command.data.name}`)
-					.setDescription(command.description_full || 'No description available.')
+					.setDescription(
+						command.description_full || 'No description available.',
+					)
 					.addFields(
 						{ name: 'Usage', value: `\`${command.usage}\`` },
-						{ name: 'Examples', value: command.examples.join('\n') || 'No examples available.' },
+						{
+							name: 'Examples',
+							value:
+								command.examples.join('\n') ||
+								'No examples available.',
+						},
 					)
 					.setFooter({
 						text: 'Use /help to return to the main menu.',
@@ -70,9 +79,13 @@ module.exports = {
 			if (searchQuery) {
 				const filteredCommands = commands.filter(
 					(cmd) =>
-						cmd.data.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+						cmd.data.name
+							.toLowerCase()
+							.includes(searchQuery.toLowerCase()) ||
 						(cmd.data.description &&
-							cmd.data.description.toLowerCase().includes(searchQuery.toLowerCase())),
+							cmd.data.description
+								.toLowerCase()
+								.includes(searchQuery.toLowerCase())),
 				);
 
 				if (filteredCommands.length === 0) {
@@ -84,11 +97,15 @@ module.exports = {
 				const searchEmbed = new EmbedBuilder()
 					.setColor('#00AAFF')
 					.setTitle('🔍 Search Results')
-					.setDescription('Here are the commands matching your search:')
+					.setDescription(
+						'Here are the commands matching your search:',
+					)
 					.addFields(
 						filteredCommands.map((cmd) => ({
 							name: `/${cmd.data.name}`,
-							value: cmd.data.description || 'No description available.',
+							value:
+								cmd.data.description ||
+								'No description available.',
 						})),
 					)
 					.setFooter({
@@ -135,10 +152,11 @@ module.exports = {
 				components: [buttonRow],
 			});
 
-			const collector = interaction.channel.createMessageComponentCollector({
-				filter: (i) => i.user.id === interaction.user.id,
-				time: 300000,
-			});
+			const collector =
+				interaction.channel.createMessageComponentCollector({
+					filter: (i) => i.user.id === interaction.user.id,
+					time: 300000,
+				});
 
 			let currentPage = 0;
 			const ITEMS_PER_PAGE = 5;
@@ -159,11 +177,15 @@ module.exports = {
 					const embed = new EmbedBuilder()
 						.setColor('#00AAFF')
 						.setTitle(`📜 ${category} Commands`)
-						.setDescription(`Commands in the **${category}** category:`)
+						.setDescription(
+							`Commands in the **${category}** category:`,
+						)
 						.addFields(
 							pageCommands.map((cmd) => ({
 								name: `/${cmd.data.name}`,
-								value: cmd.data.description || 'No description available.',
+								value:
+									cmd.data.description ||
+									'No description available.',
 							})),
 						)
 						.setFooter({
@@ -203,16 +225,31 @@ module.exports = {
 						const guideEmbed = new EmbedBuilder()
 							.setColor('#00AAFF')
 							.setTitle('📝 Setup Guide')
-							.setDescription('Follow these steps to set up the bot:')
+							.setDescription(
+								'Follow these steps to set up the bot:',
+							)
 							.addFields(
-								{ name: 'Step 1', value: 'Invite the bot to your server.' },
-								{ name: 'Step 2', value: 'Configure the bot settings as needed.' },
-								{ name: 'Step 3', value: 'Use `/help` to learn about commands.' },
-								{ name: 'Support', value: 'Join our support server for assistance.' },
+								{
+									name: 'Step 1',
+									value: 'Invite the bot to your server.',
+								},
+								{
+									name: 'Step 2',
+									value: 'Configure the bot settings as needed.',
+								},
+								{
+									name: 'Step 3',
+									value: 'Use `/help` to learn about commands.',
+								},
+								{
+									name: 'Support',
+									value: 'Join our support server for assistance.',
+								},
 							)
 							.setFooter({
 								text: 'Use the Back button to return.',
-								iconURL: interaction.client.user.displayAvatarURL(),
+								iconURL:
+									interaction.client.user.displayAvatarURL(),
 							})
 							.setTimestamp();
 
@@ -224,18 +261,28 @@ module.exports = {
 								.setEmoji('🔙'),
 						);
 
-						await i.update({ embeds: [guideEmbed], components: [backRow] });
+						await i.update({
+							embeds: [guideEmbed],
+							components: [backRow],
+						});
 					} else if (i.customId === 'faq') {
 						const faqEmbed = new EmbedBuilder()
 							.setColor('#00AAFF')
 							.setTitle('❔ Frequently Asked Questions')
 							.addFields(
-								{ name: 'How do I invite the bot?', value: 'Use the invite link provided.' },
-								{ name: 'Bot not responding?', value: 'Check permissions and command syntax.' },
+								{
+									name: 'How do I invite the bot?',
+									value: 'Use the invite link provided.',
+								},
+								{
+									name: 'Bot not responding?',
+									value: 'Check permissions and command syntax.',
+								},
 							)
 							.setFooter({
 								text: 'Use the Back button to return.',
-								iconURL: interaction.client.user.displayAvatarURL(),
+								iconURL:
+									interaction.client.user.displayAvatarURL(),
 							})
 							.setTimestamp();
 
@@ -247,17 +294,32 @@ module.exports = {
 								.setEmoji('🔙'),
 						);
 
-						await i.update({ embeds: [faqEmbed], components: [backRow] });
+						await i.update({
+							embeds: [faqEmbed],
+							components: [backRow],
+						});
 					} else if (i.customId === 'commands') {
-						await i.update({ embeds: [pages[currentPage]], components: [getNavigationRow()] });
+						await i.update({
+							embeds: [pages[currentPage]],
+							components: [getNavigationRow()],
+						});
 					} else if (i.customId === 'next') {
 						currentPage++;
-						await i.update({ embeds: [pages[currentPage]], components: [getNavigationRow()] });
+						await i.update({
+							embeds: [pages[currentPage]],
+							components: [getNavigationRow()],
+						});
 					} else if (i.customId === 'prev') {
 						currentPage--;
-						await i.update({ embeds: [pages[currentPage]], components: [getNavigationRow()] });
+						await i.update({
+							embeds: [pages[currentPage]],
+							components: [getNavigationRow()],
+						});
 					} else if (i.customId === 'back') {
-						await i.update({ embeds: [mainEmbed], components: [buttonRow] });
+						await i.update({
+							embeds: [mainEmbed],
+							components: [buttonRow],
+						});
 					}
 				} catch (error) {
 					console.error('Error handling button interaction:', error);
@@ -268,7 +330,8 @@ module.exports = {
 			collector.on('end', async () => {
 				await interaction.editReply({
 					components: [],
-					content: '⏰ The help menu has expired. Please use `/help` again.',
+					content:
+						'⏰ The help menu has expired. Please use `/help` again.',
 				});
 			});
 		} catch (error) {

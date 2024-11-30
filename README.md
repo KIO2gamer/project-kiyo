@@ -5,8 +5,8 @@ This bot is only for the [TKOD Discord server](https://discord.gg/y3GvzeZVJ3).
 
 ## Requirements
 
--   Node.js >= 18.0.0
--   npm
+- Node.js >= 18.0.0
+- npm
 
 ## Installation
 

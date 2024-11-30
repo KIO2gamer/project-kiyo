@@ -17,16 +17,23 @@ module.exports = {
 	async execute(interaction) {
 		if (!interaction.isCommand()) return;
 
-		const command = interaction.client.commands.get(interaction.commandName);
+		const command = interaction.client.commands.get(
+			interaction.commandName,
+		);
 
 		if (!command) {
-			console.error(`No command matching ${interaction.commandName} was found.`);
+			console.error(
+				`No command matching ${interaction.commandName} was found.`,
+			);
 			return;
 		}
 
 		try {
 			// Special handling for 'get_yt_sub_role' command
-			if (interaction.commandName === 'get_yt_sub_role' || interaction.commandName === 'bot_info') {
+			if (
+				interaction.commandName === 'get_yt_sub_role' ||
+				interaction.commandName === 'bot_info'
+			) {
 				await command.execute(interaction);
 				return;
 			}

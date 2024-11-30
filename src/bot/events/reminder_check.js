@@ -20,26 +20,33 @@ module.exports = {
 			const pendingReminders = await Reminder.find();
 
 			for (const reminder of pendingReminders) {
-				const timeLeft = new Date(reminder.reminderTime).getTime() - Date.now();
+				const timeLeft =
+					new Date(reminder.reminderTime).getTime() - Date.now();
 
 				// Function to send the reminder
 				const sendReminder = async () => {
 					try {
-						const channel = await client.channels.fetch(reminder.channelId);
+						const channel = await client.channels.fetch(
+							reminder.channelId,
+						);
 						if (!channel) {
 							// If the channel doesn't exist, delete the reminder
 							await Reminder.findByIdAndDelete(reminder._id);
 							return;
 						}
 						await channel.send(
-							`⏰ <@${reminder.userId}> Reminder: ${reminder.reminderMessage}`
+							`⏰ <@${reminder.userId}> Reminder: ${reminder.reminderMessage}`,
 						);
 						// After sending the reminder, delete it from the database
 						await Reminder.findByIdAndDelete(reminder._id);
 					} catch (error) {
-						console.error(`Error sending reminder: ${error.message}`);
+						console.error(
+							`Error sending reminder: ${error.message}`,
+						);
 						// Optionally, update the reminder status to 'failed'
-						await Reminder.findByIdAndUpdate(reminder._id, { status: 'failed' });
+						await Reminder.findByIdAndUpdate(reminder._id, {
+							status: 'failed',
+						});
 					}
 				};
 

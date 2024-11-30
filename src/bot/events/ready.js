@@ -10,13 +10,13 @@ module.exports = {
 
 		logInfo(`Bot is ready and operational. Logged in as ${user.tag}`);
 		logInfo(
-			`Serving ${guilds.cache.size} guild${guilds.cache.size !== 1 ? 's' : ''}`
+			`Serving ${guilds.cache.size} guild${guilds.cache.size !== 1 ? 's' : ''}`,
 		);
 		logInfo(
-			`Watching ${channels.cache.size} channel${channels.cache.size !== 1 ? 's' : ''}`
+			`Watching ${channels.cache.size} channel${channels.cache.size !== 1 ? 's' : ''}`,
 		);
 		logInfo(
-			`Observing ${users.cache.size} user${users.cache.size !== 1 ? 's' : ''}`
+			`Observing ${users.cache.size} user${users.cache.size !== 1 ? 's' : ''}`,
 		);
 
 		guilds.cache.forEach((guild) => {

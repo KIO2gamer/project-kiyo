@@ -1,4 +1,9 @@
-const { Events, AuditLogEvent, EmbedBuilder, PermissionsBitField } = require('discord.js');
+const {
+	Events,
+	AuditLogEvent,
+	EmbedBuilder,
+	PermissionsBitField,
+} = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 
 async function fetchPartialMessages(oldMessage, newMessage) {

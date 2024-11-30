@@ -239,5 +239,5 @@ async function sendLongMessage(message, content) {
 		chunks.push(content.slice(i, i + maxLength));
 	}
 
-	await Promise.all(chunks.map(chunk => message.channel.send(chunk)));
+	await Promise.all(chunks.map((chunk) => message.channel.send(chunk)));
 }
