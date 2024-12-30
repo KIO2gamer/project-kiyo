@@ -1,3 +1,16 @@
+require('dotenv').config();
+
+// Environment Variables
+const {
+	DISCORD_CLIENT_ID,
+	DISCORD_TOKEN,
+	MONGODB_URI,
+	DISCORD_GUILD_IDS = ''
+} = process.env;
+
+// Constants
+const GUILD_IDS = DISCORD_GUILD_IDS.split(',').filter(Boolean);
+
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -9,27 +22,29 @@ const {
 	REST,
 	Routes,
 } = require('discord.js');
-require('dotenv').config();
+const Logger = require('./../logger');
 
-const { DISCORD_CLIENT_ID, DISCORD_TOKEN, MONGODB_URI } = process.env;
-const DISCORD_GUILD_IDS = process.env.DISCORD_GUILD_IDS
-	? process.env.DISCORD_GUILD_IDS.split(',')
-	: [];
-
-// Cyan color for starting message
-console.log('\x1b[36m%s\x1b[0m', '[BOT] Starting bot...');
+Logger.log('BOT', 'Initializing...');
 
 const client = new Client({
 	intents: [
+		// Server-related intents
 		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildVoiceStates,
+
+		// Message-related intents
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.DirectMessages,
 		GatewayIntentBits.GuildMessageReactions,
-		GatewayIntentBits.GuildVoiceStates,
+		GatewayIntentBits.GuildPresences,
 	],
-	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+	partials: [
+		Partials.Message,
+		Partials.Channel,
+		Partials.Reaction
+	]
 });
 
 client.commands = new Collection();
@@ -41,15 +56,22 @@ client.commands = new Collection();
  * @param {function} callback - The action to apply to each file. This function receives the file path as an argument.
  */
 const loadFiles = (dir, callback) => {
-	fs.readdirSync(dir).forEach((file) => {
-		const filePath = path.join(dir, file);
+	const processFile = (filePath) => {
 		const stat = fs.statSync(filePath);
+
 		if (stat.isDirectory()) {
-			loadFiles(filePath, callback); // Recursively loads files from a directory and its subdirectories, and applies a given action to each file.
-		} else if (file.endsWith('.js')) {
-			callback(filePath); // Only process .js files to ensure we are loading JavaScript modules
+			loadFiles(filePath, callback);
+			return;
 		}
-	});
+
+		if (!filePath.endsWith('.js')) return;
+
+		callback(filePath);
+	};
+
+	fs.readdirSync(dir)
+		.map(file => path.join(dir, file))
+		.forEach(processFile);
 };
 
 /**
@@ -61,7 +83,7 @@ const loadFiles = (dir, callback) => {
  * @param {string} dir - The directory to load commands from.
  */
 const loadCommands = (dir) => {
-	console.log('\x1b[33m%s\x1b[0m', '[COMMANDS] Loading commands...'); // Yellow color for command loading
+	Logger.log('COMMANDS', 'Loading command modules', 'info');
 	const commandCache = new Map();
 	loadFiles(dir, (filePath) => {
 		if (!commandCache.has(filePath)) {
@@ -77,15 +99,12 @@ const loadCommands = (dir) => {
 			}
 		}
 	});
-	console.log(
-		'\x1b[32m%s\x1b[0m',
-		'[COMMANDS] All Commands Loaded Successfully!!!',
-	); // Green color for success
+	Logger.log('COMMANDS', 'Command modules loaded', 'success');
 };
 
 // Function to load events
 const loadEvents = (dir) => {
-	console.log('\x1b[33m%s\x1b[0m', '[EVENTS] Loading events...'); // Yellow color for event loading
+	Logger.log('EVENTS', 'Loading event modules', 'info');
 	loadFiles(dir, (filePath) => {
 		const event = require(filePath);
 		const execute = (...args) => event.execute(...args);
@@ -93,7 +112,7 @@ const loadEvents = (dir) => {
 			? client.once(event.name, execute)
 			: client.on(event.name, execute);
 	});
-	console.log('\x1b[32m%s\x1b[0m', '[EVENTS] Events loaded successfully!!!'); // Green color for success
+	Logger.log('EVENTS', 'Event modules loaded', 'success');
 };
 
 // Load commands and events from their respective directories
@@ -102,16 +121,13 @@ loadEvents(path.join(__dirname, 'bot/events')); // Loads all events
 
 // Function to connect to MongoDB
 const connectToMongoDB = async () => {
-	console.log('\x1b[33m%s\x1b[0m', '[DATABASE] Connecting to MongoDB...'); // Yellow color for connection attempt
+	Logger.log('DATABASE', 'Establishing database connection', 'info');
 	try {
 		mongoose.set('strictQuery', false);
 		await mongoose.connect(MONGODB_URI);
-		console.log('\x1b[32m%s\x1b[0m', '[DATABASE] Connected to MongoDB'); // Green color for successful connection
+		Logger.log('DATABASE', 'Database connection established', 'success');
 	} catch (error) {
-		console.error(
-			'\x1b[31m%s\x1b[0m',
-			`[DATABASE] MongoDB connection failed: ${error.message}`,
-		); // Red color for error
+		Logger.log('DATABASE', `Database connection failed: ${error.message}`, 'error');
 		process.exit(1);
 	}
 };
@@ -126,73 +142,64 @@ const connectToMongoDB = async () => {
  * @async
  * @function deployCommands
  * @returns {Promise<void>} A promise that resolves when the deployment is complete.
- *
- * @example
- * deployCommands().then(() => {
- *   console.log('Commands deployed successfully.');
- * }).catch((error) => {
- *   console.error('Failed to deploy commands:', error);
- * });
+ * @throws {Error} Throws an error if the deployment fails.
  */
-const deployCommands = async () => {
-	console.log('\x1b[33m%s\x1b[0m', '[DEPLOY] Deploying commands...'); // Yellow color for deployment start
-	const commands = [];
-	loadFiles(path.join(__dirname, 'bot/commands'), (filePath) => {
-		const command = require(filePath);
-		if (command?.data?.toJSON) commands.push(command.data.toJSON());
-	});
-
-	const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
+const deployCommandsToGuild = async (rest, guildId, commands) => {
 	try {
-		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), {
-			body: [],
-		});
-		for (const guildId of DISCORD_GUILD_IDS) {
-			try {
-				const result = await rest.put(
-					Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-					{ body: commands },
-				);
-				console.log(
-					'\x1b[32m%s\x1b[0m',
-					`[DEPLOY] Successfully deployed ${result.length} commands to guild ${guildId}`,
-				); // Green color for success
-			} catch (error) {
-				console.error(
-					'\x1b[31m%s\x1b[0m',
-					`[DEPLOY] Failed to deploy commands to guild ${guildId}:`,
-					error,
-				); // Red color for error
-			}
-		}
+		await rest.put(
+			Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
+			{ body: commands }
+		);
+		Logger.log('DEPLOY', `Deployed ${commands.length} modules to ${guildId}`, 'success');
 	} catch (error) {
-		console.error(
-			'\x1b[31m%s\x1b[0m',
-			'[DEPLOY] Command deployment failed:',
-			error,
-		); // Red color for error
+		Logger.log('DEPLOY', `Deployment failed for ${guildId}: ${error.message}`, 'error');
 	}
 };
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-	console.log('\x1b[36m%s\x1b[0m', '[BOT] Shutting down gracefully...'); // Cyan color for shutdown message
-	await mongoose.connection.close();
-	client.destroy();
-	process.exit(0);
-});
+const deployCommands = async () => {
+	Logger.log('DEPLOY', 'Deploying command modules', 'info');
+	const commands = [];
+	const commandsPath = path.join(__dirname, 'bot/commands');
 
-// Initialize the bot
-(async () => {
+	loadFiles(commandsPath, (filePath) => {
+		const command = require(filePath);
+		if (command?.data?.toJSON) {
+			commands.push(command.data.toJSON());
+		}
+	});
+
+	const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
+
+	try {
+		// Clear global commands first
+		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: [] });
+		// Deploy to each guild
+		await Promise.all(
+			GUILD_IDS.map(guildId => deployCommandsToGuild(rest, guildId, commands))
+		);
+	} catch (error) {
+		Logger.log('DEPLOY', `Failed to deploy command modules: ${error.message}`, 'error');
+	}
+};
+
+const initializeBot = async () => {
 	try {
 		await connectToMongoDB();
 		await deployCommands();
 		await client.login(DISCORD_TOKEN);
+		Logger.log('BOT', 'Initialization complete', 'success');
 	} catch (error) {
-		console.error(
-			'\x1b[31m%s\x1b[0m',
-			`[BOT] Failed to start the bot: ${error.message}`,
-		); // Red color for error
+		Logger.log('BOT', `Initialization failed: ${error.message}`, 'error');
 		process.exit(1);
 	}
-})();
+};
+
+process.on('SIGINT', async () => {
+	Logger.log('BOT', 'Initiating shutdown', 'warning');
+	await mongoose.connection.close();
+	client.destroy();
+	Logger.log('BOT', 'Shutdown complete', 'info');
+	process.exit(0);
+});
+
+initializeBot();

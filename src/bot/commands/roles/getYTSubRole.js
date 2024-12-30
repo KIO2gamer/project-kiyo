@@ -37,7 +37,6 @@ module.exports = {
 		),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
 		try {
 			const interactionId = interaction.id;
 			const guildId = interaction.guild.id;

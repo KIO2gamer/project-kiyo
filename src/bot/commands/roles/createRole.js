@@ -103,6 +103,20 @@ module.exports = {
 	async execute(interaction) {
 		const name = interaction.options.getString('name');
 		const color = interaction.options.getString('color');
+
+		// Validate name length
+		if (name.length < 1 || name.length > 100) {
+			return interaction.editReply(
+				'Role name must be between 1 and 100 characters.',
+			);
+		}
+
+		// Validate color format
+		const colorRegex = /^#([0-9A-F]{3}){1,2}$/i;
+		if (color && !colorRegex.test(color)) {
+			return interaction.editReply('Color must be a valid hex code.');
+		}
+
 		const hoist = interaction.options.getBoolean('hoist');
 		const mentionable = interaction.options.getBoolean('mentionable');
 
@@ -111,18 +125,27 @@ module.exports = {
 		// Dynamically assign permissions based on grouped options
 		permissionGroups.forEach((group) => {
 			if (interaction.options.getBoolean(group.name)) {
-				group.flags.forEach((flag) => permissions.add(flag));
+				group.flags.forEach((flag) =>
+					permissions.add(PermissionsBitField.resolve(flag)),
+				);
 			}
 		});
 
-		const role = await interaction.guild.roles.create({
-			name: name,
-			color: color || null,
-			hoist: hoist || false,
-			mentionable: mentionable || false,
-			permissions: permissions,
-		});
+		try {
+			const role = await interaction.guild.roles.create({
+				name: name,
+				color: color || null,
+				hoist: hoist || false,
+				mentionable: mentionable || false,
+				permissions: permissions,
+			});
 
-		return interaction.editReply(`Created new role: ${role}`);
+			return interaction.editReply(`Created new role: ${role}`);
+		} catch (error) {
+			console.error('Failed to create role:', error);
+			return interaction.editReply(
+				'There was an error creating the role. Please try again later.',
+			);
+		}
 	},
 };

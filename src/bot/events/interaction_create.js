@@ -31,7 +31,6 @@ module.exports = {
 		try {
 			// Special handling for 'get_yt_sub_role' command
 			if (
-				interaction.commandName === 'get_yt_sub_role' ||
 				interaction.commandName === 'bot_info'
 			) {
 				await command.execute(interaction);

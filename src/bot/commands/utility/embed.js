@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const DEFAULT_COLOR = '#0099ff';
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('embed')
@@ -8,13 +10,15 @@ module.exports = {
 			option
 				.setName('title')
 				.setDescription('The title of the embed')
-				.setRequired(true),
+				.setRequired(true)
+				.setMaxLength(256),
 		)
 		.addStringOption((option) =>
 			option
 				.setName('description')
 				.setDescription('The description of the embed')
-				.setRequired(true),
+				.setRequired(true)
+				.setMaxLength(4096),
 		)
 		.addStringOption((option) =>
 			option
@@ -26,7 +30,8 @@ module.exports = {
 			option
 				.setName('footer')
 				.setDescription('The footer text of the embed')
-				.setRequired(false),
+				.setRequired(false)
+				.setMaxLength(2048),
 		)
 		.addStringOption((option) =>
 			option
@@ -38,7 +43,8 @@ module.exports = {
 			option
 				.setName('author')
 				.setDescription('The author of the embed')
-				.setRequired(false),
+				.setRequired(false)
+				.setMaxLength(256),
 		)
 		.addStringOption((option) =>
 			option
@@ -52,40 +58,39 @@ module.exports = {
 				.setDescription('Whether to include a timestamp')
 				.setRequired(false),
 		),
+	category: 'utility',
 	async execute(interaction) {
-		const title = interaction.options.getString('title');
-		const description = interaction.options.getString('description');
-		const color = interaction.options.getString('color') || '#0099ff';
-		const footer = interaction.options.getString('footer');
-		const thumbnail = interaction.options.getString('thumbnail');
-		const author = interaction.options.getString('author');
-		const image = interaction.options.getString('image');
-		const timestamp = interaction.options.getBoolean('timestamp');
-
+		const options = interaction.options;
 		const embed = new EmbedBuilder()
-			.setTitle(title)
-			.setDescription(description)
-			.setColor(color);
+			.setTitle(options.getString('title'))
+			.setDescription(options.getString('description'))
+			.setColor(options.getString('color') || DEFAULT_COLOR);
 
-		if (footer) {
-			embed.setFooter({ text: footer });
-		}
+		const footer = options.getString('footer');
+		if (footer) embed.setFooter({ text: footer });
 
+		const thumbnail = options.getString('thumbnail');
 		if (thumbnail) {
-			embed.setThumbnail(thumbnail);
+			try {
+				embed.setThumbnail(thumbnail);
+			} catch (error) {
+				console.error('Error setting thumbnail:', error);
+			}
 		}
 
-		if (author) {
-			embed.setAuthor({ name: author });
-		}
+		const author = options.getString('author');
+		if (author) embed.setAuthor({ name: author });
 
+		const image = options.getString('image');
 		if (image) {
-			embed.setImage(image);
+			try {
+				embed.setImage(image);
+			} catch (error) {
+				console.error('Error setting image:', error);
+			}
 		}
 
-		if (timestamp) {
-			embed.setTimestamp();
-		}
+		if (options.getBoolean('timestamp')) embed.setTimestamp();
 
 		await interaction.editReply({ embeds: [embed] });
 	},
