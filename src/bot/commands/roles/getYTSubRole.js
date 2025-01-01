@@ -9,161 +9,104 @@ const youtube = google.youtube({
 	auth: process.env.YOUTUBE_API_KEY,
 });
 
-const algorithm = 'aes-256-cbc';
+const ALGORITHM = 'aes-256-cbc';
 
 function encrypt(text, secretKey, iv) {
-	const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
+	const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(secretKey), iv);
 	let encrypted = cipher.update(text);
 	encrypted = Buffer.concat([encrypted, cipher.final()]);
-	return (
-		iv.toString('hex') +
-		':' +
-		encrypted.toString('hex') +
-		':' +
-		secretKey.toString('hex')
-	);
+	return `${iv.toString('hex')}:${encrypted.toString('hex')}:${secretKey.toString('hex')}`;
 }
 
 module.exports = {
-	description_full:
-		'Verify your YouTube channel using Discord OAuth2, fetch your subscriber count, and automatically assign a role based on your subscriber count. If the user has multiple channels, the role will be assigned to the channel with the highest subscriber count.',
+	data: new SlashCommandBuilder()
+		.setName('get_yt_sub_role')
+		.setDescription('Assign a role based on your YouTube subscriber count.'),
+	description_full: 'Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.',
 	usage: '/get_yt_sub_role',
 	examples: ['/get_yt_sub_role'],
 	category: 'roles',
-	data: new SlashCommandBuilder()
-		.setName('get_yt_sub_role')
-		.setDescription(
-			'Automatically assign a role based on your channel with the highest subscriber count.',
-		),
 
 	async execute(interaction) {
 		try {
-			const interactionId = interaction.id;
-			const guildId = interaction.guild.id;
-			const channelId = interaction.channel.id;
-			const state = JSON.stringify({ interactionId, guildId, channelId });
+			await interaction.deferReply({ ephemeral: true });
 
-			// Generate a random encryption key and IV
+			const state = JSON.stringify({
+				interactionId: interaction.id,
+				guildId: interaction.guild.id,
+				channelId: interaction.channel.id,
+			});
+
 			const secretKey = crypto.randomBytes(32);
 			const iv = crypto.randomBytes(16);
 			const encryptedState = encrypt(state, secretKey, iv);
 			const discordOAuthUrl = generateDiscordOAuthUrl(encryptedState);
 
-			const embed = createEmbed(
-				'🎥 YouTube Subscriber Role Verification',
-				"Let's get you verified and assign you a special role based on your YouTube subscriber count!",
-				[
-					{
-						name: '📋 What to do:',
-						value: '1. Click the link below\n2. Authorize the app\n3. Connect your YouTube account\n4. Wait for confirmation',
-						inline: false,
-					},
-					{
-						name: '🔗 Authorization Link',
-						value: `[Click here to start the verification process](${discordOAuthUrl})`,
-						inline: false,
-					},
-				],
-				'This process is safe and secure. We only access your public YouTube data.',
-			);
-
 			await interaction.editReply({
-				embeds: [embed],
-				ephemeral: true,
+				embeds: [
+					createEmbed(
+						'🎥 YouTube Verification',
+						'Authorize your YouTube account to get a role based on your subscriber count.',
+						[
+							{
+								name: 'Steps',
+								value: '1. Click the link below\n2. Authorize the app\n3. Wait for confirmation',
+								inline: false,
+							},
+							{
+								name: '🔗 Authorization Link',
+								value: `[Click here](${discordOAuthUrl})`,
+								inline: false,
+							},
+						],
+						'Secure verification process.',
+					)
+				],
 			});
 
-			const oauthData =
-				await getAuthorizationDataFromMongoDB(interactionId);
-			if (
-				!oauthData.youtubeConnections ||
-				oauthData.youtubeConnections.length === 0
-			) {
-				const errorEmbed = createEmbed(
-					'❌ No YouTube Connections Found',
-					"We couldn't find any YouTube connections associated with your account.",
-					[
-						{
-							name: '🔄 What to do next',
-							value: 'Please make sure you have connected your YouTube account to Discord and try again.',
-							inline: false,
-						},
-					],
-					'If the problem persists, please contact a server administrator.',
-					0xff0000,
-				);
-
-				await interaction.followUp({
-					embeds: [errorEmbed],
-					ephemeral: true,
-				});
-				return;
+			const oauthData = await getAuthorizationDataFromMongoDB(interaction.id);
+			if (!oauthData?.youtubeConnections?.length) {
+				throw new Error('No YouTube connections found.');
 			}
 
-			const highestSubscriberData = await getHighestSubscriberCount(
-				oauthData.youtubeConnections,
-			);
-			const { youtubeChannelId, subscriberCount } = highestSubscriberData;
-
-			if (subscriberCount !== null) {
-				const assignedRole = await assignSubscriberRole(
-					interaction.member,
-					subscriberCount,
-				);
-				const youtubeUrl = `https://www.youtube.com/channel/${youtubeChannelId}`;
-				const successEmbed = createEmbed(
-					'🎉 YouTube Channel Verified Successfully! 🎉',
-					"Great news! We've successfully verified your YouTube channel. Here's what you need to know:",
-					[
-						{
-							name: '🏆 Your New Role',
-							value: `You've been awarded the **${assignedRole}** role!`,
-							inline: false,
-						},
-						{
-							name: '👥 Your Subscriber Count',
-							value: `You have an impressive **${subscriberCount.toLocaleString()}** subscribers!`,
-							inline: false,
-						},
-						{
-							name: '🔗 Your Channel',
-							value: `[Click here to visit your channel](${youtubeUrl})`,
-							inline: false,
-						},
-					],
-					'Thank you for verifying your YouTube channel with us!',
-				);
-
-				await interaction.editReply({
-					embeds: [successEmbed],
-					ephemeral: true,
-				});
-			} else {
-				throw new Error('Failed to retrieve YouTube subscriber count.');
+			const { youtubeChannelId, subscriberCount } = await getHighestSubscriberCount(oauthData.youtubeConnections);
+			if (subscriberCount === null) {
+				throw new Error('Failed to retrieve subscriber count.');
 			}
-		} catch (error) {
-			console.log(error);
-			const errorEmbed = createEmbed(
-				'❌ Oops! Something went wrong',
-				'We encountered an error while processing your request.',
-				[
-					{
-						name: '📝 Error Details',
-						value: error.message,
-						inline: false,
-					},
-					{
-						name: '🔄 What to do next',
-						value: 'Please try again later or contact a server administrator if the problem persists.',
-						inline: false,
-					},
-				],
-				'We apologize for the inconvenience.',
-				0xff0000,
-			);
 
+			const roleName = await assignSubscriberRole(interaction.member, subscriberCount);
 			await interaction.editReply({
-				embeds: [errorEmbed],
-				ephemeral: true,
+				embeds: [
+					createEmbed(
+						'🎉 Verification Complete!',
+						'You have been successfully verified and assigned a role.',
+						[
+							{
+								name: '🏆 Role Assigned',
+								value: roleName,
+								inline: false,
+							},
+							{
+								name: '👥 Subscriber Count',
+								value: subscriberCount.toLocaleString(),
+								inline: false,
+							},
+							{
+								name: '🔗 YouTube Channel',
+								value: `[View Channel](https://www.youtube.com/channel/${youtubeChannelId})`,
+								inline: false,
+							}
+						],
+						'Thank you for verifying!',
+					)
+				],
+			});
+		} catch (error) {
+			console.error(error);
+			await interaction.editReply({
+				embeds: [
+					createEmbed('❌ Error', error.message, [], 'Please try again later.', 0xff0000),
+				],
 			});
 		}
 	},
@@ -173,77 +116,49 @@ function generateDiscordOAuthUrl(state) {
 	return `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${encodeURIComponent(state)}`;
 }
 
-function createEmbed(title, description, fields, footerText, color = 0x0099ff) {
+function createEmbed(title, description, fields = [], footerText, color = 0x0099ff) {
 	return {
 		color,
 		title,
 		description,
 		fields,
-		footer: {
-			text: footerText,
-		},
+		footer: { text: footerText },
 		timestamp: new Date(),
 	};
 }
 
 async function getAuthorizationDataFromMongoDB(interactionId) {
-	const fetchTimeout = 60000; // 60 seconds timeout
-	const pollingInterval = 3000; // Poll every 3 seconds
+	const timeout = 60000;
+	const pollingInterval = 1000;
+	let elapsed = 0;
 
-	let elapsedTime = 0;
-	while (elapsedTime < fetchTimeout) {
+	while (elapsed < timeout) {
 		const oauthRecord = await OAuthCode.findOne({ interactionId });
-
-		if (oauthRecord) {
-			return {
-				code: oauthRecord.code,
-				youtubeConnections: oauthRecord.youtubeConnections || [],
-			};
-		}
-
-		await new Promise((resolve) => setTimeout(resolve, pollingInterval));
-		elapsedTime += pollingInterval;
+		if (oauthRecord) return oauthRecord;
+		await new Promise((res) => setTimeout(res, pollingInterval));
+		elapsed += pollingInterval;
 	}
-
-	throw new Error('Timeout waiting for authorization.');
+	throw new Error('Authorization timeout.');
 }
 
 async function getHighestSubscriberCount(youtubeConnections) {
-	let highestSubscriberData = {
-		youtubeChannelId: null,
-		subscriberCount: 0,
-	};
-
+	let highest = { youtubeChannelId: null, subscriberCount: 0 };
 	for (const connection of youtubeConnections) {
-		const subscriberCount = await getYouTubeSubscriberCount(connection.id);
-		if (subscriberCount > highestSubscriberData.subscriberCount) {
-			highestSubscriberData = {
-				youtubeChannelId: connection.id,
-				subscriberCount,
-			};
+		const count = await getYouTubeSubscriberCount(connection.id);
+		if (count > highest.subscriberCount) {
+			highest = { youtubeChannelId: connection.id, subscriberCount: count };
 		}
 	}
-
-	return highestSubscriberData;
+	return highest;
 }
 
-async function getYouTubeSubscriberCount(youtubeChannelId) {
-	try {
-		const response = await youtube.channels.list({
-			part: 'statistics',
-			id: youtubeChannelId,
-		});
-
-		const channelData = response.data.items[0];
-		return parseInt(channelData.statistics.subscriberCount, 10);
-	} catch (error) {
-		console.error('YouTube API error:', error.message);
-		return null;
-	}
+async function getYouTubeSubscriberCount(channelId) {
+	const response = await youtube.channels.list({ part: 'statistics', id: channelId });
+	return parseInt(response.data.items[0]?.statistics?.subscriberCount || 0, 10);
 }
 
 async function assignSubscriberRole(member, subscriberCount) {
-	const roleRanges = [
+	const ranges = [
 		{ max: 100, name: 'Less than 100 Subs' },
 		{ max: 500, name: '100 - 499 Subs' },
 		{ max: 1000, name: '500 - 999 Subs' },
@@ -255,26 +170,9 @@ async function assignSubscriberRole(member, subscriberCount) {
 		{ max: 1000000, name: '500K - 999.9K Subs' },
 		{ max: Infinity, name: '1M+ Subs' },
 	];
-
-	const roleName = roleRanges.find(
-		(range) => subscriberCount < range.max,
-	).name;
-
-	try {
-		const subscriberRoleData = await RoleSchema.find({ roleName });
-		if (!subscriberRoleData) {
-			throw new Error(`Role "${roleName}" not found in the database.`);
-		}
-
-		const role = member.guild.roles.cache.get(subscriberRoleData.roleID);
-		if (!role) {
-			throw new Error(`Role "${roleName}" not found in the guild.`);
-		}
-
-		await member.roles.add(role);
-		return roleName;
-	} catch (error) {
-		console.error('Failed to assign role:', error.message);
-		throw new Error(`Failed to assign subscriber role: ${error.message}`);
-	}
+	const roleName = ranges.find(range => subscriberCount < range.max).name;
+	const roleData = await RoleSchema.findOne({ roleName });
+	if (!roleData) throw new Error(`Role "${roleName}" not found.`);
+	await member.roles.add(roleData.roleID);
+	return roleName;
 }
