@@ -16,34 +16,25 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		if (!interaction.isCommand()) return;
-
-		const command = interaction.client.commands.get(
-			interaction.commandName,
-		);
+		const { client, commandName } = interaction;
+		const command = client.commands.get(commandName);
 
 		if (!command) {
-			console.error(
-				`No command matching ${interaction.commandName} was found.`,
-			);
+			console.error(`No command matching ${commandName} was found.`);
 			return;
 		}
 
 		try {
-			// Special handling for 'get_yt_sub_role' command
-			if (
-				interaction.commandName === 'bot_info'
-			) {
+			if (commandName === 'bot_info') {
 				await command.execute(interaction);
 				return;
 			}
-
 			// Defer reply to ensure response time is handled within the 3-second window
 			await interaction.deferReply();
-
 			// Execute the command
 			await command.execute(interaction);
 		} catch (error) {
-			console.error(`Error executing ${interaction.commandName}`);
+			console.error(`Error executing ${commandName}`);
 			await handleError(interaction, error);
 		}
 	},

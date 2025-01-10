@@ -36,9 +36,14 @@ async function sendBotInfo(sent, interaction) {
 
 		const systemSpecs = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommand Count: ${interaction.client.commands.size}\nCommand Type: Slash Commands\nMemory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB\n\`\`\``;
 
-		const embed = new EmbedBuilder()
-			.setTitle('🤖 Bot Information')
-			.setURL(process.env.DISCORD_INVITE)
+		const inviteLink = process.env.DISCORD_INVITE;
+		const embed = new EmbedBuilder().setTitle('🤖 Bot Information');
+
+		if (inviteLink && inviteLink.startsWith('https://')) {
+			embed.setURL(inviteLink);
+		}
+
+		embed
 			.setColor('#8A2BE2')
 			.setDescription(description)
 			.addFields(
@@ -60,10 +65,10 @@ async function sendBotInfo(sent, interaction) {
 			})
 			.setTimestamp();
 
-		await interaction.editReply({ content: ' ', embeds: [embed] });
+		return interaction.editReply({ content: ' ', embeds: [embed], ephemeral: true });
 	} catch (error) {
 		console.error('Error retrieving bot information:', error);
-		await handleError(interaction, error);
+		return handleError(interaction, error);
 	}
 }
 
