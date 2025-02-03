@@ -34,10 +34,10 @@ module.exports = {
 				{ upsert: true, new: true },
 			);
 
-			await interaction.editReply(`Ticket category set to: ${category}`);
+			await interaction.reply(`Ticket category set to: ${category}`);
 		} catch (error) {
 			console.error('Error updating ticket category:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'An error occurred while setting the ticket category.',
 			);
 		}

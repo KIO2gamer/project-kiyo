@@ -68,7 +68,7 @@ module.exports = {
 					iconURL: interaction.user.displayAvatarURL(),
 				});
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error fetching server status:', error);
 			await handleError(interaction, error);

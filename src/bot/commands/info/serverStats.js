@@ -37,10 +37,10 @@ module.exports = {
 		try {
 			const stats = await collectServerStats(guild, startDate);
 			const embed = createStatsEmbed(guild, timeframe, stats);
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error executing server_stats:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'An error occurred while fetching server stats.',
 			);
 		}

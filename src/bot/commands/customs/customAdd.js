@@ -53,7 +53,7 @@ module.exports = {
 
 			await customCommand.save();
 
-			await interaction.editReply({
+			await interaction.reply({
 				content: `Custom command "${name}" added successfully!`,
 				ephemeral: true,
 			});

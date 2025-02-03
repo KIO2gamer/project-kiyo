@@ -43,7 +43,7 @@ module.exports = {
 				.setDescription(
 					'I do not have the required permissions to unlock the channel.',
 				);
-			await interaction.editReply({ embeds: [noPermissionEmbed] });
+			await interaction.reply({ embeds: [noPermissionEmbed] });
 			return;
 		}
 
@@ -66,7 +66,7 @@ module.exports = {
 				.get(interaction.guild.id)
 				?.deny.has(PermissionFlagsBits.SendMessages)
 		) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [errorEmbed],
 			});
 			return;
@@ -79,11 +79,11 @@ module.exports = {
 			});
 
 			if (channel === interaction.channel) {
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [embed],
 				});
 			} else {
-				await interaction.editReply({
+				await interaction.reply({
 					content: '**Unlocked Successfully**',
 				});
 				await channel.send({

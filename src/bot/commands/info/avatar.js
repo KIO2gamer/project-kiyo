@@ -54,7 +54,7 @@ module.exports = {
 	 * @param {Function} interaction.options.getInteger - Function to get an integer from the options.
 	 * @param {Function} interaction.options.getString - Function to get a string from the options.
 	 * @param {Object} interaction.user - The user who initiated the interaction.
-	 * @param {Function} interaction.editReply - Function to send a reply to the interaction.
+	 * @param {Function} interaction.reply - Function to send a reply to the interaction.
 	 *
 	 * @returns {Promise<void>} - A promise that resolves when the reply is sent.
 	 */
@@ -88,6 +88,6 @@ module.exports = {
 				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 			});
 
-		await interaction.editReply({ embeds: [embed] });
+		await interaction.reply({ embeds: [embed] });
 	},
 };

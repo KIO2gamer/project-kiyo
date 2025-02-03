@@ -31,7 +31,7 @@ module.exports = {
 				{ channelId: channel.id },
 				{ upsert: true, new: true },
 			);
-			await interaction.editReply(
+			await interaction.reply(
 				`AI chat channel has been set to ${channel}`,
 			);
 		} catch (error) {

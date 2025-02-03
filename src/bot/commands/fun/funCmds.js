@@ -161,7 +161,7 @@ module.exports = {
 				await handleDoNotTouch(interaction);
 				break;
 			default:
-				await interaction.editReply('Unknown subcommand.');
+				await interaction.reply('Unknown subcommand.');
 				break;
 		}
 	},
@@ -180,15 +180,15 @@ async function handleGifCommand(interaction, query, title) {
 
 			const embed = new EmbedBuilder().setTitle(title).setImage(gifUrl);
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} else {
-			await interaction.editReply(
+			await interaction.reply(
 				`Sorry, I could not find a ${query} GIF.`,
 			);
 		}
 	} catch (error) {
 		console.error(`Error fetching ${query} GIF:`, error);
-		await interaction.editReply(
+		await interaction.reply(
 			`There was an error trying to fetch a ${query} GIF.`,
 		);
 	}
@@ -199,7 +199,7 @@ async function handleSummon(interaction) {
 	const userId = userOption.id;
 
 	if (!userOption) {
-		return interaction.editReply('You need to mention a user to summon!');
+		return interaction.reply('You need to mention a user to summon!');
 	}
 
 	const embed = new EmbedBuilder()
@@ -219,7 +219,7 @@ async function handleSummon(interaction) {
 		await interaction.channel.send({ embeds: [embed] });
 	} catch (error) {
 		console.error('Error executing summon command:', error);
-		interaction.editReply(
+		interaction.reply(
 			'There was an error while executing this command.',
 		);
 	}
@@ -250,7 +250,7 @@ async function handleKill(interaction) {
 		})
 		.setTimestamp();
 
-	await interaction.editReply({ embeds: [embed] });
+	await interaction.reply({ embeds: [embed] });
 }
 
 async function handleDoNotTouch(interaction) {
@@ -265,7 +265,7 @@ async function handleDoNotTouch(interaction) {
 			.setStyle(ButtonStyle.Danger),
 	);
 
-	await interaction.editReply({
+	await interaction.reply({
 		content:
 			'ALERT: Unauthorized system override detected. Your device and account have been flagged for immediate termination. Proceed with caution. /j',
 		components: [row],
@@ -295,7 +295,7 @@ async function handleDoNotTouch(interaction) {
 
 	collector.on('end', (collected) => {
 		if (!collected.size) {
-			interaction.editReply({
+			interaction.reply({
 				content:
 					'ALERT: Override timeout detected. Initiating emergency shutdown. All systems will be locked for security audit. /j',
 				components: [],

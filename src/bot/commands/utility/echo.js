@@ -50,7 +50,7 @@ module.exports = {
 				.permissionsFor(interaction.guild.members.me)
 				.has(PermissionFlagsBits.SendMessages)
 		) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: `I don't have permission to send messages in ${channel}.`,
 				ephemeral: true,
 			});
@@ -71,7 +71,7 @@ module.exports = {
 				);
 			}
 
-			await interaction.editReply({
+			await interaction.reply({
 				content: `Message echoed successfully in ${channel}.`,
 				ephemeral: true,
 			});
@@ -79,7 +79,7 @@ module.exports = {
 			handleError(
 				interaction,
 				error,
-				await interaction.editReply({
+				await interaction.reply({
 					content:
 						'There was an error trying to execute that command.',
 					ephemeral: true,

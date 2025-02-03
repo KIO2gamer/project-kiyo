@@ -78,6 +78,6 @@ module.exports = {
 			)
 			.setFooter({ text: 'As Sheldon Cooper would say, "Bazinga!"' });
 
-		await interaction.editReply({ embeds: [embed] });
+		await interaction.reply({ embeds: [embed] });
 	},
 };

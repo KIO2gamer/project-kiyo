@@ -47,7 +47,7 @@ module.exports = {
 				.setDescription(
 					'I do not have the required permissions to lock the channel.',
 				);
-			await interaction.editReply({ embeds: [noPermissionEmbed] });
+			await interaction.reply({ embeds: [noPermissionEmbed] });
 			return;
 		}
 
@@ -61,7 +61,7 @@ module.exports = {
 				.setTitle('ERROR')
 				.setColor('Red')
 				.setDescription(`${channel} is already locked.`);
-			await interaction.editReply({ embeds: [alreadyLockedEmbed] });
+			await interaction.reply({ embeds: [alreadyLockedEmbed] });
 			return;
 		}
 
@@ -81,11 +81,11 @@ module.exports = {
 				.setTimestamp();
 
 			if (channel === interaction.channel) {
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [lockEmbed],
 				});
 			} else {
-				await interaction.editReply({
+				await interaction.reply({
 					content: '**Locked Successfully**',
 				});
 				await channel.send({

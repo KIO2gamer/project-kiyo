@@ -24,7 +24,7 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(user.id);
 		// Early return if member is not found (e.g., left the server)
 		if (!member) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: 'That user is not a member of this server.',
 				ephemeral: true,
 			});
@@ -81,12 +81,12 @@ module.exports = {
 				value:
 					member.roles.cache.size > 1 // Show roles only if there's more than @everyone
 						? member.roles.cache
-								.filter(
-									(role) => role.id !== interaction.guild.id,
-								)
-								.sort((a, b) => b.position - a.position)
-								.map((role) => role.toString())
-								.join(', ')
+							.filter(
+								(role) => role.id !== interaction.guild.id,
+							)
+							.sort((a, b) => b.position - a.position)
+							.map((role) => role.toString())
+							.join(', ')
 						: 'None',
 			},
 			{
@@ -125,6 +125,6 @@ module.exports = {
 			.setColor(member.displayHexColor) // Use member's display color
 			.addFields(fields);
 
-		await interaction.editReply({ embeds: [user_InfoEmbed] });
+		await interaction.reply({ embeds: [user_InfoEmbed] });
 	},
 };

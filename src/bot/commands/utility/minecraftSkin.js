@@ -28,7 +28,7 @@ module.exports = {
 		// Check Cache
 		const cachedData = cache.get(username);
 		if (cachedData) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [cachedData],
 				ephemeral: true,
 			});
@@ -38,14 +38,14 @@ module.exports = {
 		try {
 			const playerData = await fetchPlayerData(username);
 			if (!playerData) {
-				await interaction.editReply('Player not found on Ashcon API.');
+				await interaction.reply('Player not found on Ashcon API.');
 				return;
 			}
 
 			const infoEmbed = createInfoEmbed(playerData);
 			cache.set(username, infoEmbed);
 
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [infoEmbed],
 				ephemeral: true,
 			});

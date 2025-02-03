@@ -28,7 +28,7 @@ module.exports = {
 			const customCommands = await cc.find({}).sort({ name: 1 });
 
 			if (customCommands.length === 0) {
-				await interaction.editReply('There are no custom commands.');
+				await interaction.reply('There are no custom commands.');
 				return;
 			}
 
@@ -74,7 +74,7 @@ module.exports = {
 					.setDisabled(pages === 1),
 			);
 
-			const initialMessage = await interaction.editReply({
+			const initialMessage = await interaction.reply({
 				embeds: [generateEmbed(0)],
 				components: [row],
 				fetchReply: true,

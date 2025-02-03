@@ -66,7 +66,7 @@ module.exports = {
 				)
 			)
 		) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: 'You do not have permission to use this command.',
 				ephemeral: true,
 			});
@@ -82,9 +82,9 @@ module.exports = {
 			if (typeof result !== 'string') {
 				output = require('util').inspect(result);
 			}
-			await interaction.editReply(`\`\`\`js\n${output}\n\`\`\``);
+			await interaction.reply(`\`\`\`js\n${output}\n\`\`\``);
 		} catch (error) {
-			await interaction.editReply(`\`\`\`js\n${error}\n\`\`\``);
+			await interaction.reply(`\`\`\`js\n${error}\n\`\`\``);
 		}
 	},
 };

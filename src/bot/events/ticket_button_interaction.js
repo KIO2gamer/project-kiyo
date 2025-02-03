@@ -27,7 +27,7 @@ module.exports = {
 
 				// Check if the category ID is set
 				if (!ticketCategoryId) {
-					return interaction.editReply({
+					return interaction.reply({
 						content:
 							'A ticket category has not been set yet. Please use the `/set_ticket_category` command to set one.',
 					});
@@ -40,7 +40,7 @@ module.exports = {
 				);
 
 				if (existingChannel) {
-					return interaction.editReply({
+					return interaction.reply({
 						content: `You already have an open ticket: <#${existingChannel.id}>.`,
 					});
 				}
@@ -87,12 +87,12 @@ module.exports = {
 				await ticketChannel.send({ embeds: [embed] });
 
 				// Send a confirmation to the user
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Your ticket has been created: <#${ticketChannel.id}>.`,
 				});
 			} catch (error) {
 				console.error('Error creating ticket channel:', error);
-				await interaction.editReply({
+				await interaction.reply({
 					content:
 						'There was an error creating your ticket. Please try again later.',
 				});

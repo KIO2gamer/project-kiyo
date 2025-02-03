@@ -64,7 +64,7 @@ module.exports = {
 			interaction.options.getString('reason') ?? 'No reason provided';
 
 		if (!targetUser) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					createErrorEmbed('ERROR', 'User not found', interaction),
 				],
@@ -73,7 +73,7 @@ module.exports = {
 		}
 
 		if (targetUser.id === interaction.guild.ownerId) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					createErrorEmbed(
 						'ERROR',
@@ -87,7 +87,7 @@ module.exports = {
 
 		const roleError = checkRolePermissions(interaction, targetUser);
 		if (roleError) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [createErrorEmbed('ERROR', roleError, interaction)],
 			});
 			return;
@@ -103,7 +103,7 @@ module.exports = {
 
 			await logEntry.save();
 
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('WARNED!!!')
@@ -122,7 +122,7 @@ module.exports = {
 				'An error occurred while trying to warn the user:',
 				error,
 			);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					createErrorEmbed(
 						'ERROR',

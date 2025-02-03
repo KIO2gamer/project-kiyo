@@ -108,7 +108,7 @@ async function sendServerInfo(interaction) {
 				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 			});
 
-		await interaction.editReply({ embeds: [serverInfoEmbed] });
+		await interaction.reply({ embeds: [serverInfoEmbed] });
 	} catch (error) {
 		console.error('Error fetching server information:', error);
 		await handleError(interaction, error);

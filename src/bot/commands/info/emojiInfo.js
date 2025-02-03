@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { EmbedBuilder } = require('discord.js');
+const { handleError } = require('../../utils/errorHandler.js');
 
 module.exports = {
 	description_full:
@@ -20,46 +21,51 @@ module.exports = {
 		),
 	async execute(interaction) {
 		const emojiName = interaction.options.getString('emoji');
+		try {
+			if (!emojiName) {
+				const allEmojis = interaction.guild.emojis.cache
+					.map((emoji) => `${emoji} - \`<:${emoji.name}:${emoji.id}>\``)
+					.join('\n');
+				const embed = new EmbedBuilder()
+					.setTitle(`All Emojis in ${interaction.guild.name}`)
+					.setDescription(allEmojis || 'No custom emojis in this server.')
+					.setColor('#00ff00');
 
-		if (!emojiName) {
-			const allEmojis = interaction.guild.emojis.cache
-				.map((emoji) => `${emoji} - \`<:${emoji.name}:${emoji.id}>\``)
-				.join('\n');
-			const embed = new EmbedBuilder()
-				.setTitle(`All Emojis in ${interaction.guild.name}`)
-				.setDescription(allEmojis || 'No custom emojis in this server.')
-				.setColor('#00ff00');
+				return interaction.reply({ embeds: [embed], split: true });
+			}
 
-			return interaction.editReply({ embeds: [embed], split: true });
-		}
-
-		const emoji = interaction.guild.emojis.cache.find(
-			(e) => e.name === emojiName,
-		);
-
-		if (!emoji) {
-			return interaction.editReply('Emoji not found.');
-		}
-
-		const embed = new EmbedBuilder()
-			.setTitle('Emoji Info')
-			.setThumbnail(emoji.imageURL())
-			.addFields(
-				{ name: 'Emoji Name', value: emoji.name, inline: true },
-				{ name: 'Emoji ID', value: emoji.id, inline: true },
-				{ name: 'Emoji URL', value: emoji.imageURL(), inline: true },
-				{
-					name: 'Emoji Created At',
-					value: emoji.createdAt.toDateString(),
-					inline: true,
-				},
-				{
-					name: 'Emoji Animated',
-					value: emoji.animated ? 'Yes' : 'No',
-					inline: true,
-				},
+			const emoji = interaction.guild.emojis.cache.find(
+				(e) => e.name === emojiName,
 			);
 
-		await interaction.editReply({ embeds: [embed] });
+			if (!emoji) {
+				return interaction.reply('Emoji not found.');
+			}
+
+			const embed = new EmbedBuilder()
+				.setTitle('Emoji Info')
+				.setThumbnail(emoji.imageURL())
+				.addFields(
+					{ name: 'Emoji Name', value: emoji.name, inline: true },
+					{ name: 'Emoji ID', value: emoji.id, inline: true },
+					{ name: 'Emoji URL', value: emoji.imageURL(), inline: true },
+					{
+						name: 'Emoji Created At',
+						value: emoji.createdAt.toDateString(),
+						inline: true,
+					},
+					{
+						name: 'Emoji Animated',
+						value: emoji.animated ? 'Yes' : 'No',
+						inline: true,
+					},
+				);
+
+			await interaction.reply({ embeds: [embed] });
+		}
+		catch (error) {
+			console.error('❌ Failed to execute command:', error);
+			await handleError(interaction, error);
+		}
 	},
 };

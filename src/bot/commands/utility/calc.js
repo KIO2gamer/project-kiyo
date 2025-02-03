@@ -52,10 +52,10 @@ module.exports = {
 				)
 				.setTimestamp();
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error calculating expression:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				content:
 					'Invalid mathematical expression. Please check your input.',
 				ephemeral: true,

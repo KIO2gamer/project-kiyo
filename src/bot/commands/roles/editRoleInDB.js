@@ -43,7 +43,7 @@ module.exports = {
 			// Check if role exists in the database
 			const existingRole = await Role.findOne({ roleID: role.id });
 			if (!existingRole) {
-				return interaction.editReply(
+				return interaction.reply(
 					`The role "${role.name}" was not found in the database!`,
 				);
 			}
@@ -58,7 +58,7 @@ module.exports = {
 
 			await existingRole.save();
 
-			await interaction.editReply(
+			await interaction.reply(
 				`Role "${role.name}" has been updated in the database!`,
 			);
 		} catch (error) {

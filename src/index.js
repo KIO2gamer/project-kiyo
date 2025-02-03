@@ -9,7 +9,7 @@ const {
 } = process.env;
 
 // Constants
-const GUILD_IDS = DISCORD_GUILD_IDS.split(',').filter(Boolean);
+const GUILD_IDS = (DISCORD_GUILD_IDS || '').split(',').filter(Boolean);
 
 const fs = require('fs');
 const path = require('path');
@@ -124,7 +124,7 @@ const connectToMongoDB = async () => {
 	Logger.log('DATABASE', 'Establishing database connection', 'info');
 	try {
 		mongoose.set('strictQuery', false);
-		await mongoose.connect(MONGODB_URI);
+		await mongoose.connect(MONGODB_URI).catch(err => console.error('❌ MongoDB Connection Error:', err));
 		Logger.log('DATABASE', 'Database connection established', 'success');
 	} catch (error) {
 		Logger.log('DATABASE', `Database connection failed: ${error.message}`, 'error');
@@ -203,3 +203,13 @@ process.on('SIGINT', async () => {
 });
 
 initializeBot();
+
+// Global Error Handling
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('❌ Unhandled Promise Rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+	console.error('❌ Uncaught Exception:', error);
+});
+

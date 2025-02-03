@@ -45,7 +45,7 @@ module.exports = {
 		const durationMs = ms(duration);
 
 		if (!targetUser) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -61,7 +61,7 @@ module.exports = {
 		}
 
 		if (targetUser.id === interaction.guild.ownerId) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -85,7 +85,7 @@ module.exports = {
 			interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -103,7 +103,7 @@ module.exports = {
 		}
 
 		if (targetUserRolePosition >= botRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -121,7 +121,7 @@ module.exports = {
 		}
 
 		if (!durationMs || durationMs > ms('28d')) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -142,15 +142,15 @@ module.exports = {
 			const currentTime = Date.now();
 			const newTimeoutDuration =
 				targetUser.communicationDisabledUntilTimestamp &&
-				targetUser.communicationDisabledUntilTimestamp > currentTime
+					targetUser.communicationDisabledUntilTimestamp > currentTime
 					? targetUser.communicationDisabledUntilTimestamp -
-						currentTime +
-						durationMs
+					currentTime +
+					durationMs
 					: durationMs;
 
 			if (newTimeoutDuration <= 0) {
 				await targetUser.timeout(null, reason); // Remove timeout if the new duration is less than or equal to zero
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
 							.setTitle('Timeout Removed')
@@ -165,7 +165,7 @@ module.exports = {
 					],
 				});
 			} else if (newTimeoutDuration > ms('28d')) {
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
 							.setTitle('ERROR')
@@ -191,7 +191,7 @@ module.exports = {
 				await logEntry.save();
 
 				await targetUser.timeout(newTimeoutDuration, reason);
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
 							.setTitle('Timeout Updated')
@@ -208,7 +208,7 @@ module.exports = {
 			}
 		} catch (error) {
 			console.error('Failed to timeout user:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')

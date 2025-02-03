@@ -57,10 +57,10 @@ module.exports = {
 					mentionable !== undefined ? mentionable : role.mentionable,
 			});
 
-			return interaction.editReply(`Role ${role} updated successfully!`);
+			return interaction.reply(`Role ${role} updated successfully!`);
 		} catch (error) {
 			console.error('Error editing role:', error);
-			return interaction.editReply(
+			return interaction.reply(
 				'An error occurred while updating the role.',
 			);
 		}

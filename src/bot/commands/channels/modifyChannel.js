@@ -211,7 +211,7 @@ module.exports = {
 				PermissionsBitField.Flags.ManageChannels,
 			)
 		) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: 'I do not have permission to manage channels.',
 				ephemeral: true,
 			});
@@ -222,14 +222,14 @@ module.exports = {
 				PermissionsBitField.Flags.ManageChannels,
 			)
 		) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: 'You do not have permission to manage channels.',
 				ephemeral: true,
 			});
 		}
 
 		if (!newChannelName && !permissionChoice) {
-			return interaction.editReply({
+			return interaction.reply({
 				content:
 					"Please specify what you'd like to modify (channel name or permissions).",
 				ephemeral: true,
@@ -315,7 +315,7 @@ module.exports = {
 					);
 
 				if (!channelUpdated) {
-					return interaction.editReply({
+					return interaction.reply({
 						content: channelResponse,
 						ephemeral: true,
 					});
@@ -326,7 +326,7 @@ module.exports = {
 			}
 
 			if (updated) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: response.slice(0, -2),
 					ephemeral: true,
 				});

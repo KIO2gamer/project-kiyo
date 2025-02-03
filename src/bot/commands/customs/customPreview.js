@@ -24,7 +24,7 @@ module.exports = {
 	 * @param {Object} interaction - The interaction object from Discord.
 	 * @param {Object} interaction.options - The options provided with the interaction.
 	 * @param {Function} interaction.options.getString - Function to get a string option by name.
-	 * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+	 * @param {Function} interaction.reply - Function to edit the reply to the interaction.
 	 * @returns {Promise<void>} - A promise that resolves when the interaction is handled.
 	 */
 	async execute(interaction) {
@@ -39,7 +39,7 @@ module.exports = {
 			}
 
 			if (!customCommand) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found.`,
 					ephemeral: true,
 				});
@@ -58,7 +58,7 @@ module.exports = {
 				)
 				.setTimestamp();
 
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [embed],
 				ephemeral: true,
 			});

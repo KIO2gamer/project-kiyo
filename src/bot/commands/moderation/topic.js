@@ -14,8 +14,8 @@ module.exports = {
 		.setDescription('Sends a message about changing the topic.')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers |
-				PermissionFlagsBits.KickMembers |
-				PermissionFlagsBits.ManageChannels,
+			PermissionFlagsBits.KickMembers |
+			PermissionFlagsBits.ManageChannels,
 		)
 		.addUserOption((option) =>
 			option
@@ -48,14 +48,14 @@ module.exports = {
 		if (user3) userMentions += `${user3}\n`;
 
 		if (!userMentions) {
-			return interaction.editReply({
+			return interaction.reply({
 				content:
 					'No users provided. Please specify at least one user to change the topic.',
 				ephemeral: true,
 			});
 		}
 
-		await interaction.editReply({
+		await interaction.reply({
 			content: 'Topic change message sent.',
 			ephemeral: true,
 		});

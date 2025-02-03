@@ -75,18 +75,17 @@ module.exports = {
 				.setTitle('Channel Created!')
 				.setColor('Green')
 				.setDescription(
-					`The ${getChannelType(newChannel)} channel <#${
-						newChannel.id
+					`The ${getChannelType(newChannel)} channel <#${newChannel.id
 					}> has been successfully created.`,
 				)
 				.setTimestamp();
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			handleError(
 				interaction,
 				error,
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'An error occurred while creating the channel.',
 					ephemeral: true,
 				}),

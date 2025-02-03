@@ -50,10 +50,10 @@ module.exports = {
 				})
 				.setTimestamp();
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error executing translate command:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'There was an error while executing this command. Please try again later.',
 			);
 		}

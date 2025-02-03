@@ -44,7 +44,7 @@ module.exports = {
 			);
 
 			if (!bannedUser) {
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
 							.setTitle('Error')
@@ -71,7 +71,7 @@ module.exports = {
 
 			await logEntry.save();
 
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('User Unbanned')
@@ -96,7 +96,7 @@ module.exports = {
 			});
 		} catch (error) {
 			console.error('Error unbanning user:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('Error')

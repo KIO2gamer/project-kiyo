@@ -23,7 +23,7 @@ module.exports = {
 	 * @param {Object} interaction - The interaction object from Discord.
 	 * @param {Object} interaction.options - The options provided with the interaction.
 	 * @param {Function} interaction.options.getString - Function to get a string option by name.
-	 * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+	 * @param {Function} interaction.reply - Function to edit the reply to the interaction.
 	 * @param {Function} interaction.awaitMessageComponent - Function to await a message component interaction.
 	 * @param {Object} interaction.user - The user who initiated the interaction.
 	 * @param {string} interaction.user.id - The ID of the user who initiated the interaction.
@@ -42,7 +42,7 @@ module.exports = {
 			}
 
 			if (!cc_record) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found!`,
 					ephemeral: true,
 				});
@@ -56,7 +56,7 @@ module.exports = {
 				? `The name you provided is an alias. The main command name is "${command_name}". Do you want to delete this command?`
 				: `Are you sure you want to delete the custom command "${command_name}"?`;
 
-			const confirmationResponse = await interaction.editReply({
+			const confirmationResponse = await interaction.reply({
 				content: confirmMessage,
 				ephemeral: true,
 				components: [
@@ -88,7 +88,7 @@ module.exports = {
 				.catch(() => null);
 
 			if (!confirmation) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'Command deletion timed out.',
 					components: [],
 				});
@@ -97,14 +97,13 @@ module.exports = {
 
 			if (confirmation.customId === 'delete_confirm') {
 				await cc.deleteOne({ _id: cc_record._id });
-				await interaction.editReply({
-					content: `Custom command "${command_name}"${
-						alias_name ? ` (alias: ${alias_name})` : ''
-					} deleted successfully!`,
+				await interaction.reply({
+					content: `Custom command "${command_name}"${alias_name ? ` (alias: ${alias_name})` : ''
+						} deleted successfully!`,
 					components: [],
 				});
 			} else {
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'Command deletion cancelled.',
 					components: [],
 				});

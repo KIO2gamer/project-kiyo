@@ -40,13 +40,13 @@ module.exports = {
 					accessToken,
 				);
 				const embed = this.createGameEmbed(game, interaction.user);
-				await interaction.editReply({ embeds: [embed] });
+				await interaction.reply({ embeds: [embed] });
 			} else {
-				await interaction.editReply('Game not found.');
+				await interaction.reply('Game not found.');
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.editReply('Error fetching game info.');
+			await interaction.reply('Error fetching game info.');
 		}
 	},
 
@@ -110,8 +110,8 @@ module.exports = {
 					name: 'Release Date',
 					value: game.first_release_date
 						? new Date(
-								game.first_release_date * 1000,
-							).toLocaleDateString()
+							game.first_release_date * 1000,
+						).toLocaleDateString()
 						: 'Unknown',
 					inline: true,
 				},

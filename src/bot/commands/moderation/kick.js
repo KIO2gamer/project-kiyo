@@ -36,7 +36,7 @@ module.exports = {
 			interaction.options.getString('reason') ?? 'No reason provided';
 
 		if (!targetUser) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -52,7 +52,7 @@ module.exports = {
 		}
 
 		if (targetUser.id === interaction.guild.ownerId) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -75,7 +75,7 @@ module.exports = {
 			interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -93,7 +93,7 @@ module.exports = {
 		}
 
 		if (targetUserRolePosition >= botRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -121,7 +121,7 @@ module.exports = {
 			await logEntry.save();
 
 			await targetUser.kick(reason);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('KICKED!!!')
@@ -136,13 +136,13 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
 						.setDescription(
 							error.message ??
-								'An error occurred while trying to kick the user',
+							'An error occurred while trying to kick the user',
 						)
 						.setColor('Red')
 						.setFooter({

@@ -25,7 +25,7 @@ module.exports = {
 		const channelId = await extractChannelId(channelInput);
 
 		if (!channelId) {
-			return interaction.editReply(
+			return interaction.reply(
 				'Invalid YouTube channel ID, URL, handle, or video URL. Please provide a valid input.',
 			);
 		}
@@ -38,7 +38,7 @@ module.exports = {
 
 			const channelData = await getChannelData(youtube, channelId);
 			if (!channelData) {
-				return interaction.editReply(
+				return interaction.reply(
 					'No channel found with the provided ID.',
 				);
 			}
@@ -49,10 +49,10 @@ module.exports = {
 			);
 
 			const embed = createEmbed(channelData, latestVideoData, channelId);
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			console.error('Error fetching YouTube stats:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'An error occurred while fetching YouTube statistics. Please try again later.',
 			);
 		}

@@ -30,7 +30,7 @@ module.exports = {
 		const logRange = interaction.options.getString('logrange');
 
 		if (!logNumber && !logRange) {
-			await interaction.editReply(
+			await interaction.reply(
 				'Please provide either a log number or a range of log numbers to delete.',
 			);
 			return;
@@ -43,11 +43,11 @@ module.exports = {
 				});
 
 				if (log) {
-					await interaction.editReply(
+					await interaction.reply(
 						`Successfully deleted log #${logNumber}.`,
 					);
 				} else {
-					await interaction.editReply(
+					await interaction.reply(
 						`No log found with log number ${logNumber}.`,
 					);
 				}
@@ -57,7 +57,7 @@ module.exports = {
 					.map((num) => parseInt(num.trim()));
 
 				if (isNaN(start) || isNaN(end)) {
-					await interaction.editReply(
+					await interaction.reply(
 						'Invalid log range. Please provide a valid range (e.g., 1-5).',
 					);
 					return;
@@ -68,18 +68,18 @@ module.exports = {
 				});
 
 				if (deletedLogs.deletedCount > 0) {
-					await interaction.editReply(
+					await interaction.reply(
 						`Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,
 					);
 				} else {
-					await interaction.editReply(
+					await interaction.reply(
 						`No logs found in the range #${start}-#${end}.`,
 					);
 				}
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.editReply(
+			await interaction.reply(
 				'Failed to delete the log(s). Please try again later.',
 			);
 		}

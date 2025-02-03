@@ -166,57 +166,158 @@ function generateHtmlResponse(
 	message,
 	additionalMessage,
 	buttonText = '',
-	buttonLink = '',
+	buttonLink = ''
 ) {
 	return `
-        <html>
-            <head>
-                <title>${title}</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                        background-color: #f4f4f4;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    .container {
-                        max-width: 600px;
-                        margin: 50px auto;
-                        background: white;
-                        padding: 20px;
-                        border-radius: 10px;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    }
-                    h1 {
-                        color: ${title === 'Success' ? '#4CAF50' : '#FF0000'};
-                    }
-                    p {
-                        font-size: 16px;
-                        color: #333;
-                    }
-                    .button {
-                        display: inline-block;
-                        margin-top: 20px;
-                        padding: 10px 20px;
-                        font-size: 16px;
-                        color: white;
-                        background-color: #7289DA;
-                        border: none;
-                        border-radius: 5px;
-                        text-decoration: none;
-                        cursor: pointer;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>${heading}</h1>
-                    <p>${message}</p>
-                    <p>${additionalMessage}</p>
-                    ${buttonText && buttonLink ? `<a class="button" href="${buttonLink}">${buttonText}</a>` : ''}
-                </div>
-            </body>
-        </html>
-    `;
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>${title}</title>
+			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+			<style>
+				* {
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+					font-family: 'Inter', sans-serif;
+				}
+
+				body {
+					background-color: #f8fafc;
+					min-height: 100vh;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					padding: 1rem;
+				}
+
+				.container {
+					max-width: 800px;
+					width: 100%;
+					background: white;
+					padding: 2.5rem;
+					border-radius: 12px;
+					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+					text-align: center;
+				}
+
+				.header {
+					margin-bottom: 2rem;
+				}
+
+				h1 {
+					font-size: 2rem;
+					font-weight: 600;
+					color: ${title === 'Success' ? '#16a34a' : '#dc2626'};
+					margin-bottom: 0.5rem;
+				}
+
+				.subtitle {
+					font-size: 1.125rem;
+					font-weight: 400;
+					color: #64748b;
+					margin-bottom: 2rem;
+				}
+
+				.content {
+					margin-bottom: 2rem;
+				}
+
+				.message {
+					font-size: 1.125rem;
+					color: #1e293b;
+					margin-bottom: 1rem;
+				}
+
+				.details {
+					font-size: 0.875rem;
+					color: #64748b;
+					margin-top: 1rem;
+					display: none;
+				}
+
+				.show-details {
+					color: #7289da;
+					font-size: 0.875rem;
+					cursor: pointer;
+					margin-top: 1rem;
+				}
+
+				.button {
+					display: inline-block;
+					padding: 0.75rem 1.5rem;
+					font-size: 1rem;
+					font-weight: 500;
+					color: white;
+					background-color: #7289da;
+					border: none;
+					border-radius: 6px;
+					text-decoration: none;
+					cursor: pointer;
+					transition: all 0.2s ease;
+					margin-top: 2rem;
+				}
+
+				.button:hover {
+					background-color: #6366f1;
+					transform: translateY(-1px);
+				}
+
+				.button:active {
+					transform: translateY(0);
+					box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+				}
+
+				.footer {
+					margin-top: 2rem;
+					font-size: 0.875rem;
+					color: #64748b;
+				}
+
+				@media (max-width: 768px) {
+					.container {
+						padding: 1.5rem;
+					}
+
+					h1 {
+						font-size: 1.5rem;
+					}
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<div class="header">
+					<h1>${heading}</h1>
+					<!-- Removed subtitle since it was undefined -->
+				</div>
+				
+				<div class="content">
+					<div class="message">${message}</div>
+					<div class="details">${additionalMessage}</div>
+					<p class="show-details" onclick="toggleDetails()">Show more details</p>
+				</div>
+
+				${buttonText && buttonLink ? `<a href="${buttonLink}" class="button">${buttonText}</a>` : ''}
+
+				<div class="footer">
+					<p>© ${new Date().getFullYear()} Your Company. All rights reserved.</p>
+				</div>
+			</div>
+
+			<script>
+				function toggleDetails() {
+					const details = document.querySelector('.details');
+					const showDetails = document.querySelector('.show-details');
+					
+					details.style.display = details.style.display === 'none' || details.style.display === '' ? 'block' : 'none';
+					showDetails.textContent = details.style.display === 'block' ? 'Hide details' : 'Show more details';
+				}
+			</script>
+		</body>
+		</html>
+	`;
 }

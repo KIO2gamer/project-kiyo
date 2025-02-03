@@ -59,7 +59,7 @@ module.exports = {
 
 	async checkTargetUser(interaction, targetUser) {
 		if (!targetUser) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -75,7 +75,7 @@ module.exports = {
 		}
 
 		if (targetUser.id === interaction.guild.ownerId) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -103,7 +103,7 @@ module.exports = {
 			interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -121,7 +121,7 @@ module.exports = {
 		}
 
 		if (targetUserRolePosition >= botRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -144,7 +144,7 @@ module.exports = {
 	parseDuration(interaction, duration) {
 		const durationMs = ms(duration);
 		if (!durationMs) {
-			interaction.editReply({
+			interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -176,7 +176,7 @@ module.exports = {
 			await logEntry.save();
 
 			await targetUser.ban({ reason: reason });
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('TEMPORARY BAN')
@@ -202,7 +202,7 @@ module.exports = {
 			}, durationMs);
 		} catch (error) {
 			console.error('Error banning user:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')

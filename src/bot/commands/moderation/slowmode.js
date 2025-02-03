@@ -41,7 +41,7 @@ module.exports = {
 		const duration = ms(durationInput) / 1000;
 
 		if (isNaN(duration) || duration < 0 || duration > 21600) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -68,7 +68,7 @@ module.exports = {
 				description = `The slowmode for <#${channel.id}> has been set to ${durationInput}.`;
 			}
 
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('Slowmode Set')

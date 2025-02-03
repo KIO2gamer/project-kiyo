@@ -20,7 +20,7 @@ module.exports = {
 	 * @param {Object} interaction.member.permissions - The permissions object of the member.
 	 * @param {Object} interaction.user - The user object of the member who initiated the interaction.
 	 * @param {Object} interaction.channel - The channel object where the interaction was initiated.
-	 * @param {Function} interaction.editReply - Function to edit the initial reply of the interaction.
+	 * @param {Function} interaction.reply - Function to edit the initial reply of the interaction.
 	 * @param {Function} interaction.followUp - Function to send a follow-up message to the interaction.
 	 *
 	 * @returns {Promise<void>} - A promise that resolves when the command execution is complete.
@@ -38,14 +38,14 @@ module.exports = {
 				PermissionFlagsBits.Administrator,
 			)
 		) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: '❌ You do not have permission to use this command.',
 				ephemeral: true,
 			});
 		}
 
 		// Initial warning message
-		await interaction.editReply({
+		await interaction.reply({
 			content:
 				'⚠️ **DANGER**: This will permanently delete ALL data in the database. Are you absolutely sure?\nType `CONFIRM` to proceed.',
 			ephemeral: true,
@@ -72,17 +72,17 @@ module.exports = {
 							await collection.drop();
 						}
 
-						await interaction.editReply(
+						await interaction.reply(
 							'✅ Database has been completely wiped.',
 						);
 					} catch (error) {
 						console.error('Database clear error:', error);
-						await interaction.editReply(
+						await interaction.reply(
 							'❌ An error occurred while clearing the database.',
 						);
 					}
 				} else {
-					await interaction.editReply('❌ Database wipe cancelled.');
+					await interaction.reply('❌ Database wipe cancelled.');
 				}
 				message
 					.delete()

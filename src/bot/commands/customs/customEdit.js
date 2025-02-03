@@ -37,7 +37,7 @@ module.exports = {
 	 * @param {Object} interaction - The interaction object from Discord.
 	 * @param {Object} interaction.options - The options provided with the interaction.
 	 * @param {Function} interaction.options.getString - Function to get a string option by name.
-	 * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+	 * @param {Function} interaction.reply - Function to edit the reply to the interaction.
 	 * @param {Function} interaction.awaitMessageComponent - Function to await a message component interaction.
 	 * @param {Object} interaction.user - The user who initiated the interaction.
 	 * @param {string} interaction.user.id - The ID of the user who initiated the interaction.
@@ -57,7 +57,7 @@ module.exports = {
 			}
 
 			if (!customCommand) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Custom command or alias "${name}" not found!`,
 					ephemeral: true,
 				});
@@ -69,7 +69,7 @@ module.exports = {
 				? `The name you provided is an alias. The main command name is "${customCommand.name}". Do you want to edit this command?`
 				: `Are you sure you want to edit the custom command "${name}"?`;
 
-			const confirmationResponse = await interaction.editReply({
+			const confirmationResponse = await interaction.reply({
 				content: confirmMessage,
 				ephemeral: true,
 				components: [
@@ -101,7 +101,7 @@ module.exports = {
 				.catch(() => null);
 
 			if (!confirmation) {
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'Command edit timed out.',
 					components: [],
 				});
@@ -114,12 +114,12 @@ module.exports = {
 					customCommand.alias_name = newAlias;
 				}
 				await customCommand.save();
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Custom command "${customCommand.name}" edited successfully!`,
 					components: [],
 				});
 			} else {
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'Command edit cancelled.',
 					components: [],
 				});

@@ -29,9 +29,8 @@ module.exports = {
 			imageMedia = 'https://i.imgur.com/u1pmQMV.png';
 		}
 
-		let description = `The coin landed on **${
-			result.charAt(0).toUpperCase() + result.slice(1)
-		}**!`;
+		let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)
+			}**!`;
 
 		if (bet) {
 			if (bet === result) {
@@ -47,6 +46,6 @@ module.exports = {
 			.setDescription(description)
 			.setThumbnail(imageMedia);
 
-		await interaction.editReply({ embeds: [embed] });
+		await interaction.reply({ embeds: [embed] });
 	},
 };

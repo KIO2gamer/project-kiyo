@@ -18,6 +18,6 @@ module.exports = {
 	async execute(interaction) {
 		const role = interaction.options.getRole('role');
 		await role.delete();
-		return interaction.editReply(`Deleted role: ${role.name}`);
+		return interaction.reply(`Deleted role: ${role.name}`);
 	},
 };

@@ -54,19 +54,19 @@ module.exports = {
 					content: caption,
 					files: [imagePaths[options]],
 				});
-				await interaction.editReply({
+				await interaction.reply({
 					content: `Image successfully posted: ${options}`,
 					ephemeral: true,
 				});
 			} else {
-				await interaction.editReply({
+				await interaction.reply({
 					content: 'There is no such option available',
 					ephemeral: true,
 				});
 			}
 		} catch (error) {
 			console.error('Error posting image:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				content: `An error occurred: ${error.message}`,
 				ephemeral: true,
 			});

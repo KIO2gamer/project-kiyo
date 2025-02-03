@@ -24,7 +24,7 @@ module.exports = {
 			// Check for Duplicates
 			const existingRole = await Role.findOne({ roleID: role.id });
 			if (existingRole) {
-				return interaction.editReply(
+				return interaction.reply(
 					`The role "${role.name}" is already in the database!`,
 				);
 			}
@@ -41,7 +41,7 @@ module.exports = {
 			// Save the new role to the database
 			await newRole.save();
 
-			await interaction.editReply(
+			await interaction.reply(
 				'Role data successfully added to the database!',
 			);
 		} catch (error) {

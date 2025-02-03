@@ -271,7 +271,7 @@ module.exports = {
 		};
 
 		// Send initial message with the first page of results
-		const message = await interaction.editReply(await displayResults());
+		const message = await interaction.reply(await displayResults());
 
 		// Create button collector for pagination
 		const collector = message.createMessageComponentCollector({

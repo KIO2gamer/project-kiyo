@@ -51,7 +51,7 @@ module.exports = {
 					randomTrack =
 						tracks.length > 0
 							? tracks[Math.floor(Math.random() * tracks.length)]
-									.track
+								.track
 							: null;
 
 					const lyricsResponse = await axios.get(
@@ -111,7 +111,7 @@ module.exports = {
 						.setStyle(ButtonStyle.Secondary),
 				);
 
-				await interaction.editReply({
+				await interaction.reply({
 					embeds: [questionEmbed],
 					components: [row],
 				});
@@ -200,7 +200,7 @@ module.exports = {
 						'Sorry, there was an error while trying to play the game. Please try again later.',
 					);
 
-				await interaction.editReply({ embeds: [errorEmbed] });
+				await interaction.reply({ embeds: [errorEmbed] });
 			}
 		};
 

@@ -35,12 +35,12 @@ module.exports = {
 				{ upsert: true, new: true },
 			);
 
-			await interaction.editReply(
+			await interaction.reply(
 				`Message logs channel set to: ${channel}`,
 			);
 		} catch (error) {
 			console.error('Error setting message logs channel:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				content:
 					'An error occurred while setting the message logs channel.',
 				ephemeral: true,

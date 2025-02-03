@@ -52,14 +52,14 @@ module.exports = {
 	 * @param {Function} interaction.options.getBoolean - Function to get a boolean option.
 	 * @param {Object} interaction.client - The client object from Discord.
 	 * @param {Map} interaction.client.commands - The collection of commands.
-	 * @param {Function} interaction.editReply - Function to edit the reply to the interaction.
+	 * @param {Function} interaction.reply - Function to edit the reply to the interaction.
 	 *
-	 * @returns {Promise<void>} - A promise that resolves when the interaction.editReply is edited.
+	 * @returns {Promise<void>} - A promise that resolves when the interaction.reply is edited.
 	 */
 	async execute(interaction) {
 		// Check if user is bot owner
 		if (interaction.user.id !== process.env.OWNER_ID) {
-			return await interaction.editReply({
+			return await interaction.reply({
 				content: 'Only the bot owner can use this command!',
 				ephemeral: true,
 			});
@@ -71,7 +71,7 @@ module.exports = {
 		const allowed = interaction.options.getBoolean('allowed');
 
 		if (!role && !user) {
-			return await interaction.editReply({
+			return await interaction.reply({
 				content: 'You must specify either a role or user!',
 				ephemeral: true,
 			});
@@ -80,7 +80,7 @@ module.exports = {
 		// Get the command
 		const command = interaction.client.commands.get(commandName);
 		if (!command) {
-			return await interaction.editReply({
+			return await interaction.reply({
 				content: 'That command does not exist!',
 				ephemeral: true,
 			});
@@ -99,12 +99,10 @@ module.exports = {
 			command.permissions.users[user.id] = allowed;
 		}
 
-		await interaction.editReply({
-			content: `Successfully ${
-				allowed ? 'allowed' : 'denied'
-			} permissions for ${
-				role ? `role ${role.name}` : `user ${user.tag}`
-			} on command ${commandName}`,
+		await interaction.reply({
+			content: `Successfully ${allowed ? 'allowed' : 'denied'
+				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
+				} on command ${commandName}`,
 			ephemeral: true,
 		});
 	},

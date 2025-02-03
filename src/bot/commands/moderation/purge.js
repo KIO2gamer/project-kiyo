@@ -34,7 +34,7 @@ module.exports = {
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
 	async execute(interaction) {
-		await interaction.editReply({
+		await interaction.reply({
 			content: 'Processing purge command...',
 			ephemeral: true,
 		});
@@ -57,7 +57,7 @@ module.exports = {
 			}
 
 			if (messages.length === 0) {
-				return interaction.editReply({
+				return interaction.reply({
 					embeds: [
 						new EmbedBuilder()
 							.setTitle('No Messages Found')

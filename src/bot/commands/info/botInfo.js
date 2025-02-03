@@ -65,7 +65,7 @@ async function sendBotInfo(sent, interaction) {
 			})
 			.setTimestamp();
 
-		return interaction.editReply({ content: ' ', embeds: [embed], ephemeral: true });
+		return interaction.reply({ content: ' ', embeds: [embed], ephemeral: true });
 	} catch (error) {
 		console.error('Error retrieving bot information:', error);
 		return handleError(interaction, error);

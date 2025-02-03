@@ -52,7 +52,7 @@ module.exports = {
 		);
 
 		if (!commandPath) {
-			return interaction.editReply({
+			return interaction.reply({
 				content: `There is no command with name \`${commandName}\`!`,
 				ephemeral: true,
 			});
@@ -64,13 +64,13 @@ module.exports = {
 			interaction.client.commands.delete(commandName);
 			const newCommand = require(commandPath);
 			interaction.client.commands.set(newCommand.data.name, newCommand);
-			await interaction.editReply({
+			await interaction.reply({
 				content: `Command \`${commandName}\` was reloaded!`,
 				ephemeral: true,
 			});
 		} catch (error) {
 			console.error(error);
-			await interaction.editReply({
+			await interaction.reply({
 				content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
 				ephemeral: true,
 			});
@@ -134,7 +134,7 @@ module.exports = {
 			}
 		});
 
-		await interaction.editReply({
+		await interaction.reply({
 			content: 'All commands reloaded!',
 			ephemeral: true,
 		});

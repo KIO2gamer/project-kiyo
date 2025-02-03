@@ -41,7 +41,7 @@ module.exports = {
 		const newReason = interaction.options.getString('reason');
 
 		if (!logNumber && !logRange) {
-			await interaction.editReply(
+			await interaction.reply(
 				'Please provide either a log number or a range of log numbers to edit.',
 			);
 			return;
@@ -56,11 +56,11 @@ module.exports = {
 				if (log) {
 					log.reason = newReason;
 					await log.save();
-					await interaction.editReply(
+					await interaction.reply(
 						`Successfully updated reason for log #${logNumber} to: ${newReason}`,
 					);
 				} else {
-					await interaction.editReply(
+					await interaction.reply(
 						`No log found with log number ${logNumber}.`,
 					);
 				}
@@ -70,7 +70,7 @@ module.exports = {
 					.map((num) => parseInt(num.trim()));
 
 				if (isNaN(start) || isNaN(end)) {
-					await interaction.editReply(
+					await interaction.reply(
 						'Invalid log range. Please provide a valid range (e.g., 1-5).',
 					);
 					return;
@@ -85,18 +85,18 @@ module.exports = {
 						{ logNumber: { $gte: start, $lte: end } },
 						{ $set: { reason: newReason } },
 					);
-					await interaction.editReply(
+					await interaction.reply(
 						`Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`,
 					);
 				} else {
-					await interaction.editReply(
+					await interaction.reply(
 						`No logs found in the range #${start}-#${end}.`,
 					);
 				}
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.editReply(
+			await interaction.reply(
 				'Failed to update the log(s). Please try again later.',
 			);
 		}

@@ -38,10 +38,10 @@ module.exports = {
 			const response = result.response;
 			const text = response.text();
 
-			await interaction.editReply(text);
+			await interaction.reply(text);
 		} catch (error) {
 			console.error('Error in ask-gemini command:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'Sorry, there was an error processing your request.',
 			);
 		}

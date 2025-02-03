@@ -83,15 +83,15 @@ module.exports = {
 						.setURL(photo.url);
 				});
 
-				await interaction.editReply({ embeds });
+				await interaction.reply({ embeds });
 			} else {
-				await interaction.editReply(
+				await interaction.reply(
 					'Sorry, I could not find any photos for that query.',
 				);
 			}
 		} catch (error) {
 			console.error('Error fetching photo:', error);
-			await interaction.editReply(
+			await interaction.reply(
 				'There was an error trying to fetch the photo.',
 			);
 		}

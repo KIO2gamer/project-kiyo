@@ -37,7 +37,7 @@ module.exports = {
 
 		// Check if the target user exists
 		if (!targetUser) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -54,7 +54,7 @@ module.exports = {
 
 		// Check if the target user is the server owner
 		if (targetUser.id === interaction.guild.ownerId) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -80,7 +80,7 @@ module.exports = {
 
 		// Check if the user trying to ban has a higher role than the target
 		if (targetUserRolePosition >= requestUserRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -99,7 +99,7 @@ module.exports = {
 
 		// Check if the bot has a higher role than the target
 		if (targetUserRolePosition >= botRolePosition) {
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
@@ -128,7 +128,7 @@ module.exports = {
 			await logEntry.save();
 
 			await targetUser.ban({ reason: reason });
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('BANNED!!!')
@@ -144,7 +144,7 @@ module.exports = {
 			});
 		} catch (error) {
 			console.error('Error banning user:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')

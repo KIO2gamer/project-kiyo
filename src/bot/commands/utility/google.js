@@ -27,7 +27,7 @@ module.exports = {
 
 		if (!apiKey || !searchEngineId) {
 			console.error('Google API key or Search Engine ID not found!');
-			return interaction.editReply({
+			return interaction.reply({
 				content:
 					'This command is not configured properly. Please contact the server administrator.',
 				ephemeral: true,
@@ -49,7 +49,7 @@ module.exports = {
 			const results = response.data.items.slice(0, 5); // Show top 3 results
 
 			if (results.length === 0) {
-				return interaction.editReply({
+				return interaction.reply({
 					content: 'No results found for your query.',
 					ephemeral: true,
 				});
@@ -66,10 +66,10 @@ module.exports = {
 				});
 			});
 
-			await interaction.editReply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], ephemeral: true });
 		} catch (error) {
 			console.error('Error performing Google search:', error);
-			await interaction.editReply({
+			await interaction.reply({
 				content:
 					'An error occurred while performing the search. Please try again later.',
 				ephemeral: true,

@@ -50,7 +50,7 @@ module.exports = {
 		await reminder.save();
 
 		// Confirm that the reminder is set
-		await interaction.editReply(
+		await interaction.reply(
 			`Reminder set! I'll remind you in ${time} seconds: "${reminderMessage}"`,
 		);
 

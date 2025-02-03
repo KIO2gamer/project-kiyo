@@ -39,7 +39,7 @@ module.exports = {
 				.filter((word) => word);
 
 			if (words.length === 0) {
-				await interaction.editReply(
+				await interaction.reply(
 					'Oops! The word list is as empty as a ghost town!',
 				);
 				return;
@@ -71,7 +71,7 @@ module.exports = {
 				)
 				.setFooter({ text: 'Type a letter to make a guess!' });
 
-			const msg = await interaction.editReply({
+			const msg = await interaction.reply({
 				embeds: [gameEmbed],
 				fetchReply: true,
 			});
@@ -115,7 +115,7 @@ module.exports = {
 					remainingGuesses--;
 					const funnyMessage =
 						funnyMessages[
-							Math.floor(Math.random() * funnyMessages.length)
+						Math.floor(Math.random() * funnyMessages.length)
 						];
 					const reply = await m.reply(`😅 ${funnyMessage}`);
 					setTimeout(() => reply.delete(), 3000);
@@ -196,7 +196,7 @@ module.exports = {
 			});
 		} catch (err) {
 			console.error('Failed to read the word list:', err);
-			await interaction.editReply(
+			await interaction.reply(
 				'Oops! An error occurred while setting up the game. Maybe the hangman took a coffee break?',
 			);
 		}

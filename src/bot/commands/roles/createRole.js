@@ -106,7 +106,7 @@ module.exports = {
 
 		// Validate name length
 		if (name.length < 1 || name.length > 100) {
-			return interaction.editReply(
+			return interaction.reply(
 				'Role name must be between 1 and 100 characters.',
 			);
 		}
@@ -114,7 +114,7 @@ module.exports = {
 		// Validate color format
 		const colorRegex = /^#([0-9A-F]{3}){1,2}$/i;
 		if (color && !colorRegex.test(color)) {
-			return interaction.editReply('Color must be a valid hex code.');
+			return interaction.reply('Color must be a valid hex code.');
 		}
 
 		const hoist = interaction.options.getBoolean('hoist');
@@ -140,10 +140,10 @@ module.exports = {
 				permissions: permissions,
 			});
 
-			return interaction.editReply(`Created new role: ${role}`);
+			return interaction.reply(`Created new role: ${role}`);
 		} catch (error) {
 			console.error('Failed to create role:', error);
-			return interaction.editReply(
+			return interaction.reply(
 				'There was an error creating the role. Please try again later.',
 			);
 		}

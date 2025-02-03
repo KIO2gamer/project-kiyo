@@ -17,7 +17,7 @@ module.exports = {
 			const roles = await Role.find();
 
 			if (roles.length === 0) {
-				return interaction.editReply(
+				return interaction.reply(
 					'There are no roles stored in the database.',
 				);
 			}
@@ -29,14 +29,13 @@ module.exports = {
 					roles
 						.map(
 							(role, index) =>
-								`${index + 1}. **${role.roleName}** (ID: \`${
-									role.roleID
+								`${index + 1}. **${role.roleName}** (ID: \`${role.roleID
 								}\`, Color: \`${role.roleColor}\`)`,
 						)
 						.join('\n'),
 				);
 
-			await interaction.editReply({ embeds: [embed] });
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
 			handleError(interaction, error);
 		}
