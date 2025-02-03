@@ -304,7 +304,7 @@ function generateHtmlResponse(
 				${buttonText && buttonLink ? `<a href="${buttonLink}" class="button">${buttonText}</a>` : ''}
 
 				<div class="footer">
-					<p>© ${new Date().getFullYear()} Your Company. All rights reserved.</p>
+					<p>The Kiyo bot and this website would never share your data to other services. It automatically gets deleted from the database after a short while.</p>
 				</div>
 			</div>
 
