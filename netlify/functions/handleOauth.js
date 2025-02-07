@@ -23,13 +23,12 @@ async function connectToDatabase() {
 const algorithm = 'aes-256-cbc';
 
 function decrypt(text) {
-	const textParts = text.split(':');
-	const iv = Buffer.from(textParts.shift(), 'hex');
-	const encryptedText = Buffer.from(textParts.shift(), 'hex');
-	const secretKey = Buffer.from(textParts.join(':'), 'hex');
+	const [ivHex, encryptedTextHex, ...secretKeyHex] = text.split(':');
+	const iv = Buffer.from(ivHex, 'hex');
+	const encryptedText = Buffer.from(encryptedTextHex, 'hex');
+	const secretKey = Buffer.from(secretKeyHex.join(':'), 'hex');
 	const decipher = crypto.createDecipheriv(algorithm, secretKey, iv);
-	let decrypted = decipher.update(encryptedText);
-	decrypted = Buffer.concat([decrypted, decipher.final()]);
+	const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
 	return decrypted.toString();
 }
 
@@ -38,10 +37,7 @@ exports.handler = async function (event) {
 	const { code, state } = getCodeAndState(event);
 
 	if (!code || !state) {
-		return createErrorResponse(
-			400,
-			'Missing authorization code or state parameter.',
-		);
+		return createErrorResponse(400, 'Missing authorization code or state parameter.');
 	}
 
 	try {
@@ -50,24 +46,14 @@ exports.handler = async function (event) {
 		const youtubeConnections = await getYouTubeConnections(accessToken);
 
 		if (youtubeConnections.length === 0) {
-			return createErrorResponse(
-				404,
-				'No YouTube connections found for this Discord account.',
-			);
+			return createErrorResponse(404, 'No YouTube connections found for this Discord account.');
 		}
 
 		await saveOAuthRecord(decryptedState, code, youtubeConnections);
-
 		return createSuccessResponse(youtubeConnections.length, decryptedState);
 	} catch (error) {
-		console.error(
-			'❌ Error fetching Discord connections or saving to MongoDB:',
-			error,
-		);
-		return createErrorResponse(
-			500,
-			'An unexpected error occurred while processing your request.',
-		);
+		console.error('❌ Error fetching Discord connections or saving to MongoDB:', error);
+		return createErrorResponse(500, 'An unexpected error occurred while processing your request.');
 	}
 };
 
@@ -83,12 +69,7 @@ function createErrorResponse(statusCode, message) {
 	return {
 		statusCode,
 		headers: { 'Content-Type': 'text/html' },
-		body: generateHtmlResponse(
-			'Error',
-			statusCode,
-			message,
-			'Please ensure both code and state are provided in the request.',
-		),
+		body: generateHtmlResponse('Error', statusCode, message, 'Please ensure both code and state are provided in the request.'),
 	};
 }
 
@@ -112,20 +93,12 @@ async function exchangeCodeForToken(code) {
 }
 
 async function getYouTubeConnections(accessToken) {
-	const connectionsResponse = await fetch(
-		'https://discord.com/api/users/@me/connections',
-		{
-			headers: { Authorization: `Bearer ${accessToken}` },
-		},
-	);
+	const connectionsResponse = await fetch('https://discord.com/api/users/@me/connections', {
+		headers: { Authorization: `Bearer ${accessToken}` },
+	});
 
 	const connectionsData = await connectionsResponse.json();
-
-	const youtubeConnections = connectionsData.filter(
-		(connection) => connection.type === 'youtube',
-	);
-
-	return youtubeConnections;
+	return connectionsData.filter(connection => connection.type === 'youtube');
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {
@@ -133,7 +106,7 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
 	const oauthRecord = new OAuthCode({
 		interactionId,
 		code,
-		youtubeConnections: youtubeConnections.map((conn) => ({
+		youtubeConnections: youtubeConnections.map(conn => ({
 			id: conn.id,
 			name: conn.name,
 		})),
@@ -160,164 +133,144 @@ function createSuccessResponse(connectionsLength, state) {
 	};
 }
 
-function generateHtmlResponse(
-	title,
-	heading,
-	message,
-	additionalMessage,
-	buttonText = '',
-	buttonLink = ''
-) {
+function generateHtmlResponse(title, heading, message, additionalMessage, buttonText = '', buttonLink = '') {
 	return `
-		<!DOCTYPE html>
-		<html lang="en">
-		<head>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>${title}</title>
-			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-			<style>
-				* {
-					margin: 0;
-					padding: 0;
-					box-sizing: border-box;
-					font-family: 'Inter', sans-serif;
-				}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${title}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    font-family: 'Inter', sans-serif;
+                }
 
-				body {
-					background-color: #f8fafc;
-					min-height: 100vh;
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-					align-items: center;
-					padding: 1rem;
-				}
+                body {
+                    background-color: #f8fafc;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 1rem;
+                }
 
-				.container {
-					max-width: 800px;
-					width: 100%;
-					background: white;
-					padding: 2.5rem;
-					border-radius: 12px;
-					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-					text-align: center;
-				}
+                .container {
+                    max-width: 800px;
+                    width: 100%;
+                    background: white;
+                    padding: 2.5rem;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }
 
-				.header {
-					margin-bottom: 2rem;
-				}
+                .header {
+                    margin-bottom: 2rem;
+                }
 
-				h1 {
-					font-size: 2rem;
-					font-weight: 600;
-					color: ${title === 'Success' ? '#16a34a' : '#dc2626'};
-					margin-bottom: 0.5rem;
-				}
+                h1 {
+                    font-size: 2rem;
+                    font-weight: 600;
+                    color: ${title === 'Success' ? '#16a34a' : '#dc2626'};
+                    margin-bottom: 0.5rem;
+                }
 
-				.subtitle {
-					font-size: 1.125rem;
-					font-weight: 400;
-					color: #64748b;
-					margin-bottom: 2rem;
-				}
+                .content {
+                    margin-bottom: 2rem;
+                }
 
-				.content {
-					margin-bottom: 2rem;
-				}
+                .message {
+                    font-size: 1.125rem;
+                    color: #1e293b;
+                    margin-bottom: 1rem;
+                }
 
-				.message {
-					font-size: 1.125rem;
-					color: #1e293b;
-					margin-bottom: 1rem;
-				}
+                .details {
+                    font-size: 0.875rem;
+                    color: #64748b;
+                    margin-top: 1rem;
+                    display: none;
+                }
 
-				.details {
-					font-size: 0.875rem;
-					color: #64748b;
-					margin-top: 1rem;
-					display: none;
-				}
+                .show-details {
+                    color: #7289da;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    margin-top: 1rem;
+                }
 
-				.show-details {
-					color: #7289da;
-					font-size: 0.875rem;
-					cursor: pointer;
-					margin-top: 1rem;
-				}
+                .button {
+                    display: inline-block;
+                    padding: 0.75rem 1.5rem;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    color: white;
+                    background-color: #7289da;
+                    border: none;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    margin-top: 2rem;
+                }
 
-				.button {
-					display: inline-block;
-					padding: 0.75rem 1.5rem;
-					font-size: 1rem;
-					font-weight: 500;
-					color: white;
-					background-color: #7289da;
-					border: none;
-					border-radius: 6px;
-					text-decoration: none;
-					cursor: pointer;
-					transition: all 0.2s ease;
-					margin-top: 2rem;
-				}
+                .button:hover {
+                    background-color: #6366f1;
+                    transform: translateY(-1px);
+                }
 
-				.button:hover {
-					background-color: #6366f1;
-					transform: translateY(-1px);
-				}
+                .footer {
+                    margin-top: 2rem;
+                    font-size: 0.875rem;
+                    color: #64748b;
+                }
 
-				.button:active {
-					transform: translateY(0);
-					box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-				}
+                @media (max-width: 768px) {
+                    .container {
+                        padding: 1.5rem;
+                    }
 
-				.footer {
-					margin-top: 2rem;
-					font-size: 0.875rem;
-					color: #64748b;
-				}
+                    h1 {
+                        font-size: 1.5rem;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>${heading}</h1>
+                </div>
+                
+                <div class="content">
+                    <div class="message">${message}</div>
+                    <div class="details">${additionalMessage}</div>
+                    <p class="show-details" onclick="toggleDetails()">Show more details</p>
+                </div>
 
-				@media (max-width: 768px) {
-					.container {
-						padding: 1.5rem;
-					}
+                ${buttonText && buttonLink ? `<a href="${buttonLink}" class="button">${buttonText}</a>` : ''}
 
-					h1 {
-						font-size: 1.5rem;
-					}
-				}
-			</style>
-		</head>
-		<body>
-			<div class="container">
-				<div class="header">
-					<h1>${heading}</h1>
-					<!-- Removed subtitle since it was undefined -->
-				</div>
-				
-				<div class="content">
-					<div class="message">${message}</div>
-					<div class="details">${additionalMessage}</div>
-					<p class="show-details" onclick="toggleDetails()">Show more details</p>
-				</div>
+                <div class="footer">
+                    <p>The Kiyo bot and this website would never share your data with other services. It automatically gets deleted from the database after a short while.</p>
+                </div>
+            </div>
 
-				${buttonText && buttonLink ? `<a href="${buttonLink}" class="button">${buttonText}</a>` : ''}
-
-				<div class="footer">
-					<p>The Kiyo bot and this website would never share your data to other services. It automatically gets deleted from the database after a short while.</p>
-				</div>
-			</div>
-
-			<script>
-				function toggleDetails() {
-					const details = document.querySelector('.details');
-					const showDetails = document.querySelector('.show-details');
-					
-					details.style.display = details.style.display === 'none' || details.style.display === '' ? 'block' : 'none';
-					showDetails.textContent = details.style.display === 'block' ? 'Hide details' : 'Show more details';
-				}
-			</script>
-		</body>
-		</html>
-	`;
+            <script>
+                function toggleDetails() {
+                    const details = document.querySelector('.details');
+                    const showDetails = document.querySelector('.show-details');
+                    
+                    details.style.display = details.style.display === 'none' || details.style.display === '' ? 'block' : 'none';
+                    showDetails.textContent = details.style.display === 'block' ? 'Hide details' : 'Show more details';
+                }
+            </script>
+        </body>
+        </html>
+    `;
 }

@@ -13,8 +13,7 @@ const ALGORITHM = 'aes-256-cbc';
 
 function encrypt(text, secretKey, iv) {
 	const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(secretKey), iv);
-	let encrypted = cipher.update(text);
-	encrypted = Buffer.concat([encrypted, cipher.final()]);
+	let encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 	return `${iv.toString('hex')}:${encrypted.toString('hex')}:${secretKey.toString('hex')}`;
 }
 
