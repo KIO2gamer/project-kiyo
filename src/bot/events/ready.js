@@ -24,8 +24,8 @@ let activityIndex = 0;
 let activityInterval = null;
 
 const setNextActivity = async (client) => {
+	const currentActivity = activities[activityIndex];
 	try {
-		const currentActivity = activities[activityIndex];
 		await client.user.setPresence({
 			activities: [currentActivity],
 			status: 'online'
@@ -37,41 +37,36 @@ const setNextActivity = async (client) => {
 	}
 };
 
+const logBotStatistics = (client) => {
+	if (typeof Logger.table === 'function') {
+		const stats = {
+			Username: client.user.tag,
+			Guilds: client.guilds.cache.size,
+			Channels: client.channels.cache.size,
+			Users: client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount || 0), 0)
+		};
+		Logger.table(stats, 'Bot Statistics');
+	}
+};
+
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute: async (client) => {
-		try {
-			if (!client.user) {
-				Logger.log('BOT', 'Bot is not ready!', 'error');
-				return;
-			}
-
-			Logger.log('BOT', 'Bot is ready!', 'success');
-
-			if (typeof Logger.table === 'function') {
-				const stats = {
-					Username: client.user.tag,
-					Guilds: client.guilds.cache.size,
-					Channels: client.channels.cache.size,
-					Users: client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount || 0), 0),
-					Version: process.env.npm_package_version || 'unknown'
-				};
-
-				Logger.table(stats, 'Bot Statistics');
-			}
-
-			// Start activity cycling
-			activityInterval = setInterval(() => setNextActivity(client), 10000);
-			Logger.log('BOT', 'Activity cycling started', 'info');
-
-			// Set initial activity
-			await setNextActivity(client);
-
-		} catch (error) {
-			Logger.log('BOT', `Error during bot initialization: ${error.message}`, 'error');
-			throw error;
+		if (!client.user) {
+			Logger.log('BOT', 'Bot is not ready!', 'error');
+			return;
 		}
+
+		Logger.log('BOT', 'Bot is ready!', 'success');
+		logBotStatistics(client);
+
+		// Start activity cycling
+		activityInterval = setInterval(() => setNextActivity(client), 10000);
+		Logger.log('BOT', 'Activity cycling started', 'info');
+
+		// Set initial activity
+		await setNextActivity(client);
 	},
 	stopActivityCycle: () => {
 		if (activityInterval) {

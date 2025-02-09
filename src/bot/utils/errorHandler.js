@@ -8,46 +8,49 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
  * @param {import('discord.js').Message} [sent] - The initial message sent by the command (optional).
  */
 async function handleError(interaction, error, sent) {
-	// Log the full error for debugging
-	console.error(`❌ Error executing command:`, error);
+	// Add a timestamp for clearer log tracking
+	const timestamp = new Date().toISOString();
+	console.error(`[${timestamp}] ❌ Error executing command:\n${error.stack || error.message}`);
 
-	// Truncate long errors to prevent excessive message length
-	const errorMessage = error.stack ? error.stack.substring(0, 1000) + '...' : error.message;
+	// Create a shortened error message if the full stack is too long
+	const shortError = error.stack
+		? error.stack.substring(0, 1000) + (error.stack.length > 1000 ? '...' : '')
+		: error.message;
 
-	// Create the error embed
+	// Build an embed to notify the user about the error
 	const errorEmbed = new EmbedBuilder()
 		.setTitle('⚠️ An error occurred')
-		.setDescription('There was a problem executing the command. Please try again later.')
-		.setColor('#5865F2') // Consistent color
+		.setDescription(
+			'There was a problem executing the command. Please try again later.\n' +
+			'If you need more details, click the button below.'
+		)
+		.setColor('#5865F2')
 		.setTimestamp();
 
-	// Create a button to reveal the full traceback
-	const row = new ActionRowBuilder()
-		.addComponents(
-			new ButtonBuilder()
-				.setCustomId('show_full_error')
-				.setLabel('Show Full Error')
-				.setStyle(ButtonStyle.Danger)
-		);
+	// Create a button to show the full error trace
+	const row = new ActionRowBuilder().addComponents(
+		new ButtonBuilder()
+			.setCustomId('show_full_error')
+			.setLabel('Show Full Error')
+			.setStyle(ButtonStyle.Danger)
+	);
 
 	try {
-		let response;
-		if (sent) {
-			response = await sent.edit({ embeds: [errorEmbed], components: [row] });
-		} else if (interaction.replied || interaction.deferred) {
-			response = await interaction.editReply({ embeds: [errorEmbed], components: [row], ephemeral: true });
-		} else {
-			response = await interaction.reply({ embeds: [errorEmbed], components: [row], ephemeral: true });
-		}
+		const response = sent
+			? await sent.edit({ embeds: [errorEmbed], components: [row] })
+			: await (interaction.replied || interaction.deferred
+				? interaction.editReply({ embeds: [errorEmbed], components: [row], ephemeral: true })
+				: interaction.reply({ embeds: [errorEmbed], components: [row], ephemeral: true }));
 
-		// Create button collector
-		const collector = response.createMessageComponentCollector({ time: 60000 }); // Button active for 60 seconds
+		// Create a collector for the button interaction with a 60-second timeout
+		const collector = response.createMessageComponentCollector({ time: 60000 });
 
 		collector.on('collect', async (i) => {
 			if (i.customId === 'show_full_error' && i.user.id === interaction.user.id) {
+				const fullError = error.stack || error.message;
 				const fullErrorEmbed = new EmbedBuilder()
-					.setTitle('🔍 Full Error Traceback')
-					.setDescription(`\`\`\`js\n${error.stack || error.message}\n\`\`\``)
+					.setTitle('🔍 Full Error Trace')
+					.setDescription(`\`\`\`js\n${fullError}\n\`\`\``)
 					.setColor('Red')
 					.setTimestamp();
 
@@ -56,13 +59,11 @@ async function handleError(interaction, error, sent) {
 		});
 
 		collector.on('end', async () => {
-			if (response) {
-				await response.edit({ components: [] }).catch(() => { });
-			}
+			// Disable the button after the collector ends
+			await response.edit({ components: [] }).catch(() => { });
 		});
-
 	} catch (sendError) {
-		console.error('❌ Failed to send error message:', sendError);
+		console.error(`[${timestamp}] ❌ Failed to send error message:\n${sendError.stack || sendError.message}`);
 	}
 }
 

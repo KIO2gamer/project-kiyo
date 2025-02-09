@@ -1,3 +1,4 @@
+// Load environment variables
 require('dotenv').config();
 
 // Environment Variables
@@ -8,8 +9,14 @@ const {
 	DISCORD_GUILD_IDS = ''
 } = process.env;
 
+// Validate critical environment variables
+if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !MONGODB_URI) {
+	console.error('Missing one or more required environment variables.');
+	process.exit(1);
+}
+
 // Constants
-const GUILD_IDS = (DISCORD_GUILD_IDS || '').split(',').filter(Boolean);
+const GUILD_IDS = DISCORD_GUILD_IDS.split(',').filter(Boolean);
 
 const fs = require('fs');
 const path = require('path');
@@ -20,20 +27,18 @@ const {
 	GatewayIntentBits,
 	Partials,
 	REST,
-	Routes,
+	Routes
 } = require('discord.js');
 const Logger = require('./../logger');
 
-Logger.log('BOT', 'Initializing...');
+Logger.log('BOT', 'Initializing...', 'info');
 
+// Create Discord client with required intents and partials
 const client = new Client({
 	intents: [
-		// Server-related intents
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.GuildVoiceStates,
-
-		// Message-related intents
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.DirectMessages,
@@ -53,19 +58,22 @@ client.commands = new Collection();
  * Recursively loads files from a directory and applies a given action to each file.
  *
  * @param {string} dir - The directory to load files from.
- * @param {function} callback - The action to apply to each file. This function receives the file path as an argument.
+ * @param {function} callback - The action to apply to each file. Receives the file path as an argument.
  */
 const loadFiles = (dir, callback) => {
 	const processFile = (filePath) => {
-		const stat = fs.statSync(filePath);
-
+		let stat;
+		try {
+			stat = fs.statSync(filePath);
+		} catch (error) {
+			Logger.log('FILES', `Error accessing ${filePath}: ${error.message}`, 'warning');
+			return;
+		}
 		if (stat.isDirectory()) {
 			loadFiles(filePath, callback);
 			return;
 		}
-
 		if (!filePath.endsWith('.js')) return;
-
 		callback(filePath);
 	};
 
@@ -75,10 +83,7 @@ const loadFiles = (dir, callback) => {
 };
 
 /**
- * Loads commands from a specified directory and its subdirectories.
- *
- * This function reads all JavaScript files in the given directory and its subdirectories,
- * and registers the commands found in those files with the Discord client.
+ * Loads command modules from a specified directory and registers them with the Discord client.
  *
  * @param {string} dir - The directory to load commands from.
  */
@@ -87,13 +92,18 @@ const loadCommands = (dir) => {
 	const commandCache = new Map();
 	loadFiles(dir, (filePath) => {
 		if (!commandCache.has(filePath)) {
-			commandCache.set(filePath, require(filePath));
+			try {
+				commandCache.set(filePath, require(filePath));
+			} catch (error) {
+				Logger.log('COMMANDS', `Failed to require ${filePath}: ${error.message}`, 'warning');
+				return;
+			}
 		}
 		const command = commandCache.get(filePath);
 		if (command?.data?.name && command.execute) {
 			client.commands.set(command.data.name, command);
-			if (command.data.aliases) {
-				command.data.aliases.forEach((alias) => {
+			if (command.data.aliases && Array.isArray(command.data.aliases)) {
+				command.data.aliases.forEach(alias => {
 					client.commands.set(alias, command);
 				});
 			}
@@ -102,29 +112,48 @@ const loadCommands = (dir) => {
 	Logger.log('COMMANDS', 'Command modules loaded', 'success');
 };
 
-// Function to load events
+/**
+ * Loads event modules from a specified directory and registers them with the Discord client.
+ *
+ * @param {string} dir - The directory to load events from.
+ */
 const loadEvents = (dir) => {
 	Logger.log('EVENTS', 'Loading event modules', 'info');
 	loadFiles(dir, (filePath) => {
-		const event = require(filePath);
+		let event;
+		try {
+			event = require(filePath);
+		} catch (error) {
+			Logger.log('EVENTS', `Failed to require ${filePath}: ${error.message}`, 'warning');
+			return;
+		}
 		const execute = (...args) => event.execute(...args);
-		event.once
-			? client.once(event.name, execute)
-			: client.on(event.name, execute);
+		if (event.once) {
+			client.once(event.name, execute);
+		} else {
+			client.on(event.name, execute);
+		}
 	});
 	Logger.log('EVENTS', 'Event modules loaded', 'success');
 };
 
 // Load commands and events from their respective directories
-loadCommands(path.join(__dirname, 'bot/commands')); // Recursively loads commands from all sub-categories
-loadEvents(path.join(__dirname, 'bot/events')); // Loads all events
+loadCommands(path.join(__dirname, 'bot/commands'));
+loadEvents(path.join(__dirname, 'bot/events'));
 
-// Function to connect to MongoDB
+/**
+ * Connects to MongoDB using Mongoose with improved connection options.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 const connectToMongoDB = async () => {
 	Logger.log('DATABASE', 'Establishing database connection', 'info');
 	try {
 		mongoose.set('strictQuery', false);
-		await mongoose.connect(MONGODB_URI).catch(err => console.error('❌ MongoDB Connection Error:', err));
+		await mongoose.connect(MONGODB_URI).catch(err => {
+			console.error('❌ MongoDB Connection Error:', err);
+		});
 		Logger.log('DATABASE', 'Database connection established', 'success');
 	} catch (error) {
 		Logger.log('DATABASE', `Database connection failed: ${error.message}`, 'error');
@@ -132,17 +161,14 @@ const connectToMongoDB = async () => {
 	}
 };
 
-// Deploy commands to Discord API
 /**
- * Deploys commands to Discord application and guilds.
- *
- * This function loads command files, converts them to JSON, and deploys them
- * to the specified Discord application and guilds using the Discord REST API.
+ * Deploys command modules to a specific guild.
  *
  * @async
- * @function deployCommands
- * @returns {Promise<void>} A promise that resolves when the deployment is complete.
- * @throws {Error} Throws an error if the deployment fails.
+ * @param {REST} rest - The Discord REST client.
+ * @param {string} guildId - The guild ID for deployment.
+ * @param {Array} commands - Array of command data.
+ * @returns {Promise<void>}
  */
 const deployCommandsToGuild = async (rest, guildId, commands) => {
 	try {
@@ -156,15 +182,25 @@ const deployCommandsToGuild = async (rest, guildId, commands) => {
 	}
 };
 
+/**
+ * Deploys command modules to the Discord API.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 const deployCommands = async () => {
 	Logger.log('DEPLOY', 'Deploying command modules', 'info');
 	const commands = [];
 	const commandsPath = path.join(__dirname, 'bot/commands');
 
 	loadFiles(commandsPath, (filePath) => {
-		const command = require(filePath);
-		if (command?.data?.toJSON) {
-			commands.push(command.data.toJSON());
+		try {
+			const command = require(filePath);
+			if (command?.data?.toJSON) {
+				commands.push(command.data.toJSON());
+			}
+		} catch (error) {
+			Logger.log('DEPLOY', `Failed to load command from ${filePath}: ${error.message}`, 'warning');
 		}
 	});
 
@@ -173,7 +209,7 @@ const deployCommands = async () => {
 	try {
 		// Clear global commands first
 		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: [] });
-		// Deploy to each guild
+		// Deploy to each guild concurrently
 		await Promise.all(
 			GUILD_IDS.map(guildId => deployCommandsToGuild(rest, guildId, commands))
 		);
@@ -182,10 +218,21 @@ const deployCommands = async () => {
 	}
 };
 
+/**
+ * Initializes the bot by connecting to MongoDB, deploying commands, and logging in.
+ *
+ * Parallelizes the MongoDB connection and command deployment to reduce startup time.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 const initializeBot = async () => {
 	try {
-		await connectToMongoDB();
-		await deployCommands();
+		// Parallelize DB connection and command deployment
+		await Promise.all([
+			connectToMongoDB(),
+			deployCommands()
+		]);
 		await client.login(DISCORD_TOKEN);
 		Logger.log('BOT', 'Initialization complete', 'success');
 	} catch (error) {
@@ -194,6 +241,7 @@ const initializeBot = async () => {
 	}
 };
 
+// Graceful shutdown on SIGINT
 process.on('SIGINT', async () => {
 	Logger.log('BOT', 'Initiating shutdown', 'warning');
 	await mongoose.connection.close();
@@ -202,10 +250,8 @@ process.on('SIGINT', async () => {
 	process.exit(0);
 });
 
-initializeBot();
-
-// Global Error Handling
-process.on('unhandledRejection', (reason, promise) => {
+// Global error handling
+process.on('unhandledRejection', (reason) => {
 	console.error('❌ Unhandled Promise Rejection:', reason);
 });
 
@@ -213,3 +259,5 @@ process.on('uncaughtException', (error) => {
 	console.error('❌ Uncaught Exception:', error);
 });
 
+// Start the bot initialization
+initializeBot();
