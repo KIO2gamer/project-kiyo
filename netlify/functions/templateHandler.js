@@ -3,30 +3,39 @@ const path = require('path');
 
 class TemplateHandler {
 	constructor() {
-		this.templateCache = null;
+		this.templateCache = new Map();
 	}
 
-	async loadTemplate() {
-		if (!this.templateCache) {
-			const templatePath = path.join(__dirname, '../templates/oauth-response.html');
-			this.templateCache = await fs.readFile(templatePath, 'utf8');
+	async loadTemplate(templateName) {
+		if (!this.templateCache.has(templateName)) {
+			const templatePath = path.join(__dirname, `../templates/${templateName}.html`);
+			const template = await fs.readFile(templatePath, 'utf8');
+			this.templateCache.set(templateName, template);
 		}
-		return this.templateCache;
+		return this.templateCache.get(templateName);
 	}
 
-	async generateResponse(options) {
+	async generateResponse(templateName, options) {
 		const {
 			title,
 			heading,
 			message,
 			additionalMessage,
 			buttonText,
-			buttonLink
+			buttonLink,
+			status = 'info'
 		} = options;
 
-		const template = await this.loadTemplate();
+		const template = await this.loadTemplate(templateName);
 
-		const titleColor = title === 'Success' ? '#16a34a' : '#dc2626';
+		const statusColors = {
+			success: '#16a34a',
+			error: '#dc2626',
+			warning: '#eab308',
+			info: '#3b82f6'
+		};
+
+		const titleColor = statusColors[status] || statusColors.info;
 		const buttonHtml = buttonText && buttonLink
 			? `<a href="${buttonLink}" class="button">${buttonText}</a>`
 			: '';
@@ -36,7 +45,7 @@ class TemplateHandler {
 			.replace('titleColor', titleColor)
 			.replace('${heading}', heading)
 			.replace('${message}', message)
-			.replace('${additionalMessage}', additionalMessage)
+			.replace('${additionalMessage}', additionalMessage || '')
 			.replace('${buttonHtml}', buttonHtml);
 	}
 }

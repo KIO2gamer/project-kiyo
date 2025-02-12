@@ -154,3 +154,21 @@ async function createErrorResponse(statusCode, message) {
         body: html
     };
 }
+
+async function handleWarningResponse(message) {
+    const html = await templateHandler.generateResponse('warning-template', {
+        title: 'Warning',
+        heading: 'Action Required',
+        message: message,
+        additionalMessage: 'Please review the following details carefully.',
+        buttonText: 'Acknowledge',
+        buttonLink: '#',
+        status: 'warning'
+    });
+
+    return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html
+    };
+}
