@@ -4,6 +4,7 @@ const {
 	version: djsVersion,
 } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
+const moment = require('moment');
 
 module.exports = {
 	description_full:
@@ -30,33 +31,45 @@ async function sendBotInfo(sent, interaction) {
 	try {
 		const uptime = formatUptime(interaction.client.uptime);
 
-		const description = `\`\`\`fix\nDeveloper: kio2gamer\nStatus: In Development\nLanguage: JavaScript\nCreation Date: ${interaction.client.user.createdAt.toUTCString()}\n\`\`\``;
+		const description = `\`\`\`ansi
+\x1b[34mDeveloper:\x1b[32m kio2gamer\x1b[0m
+\x1b[34mStatus:\x1b[33m In Development\x1b[0m
+\x1b[34mLanguage:\x1b[35m JavaScript\x1b[0m
+\x1b[34mCreation Date:\x1b[36m ${moment(interaction.client.user.createdAt)
+				.format('MMM DD, YYYY, h:mm A UTC')}\x1b[0m
+\`\`\``;
 
-		const performanceMetrics = `\`\`\`fix\nLatency: ${sent.createdTimestamp - interaction.createdTimestamp}ms\nWebSocket: ${interaction.client.ws.ping}ms\nUptime: ${uptime}\nNode.js Version: ${process.version}\ndiscord.js Version: v${djsVersion}\n\`\`\``;
+		const performanceMetrics = `\`\`\`ansi
+\x1b[34mLatency:\x1b[0m ${sent.createdTimestamp - interaction.createdTimestamp}ms
+\x1b[34mWebSocket:\x1b[0m ${interaction.client.ws.ping}ms
+\x1b[34mUptime:\x1b[0m ${uptime}
+\x1b[34mNode.js Version:\x1b[0m ${process.version}
+\x1b[34mdiscord.js Version:\x1b[0m v${djsVersion}
+\`\`\``;
 
-		const systemSpecs = `\`\`\`fix\nBot ID: ${interaction.client.user.id}\nType: Private\nCommand Count: ${interaction.client.commands.size}\nCommand Type: Slash Commands\nMemory Usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB\n\`\`\``;
+		const systemSpecs = `\`\`\`ansi
+\x1b[34mBot ID:\x1b[0m ${interaction.client.user.id}
+\x1b[34mType:\x1b[0m Private
+\x1b[34mCommand Count:\x1b[0m ${interaction.client.commands.size}
+\x1b[34mCommand Type:\x1b[0m Slash Commands
+\x1b[34mMemory Usage:\x1b[0m ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
+\`\`\``;
 
-		const inviteLink = process.env.DISCORD_INVITE;
-		const embed = new EmbedBuilder().setTitle('🤖 Bot Information');
-
-		if (inviteLink && inviteLink.startsWith('https://')) {
-			embed.setURL(inviteLink);
-		}
-
-		embed
+		const embed = new EmbedBuilder()
+			.setTitle('🤖 Bot Information')
 			.setColor('#8A2BE2')
 			.setDescription(description)
 			.addFields(
 				{
-					name: '📊 Performance Metrics',
+					name: '📊 **Performance Metrics**',
 					value: performanceMetrics,
 					inline: false,
 				},
 				{
-					name: '💻 System Specifications',
+					name: '💻 **System Specifications**',
 					value: systemSpecs,
 					inline: false,
-				},
+				}
 			)
 			.setThumbnail(interaction.client.user.displayAvatarURL())
 			.setFooter({
@@ -65,7 +78,12 @@ async function sendBotInfo(sent, interaction) {
 			})
 			.setTimestamp();
 
-		return interaction.reply({ content: ' ', embeds: [embed], ephemeral: true });
+		const inviteLink = process.env.DISCORD_INVITE;
+		if (inviteLink && inviteLink.startsWith('https://')) {
+			embed.setURL(inviteLink);
+		}
+
+		return interaction.editReply({ content: ' ', embeds: [embed], ephemeral: true });
 	} catch (error) {
 		console.error('Error retrieving bot information:', error);
 		return handleError(interaction, error);

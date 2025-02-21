@@ -30,6 +30,8 @@ module.exports = {
 		'/server_stats timeframe: All Time',
 	],
 	async execute(interaction) {
+		await interaction.deferReply(); // Defer reply immediately
+
 		const timeframe = interaction.options.getString('timeframe') || 'all';
 		const guild = interaction.guild;
 		const startDate = getStartDate(timeframe);
@@ -37,10 +39,10 @@ module.exports = {
 		try {
 			const stats = await collectServerStats(guild, startDate);
 			const embed = createStatsEmbed(guild, timeframe, stats);
-			await interaction.reply({ embeds: [embed] });
+			await interaction.editReply({ embeds: [embed] }); // Use editReply to send the embed after deferring
 		} catch (error) {
 			console.error('Error executing server_stats:', error);
-			await interaction.reply(
+			await interaction.editReply( // Use editReply for error messages as well
 				'An error occurred while fetching server stats.',
 			);
 		}
@@ -68,8 +70,7 @@ async function collectServerStats(guild, startDate) {
 
 	const stats = {
 		totalMembers: members.size,
-		newMembers: members.filter((member) => member.joinedAt >= startDate)
-			.size,
+		newMembers: members.filter((member) => member.joinedAt >= startDate).size,
 		textChannels: channels.filter((c) => c.isTextBased()).size,
 		voiceChannels: channels.filter((c) => c.type === 'GUILD_VOICE').size,
 		roles: guild.roles.cache.size,
@@ -79,7 +80,9 @@ async function collectServerStats(guild, startDate) {
 	};
 
 	const textChannels = channels.filter((channel) => channel.isTextBased());
-	for (const channel of textChannels.values()) {
+	const channelMessagePromises = textChannels.map(async (channel) => { // Map channels to promises
+		let channelMessagesSent = 0;
+		let channelReactionsGiven = 0;
 		let lastId;
 		let fetchMore = true;
 		while (fetchMore) {
@@ -92,8 +95,8 @@ async function collectServerStats(guild, startDate) {
 			const relevantMessages = messages.filter(
 				(msg) => msg.createdAt >= startDate,
 			);
-			stats.messagesSent += relevantMessages.size;
-			stats.reactionsGiven += relevantMessages.reduce(
+			channelMessagesSent += relevantMessages.size;
+			channelReactionsGiven += relevantMessages.reduce(
 				(acc, msg) => acc + msg.reactions.cache.size,
 				0,
 			);
@@ -101,7 +104,16 @@ async function collectServerStats(guild, startDate) {
 			if (messages.size < 100) fetchMore = false;
 			lastId = messages.last().id;
 		}
-	}
+		return { messagesSent: channelMessagesSent, reactionsGiven: channelReactionsGiven }; // Return stats for each channel
+	});
+
+	const channelStats = await Promise.all(channelMessagePromises); // Wait for all channel message fetches to complete
+
+	// Aggregate stats from all channels
+	channelStats.forEach(channelStat => {
+		stats.messagesSent += channelStat.messagesSent;
+		stats.reactionsGiven += channelStat.reactionsGiven;
+	});
 
 	return stats;
 }
