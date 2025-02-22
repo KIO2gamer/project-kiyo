@@ -7,9 +7,10 @@ const {
 } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
 const EMBED_COLOR = '#5865F2';
+const BOT_ICON_URL = 'https://i.imgur.com/0X4O7f3.png';
 const cooldowns = new Map();
 
-// Helper function to handle pagination
+// Helper function to handle pagination (no changes needed here)
 function paginate(items, itemsPerPage, page) {
 	const totalPages = Math.ceil(items.length / itemsPerPage);
 	const slicedItems = items.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
@@ -47,6 +48,7 @@ module.exports = {
 			const commands = Array.from(allCommands.values());
 
 			if (commandQuery) {
+				// ... (Command Query Logic - No changes needed here) ...
 				const command = commands.find(
 					(cmd) =>
 						cmd.data.name.toLowerCase() === commandQuery.toLowerCase(),
@@ -54,24 +56,30 @@ module.exports = {
 
 				if (!command) {
 					return interaction.reply({
-						content: `❌ No command found with the name \`${commandQuery}\`.`,
+						content: `❌ Command \`${commandQuery}\` not found. Please check the command name and try again.`,
+						ephemeral: true,
 					});
 				}
 
 				const commandEmbed = new EmbedBuilder()
 					.setColor(EMBED_COLOR)
-					.setImage('https://i.imgur.com/0X4O7f3.png')
-					.setTitle(`✨ Command: /${command.data.name}`)
-					.setDescription(command.description_full || 'No description available.')
+					.setThumbnail(interaction.client.user.displayAvatarURL())
+					.setTitle(`/${command.data.name} Command Help`)
+					.setDescription(
+						command.description_full || '*No detailed description provided for this command.*',
+					)
 					.addFields(
-						{ name: 'Usage', value: `\`${command.usage}\`` },
+						{ name: 'Category', value: command.category || 'General', inline: true },
+						{ name: 'Usage', value: `\`${command.usage}\``, inline: true },
 						{
 							name: 'Examples',
-							value: command.examples.join('\n') || 'No examples available.',
+							value:
+								command.examples?.map((ex) => `\`${ex}\``).join('\n') ||
+								'*No examples available.*',
 						},
 					)
 					.setFooter({
-						text: 'Use /help to return to the main menu.',
+						text: 'Tip: Use /help to see the main menu or /help [search:keyword] to find commands.',
 						iconURL: interaction.client.user.displayAvatarURL(),
 					})
 					.setTimestamp();
@@ -91,7 +99,8 @@ module.exports = {
 
 				if (filteredCommands.length === 0) {
 					return interaction.reply({
-						content: `❌ No commands found matching \`${searchQuery}\`.`,
+						content: `🔍 No commands found matching your search for \`${searchQuery}\`.`,
+						ephemeral: true,
 					});
 				}
 
@@ -99,19 +108,23 @@ module.exports = {
 				const pages = [];
 				for (let i = 0; i < filteredCommands.length; i += ITEMS_PER_PAGE) {
 					const pageCommands = filteredCommands.slice(i, i + ITEMS_PER_PAGE);
+					// **Improved Search Embed Output:**
+					const commandList = pageCommands
+						.map(cmd => {
+							const commandName = `/${cmd.data.name}`;
+							const description = cmd.data.description || '*No description available.*';
+							return `> \`${commandName}\` - ${description}`; // List format in description
+						})
+						.join('\n');
+
 					const searchEmbed = new EmbedBuilder()
 						.setColor(EMBED_COLOR)
-						.setImage('https://i.imgur.com/0X4O7f3.png')
-						.setTitle('🔍 Search Results')
-						.setDescription('Here are the commands matching your search:')
-						.addFields(
-							pageCommands.map((cmd) => ({
-								name: `/${cmd.data.name}`,
-								value: cmd.data.description || 'No description available.',
-							})),
-						)
+						.setThumbnail(interaction.client.user.displayAvatarURL())
+						.setTitle(`🔍 Search Results for "${searchQuery}" (Page ${pages.length + 1})`)
+						.setDescription(`Here are the commands matching your search query:\n${commandList}`) // Use the formatted command list in description
+						// Removed addFields as we are using setDescription for command listing
 						.setFooter({
-							text: `Page ${pages.length + 1}`,
+							text: `Page ${pages.length + 1} of ${Math.ceil(filteredCommands.length / ITEMS_PER_PAGE)}`,
 							iconURL: interaction.client.user.displayAvatarURL(),
 						})
 						.setTimestamp();
@@ -164,27 +177,39 @@ module.exports = {
 				});
 
 				collector.on('end', async () => {
-					await interaction.reply({
-						components: [],
-						content: '⏰ The search results have expired. Please use `/help` again.',
-					});
+					try {
+						await interaction.editReply({
+							components: [],
+							content: '⏰ Search results expired.',
+							embeds: [],
+						});
+					} catch (error) {
+						console.error('Error ending help collector:', error);
+					}
 				});
 				return;
 			}
 
-			// Main help menu
+			// Main help menu (No changes needed here)
 			const mainEmbed = new EmbedBuilder()
 				.setColor(EMBED_COLOR)
-				.setImage('https://i.imgur.com/0X4O7f3.png')
-				.setTitle('📖 Help Menu')
-				.setDescription('Welcome! Use the buttons below to navigate.')
 				.setThumbnail(interaction.client.user.displayAvatarURL())
+				.setTitle('📖 Welcome to the Help Menu!')
+				.setDescription(
+					'Need assistance or want to know what I can do? Explore the options below:\n\n' +
+					'**> 📜 Commands:** View a list of all available commands.\n' +
+					'**> 🔗 Support Server:** Get direct support, suggest features, or report bugs.',
+				)
+				.addFields({
+					name: 'Quick Navigation',
+					value: 'Use the buttons below to navigate the help menu. For command-specific help, use `/help command:[command name]`. To search commands, use `/help search:[keyword]`.',
+				})
 				.setTimestamp();
 
 			const buttonRow = new ActionRowBuilder().addComponents(
 				new ButtonBuilder()
 					.setCustomId('commands')
-					.setLabel('Commands')
+					.setLabel('Commands List')
 					.setStyle(ButtonStyle.Primary)
 					.setEmoji('📜'),
 				new ButtonBuilder()
@@ -198,6 +223,113 @@ module.exports = {
 				embeds: [mainEmbed],
 				components: [buttonRow],
 			});
+
+			// **NEW: Interaction Collector for Main Menu Buttons** (No changes needed here)
+			const mainMenuCollector = interaction.channel.createMessageComponentCollector({
+				filter: (i) => i.user.id === interaction.user.id,
+				time: 300000, // 5 minutes timeout for main menu interaction as well
+			});
+
+			mainMenuCollector.on('collect', async (i) => {
+				if (i.customId === 'commands') {
+					// ... (Command List Logic - No changes needed here) ...
+					const ITEMS_PER_PAGE_COMMANDS = 10; // Items per page for command list
+					const commandListPages = [];
+					for (let j = 0; j < commands.length; j += ITEMS_PER_PAGE_COMMANDS) {
+						const pageCommands = commands.slice(j, j + ITEMS_PER_PAGE_COMMANDS);
+						const commandListEmbed = new EmbedBuilder()
+							.setColor(EMBED_COLOR)
+							.setThumbnail(i.client.user.displayAvatarURL())
+							.setTitle('📜 Command List')
+							.setDescription('Here is a list of all available commands:')
+							.addFields(
+								pageCommands.map((cmd) => ({
+									name: `/${cmd.data.name}`,
+									value: cmd.data.description || '*No description available.*',
+								})),
+							)
+							.setFooter({
+								text: `Page ${commandListPages.length + 1} of ${Math.ceil(commands.length / ITEMS_PER_PAGE_COMMANDS)}`,
+								iconURL: i.client.user.displayAvatarURL(),
+							})
+							.setTimestamp();
+						commandListPages.push(commandListEmbed);
+					}
+
+					let currentCommandListPage = 0;
+					const getCommandListNavigationRow = () =>
+						new ActionRowBuilder().addComponents(
+							new ButtonBuilder()
+								.setCustomId('cmd_prev') // Different customId to avoid conflict with search pagination
+								.setLabel('Previous')
+								.setStyle(ButtonStyle.Secondary)
+								.setEmoji('⬅️')
+								.setDisabled(currentCommandListPage === 0),
+							new ButtonBuilder()
+								.setCustomId('cmd_next') // Different customId
+								.setLabel('Next')
+								.setStyle(ButtonStyle.Secondary)
+								.setEmoji('➡️')
+								.setDisabled(currentCommandListPage === commandListPages.length - 1),
+						);
+
+					await i.update({ // Use i.update to edit the original main menu message
+						embeds: [commandListPages[currentCommandListPage]],
+						components: [getCommandListNavigationRow()],
+					});
+
+					const commandListPaginator = i.channel.createMessageComponentCollector({ // Create a *new* collector for command list pagination
+						filter: (btn_i) => btn_i.user.id === i.user.id,
+						time: 300000,
+					});
+
+					commandListPaginator.on('collect', async (btn_i) => {
+						if (btn_i.customId === 'cmd_next') {
+							currentCommandListPage++;
+							await btn_i.update({
+								embeds: [commandListPages[currentCommandListPage]],
+								components: [getCommandListNavigationRow()],
+							});
+						} else if (btn_i.customId === 'cmd_prev') {
+							currentCommandListPage--;
+							await btn_i.update({
+								embeds: [commandListPages[currentCommandListPage]],
+								components: [getCommandListNavigationRow()],
+							});
+						}
+					});
+
+					commandListPaginator.on('end', async () => {
+						try {
+							await i.editReply({ // Edit the command list message on timeout
+								components: [],
+								content: '⏰ Command list expired.',
+								embeds: [],
+							});
+						} catch (error) {
+							console.error('Error ending command list collector:', error);
+						}
+					});
+					mainMenuCollector.stop(); // Stop the main menu collector after "commands" is clicked and command list is shown
+					return; // Important to return to prevent further main menu collector logic
+				}
+				// You can add more button handlers here if you add more buttons to the main menu
+				// For example, if you add a "Guides" button:
+				// else if (i.customId === 'guides') {
+				//     // Logic to display guides
+				// }
+			});
+
+			mainMenuCollector.on('end', collected => {
+				if (collected.size === 0) { // Only edit if no interaction happened within timeout for main menu itself (not command list)
+					interaction.editReply({
+						components: [],
+						content: '⏰ Help menu expired due to inactivity.',
+					}).catch(error => console.error("Error editing reply on main menu timeout:", error));
+				}
+			});
+
+
 		} catch (error) {
 			console.error('Error executing help command:', error);
 			await handleError(interaction, error);
