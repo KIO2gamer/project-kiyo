@@ -2,8 +2,6 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a342cd56-0c9d-4650-8a27-3bbcf1889819/deploy-status)](https://app.netlify.com/sites/kiyo-verification/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/KIO2gamer/project-kiyo/blob/main/LICENSE.md)
-[![Node.js Version](https://img.shields.io/node/v/kiyo-discord-bot.svg)](https://nodejs.org/)
-[![Discord Server](https://discord.com/api/guilds/YOUR_DISCORD_GUILD_ID/widget.png?style=shield)](https://discord.gg/y3GvzeZVJ3)
 [![GitHub Actions Status](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml/badge.svg)](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io)
 [![eslint](https://img.shields.io/badge/eslint-8.x-brightgreen.svg)](https://eslint.org/)
@@ -16,7 +14,7 @@ A versatile Discord bot packed with moderation, entertainment, and utility comma
 - **Entertainment:** Fun and engaging commands to keep users entertained (e.g., games, image commands, meme generation). _(Add specific entertainment features here)_
 - **Utility:** Useful tools and commands to provide information and enhance server functionality (e.g., weather, calculator, search, YouTube info). _(Add specific utility features here)_
 - **YouTube Subscriber Roles:** Automatically assign roles to users based on their YouTube subscriber counts, encouraging community engagement.
-- **And more!** Explore the commands to discover all the features Kiyo has to offer. _(Optional: Link to a command list or documentation if available)_
+- **And more!** Explore the [commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) to discover all the features Kiyo has to offer.
 
 ## 🛠️ Requirements
 
