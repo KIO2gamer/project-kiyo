@@ -97,7 +97,19 @@ async function getYouTubeConnections(accessToken) {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
 
+    if (!connectionsResponse.ok) {
+        console.error("Discord connections API error:", connectionsResponse.status, connectionsResponse.statusText);
+        const errorData = await connectionsResponse.json();
+        console.error("Discord connections API error details:", errorData);
+        return []; // Return empty array on API error
+    }
+
     const connectionsData = await connectionsResponse.json();
+    console.log("Discord connections data:", connectionsData); // Log this!
+    if (!Array.isArray(connectionsData)) {
+        console.error("Error: connectionsData is not an array:", connectionsData);
+        return []; // Return empty array if not an array
+    }
     return connectionsData.filter(connection => connection.type === 'youtube');
 }
 
