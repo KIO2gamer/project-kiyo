@@ -151,5 +151,5 @@ This project is licensed under the **[MIT License](https://github.com/KIO2gamer/
 ---
 
 <p align="center">
-  <sub><sup>Made with ❤️ by <a href="https://github.com/KIO2gamer">KIO2gamer</a> and contributors</sup></sub>
+  Made with ❤️ by <a href="https://github.com/KIO2gamer">KIO2gamer</a> and contributors</sup></sub>
 </p>
