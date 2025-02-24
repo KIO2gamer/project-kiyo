@@ -13,7 +13,7 @@ module.exports = {
 	name: Events.MessageDelete,
 	/**
 	 * Handles the message delete event and logs the details to a specified log channel.
-	 * 
+	 *
 	 * @async
 	 * @function execute
 	 * @param {Message} message - The deleted message object.
@@ -21,8 +21,8 @@ module.exports = {
 	 */
 	async execute(message) {
 		try {
-			// Ignore bot messages and self-deletions
-			if (message.author.bot || message.author.id === message.client.user.id) {
+			// Ignore bot messages and self-deletions (messages authored by bot)
+			if (message.author.bot) {
 				return;
 			}
 
@@ -69,6 +69,35 @@ module.exports = {
 				return;
 			}
 
+			// Fetch audit logs to determine deletion cause
+			const auditLogs = await message.guild.fetchAuditLogs({
+				type: AuditLogEvent.MessageDelete,
+				limit: 1
+			});
+
+			const auditEntry = auditLogs.entries.first();
+			if (auditEntry) {
+				const { executor, target, createdTimestamp } = auditEntry;
+				const timeDifference = Date.now() - createdTimestamp;
+
+				// Check if the executor of the deletion is the bot itself
+				if (executor.id === message.client.user.id && target.id === message.author.id && timeDifference < 5000) {
+					Logger.debug('Self-deletion detected, skipping logging.'); // Optional debug log
+					return; // Skip logging if bot is the executor
+				}
+
+				if (
+					target.id === message.author.id &&
+					timeDifference < 5000
+				) {
+					logEmbed.addFields({
+						name: 'Deleted By',
+						value: `${executor.tag} (${executor.id})`,
+						inline: true
+					});
+				}
+			}
+
 			// Create log embed
 			const logEmbed = new EmbedBuilder()
 				.setColor(0xff0000)
@@ -97,28 +126,6 @@ module.exports = {
 				])
 				.setTimestamp();
 
-			// Fetch audit logs to determine deletion cause
-			const auditLogs = await message.guild.fetchAuditLogs({
-				type: AuditLogEvent.MessageDelete,
-				limit: 1
-			});
-
-			const auditEntry = auditLogs.entries.first();
-			if (auditEntry) {
-				const { executor, target, createdTimestamp } = auditEntry;
-				const timeDifference = Date.now() - createdTimestamp;
-
-				if (
-					target.id === message.author.id &&
-					timeDifference < 5000
-				) {
-					logEmbed.addFields({
-						name: 'Deleted By',
-						value: `${executor.tag} (${executor.id})`,
-						inline: true
-					});
-				}
-			}
 
 			// Collect and send attachments
 			const attachments = [];

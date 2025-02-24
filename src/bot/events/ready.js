@@ -1,34 +1,43 @@
 const { ActivityType } = require('discord-api-types/v10');
 const Logger = require('./../../../logger');
 
+// Simplified activities array - now just an array of activity names (strings)
 const activities = [
-	// Playing activities
-	{ name: '🎮 Exploring new worlds', type: ActivityType.Playing },
-	{ name: '🎲 Rolling the dice', type: ActivityType.Playing },
-	{ name: '👾 Conquering challenges', type: ActivityType.Playing },
+	'🎮 Exploring new worlds',
+	'🎲 Rolling the dice',
+	'👾 Conquering challenges',
+	'🎧 Listening to your commands', // Shortened for brevity
+	'🎤 Ready for your requests',    // Shortened for brevity
+	'👀 Monitoring the server',
+	'🛡️ Guarding your community',
+	'🔴 Broadcasting updates',       // Shortened, generalized
+	'🎬 Showcasing features'
+];
 
-	// Listening activities
-	{ name: '🎧 the rhythm of your commands', type: ActivityType.Listening },
-	{ name: '🎤 your next request', type: ActivityType.Listening },
+// Choose a consistent ActivityType for all activities - Playing is a good default
+const DEFAULT_ACTIVITY_TYPE = ActivityType.Custom;
 
-	// Watching activities
-	{ name: '👀 Monitoring the server', type: ActivityType.Watching },
-	{ name: '🛡️ Guarding your community', type: ActivityType.Watching },
-
-	// Streaming activities
-	{ name: '🔴 Broadcasting knowledge', type: ActivityType.Streaming },
-	{ name: '🎬 Showcasing features', type: ActivityType.Streaming }
+// Define available bot statuses
+const statusOptions = [
+	'online',
+	'idle',
+	'dnd',
 ];
 
 let activityIndex = 0;
 let activityInterval = null;
 
 const setNextActivity = async (client) => {
-	const currentActivity = activities[activityIndex];
+	// Get the activity name from the simplified activities array
+	const activityName = activities[activityIndex];
+	// Randomly select a status
+	const randomStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
+
 	try {
 		await client.user.setPresence({
-			activities: [currentActivity],
-			status: 'online'
+			// Use the consistent DEFAULT_ACTIVITY_TYPE for all activities
+			activities: [{ name: activityName, type: DEFAULT_ACTIVITY_TYPE }],
+			status: randomStatus
 		});
 		activityIndex = (activityIndex + 1) % activities.length;
 	} catch (error) {
@@ -61,12 +70,13 @@ module.exports = {
 		Logger.log('BOT', 'Bot is ready!', 'success');
 		logBotStatistics(client);
 
+		// Set initial activity and status immediately on startup
+		await setNextActivity(client);
+		Logger.log('BOT', 'Initial activity and status set', 'info');
+
 		// Start activity cycling
 		activityInterval = setInterval(() => setNextActivity(client), 10000);
-		Logger.log('BOT', 'Activity cycling started', 'info');
-
-		// Set initial activity
-		await setNextActivity(client);
+		Logger.log('BOT', 'Activity cycling started (every 10 seconds)', 'info');
 	},
 	stopActivityCycle: () => {
 		if (activityInterval) {

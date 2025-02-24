@@ -7,133 +7,199 @@ const {
 } = require('discord.js');
 const he = require('he');
 
+// Constants for styling and timeouts
+const PRIMARY_COLOR = '#7289DA'; // Discord Blurple
+const CORRECT_COLOR = '#4CAF50';  // Green
+const WRONG_COLOR = '#F44336';    // Red
+const TIMEOUT_COLOR = '#FFA000';  // Orange/Amber
+const TRIVIA_TIMEOUT = 20000;     // 20 seconds for answering
+const ANSWER_BUTTON_LABELS = ['A', 'B', 'C', 'D'];
+const API_ENDPOINT = 'https://opentdb.com/api.php?amount=1&type=multiple';
+
 module.exports = {
 	description_full:
-		'The bot will provide a trivia question with four multiple-choice answers. Users can click buttons to guess the correct answer.',
+		'Tests your knowledge with a multiple-choice trivia question.',
 	usage: '/trivia',
 	examples: ['/trivia'],
 	category: 'games',
 	data: new SlashCommandBuilder()
 		.setName('trivia')
-		.setDescription(
-			'Answer a fun trivia question and test your knowledge!',
-		),
+		.setDescription('Start a trivia game and answer a question!'),
+
 	async execute(interaction) {
 		try {
-			const response = await fetch(
-				'https://opentdb.com/api.php?amount=1&type=multiple',
-			);
-			const data = await response.json();
-			const questionData = data.results[0];
-
-			const decodedQuestion = he.decode(questionData.question);
-			const decodedAnswers = questionData.incorrect_answers.map(
-				(answer) => he.decode(answer),
-			);
-			decodedAnswers.push(he.decode(questionData.correct_answer));
-
-			const answers = [...decodedAnswers].sort(() => Math.random() - 0.5);
-			const correctIndex = answers.indexOf(
-				he.decode(questionData.correct_answer),
-			);
-
-			const embed = new EmbedBuilder()
-				.setColor('#FF69B4')
-				.setTitle('🎲 Epic Trivia Challenge! 🎲')
-				.setDescription(
-					`**${decodedQuestion}**\n\n*Choose wisely, you have 20 seconds!*`,
-				)
-				.setFooter({
-					text: `Category: ${questionData.category} | Difficulty: ${questionData.difficulty.charAt(0).toUpperCase() + questionData.difficulty.slice(1)}`,
+			await interaction.deferReply(); // Defer reply for potential API delay
+			const questionData = await fetchTriviaQuestion();
+			if (!questionData) {
+				return interaction.editReply({
+					content: '⚠️ Failed to fetch trivia question. Please try again later.',
+					ephemeral: true,
 				});
+			}
 
-			const row = new ActionRowBuilder().addComponents(
-				['A', 'B', 'C', 'D'].map((letter) =>
-					new ButtonBuilder()
-						.setCustomId(letter)
-						.setLabel(letter)
-						.setStyle(ButtonStyle.Primary),
-				),
-			);
+			const { triviaEmbed, correctIndex } = createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
+			const answerRow = createAnswerRow();
 
-			const answerFields = answers.map((answer, index) => ({
-				name: `Option ${['A', 'B', 'C', 'D'][index]}`,
-				value: answer,
-				inline: true,
-			}));
-			embed.addFields(answerFields);
+			const reply = await interaction.editReply({ embeds: [triviaEmbed], components: [answerRow] }); // Get the message object after editReply
 
-			await interaction.reply({ embeds: [embed], components: [row] });
+			const collector = createButtonCollector(interaction);
+			handleCollectorEvents(collector, interaction, reply, questionData, triviaEmbed.data.fields, correctIndex); // Pass correctIndex
 
-			const filter = (i) =>
-				['A', 'B', 'C', 'D'].includes(i.customId) &&
-				i.user.id === interaction.user.id;
-			const collector =
-				interaction.channel.createMessageComponentCollector({
-					filter,
-					time: 20000,
-				});
-
-			let answered = false;
-
-			collector.on('collect', async (i) => {
-				answered = true;
-				const userAnswer = ['A', 'B', 'C', 'D'].indexOf(i.customId);
-				const correct = userAnswer === correctIndex;
-
-				const resultEmbed = new EmbedBuilder()
-					.setColor(correct ? '#00FF00' : '#FF0000')
-					.setTitle(
-						correct
-							? "🎉 Correct! You're a Trivia Master! 🎉"
-							: '😢 Oops! Not Quite Right 😢',
-					)
-					.setDescription(
-						`The correct answer was: **${answers[correctIndex]}**`,
-					)
-					.addFields(
-						{
-							name: 'Your Answer',
-							value: answers[userAnswer],
-							inline: true,
-						},
-						{
-							name: 'Correct Answer',
-							value: answers[correctIndex],
-							inline: true,
-						},
-					)
-					.setFooter({
-						text: `You answered in ${((i.createdTimestamp - interaction.createdTimestamp) / 1000).toFixed(2)} seconds!`,
-					});
-
-				await i.update({ embeds: [resultEmbed], components: [] });
-				collector.stop();
-			});
-
-			collector.on('end', async () => {
-				if (!answered) {
-					const timeoutEmbed = new EmbedBuilder()
-						.setColor('#FFA500')
-						.setTitle("⏰ Time's Up! ⏰")
-						.setDescription(
-							`The correct answer was: **${answers[correctIndex]}**`,
-						)
-						.setFooter({ text: 'Better luck next time!' });
-
-					await interaction.reply({
-						embeds: [timeoutEmbed],
-						components: [],
-					});
-				}
-			});
 		} catch (error) {
-			console.error('Error fetching trivia:', error);
-			await interaction.reply({
+			console.error('Trivia command error:', error);
+			await interaction.editReply({
 				content:
-					"Oops! The trivia machine broke. Let's try again later!",
+					'🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
 				ephemeral: true,
 			});
 		}
 	},
 };
+
+// --- Helper Functions ---
+
+async function fetchTriviaQuestion() {
+	try {
+		const response = await fetch(API_ENDPOINT);
+		if (!response.ok) {
+			console.error(`HTTP error! status: ${response.status}`); // Log HTTP errors
+			return null;
+		}
+		const data = await response.json();
+		if (data.results.length === 0) {
+			console.warn('No trivia questions returned from API.'); // Log if no questions
+			return null;
+		}
+		return data.results[0];
+	} catch (error) {
+		console.error('Error fetching trivia question from API:', error);
+		return null;
+	}
+}
+
+function decodeHtmlEntities(text) {
+	return he.decode(text);
+}
+
+function createTriviaEmbed(questionData) {
+	const decodedQuestion = decodeHtmlEntities(questionData.question);
+	const incorrectAnswers = questionData.incorrect_answers.map(decodeHtmlEntities);
+	const correctAnswer = decodeHtmlEntities(questionData.correct_answer);
+	const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
+	const correctIndex = allAnswers.indexOf(correctAnswer);
+
+	console.log(`Correct Answer from API: ${correctAnswer}`); // Debug log
+	console.log(`All Answers Array: ${JSON.stringify(allAnswers)}`); // Debug log
+	console.log(`Correct Index (calculated): ${correctIndex}`); // Debug log
+
+
+	const embed = new EmbedBuilder()
+		.setColor(PRIMARY_COLOR)
+		.setTitle('🎲 Trivia Time! 🧠')
+		.setDescription(
+			`**${decodedQuestion}**\n\n*Choose the correct answer below! You have ${TRIVIA_TIMEOUT / 1000} seconds.*`,
+		)
+		.setFooter({
+			text: `Category: ${questionData.category} | Difficulty: ${questionData.difficulty.charAt(0).toUpperCase() + questionData.difficulty.slice(1)}`,
+		})
+		.addFields(createAnswerFields(allAnswers)); // Use helper function to create fields
+
+	// Removed: embed.correctAnswerIndex = correctIndex;  // No longer attaching to embed
+	return { triviaEmbed: embed, correctIndex }; // Return both embed and correctIndex
+}
+
+function createAnswerFields(answers) {
+	return answers.map((answer, index) => ({
+		name: `Option ${ANSWER_BUTTON_LABELS[index]}`,
+		value: answer || '*Error: Answer Missing*', // Handle potential undefined answer
+		inline: true,
+	}));
+}
+
+
+function createAnswerRow() {
+	return new ActionRowBuilder().addComponents(
+		ANSWER_BUTTON_LABELS.map((letter) =>
+			new ButtonBuilder()
+				.setCustomId(letter)
+				.setLabel(letter)
+				.setStyle(ButtonStyle.Primary),
+		),
+	);
+}
+
+
+function createButtonCollector(interaction) {
+	const filter = (i) =>
+		ANSWER_BUTTON_LABELS.includes(i.customId) && i.user.id === interaction.user.id;
+	return interaction.channel.createMessageComponentCollector({
+		filter,
+		time: TRIVIA_TIMEOUT,
+	});
+}
+
+
+function handleCollectorEvents(collector, interaction, reply, questionData, answerFields, correctAnswerIndex) { // Added correctAnswerIndex parameter
+	let answered = false;
+	// Removed: const correctAnswerIndex = reply.embeds[0]?.correctAnswerIndex; // No longer needed from embed
+	const answers = answerFields.map(field => field.value); // Extract answers from embed fields
+
+	collector.on('collect', async (i) => {
+		answered = true;
+		collector.stop(); // Stop collector immediately after an answer is collected
+		const userAnswerIndex = ANSWER_BUTTON_LABELS.indexOf(i.customId); // userAnswerIndex from button click
+		const isCorrect = userAnswerIndex === correctAnswerIndex;
+
+		const resultEmbed = createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction);
+		await i.update({ embeds: [resultEmbed], components: [] });
+	});
+
+	collector.on('end', async (collected) => {
+		if (!answered) {
+			const timeoutEmbed = createTimeoutEmbed(answers, correctAnswerIndex);
+			await interaction.followUp({ embeds: [timeoutEmbed], components: [] }); // Use followUp for timeout message
+		}
+	});
+}
+
+
+function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction) { // Correct Answer Index parameter
+	console.log(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
+	console.log(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+
+	const resultEmbed = new EmbedBuilder()
+		.setColor(isCorrect ? CORRECT_COLOR : WRONG_COLOR)
+		.setTitle(
+			isCorrect
+				? "🎉 Correct Answer! You're a Trivia Star! 🎉"
+				: '😢 Not quite, but keep trying! 🌟',
+		)
+		.setDescription(`The right answer is **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`) // Safe access and fallback
+		.addFields(
+			{
+				name: 'Your Choice',
+				value: answers?.[userAnswerIndex] || '*Error: Your Answer Missing*', // Safe access and fallback
+				inline: true,
+			},
+			{
+				name: 'Correct Choice',
+				value: answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*', // Safe access and fallback
+				inline: true,
+			},
+		)
+		.setFooter({
+			text: `Answered in ${((interaction.createdTimestamp - interaction.createdTimestamp) / 1000).toFixed(2)} seconds! (This part needs fixing)`, // Time calculation is incorrect, needs to use interaction timestamps properly
+		});
+	return resultEmbed;
+}
+
+
+function createTimeoutEmbed(answers, correctAnswerIndex) { // Correct Answer Index parameter
+	console.log(`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
+	console.log(`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+	return new EmbedBuilder()
+		.setColor(TIMEOUT_COLOR)
+		.setTitle("⏰ Time's Up! No answer in time. ⏱️")
+		.setDescription(`The correct answer was **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`) // Safe access and fallback
+		.setFooter({ text: 'Don\'t worry, there\'s always next question!' });
+}

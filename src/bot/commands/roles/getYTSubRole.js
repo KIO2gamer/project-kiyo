@@ -2,20 +2,12 @@ const { SlashCommandBuilder } = require('discord.js');
 const OAuthCode = require('../../../database/OauthCode.js');
 const RoleSchema = require('../../../database/roleStorage.js');
 const { google } = require('googleapis');
-const crypto = require('crypto');
 
 const youtube = google.youtube({
 	version: 'v3',
 	auth: process.env.YOUTUBE_API_KEY,
 });
 
-const ALGORITHM = 'aes-256-cbc';
-
-function encrypt(text, secretKey, iv) {
-	const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(secretKey), iv);
-	let encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
-	return `${iv.toString('hex')}:${encrypted.toString('hex')}:${secretKey.toString('hex')}`;
-}
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -30,16 +22,13 @@ module.exports = {
 		try {
 			await interaction.deferReply({ ephemeral: true });
 
-			const state = JSON.stringify({
+			const state = JSON.stringify({ // Use JSON.stringify directly
 				interactionId: interaction.id,
 				guildId: interaction.guild.id,
 				channelId: interaction.channel.id,
 			});
 
-			const secretKey = crypto.randomBytes(32);
-			const iv = crypto.randomBytes(16);
-			const encryptedState = encrypt(state, secretKey, iv);
-			const discordOAuthUrl = generateDiscordOAuthUrl(encryptedState);
+			const discordOAuthUrl = generateDiscordOAuthUrl(state); // Pass state directly
 
 			await interaction.editReply({
 				embeds: [
@@ -112,7 +101,7 @@ module.exports = {
 };
 
 function generateDiscordOAuthUrl(state) {
-	return `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${encodeURIComponent(state)}`;
+	return `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${encodeURIComponent(state)}`; // State is now plain JSON string
 }
 
 function createEmbed(title, description, fields = [], footerText, color = 0x0099ff) {

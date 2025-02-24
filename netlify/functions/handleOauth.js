@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const OAuthCode = require('./../../src/database/OauthCode');
-const crypto = require('crypto');
 
 // MongoDB connection URI from environment variables
 const mongoUri = process.env.MONGODB_URI;
@@ -20,18 +19,6 @@ async function connectToDatabase() {
     }
 }
 
-const algorithm = 'aes-256-cbc';
-
-function decrypt(text) {
-    const [ivHex, encryptedTextHex, ...secretKeyHex] = text.split(':');
-    const iv = Buffer.from(ivHex, 'hex');
-    const encryptedText = Buffer.from(encryptedTextHex, 'hex');
-    const secretKey = Buffer.from(secretKeyHex.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv(algorithm, secretKey, iv);
-    const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
-    return decrypted.toString();
-}
-
 exports.handler = async function (event) {
     await connectToDatabase();
     const { code, state } = getCodeAndState(event);
@@ -41,7 +28,14 @@ exports.handler = async function (event) {
     }
 
     try {
-        const decryptedState = decrypt(state);
+        let decryptedState;
+        try {
+            decryptedState = JSON.parse(state); // Parse state directly as JSON
+        } catch (e) {
+            console.error("Error parsing state JSON:", e);
+            return createErrorResponse(400, 'Invalid state parameter format.'); // More specific error for state parsing
+        }
+
         const accessToken = await exchangeCodeForToken(code);
         const youtubeConnections = await getYouTubeConnections(accessToken);
 
@@ -52,8 +46,9 @@ exports.handler = async function (event) {
         await saveOAuthRecord(decryptedState, code, youtubeConnections);
         return createSuccessResponse(youtubeConnections.length, decryptedState);
     } catch (error) {
-        console.error('❌ Error fetching Discord connections or saving to MongoDB:', error);
-        return createErrorResponse(500, 'An unexpected error occurred while processing your request.');
+        console.error('❌ Error processing OAuth flow:', error); // More general error log
+        console.error(error); // Log full error for debugging
+        return createErrorResponse(500, 'An unexpected error occurred while processing your request.'); // Generic user error
     }
 };
 
@@ -65,13 +60,6 @@ function getCodeAndState(event) {
     };
 }
 
-function createErrorResponse(statusCode, message) {
-    return {
-        statusCode,
-        headers: { 'Content-Type': 'text/html' },
-        body: generateHtmlResponse('Error', statusCode, message, 'Please ensure both code and state are provided in the request.'),
-    };
-}
 
 async function exchangeCodeForToken(code) {
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
@@ -88,6 +76,12 @@ async function exchangeCodeForToken(code) {
         }),
     });
 
+    if (!tokenResponse.ok) { // Check if token request was successful
+        const errorData = await tokenResponse.json();
+        console.error("Discord token exchange error:", errorData);
+        throw new Error(`Failed to exchange code for token: ${tokenResponse.status} ${tokenResponse.statusText}`); // More specific error
+    }
+
     const tokenData = await tokenResponse.json();
     return tokenData.access_token;
 }
@@ -97,12 +91,18 @@ async function getYouTubeConnections(accessToken) {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
 
+    if (!connectionsResponse.ok) { // Check if connections request was successful
+        const errorData = await connectionsResponse.json();
+        console.error("Discord connections fetch error:", errorData);
+        throw new Error(`Failed to fetch Discord connections: ${connectionsResponse.status} ${connectionsResponse.statusText}`); // More specific error
+    }
+
     const connectionsData = await connectionsResponse.json();
     return connectionsData.filter(connection => connection.type === 'youtube');
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections) {
-    const { interactionId, guildId, channelId } = JSON.parse(state);
+    const { interactionId, guildId, channelId } = state; // State is already parsed JSON
     const oauthRecord = new OAuthCode({
         interactionId,
         code,
@@ -118,18 +118,20 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
 
 const templateHandler = require('./templateHandler');
 
-// Update createSuccessResponse
+// Update createSuccessResponse and createErrorResponse are already using templateHandler and are good.
+
 async function createSuccessResponse(connectionsLength, state) {
-    const { guildId, channelId } = JSON.parse(state);
+    const { guildId, channelId } = state;
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 
-    const html = await templateHandler.generateResponse({
+    const html = await templateHandler.generateResponse('template', { // Assuming 'template.html' is your base success template
         title: 'Success',
         heading: 'Authorization successful!',
         message: 'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
         additionalMessage: `Number of connections: ${connectionsLength}`,
         buttonText: 'Return to Discord',
-        buttonLink: discordDeepLink
+        buttonLink: discordDeepLink,
+        status: 'success' // Add status for template styling if needed
     });
 
     return {
@@ -139,13 +141,14 @@ async function createSuccessResponse(connectionsLength, state) {
     };
 }
 
-// Update createErrorResponse
+
 async function createErrorResponse(statusCode, message) {
-    const html = await templateHandler.generateResponse({
+    const html = await templateHandler.generateResponse('template', { // Assuming 'template.html' is your base error template
         title: 'Error',
         heading: statusCode,
         message: message,
-        additionalMessage: 'Please ensure both code and state are provided in the request.'
+        additionalMessage: 'Please ensure both code and state are provided in the request.',
+        status: 'error' // Add status for template styling if needed
     });
 
     return {
@@ -155,7 +158,8 @@ async function createErrorResponse(statusCode, message) {
     };
 }
 
-async function handleWarningResponse(message) {
+
+async function handleWarningResponse(message) { // No changes needed for handleWarningResponse, it's good.
     const html = await templateHandler.generateResponse('warning-template', {
         title: 'Warning',
         heading: 'Action Required',

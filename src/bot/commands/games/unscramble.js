@@ -1,104 +1,114 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs').promises;
-const path = require('path');
+
+// --- Constants ---
+const WORD_LIST_PATH = './assets/texts/wordList.txt';
+const GAME_TIMEOUT_MS = 120000; // 2 minutes for the game
+const SCRAMBLE_EMBED_COLOR = '#E67E22'; // Orange color for embed
+const CORRECT_GUESS_EMOJI = '🎉';
+const INCORRECT_GUESS_EMOJI = '❌';
+const TIME_UP_EMOJI = '⏰';
+const GAME_OVER_EMOJI = '🏁';
 
 module.exports = {
-	description_full: 'Unscramble a randomly chosen word within 30 seconds.',
-	usage: '/unscramble',
-	examples: ['/unscramble'],
-	category: 'games',
 	data: new SlashCommandBuilder()
 		.setName('unscramble')
-		.setDescription('Unscramble the word and win!'),
+		.setDescription('Start a multiplayer word unscramble game!'),
+	category: 'games',
 	async execute(interaction) {
-		try {
-			const words = await loadWords();
-			const { chosenWord, shuffledWord } = selectAndShuffleWord(words);
-			const embed = createEmbed(shuffledWord);
+		await interaction.deferReply();
 
-			await interaction.reply({ embeds: [embed] });
-			const result = await handleGuessing(interaction, chosenWord);
-			await updateEmbed(interaction, embed, result, chosenWord);
-		} catch (error) {
-			console.error('Error in unscramble command:', error);
-			await interaction.reply(
-				'An error occurred while running the game.',
-			);
+		const words = await loadWords();
+		if (!words) {
+			return interaction.editReply('Could not load words for Unscramble. Please try again later.');
 		}
-	},
-};
 
-async function loadWords() {
-	const filePath = `assets/texts/hangmanWords.txt`;
-	const data = await fs.readFile(filePath, 'utf-8');
-	const words = data
-		.split('\n')
-		.map((word) => word.trim())
-		.filter((word) => word);
-	if (words.length === 0) throw new Error('The word list is empty!');
-	return words;
-}
+		const wordToUnscramble = selectRandomWord(words);
+		const scrambledWord = scrambleWord(wordToUnscramble);
+		let gameActive = true;
+		let winner = null; // To track the winner
 
-function selectAndShuffleWord(words) {
-	const chosenWord = words[Math.floor(Math.random() * words.length)];
-	const shuffledWord = shuffleWord(chosenWord);
-	return { chosenWord, shuffledWord };
-}
+		const gameEmbed = createGameEmbed(scrambledWord);
+		await interaction.editReply({ embeds: [gameEmbed] });
 
-function shuffleWord(word) {
-	return word
-		.split('')
-		.sort(() => Math.random() - 0.5)
-		.join('');
-}
+		const messageCollector = interaction.channel.createMessageCollector({
+			filter: m => !m.author.bot && gameActive, // Any non-bot user can guess
+			time: GAME_TIMEOUT_MS,
+		});
 
-function createEmbed(shuffledWord) {
-	return new EmbedBuilder()
-		.setColor(0x0099ff)
-		.setTitle('Unscramble the Word!')
-		.setDescription(`\`\`\`${shuffledWord}\`\`\``)
-		.setFooter({ text: 'You have 30 seconds to guess!' });
-}
+		messageCollector.on('collect', async message => {
+			const guess = message.content.trim().toLowerCase();
 
-async function handleGuessing(interaction, chosenWord) {
-	const filter = (m) => m.author.id === interaction.user.id;
-	const collector = interaction.channel.createMessageCollector({
-		filter,
-		time: 30000,
-	});
-
-	return new Promise((resolve) => {
-		collector.on('collect', (msg) => {
-			if (msg.content.toLowerCase() === chosenWord.toLowerCase()) {
-				collector.stop('correct');
+			if (guess === wordToUnscramble.toLowerCase()) {
+				gameActive = false;
+				winner = message.author; // Record the winner
+				messageCollector.stop('win');
+				return;
 			} else {
-				msg.reply('Incorrect, try again!');
+				message.react(INCORRECT_GUESS_EMOJI).catch(error => console.error('Failed to react to message:', error)); // React with wrong emoji
 			}
 		});
 
-		collector.on('end', (collected, reason) => {
-			resolve(reason === 'correct' ? 'correct' : 'timeout');
+		messageCollector.on('end', (_, reason) => {
+			if (reason === 'time') {
+				const timeoutEmbed = createEndEmbed('Time\'s Up!', `${TIME_UP_EMOJI} No one unscrambled it in time! The word was **${wordToUnscramble}**.`, false);
+				interaction.followUp({ embeds: [timeoutEmbed] });
+			} else if (reason === 'win') {
+				const winEmbed = createEndEmbed('We Have a Winner!', `${CORRECT_GUESS_EMOJI} Congratulations **<@${winner.id}>**! You unscrambled **${scrambledWord}** to **${wordToUnscramble}**!`, true); // Announce the winner
+				interaction.followUp({ embeds: [winEmbed] });
+			} else if (reason === 'idle') { // If the collector ends without a win/lose reason (e.g., channel inactivity)
+				const gameoverEmbed = createEndEmbed('Game Over!', `${GAME_OVER_EMOJI} No one guessed the word. The word was **${wordToUnscramble}**.`, false);
+				interaction.followUp({ embeds: [gameoverEmbed] });
+			}
 		});
-	});
+	},
+};
+
+// --- Helper Functions ---
+
+async function loadWords() {
+	try {
+		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
+		return data.split('\n').map(word => word.trim()).filter(word => word);
+	} catch (error) {
+		console.error('Failed to load words:', error);
+		return null;
+	}
 }
 
-async function updateEmbed(interaction, embed, result, chosenWord) {
-	if (result === 'correct') {
-		embed
-			.setColor(0x00ff00)
-			.setTitle('Correct!')
-			.setDescription(
-				`You got it right! The word was **${chosenWord}**. 🎉`,
-			)
-			.setFooter({
-				text: `You completed in ${Date.now() - interaction.createdTimestamp}ms!`,
-			});
-	} else {
-		embed
-			.setColor(0xff0000)
-			.setTitle('Time Up!')
-			.setDescription(`The word was **${chosenWord}**.`)
-			.setFooter({ text: 'You had 30 seconds to guess!' });
+function selectRandomWord(words) {
+	return words[Math.floor(Math.random() * words.length)];
+}
+
+function scrambleWord(word) {
+	const letters = word.split('');
+	// Fisher-Yates (Knuth) Shuffle algorithm for efficient and unbiased shuffling
+	for (let i = letters.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[letters[i], letters[j]] = [letters[j], letters[i]]; // Swap elements
 	}
-	await interaction.reply({ embeds: [embed] });
+
+	const scrambledWord = letters.join('');
+	// Ensure scrambled word is different from the original
+	if (scrambledWord === word && word.length > 2) { // For very short words, scrambling might result in the same word
+		return scrambleWord(word); // Recursive call to scramble again if it's the same, for words longer than 2 chars
+	}
+	return scrambledWord;
+}
+
+
+function createGameEmbed(scrambledWord) {
+	return new EmbedBuilder()
+		.setColor(SCRAMBLE_EMBED_COLOR)
+		.setTitle('Multiplayer Unscramble Challenge! 🔤') // Updated title for multiplayer
+		.setDescription(`Unscramble the following word:\n\n**\`${scrambledWord.toUpperCase()}\`**\n\nType your guess in the chat! First to guess correctly wins!`) // Updated description for multiplayer
+		.setFooter({ text: `Game expires in ${GAME_TIMEOUT_MS / 60000} minutes. Good luck everyone!` }); // Updated footer for multiplayer
+}
+
+
+function createEndEmbed(title, description, isWin) {
+	return new EmbedBuilder()
+		.setColor(isWin ? '#2ecc71' : '#e74c3c') // Green for win, Red for lose
+		.setTitle(title)
+		.setDescription(description);
 }
