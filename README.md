@@ -1,5 +1,7 @@
 # Kiyo Discord Bot
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/a342cd56-0c9d-4650-8a27-3bbcf1889819/deploy-status)](https://app.netlify.com/sites/kiyo-verification/deploys)
+
 A versatile Discord bot with moderation, entertainment, and utility features.
 This bot is only for the [TKOD Discord server](https://discord.gg/y3GvzeZVJ3).
 
