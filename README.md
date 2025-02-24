@@ -3,20 +3,12 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/a342cd56-0c9d-4650-8a27-3bbcf1889819/deploy-status)](https://app.netlify.com/sites/kiyo-verification/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/KIO2gamer/project-kiyo/blob/main/LICENSE.md)
 [![Node.js Version](https://img.shields.io/node/v/kiyo-discord-bot.svg)](https://nodejs.org/)
-[![npm version](https://badge.fury.io/js/kiyo-discord-bot.svg)](https://www.npmjs.com/package/kiyo-discord-bot) <!-- Replace with your actual npm package name if published -->
-[![Discord Server](https://discord.com/api/guilds/YOUR_DISCORD_GUILD_ID/widget.png?style=shield)](https://discord.gg/YOUR_DISCORD_INVITE_CODE) <!-- Replace with your Discord server details -->
+[![Discord Server](https://discord.com/api/guilds/YOUR_DISCORD_GUILD_ID/widget.png?style=shield)](https://discord.gg/y3GvzeZVJ3)
+[![GitHub Actions Status](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml/badge.svg)](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml)
+[![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io)
+[![eslint](https://img.shields.io/badge/eslint-8.x-brightgreen.svg)](https://eslint.org/)
 
-<!-- Optional Badges - Uncomment if applicable -->
-<!-- [![GitHub Actions Status](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml/badge.svg)](https://github.com/KIO2gamer/project-kiyo/actions/workflows/build.yml) -->
-<!-- [![Code Coverage](YOUR_CODE_COVERAGE_BADGE_URL)]() --> <!-- Add your code coverage badge URL if you have testing -->
-<!-- [![Dependencies Status](https://dependency-badge.herokuapp.com/repos/KIO2gamer/project-kiyo/badge.svg)]() --> <!-- Or use a service like 'snyk' or 'renovate' for dependency badges -->
-<!-- [![devDependencies Status](https://dependency-badge.herokuapp.com/repos/KIO2gamer/project-kiyo/dev-badge.svg)]() --> <!-- Or use a service like 'snyk' or 'renovate' for dev dependency badges -->
-<!-- [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io) -->
-<!-- [![eslint](https://img.shields.io/badge/eslint-8.x-brightgreen.svg)](https://eslint.org/) -->
-
-A versatile Discord bot packed with moderation, entertainment, and utility commands to enhance your server experience. Originally designed and tailored for the [TKOD Discord server](https://discord.gg/y3GvzeZVJ3), Kiyo offers a wide range of features to manage and engage your community.
-
-**This bot is specifically designed for use within the [TKOD Discord server](https://discord.gg/y3GvzeZVJ3).**
+A versatile Discord bot packed with moderation, entertainment, and utility commands to enhance your server experience. **Originally designed and tailored for the [TKOD Discord server](https://discord.gg/y3GvzeZVJ3)**, Kiyo offers a wide range of features to manage and engage your community.
 
 ## ✨ Features
 
