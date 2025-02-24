@@ -14,7 +14,7 @@
 		"lint:fix": "eslint --fix .",
 		"format": "prettier --config .prettierrc.json --write .",
 		"format:check": "prettier --config .prettierrc.json --check .",
-		"build": "rimraf dist && babel src --out-dir dist --copy-files"
+		"build": "node scripts/build.js"
 	},
 	"repository": {
 		"type": "git",
