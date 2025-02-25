@@ -12,7 +12,7 @@ class TemplateHandler {
 		}
 
 		// Construct template path RELATIVE to templateHandler.js
-		const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
+		const templatePath = path.join(__dirname, '..', 'templates', `${templateName}.html`);
 
 		try {
 			const template = await fs.readFile(templatePath, 'utf8');
