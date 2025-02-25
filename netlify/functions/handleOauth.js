@@ -65,11 +65,47 @@ function getCodeAndState(event) {
     };
 }
 
+// --- HTML Generating Functions ---
+
+function generateHtmlResponse(title, statusCode, message, additionalMessage = '', buttonHtml = '') {
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${title}</title>
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+            .container { width: 80%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+            h1 { color: #333; }
+            p { color: #666; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+            .button:hover { background-color: #0056b3; }
+            .error-heading { color: #dc2626; }
+            .success-heading { color: #16a34a; }
+            .warning-heading { color: #eab308; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="${title.toLowerCase()}-heading">${title}</h1>
+            ${statusCode ? `<p>Status Code: ${statusCode}</p>` : ''}
+            <p>${message}</p>
+            ${additionalMessage ? `<p>${additionalMessage}</p>` : ''}
+            ${buttonHtml}
+        </div>
+    </body>
+    </html>
+    `;
+}
+
 function createErrorResponse(statusCode, message) {
+    const html = generateHtmlResponse('Error', statusCode, message, 'Please ensure both code and state are provided in the request.');
     return {
         statusCode,
         headers: { 'Content-Type': 'text/html' },
-        body: generateHtmlResponse('Error', statusCode, message, 'Please ensure both code and state are provided in the request.'),
+        body: html,
     };
 }
 
@@ -128,21 +164,20 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
     await oauthRecord.save();
 }
 
-const templateHandler = require('./templateHandler');
 
 // Update createSuccessResponse
 async function createSuccessResponse(connectionsLength, state) {
     const { guildId, channelId } = JSON.parse(state);
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 
-    const html = await templateHandler.generateResponse({
-        title: 'Success',
-        heading: 'Authorization successful!',
-        message: 'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
-        additionalMessage: `Number of connections: ${connectionsLength}`,
-        buttonText: 'Return to Discord',
-        buttonLink: discordDeepLink
-    });
+    const buttonHtml = `<a href="${discordDeepLink}" class="button">Return to Discord</a>`;
+    const html = generateHtmlResponse(
+        'Success',
+        null, // No status code for success
+        'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
+        `Number of connections: ${connectionsLength}`,
+        buttonHtml
+    );
 
     return {
         statusCode: 200,
@@ -151,35 +186,17 @@ async function createSuccessResponse(connectionsLength, state) {
     };
 }
 
-// Update createErrorResponse
+
 async function createErrorResponse(statusCode, message) {
-    const html = await templateHandler.generateResponse({
-        title: 'Error',
-        heading: statusCode,
-        message: message,
-        additionalMessage: 'Please ensure both code and state are provided in the request.'
-    });
+    const html = generateHtmlResponse(
+        'Error',
+        statusCode,
+        message,
+        'Please ensure both code and state are provided in the request.'
+    );
 
     return {
         statusCode,
-        headers: { 'Content-Type': 'text/html' },
-        body: html
-    };
-}
-
-async function handleWarningResponse(message) {
-    const html = await templateHandler.generateResponse('warning-template', {
-        title: 'Warning',
-        heading: 'Action Required',
-        message: message,
-        additionalMessage: 'Please review the following details carefully.',
-        buttonText: 'Acknowledge',
-        buttonLink: '#',
-        status: 'warning'
-    });
-
-    return {
-        statusCode: 200,
         headers: { 'Content-Type': 'text/html' },
         body: html
     };
