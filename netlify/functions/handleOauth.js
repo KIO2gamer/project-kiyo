@@ -68,6 +68,7 @@ function getCodeAndState(event) {
 // --- HTML Generating Functions ---
 
 function generateHtmlResponse(title, statusCode, message, additionalMessage = '', buttonHtml = '') {
+    const headingClass = title.toLowerCase(); // Use title to dynamically generate heading class
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -76,21 +77,62 @@ function generateHtmlResponse(title, statusCode, message, additionalMessage = ''
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-            .container { width: 80%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
-            h1 { color: #333; }
-            p { color: #666; }
-            .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
-            .button:hover { background-color: #0056b3; }
-            .error-heading { color: #dc2626; }
-            .success-heading { color: #16a34a; }
-            .warning-heading { color: #eab308; }
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin-top: 50px;
+                background-color: #f4f4f4; /* Light grey background for better readability */
+            }
+            .container {
+                width: 80%;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #ddd; /* Lighter border */
+                border-radius: 8px; /* Slightly more rounded corners */
+                background-color: white; /* White container background */
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            }
+            h1 {
+                color: #333;
+            }
+            p {
+                color: #555; /* Slightly darker and softer text color */
+                line-height: 1.6; /* Improved line spacing for readability */
+            }
+            .button {
+                display: inline-block;
+                padding: 12px 24px; /* Slightly larger button */
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 8px; /* Rounded button corners to match container */
+                margin-top: 20px;
+                transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+            }
+            .button:hover {
+                background-color: #0056b3; /* Darker shade on hover */
+            }
+            .error-heading {
+                color: #dc2626;
+            }
+            .success-heading {
+                color: #16a34a;
+            }
+            .warning-heading {
+                color: #eab308;
+            }
+            .status-code { /* New class for status code styling */
+                font-weight: bold;
+                margin-top: 10px;
+                color: #777;
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1 class="${title.toLowerCase()}-heading">${title}</h1>
-            ${statusCode ? `<p>Status Code: ${statusCode}</p>` : ''}
+            <h1 class="${headingClass}-heading">${title}</h1>
+            ${statusCode ? `<p class="status-code">Status Code: ${statusCode}</p>` : ''}
             <p>${message}</p>
             ${additionalMessage ? `<p>${additionalMessage}</p>` : ''}
             ${buttonHtml}
