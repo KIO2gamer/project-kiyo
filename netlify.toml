@@ -1,23 +1,8 @@
 [build]
+  # command = "npm run build" (Keep this removed)
+  # publish = "dist"         (Keep this removed)
   functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
-
-[router]
-  rules = [
-    { from = "/*", to = "/index.html", status = 200 },
-    { from = "/auth/*", to = "/auth.html", status = 200 },
-    { from = "/bot/*", to = "/bot.html", status = 200 },
-  ]
-
-[redirects]
-  from = "/api/*"
-  to = "/.netlify/functions/*"
-  status = 200
-  force = true
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' https: 'unsafe-inline'; style-src 'self' https: 'unsafe-inline';"
+  included_files = ["netlify/functions/templates/**"]
