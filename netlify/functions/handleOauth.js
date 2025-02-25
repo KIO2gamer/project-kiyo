@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const OAuthCode = require('./../../src/database/OauthCode');
 const crypto = require('crypto');
+const templateHandler = require('./templateHandler');
 
 // MongoDB connection URI from environment variables
 const mongoUri = process.env.MONGODB_URI;
@@ -170,14 +171,15 @@ async function createSuccessResponse(connectionsLength, state) {
     const { guildId, channelId } = JSON.parse(state);
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 
-    const buttonHtml = `<a href="${discordDeepLink}" class="button">Return to Discord</a>`;
-    const html = generateHtmlResponse(
-        'Success',
-        null, // No status code for success
-        'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
-        `Number of connections: ${connectionsLength}`,
-        buttonHtml
-    );
+    const html = await templateHandler.generateResponse('template', { // Use 'template' for success
+        title: 'Success',
+        heading: 'Authorization successful!',
+        message: 'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
+        additionalMessage: `Number of connections: ${connectionsLength}`,
+        buttonText: 'Return to Discord',
+        buttonLink: discordDeepLink,
+        status: 'success' // Add status for template styling
+    });
 
     return {
         statusCode: 200,
@@ -186,14 +188,14 @@ async function createSuccessResponse(connectionsLength, state) {
     };
 }
 
-
 async function createErrorResponse(statusCode, message) {
-    const html = generateHtmlResponse(
-        'Error',
-        statusCode,
-        message,
-        'Please ensure both code and state are provided in the request.'
-    );
+    const html = await templateHandler.generateResponse('error-template', { // Use 'error-template'
+        title: 'Error',
+        heading: statusCode,
+        message: message,
+        additionalMessage: 'Please ensure both code and state are provided in the request.',
+        status: 'error' // Add status for template styling
+    });
 
     return {
         statusCode,
