@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const OAuthCode = require('./../../src/database/OauthCode');
 const crypto = require('crypto');
-const templateHandler = require('./templateHandler');
 
 // MongoDB connection URI from environment variables
 const mongoUri = process.env.MONGODB_URI;
@@ -81,7 +80,7 @@ function generateHtmlResponse(title, statusCode, message, additionalMessage = ''
             .container { width: 80%; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
             h1 { color: #333; }
             p { color: #666; }
-            .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
             .button:hover { background-color: #0056b3; }
             .error-heading { color: #dc2626; }
             .success-heading { color: #16a34a; }
@@ -102,11 +101,17 @@ function generateHtmlResponse(title, statusCode, message, additionalMessage = ''
 }
 
 function createErrorResponse(statusCode, message) {
-    const html = generateHtmlResponse('Error', statusCode, message, 'Please ensure both code and state are provided in the request.');
+    const html = generateHtmlResponse(
+        'Error',
+        statusCode,
+        message,
+        'Please ensure both code and state are provided in the request.'
+    );
+
     return {
         statusCode,
         headers: { 'Content-Type': 'text/html' },
-        body: html,
+        body: html
     };
 }
 
@@ -165,40 +170,22 @@ async function saveOAuthRecord(state, code, youtubeConnections) {
     await oauthRecord.save();
 }
 
-
-// Update createSuccessResponse
 async function createSuccessResponse(connectionsLength, state) {
     const { guildId, channelId } = JSON.parse(state);
     const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 
-    const html = await templateHandler.generateResponse('template', { // Use 'template' for success
-        title: 'Success',
-        heading: 'Authorization successful!',
-        message: 'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
-        additionalMessage: `Number of connections: ${connectionsLength}`,
-        buttonText: 'Return to Discord',
-        buttonLink: discordDeepLink,
-        status: 'success' // Add status for template styling
-    });
+    const buttonHtml = `<a href="${discordDeepLink}" class="button">Return to Discord</a>`;
+
+    const html = generateHtmlResponse(
+        'Success',
+        null,
+        'Your YouTube connections have been successfully linked. You can now return to Discord and continue using the bot.',
+        `Number of connections: ${connectionsLength}`,
+        buttonHtml
+    );
 
     return {
         statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html
-    };
-}
-
-async function createErrorResponse(statusCode, message) {
-    const html = await templateHandler.generateResponse('error-template', { // Use 'error-template'
-        title: 'Error',
-        heading: statusCode,
-        message: message,
-        additionalMessage: 'Please ensure both code and state are provided in the request.',
-        status: 'error' // Add status for template styling
-    });
-
-    return {
-        statusCode,
         headers: { 'Content-Type': 'text/html' },
         body: html
     };
