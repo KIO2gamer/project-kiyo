@@ -188,7 +188,7 @@ module.exports = {
 			const message = await interaction.reply({
 				embeds: [initialEmbed],
 				components: initialButtons,
-				fetchReply: true,
+				withResponse: true,
 			});
 
 			const collector = message.createMessageComponentCollector({

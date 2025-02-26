@@ -77,7 +77,7 @@ module.exports = {
 			const initialMessage = await interaction.reply({
 				embeds: [generateEmbed(0)],
 				components: [row],
-				fetchReply: true,
+				withResponse: true,
 			});
 
 			const collector = initialMessage.createMessageComponentCollector({

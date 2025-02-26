@@ -18,14 +18,14 @@ module.exports = {
 
 	async execute(interaction) {
 		try {
-			const sent = await interaction.deferReply({ fetchReply: true });
+			const sent = await interaction.deferReply({ withResponse: true });
 			await sendBotInfo(sent, interaction);
 		} catch (error) {
 			handleError('Error executing bot_info command:', error);
 			await handleError(interaction, error);
 		}
 	},
-};
+}
 
 async function sendBotInfo(sent, interaction) {
 	try {
