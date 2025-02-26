@@ -112,7 +112,7 @@ module.exports = {
 				await logChannel.send({ embeds: [logEmbed] });
 			}
 		} catch (error) {
-			console.error('Error purging messages:', error);
+			handleError('Error purging messages:', error);
 			await interaction.followUp({
 				embeds: [
 					new EmbedBuilder()

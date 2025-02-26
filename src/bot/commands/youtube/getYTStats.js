@@ -51,7 +51,7 @@ module.exports = {
 			const embed = createEmbed(channelData, latestVideoData, channelId);
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error fetching YouTube stats:', error);
+			handleError('Error fetching YouTube stats:', error);
 			await interaction.reply(
 				'An error occurred while fetching YouTube statistics. Please try again later.',
 			);
@@ -114,7 +114,7 @@ async function extractChannelIdFromVideo(input) {
 				return response.data.items[0].snippet.channelId;
 			}
 		} catch (error) {
-			console.error('Error fetching video details:', error);
+			handleError('Error fetching video details:', error);
 		}
 	}
 	return null;
@@ -139,7 +139,7 @@ async function extractChannelIdFromHandle(input) {
 				return response.data.items[0].snippet.channelId;
 			}
 		} catch (error) {
-			console.error('Error fetching channel details:', error);
+			handleError('Error fetching channel details:', error);
 		}
 	}
 	return null;

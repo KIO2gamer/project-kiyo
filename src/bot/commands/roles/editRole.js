@@ -59,7 +59,7 @@ module.exports = {
 
 			return interaction.reply(`Role ${role} updated successfully!`);
 		} catch (error) {
-			console.error('Error editing role:', error);
+			handleError('Error editing role:', error);
 			return interaction.reply(
 				'An error occurred while updating the role.',
 			);

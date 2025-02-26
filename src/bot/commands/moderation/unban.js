@@ -95,7 +95,7 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			console.error('Error unbanning user:', error);
+			handleError('Error unbanning user:', error);
 			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()

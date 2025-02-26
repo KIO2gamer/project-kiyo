@@ -143,7 +143,7 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			console.error('Error banning user:', error);
+			handleError('Error banning user:', error);
 			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()

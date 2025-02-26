@@ -74,7 +74,7 @@ module.exports = {
 			try {
 				embed.setThumbnail(thumbnail);
 			} catch (error) {
-				console.error('Error setting thumbnail:', error);
+				handleError('Error setting thumbnail:', error);
 			}
 		}
 
@@ -86,7 +86,7 @@ module.exports = {
 			try {
 				embed.setImage(image);
 			} catch (error) {
-				console.error('Error setting image:', error);
+				handleError('Error setting image:', error);
 			}
 		}
 

@@ -91,7 +91,7 @@ module.exports = {
 					content: `Your ticket has been created: <#${ticketChannel.id}>.`,
 				});
 			} catch (error) {
-				console.error('Error creating ticket channel:', error);
+				handleError('Error creating ticket channel:', error);
 				await interaction.reply({
 					content:
 						'There was an error creating your ticket. Please try again later.',

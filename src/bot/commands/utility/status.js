@@ -70,7 +70,7 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error fetching server status:', error);
+			handleError('Error fetching server status:', error);
 			await handleError(interaction, error);
 		}
 	},

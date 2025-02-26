@@ -59,7 +59,7 @@ module.exports = {
 				ephemeral: true,
 			});
 		} catch (error) {
-			console.error('Error fetching Minecraft player data:', error);
+			handleError('Error fetching Minecraft player data:', error);
 			await handleError(interaction, error, 'Failed to fetch Minecraft player data.'); // More descriptive error message for handleError
 		}
 	},
@@ -73,7 +73,7 @@ async function fetchPlayerData(username) {
 		}
 		return response.data;
 	} catch (error) {
-		console.error(`Error fetching data from Ashcon API for username ${username}:`, error);
+		handleError(`Error fetching data from Ashcon API for username ${username}:`, error);
 		if (error.response) {
 			// API responded with an error status code
 			if (error.response.status === 404) {

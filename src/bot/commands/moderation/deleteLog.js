@@ -78,7 +78,7 @@ module.exports = {
 				}
 			}
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply(
 				'Failed to delete the log(s). Please try again later.',
 			);

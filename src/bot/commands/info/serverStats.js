@@ -41,7 +41,7 @@ module.exports = {
 			const embed = createStatsEmbed(guild, timeframe, stats);
 			await interaction.editReply({ embeds: [embed] }); // Use editReply to send the embed after deferring
 		} catch (error) {
-			console.error('Error executing server_stats:', error);
+			handleError('Error executing server_stats:', error);
 			await interaction.editReply( // Use editReply for error messages as well
 				'An error occurred while fetching server stats.',
 			);

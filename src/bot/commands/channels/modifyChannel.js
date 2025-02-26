@@ -332,7 +332,7 @@ module.exports = {
 				});
 			}
 		} catch (error) {
-			console.error('Error modifying channel:', error);
+			handleError('Error modifying channel:', error);
 			await handleError(interaction, error);
 		}
 	},

@@ -54,7 +54,7 @@ module.exports = {
 			try {
 				songData = await getRandomSongAndLyricsFromAPI(); // Use API to get random song and lyrics
 			} catch (error) {
-				console.error('Error fetching song data:', error);
+				handleError('Error fetching song data:', error);
 				return interaction.editReply({
 					embeds: [
 						new EmbedBuilder()
@@ -219,7 +219,7 @@ async function getRandomSongAndLyricsFromAPI() {
 		throw new Error(`No lyrics found for 3 random ${genreKeyword} tracks`);
 
 	} catch (error) {
-		console.error(`Lyric fetch error (${genreKeyword}):`, error.message);
+		handleError(`Lyric fetch error (${genreKeyword}):`, error.message);
 		throw new Error(`Couldn't find lyrics for ${genreKeyword} tracks. Try another genre!`);
 	}
 }

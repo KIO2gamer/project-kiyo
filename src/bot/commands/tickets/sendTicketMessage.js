@@ -80,7 +80,7 @@ module.exports = {
 				ephemeral: true,
 			});
 		} catch (error) {
-			console.error('Error sending ticket message:', error);
+			handleError('Error sending ticket message:', error);
 			interaction.followUp({
 				content: 'There was an error sending the message.',
 				ephemeral: true,

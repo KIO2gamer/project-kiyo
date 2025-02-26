@@ -65,7 +65,7 @@ module.exports = {
 				});
 			}
 		} catch (error) {
-			console.error('Error posting image:', error);
+			handleError('Error posting image:', error);
 			await interaction.reply({
 				content: `An error occurred: ${error.message}`,
 				ephemeral: true,

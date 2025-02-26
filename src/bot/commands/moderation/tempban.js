@@ -195,13 +195,13 @@ module.exports = {
 				try {
 					await interaction.guild.members.unban(targetUser.id);
 				} catch (error) {
-					console.error(
+					handleError(
 						`Failed to unban ${targetUser.tag}: ${error}`,
 					);
 				}
 			}, durationMs);
 		} catch (error) {
-			console.error('Error banning user:', error);
+			handleError('Error banning user:', error);
 			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()

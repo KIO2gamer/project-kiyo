@@ -45,7 +45,7 @@ module.exports = {
 				await interaction.reply('Game not found.');
 			}
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply('Error fetching game info.');
 		}
 	},

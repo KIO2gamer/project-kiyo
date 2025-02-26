@@ -11,7 +11,7 @@ const {
 
 // Validate critical environment variables
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !MONGODB_URI) {
-	console.error('Missing one or more required environment variables.');
+	handleError('Missing one or more required environment variables.');
 	process.exit(1);
 }
 
@@ -152,7 +152,7 @@ const connectToMongoDB = async () => {
 	try {
 		mongoose.set('strictQuery', false);
 		await mongoose.connect(MONGODB_URI).catch(err => {
-			console.error('❌ MongoDB Connection Error:', err);
+			handleError('❌ MongoDB Connection Error:', err);
 		});
 		Logger.log('DATABASE', 'Database connection established', 'success');
 	} catch (error) {
@@ -252,11 +252,11 @@ process.on('SIGINT', async () => {
 
 // Global error handling
 process.on('unhandledRejection', (reason) => {
-	console.error('❌ Unhandled Promise Rejection:', reason);
+	handleError('❌ Unhandled Promise Rejection:', reason);
 });
 
 process.on('uncaughtException', (error) => {
-	console.error('❌ Uncaught Exception:', error);
+	handleError('❌ Uncaught Exception:', error);
 });
 
 // Start the bot initialization

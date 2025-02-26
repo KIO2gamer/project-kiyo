@@ -40,7 +40,7 @@ module.exports = {
 
 			await interaction.reply(text);
 		} catch (error) {
-			console.error('Error in ask-gemini command:', error);
+			handleError('Error in ask-gemini command:', error);
 			await interaction.reply(
 				'Sorry, there was an error processing your request.',
 			);

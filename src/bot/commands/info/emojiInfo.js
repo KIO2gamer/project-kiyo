@@ -64,7 +64,7 @@ module.exports = {
 			await interaction.reply({ embeds: [embed] });
 		}
 		catch (error) {
-			console.error('❌ Failed to execute command:', error);
+			handleError('❌ Failed to execute command:', error);
 			await handleError(interaction, error);
 		}
 	},

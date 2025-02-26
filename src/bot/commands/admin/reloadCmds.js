@@ -69,7 +69,7 @@ module.exports = {
 				ephemeral: true,
 			});
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply({
 				content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
 				ephemeral: true,
@@ -128,7 +128,7 @@ module.exports = {
 							);
 						}
 					} catch (error) {
-						console.error(error);
+						handleError(error);
 					}
 				}
 			}

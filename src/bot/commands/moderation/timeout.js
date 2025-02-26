@@ -207,7 +207,7 @@ module.exports = {
 				});
 			}
 		} catch (error) {
-			console.error('Failed to timeout user:', error);
+			handleError('Failed to timeout user:', error);
 			await interaction.reply({
 				embeds: [
 					new EmbedBuilder()

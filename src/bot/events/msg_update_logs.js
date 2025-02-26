@@ -12,7 +12,7 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 			oldMessage = await oldMessage.fetch();
 			newMessage = await newMessage.fetch();
 		} catch (err) {
-			console.error('Error fetching partial messages:', err);
+			handleError('Error fetching partial messages:', err);
 			return false;
 		}
 	}
@@ -22,13 +22,13 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 async function getLogChannel(newMessage) {
 	const config = await MsgLogsConfig.findOne();
 	if (!config?.channelId) {
-		console.error('Log channel ID is not set.');
+		handleError('Log channel ID is not set.');
 		return null;
 	}
 
 	const logChannel = await newMessage.guild.channels.fetch(config.channelId);
 	if (!logChannel) {
-		console.error(`Log channel with ID ${config.channelId} not found.`);
+		handleError(`Log channel with ID ${config.channelId} not found.`);
 		return null;
 	}
 
@@ -43,7 +43,7 @@ async function getLogChannel(newMessage) {
 			PermissionsBitField.Flags.EmbedLinks,
 		])
 	) {
-		console.error(
+		handleError(
 			`Bot lacks permission to send messages or embed links in the channel: ${config.channelId}`,
 		);
 		return null;
@@ -141,7 +141,7 @@ async function execute(oldMessage, newMessage) {
 
 		await logChannel.send({ embeds: [logEmbed] });
 	} catch (error) {
-		console.error('Error in MessageUpdate event handler:', error);
+		handleError('Error in MessageUpdate event handler:', error);
 	}
 }
 

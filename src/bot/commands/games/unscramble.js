@@ -45,7 +45,7 @@ module.exports = {
 				messageCollector.stop('win');
 				return;
 			} else {
-				message.react(INCORRECT_GUESS_EMOJI).catch(error => console.error('Failed to react to message:', error)); // React with wrong emoji
+				message.react(INCORRECT_GUESS_EMOJI).catch(error => handleError('Failed to react to message:', error)); // React with wrong emoji
 			}
 		});
 
@@ -71,7 +71,7 @@ async function loadWords() {
 		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
 		return data.split('\n').map(word => word.trim()).filter(word => word);
 	} catch (error) {
-		console.error('Failed to load words:', error);
+		handleError('Failed to load words:', error);
 		return null;
 	}
 }

@@ -138,7 +138,7 @@ module.exports = {
 					components: row ? [row] : [],
 				};
 			} catch (error) {
-				console.error('Error fetching YouTube results:', error);
+				handleError('Error fetching YouTube results:', error);
 				return {
 					content: 'An error occurred while searching YouTube.',
 					embeds: [],
@@ -265,7 +265,7 @@ module.exports = {
 				}
 				return null;
 			} catch (error) {
-				console.error('Error fetching channel ID:', error);
+				handleError('Error fetching channel ID:', error);
 				return null;
 			}
 		};
@@ -300,7 +300,7 @@ module.exports = {
 		});
 
 		collector.on('end', () => {
-			message.edit({ components: [] }).catch(console.error); // Remove buttons after the collector ends
+			message.edit({ components: [] }).catch(handleError); // Remove buttons after the collector ends
 		});
 	},
 };

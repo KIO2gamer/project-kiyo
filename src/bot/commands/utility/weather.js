@@ -108,7 +108,7 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply(
 				'Could not fetch the weather. Please make sure the city name is correct.',
 			);

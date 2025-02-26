@@ -15,7 +15,7 @@ module.exports = {
 		try {
 			await sendServerInfo(interaction);
 		} catch (error) {
-			console.error('Error executing server_info command:', error);
+			handleError('Error executing server_info command:', error);
 			await handleError(interaction, error);
 		}
 	},
@@ -110,7 +110,7 @@ async function sendServerInfo(interaction) {
 
 		await interaction.reply({ embeds: [serverInfoEmbed] });
 	} catch (error) {
-		console.error('Error fetching server information:', error);
+		handleError('Error fetching server information:', error);
 		await handleError(interaction, error);
 	}
 }

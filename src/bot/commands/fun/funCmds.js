@@ -187,7 +187,7 @@ async function handleGifCommand(interaction, query, title) {
 			);
 		}
 	} catch (error) {
-		console.error(`Error fetching ${query} GIF:`, error);
+		handleError(`Error fetching ${query} GIF:`, error);
 		await interaction.reply(
 			`There was an error trying to fetch a ${query} GIF.`,
 		);
@@ -218,7 +218,7 @@ async function handleSummon(interaction) {
 	try {
 		await interaction.channel.send({ embeds: [embed] });
 	} catch (error) {
-		console.error('Error executing summon command:', error);
+		handleError('Error executing summon command:', error);
 		interaction.reply(
 			'There was an error while executing this command.',
 		);

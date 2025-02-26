@@ -50,7 +50,7 @@ module.exports = {
 			interaction.reply({ content: 'Embed Data:', files: [{ attachment: Buffer.from(JSON.stringify(embedData, null, 2)), name: 'embed.json' }] });
 
 		} catch (error) {
-			console.error('Error fetching embed:', error);
+			handleError('Error fetching embed:', error);
 			interaction.reply('An error occurred while fetching the embed.');
 		}
 	},

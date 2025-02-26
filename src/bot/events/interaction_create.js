@@ -16,7 +16,7 @@ module.exports = {
 		const command = client.commands.get(commandName);
 
 		if (!command) {
-			console.error(`No command matching ${commandName} was found.`);
+			handleError(`No command matching ${commandName} was found.`);
 			return;
 		}
 
@@ -24,7 +24,7 @@ module.exports = {
 			// Execute the command
 			await command.execute(interaction);
 		} catch (error) {
-			console.error(`Error executing ${commandName}:`, error);
+			handleError(`Error executing ${commandName}:`, error);
 			await handleError(interaction);
 		}
 	},

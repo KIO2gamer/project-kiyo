@@ -31,7 +31,7 @@ module.exports = {
 		const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
 		if (!apiKey || !searchEngineId) {
-			console.error('Google API key or Search Engine ID not found in environment variables.');
+			handleError('Google API key or Search Engine ID not found in environment variables.');
 			return interaction.reply({
 				embeds: [
 					new EmbedBuilder()
@@ -105,14 +105,14 @@ module.exports = {
 			await interaction.reply({ embeds: [embed], ephemeral: true });
 
 		} catch (error) {
-			console.error('Error performing Google search:', error);
+			handleError('Error performing Google search:', error);
 			let errorMessage =
 				'An error occurred while performing the search. Please try again later.';
 
 			if (error.response) {
 				// API error details
 				errorMessage = `Google Search API Error: ${error.response.status} ${error.response.statusText}\n${error.response.data?.error?.message || 'No detailed error message available.'}`;
-				console.error('Google API Error Details:', error.response.data); // Log detailed API error
+				handleError('Google API Error Details:', error.response.data); // Log detailed API error
 			} else if (error.request) {
 				errorMessage =
 					'Error reaching Google Search API. Please check your internet connection or the service might be temporarily unavailable.';

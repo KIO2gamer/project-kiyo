@@ -87,7 +87,7 @@ module.exports = {
 				},
 			});
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply({
 				content: 'An error occurred while creating the poll.',
 				ephemeral: true,

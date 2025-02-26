@@ -63,7 +63,7 @@ module.exports = {
 			});
 			await interaction.channel.delete();
 		} catch (error) {
-			console.error('Error closing ticket channel:', error.message);
+			handleError('Error closing ticket channel:', error.message);
 			if (error.message.includes('Cannot send messages')) {
 				interaction.reply({
 					content:

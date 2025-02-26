@@ -39,7 +39,7 @@ module.exports = {
 				`Message logs channel set to: ${channel}`,
 			);
 		} catch (error) {
-			console.error('Error setting message logs channel:', error);
+			handleError('Error setting message logs channel:', error);
 			await interaction.reply({
 				content:
 					'An error occurred while setting the message logs channel.',

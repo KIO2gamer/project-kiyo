@@ -62,7 +62,7 @@ module.exports = {
 			startGameCollector(collector, interaction, msg, word, gameState, gameEmbed, gameActive, winner); // Pass gameActive and winner
 
 		} catch (error) {
-			console.error('Multiplayer Hangman game error:', error);
+			handleError('Multiplayer Hangman game error:', error);
 			await interaction.editReply(
 				'Oops! An error occurred while setting up the multiplayer game. Maybe the hangman is playing with others?',
 			);
@@ -80,7 +80,7 @@ async function loadWords() {
 			.map((word) => word.trim())
 			.filter((word) => word);
 	} catch (error) {
-		console.error('Failed to read the word list file:', error);
+		handleError('Failed to read the word list file:', error);
 		return null;
 	}
 }

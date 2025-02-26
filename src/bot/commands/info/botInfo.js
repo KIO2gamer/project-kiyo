@@ -21,7 +21,7 @@ module.exports = {
 			const sent = await interaction.deferReply({ fetchReply: true });
 			await sendBotInfo(sent, interaction);
 		} catch (error) {
-			console.error('Error executing bot_info command:', error);
+			handleError('Error executing bot_info command:', error);
 			await handleError(interaction, error);
 		}
 	},
@@ -85,7 +85,7 @@ async function sendBotInfo(sent, interaction) {
 
 		return interaction.editReply({ content: ' ', embeds: [embed], ephemeral: true });
 	} catch (error) {
-		console.error('Error retrieving bot information:', error);
+		handleError('Error retrieving bot information:', error);
 		return handleError(interaction, error);
 	}
 }

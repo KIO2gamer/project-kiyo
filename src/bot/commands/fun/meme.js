@@ -24,7 +24,7 @@ module.exports = {
 					break;
 				}
 			} catch (error) {
-				console.error('Error fetching meme:', error);
+				handleError('Error fetching meme:', error);
 			}
 			attempts++;
 		}

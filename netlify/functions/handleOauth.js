@@ -14,7 +14,7 @@ async function connectToDatabase() {
             isConnected = true;
             console.log('✅ MongoDB connection established successfully');
         } catch (error) {
-            console.error('❌ MongoDB connection error:', error);
+            handleError('❌ MongoDB connection error:', error);
             throw error;
         }
     }
@@ -52,7 +52,7 @@ exports.handler = async function (event) {
         await saveOAuthRecord(decryptedState, code, youtubeConnections);
         return createSuccessResponse(youtubeConnections.length, decryptedState);
     } catch (error) {
-        console.error('❌ Error fetching Discord connections or saving to MongoDB:', error);
+        handleError('❌ Error fetching Discord connections or saving to MongoDB:', error);
         return createErrorResponse(500, 'An unexpected error occurred while processing your request.');
     }
 };
@@ -182,16 +182,16 @@ async function getYouTubeConnections(accessToken) {
     });
 
     if (!connectionsResponse.ok) {
-        console.error("Discord connections API error:", connectionsResponse.status, connectionsResponse.statusText);
+        handleError("Discord connections API error:", connectionsResponse.status, connectionsResponse.statusText);
         const errorData = await connectionsResponse.json();
-        console.error("Discord connections API error details:", errorData);
+        handleError("Discord connections API error details:", errorData);
         return []; // Return empty array on API error
     }
 
     const connectionsData = await connectionsResponse.json();
     console.log("Discord connections data:", connectionsData); // Log this!
     if (!Array.isArray(connectionsData)) {
-        console.error("Error: connectionsData is not an array:", connectionsData);
+        handleError("Error: connectionsData is not an array:", connectionsData);
         return []; // Return empty array if not an array
     }
     return connectionsData.filter(connection => connection.type === 'youtube');

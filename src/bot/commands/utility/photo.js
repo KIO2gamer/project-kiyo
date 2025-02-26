@@ -90,7 +90,7 @@ module.exports = {
 				);
 			}
 		} catch (error) {
-			console.error('Error fetching photo:', error);
+			handleError('Error fetching photo:', error);
 			await interaction.reply(
 				'There was an error trying to fetch the photo.',
 			);

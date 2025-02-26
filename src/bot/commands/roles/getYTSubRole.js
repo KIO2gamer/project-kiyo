@@ -101,7 +101,7 @@ module.exports = {
 				],
 			});
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.editReply({
 				embeds: [
 					createEmbed('❌ Error', error.message, [], 'Please try again later.', 0xff0000),

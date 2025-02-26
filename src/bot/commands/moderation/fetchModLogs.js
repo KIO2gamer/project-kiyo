@@ -213,7 +213,7 @@ module.exports = {
 				message.edit({ components: [] }); // Update, not reply
 			});
 		} catch (error) {
-			console.error('Error retrieving logs:', error);
+			handleError('Error retrieving logs:', error);
 			// Only one reply if an error occurs:
 			await interaction.reply({
 				content: 'Failed to retrieve logs.',

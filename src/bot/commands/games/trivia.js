@@ -46,7 +46,7 @@ module.exports = {
 			handleCollectorEvents(collector, interaction, reply, questionData, triviaEmbed.data.fields, correctIndex); // Pass correctIndex
 
 		} catch (error) {
-			console.error('Trivia command error:', error);
+			handleError('Trivia command error:', error);
 			await interaction.editReply({
 				content:
 					'🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
@@ -62,7 +62,7 @@ async function fetchTriviaQuestion() {
 	try {
 		const response = await fetch(API_ENDPOINT);
 		if (!response.ok) {
-			console.error(`HTTP error! status: ${response.status}`); // Log HTTP errors
+			handleError(`HTTP error! status: ${response.status}`); // Log HTTP errors
 			return null;
 		}
 		const data = await response.json();
@@ -72,7 +72,7 @@ async function fetchTriviaQuestion() {
 		}
 		return data.results[0];
 	} catch (error) {
-		console.error('Error fetching trivia question from API:', error);
+		handleError('Error fetching trivia question from API:', error);
 		return null;
 	}
 }

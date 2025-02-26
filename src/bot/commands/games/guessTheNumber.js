@@ -37,7 +37,7 @@ module.exports = {
 
 			if (timeLeft <= 0 && !gameWon) {
 				clearInterval(countdown);
-				await timerMessage.delete().catch(console.error);
+				await timerMessage.delete().catch(handleError);
 				interaction.followUp(
 					`Time's up! The number was ${randomNumber}.`,
 				);
@@ -59,7 +59,7 @@ module.exports = {
 			if (guess === randomNumber) {
 				gameWon = true;
 				clearInterval(countdown);
-				await timerMessage.delete().catch(console.error);
+				await timerMessage.delete().catch(handleError);
 				interaction.followUp(
 					`🎉 <@${msg.author.id}> guessed the number! It was ${randomNumber}!`,
 				);

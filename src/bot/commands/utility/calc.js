@@ -54,7 +54,7 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error calculating expression:', error);
+			handleError('Error calculating expression:', error);
 			await interaction.reply({
 				content:
 					'Invalid mathematical expression. Please check your input.',

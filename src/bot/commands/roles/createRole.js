@@ -142,7 +142,7 @@ module.exports = {
 
 			return interaction.reply(`Created new role: ${role}`);
 		} catch (error) {
-			console.error('Failed to create role:', error);
+			handleError('Failed to create role:', error);
 			return interaction.reply(
 				'There was an error creating the role. Please try again later.',
 			);

@@ -2,20 +2,45 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('
 
 /**
  * Handles and logs errors that occur during command execution.
+ * Can be used like console.error() or with Discord interaction objects.
  *
- * @param {import('discord.js').Interaction} interaction - The Discord interaction object.
- * @param {Error} error - The error that occurred.
- * @param {import('discord.js').Message} [sent] - The initial message sent by the command (optional).
+ * @param {...any} args - Error arguments, with optional Discord interaction object first
  */
-async function handleError(interaction, error, sent) {
+async function handleError(...args) {
 	// Add a timestamp for clearer log tracking
 	const timestamp = new Date().toISOString();
-	console.error(`[${timestamp}] ❌ Error executing command:\n${error.stack || error.message}`);
 
-	// Create a shortened error message if the full stack is too long
-	const shortError = error.stack
-		? error.stack.substring(0, 1000) + (error.stack.length > 1000 ? '...' : '')
-		: error.message;
+	// Extract parameters based on argument types
+	let interaction = null;
+	let sent = null;
+	let errorMessage = '';
+
+	// Parse arguments to support multiple usage patterns
+	for (const arg of args) {
+		if (arg?.reply || arg?.editReply) {
+			// This looks like a Discord interaction object
+			interaction = arg;
+		} else if (arg?.edit && !sent) {
+			// This looks like a sent message
+			sent = arg;
+		} else {
+			// This is part of the error content
+			if (arg instanceof Error) {
+				errorMessage += arg.stack || arg.message;
+			} else {
+				errorMessage += String(arg) + ' ';
+			}
+		}
+	}
+
+	// Log to console (like console.error)
+	console.error(`[${timestamp}] ❌ Error: ${errorMessage}`);
+
+	// If no interaction was provided, we're done - just log to console
+	if (!interaction) return;
+
+	// Create a shortened error message if the full error is too long
+	const shortError = errorMessage.substring(0, 1000) + (errorMessage.length > 1000 ? '...' : '');
 
 	// Build an embed to notify the user about the error
 	const errorEmbed = new EmbedBuilder()
@@ -47,10 +72,9 @@ async function handleError(interaction, error, sent) {
 
 		collector.on('collect', async (i) => {
 			if (i.customId === 'show_full_error' && i.user.id === interaction.user.id) {
-				const fullError = error.stack || error.message;
 				const fullErrorEmbed = new EmbedBuilder()
 					.setTitle('🔍 Full Error Trace')
-					.setDescription(`\`\`\`js\n${fullError}\n\`\`\``)
+					.setDescription(`\`\`\`js\n${errorMessage}\n\`\`\``)
 					.setColor('Red')
 					.setTimestamp();
 

@@ -40,7 +40,7 @@ module.exports = {
 						// After sending the reminder, delete it from the database
 						await Reminder.findByIdAndDelete(reminder._id);
 					} catch (error) {
-						console.error(
+						handleError(
 							`Error sending reminder: ${error.message}`,
 						);
 						// Optionally, update the reminder status to 'failed'
@@ -59,7 +59,7 @@ module.exports = {
 				}
 			}
 		} catch (error) {
-			console.error(`Error in reminder check: ${error.message}`);
+			handleError(`Error in reminder check: ${error.message}`);
 		}
 	},
 };

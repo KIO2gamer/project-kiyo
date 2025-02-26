@@ -95,7 +95,7 @@ module.exports = {
 				}
 			}
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply(
 				'Failed to update the log(s). Please try again later.',
 			);

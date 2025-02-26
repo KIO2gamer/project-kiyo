@@ -53,7 +53,7 @@ module.exports = {
 
 			await interaction.reply(reply);
 		} catch (error) {
-			console.error(error);
+			handleError(error);
 			await interaction.reply(
 				'An error occurred while fetching the poll answers.',
 			);

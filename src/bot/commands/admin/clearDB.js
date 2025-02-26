@@ -76,7 +76,7 @@ module.exports = {
 							'✅ Database has been completely wiped.',
 						);
 					} catch (error) {
-						console.error('Database clear error:', error);
+						handleError('Database clear error:', error);
 						await interaction.reply(
 							'❌ An error occurred while clearing the database.',
 						);
@@ -87,7 +87,7 @@ module.exports = {
 				message
 					.delete()
 					.catch((error) =>
-						console.error('Failed to delete message:', error),
+						handleError('Failed to delete message:', error),
 					);
 			});
 
@@ -101,7 +101,7 @@ module.exports = {
 				}
 			});
 		} catch (error) {
-			console.error('Command error:', error);
+			handleError('Command error:', error);
 			await interaction.followUp({
 				content: '❌ An error occurred while executing the command.',
 				ephemeral: true,
