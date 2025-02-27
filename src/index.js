@@ -1,5 +1,6 @@
 // Load environment variables
 require('dotenv').config();
+const { handleError } = require('./bot/utils/errorHandler');
 
 // Environment Variables
 const {
