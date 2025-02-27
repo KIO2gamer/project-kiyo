@@ -219,20 +219,38 @@ function createSearchEmbeds(results, searchQuery, client) {
 	return pages;
 }
 
+// Add this function to dynamically build command data
+function buildCommandData(existingCategories = []) {
+	// Ensure we have some default categories if none are provided yet
+	const categories = existingCategories.length > 0 ? existingCategories : ['info', 'utility', 'moderation', 'fun'];
 
-module.exports = {
-	data: new SlashCommandBuilder()
+	const categoryChoices = categories.map(category => ({
+		name: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
+		value: category,
+	}));
+
+	return new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Displays help information for bot commands.')
 		.addStringOption(option => option.setName('command').setDescription('Get details for a specific command.'))
 		.addStringOption(option =>
-			option.setName('category').setDescription('View commands within a specific category.')
-				.setRequired(false) // category option is no longer required
-				.addChoices( // We will leave addChoices here, but it will be populated dynamically in execute
-					[] // Initially empty choices - they will be set dynamically
-				)
+			option.setName('category')
+				.setDescription('View commands within a specific category.')
+				.setRequired(false)
+				.addChoices(...categoryChoices) // Spread the choices directly
 		)
-		.addStringOption(option => option.setName('search').setDescription('Search for commands by keyword.')),
+		.addStringOption(option => option.setName('search').setDescription('Search for commands by keyword.'));
+}
+
+module.exports = {
+	// Initialize with empty data that will be replaced during load
+	data: buildCommandData(),
+
+	// Method to refresh command data with current categories
+	refreshData(categories = []) {
+		this.data = buildCommandData(categories);
+		return this.data;
+	},
 
 	category: 'info',
 	usage: '/help [command:command-name] [category:category-name] [search:keyword]',
@@ -251,54 +269,70 @@ module.exports = {
 			const categoryName = interaction.options.getString('category');
 			const searchQuery = interaction.options.getString('search');
 
-			const commands = client.commands; // Now client.commands is available
+			const commands = client.commands;
 
 			// Get all categories and update emoji mapping
 			const organizedCategories = organizeCommandsByCategory(commands);
 			updateCategoryEmojis(Object.keys(organizedCategories));
 
-			// Now generate category choices using the updated emojis
-			const categoryChoices = Object.keys(organizedCategories)
-				.filter(category => organizedCategories[category].length > 0) // Only include categories with commands
-				.map(category => ({
-					name: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
-					value: category,
-				}));
-
-			// **Update the choices for the 'category' option dynamically**:
-			module.exports.data.options.find(option => option.name === 'category').choices = categoryChoices;
-
-
 			if (commandName) {
-				const command = commands.get(commandName.toLowerCase());
+				// Find the command by name
+				const command = commands.get(commandName) ||
+					Array.from(commands.values()).find(
+						cmd => cmd.data && cmd.data.name.toLowerCase() === commandName.toLowerCase()
+					);
+
 				if (!command) {
-					return interaction.reply({ content: `Command \`${commandName}\` not found.`, ephemeral: true });
+					return interaction.reply({
+						content: `⚠️ No command found with name \`${commandName}\`. Use \`/help\` without arguments to see all available commands.`,
+						ephemeral: true
+					});
 				}
-				const detailEmbed = createCommandDetailEmbed(command, client);
-				return interaction.reply({ embeds: [detailEmbed] });
+
+				// Create and display the command detail embed
+				const commandEmbed = createCommandDetailEmbed(command, client);
+				return interaction.reply({ embeds: [commandEmbed] });
 			}
 
 			if (categoryName) {
-				const organizedCommands = organizeCommandsByCategory(commands);
-				const categoryCommands = organizedCommands[categoryName.toLowerCase()];
-				if (!categoryCommands || categoryCommands.length === 0) {
-					return interaction.reply({ content: `No commands found in the \`${categoryName}\` category.`, ephemeral: true });
+				// Filter commands by the requested category
+				const categoryCommands = Array.from(commands.values())
+					.filter(cmd => cmd.category && cmd.category.toLowerCase() === categoryName.toLowerCase());
+
+				if (!categoryCommands.length) {
+					return interaction.reply({
+						content: `⚠️ No commands found in the \`${categoryName}\` category. Use \`/help\` without arguments to see all available categories.`,
+						ephemeral: true
+					});
 				}
-				const categoryPages = createCategoryCommandEmbeds(categoryName, categoryCommands, client);
-				return createPaginatedMenu(interaction, categoryPages);
+
+				// Create and display paginated embeds for the category
+				const categoryEmbeds = createCategoryCommandEmbeds(categoryName, categoryCommands, client);
+				return createPaginatedMenu(interaction, categoryEmbeds);
 			}
 
 			if (searchQuery) {
-				const searchResults = commands.filter(cmd =>
-					cmd.data.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					(cmd.data.description && cmd.data.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-					(cmd.description_full && cmd.description_full.toLowerCase().includes(searchQuery.toLowerCase()))
-				).map(cmd => cmd); // Convert to array
-				if (searchResults.length === 0) {
-					return interaction.reply({ content: `No commands found matching "${searchQuery}".`, ephemeral: true });
+				// Search for commands matching the query
+				const results = Array.from(commands.values()).filter(cmd => {
+					const name = cmd.data?.name || '';
+					const description = cmd.data?.description || cmd.description_full || '';
+					const usage = cmd.usage || '';
+					const examples = Array.isArray(cmd.examples) ? cmd.examples.join(' ') : '';
+
+					const searchString = `${name} ${description} ${usage} ${examples}`.toLowerCase();
+					return searchString.includes(searchQuery.toLowerCase());
+				});
+
+				if (!results.length) {
+					return interaction.reply({
+						content: `⚠️ No commands found matching \`${searchQuery}\`. Try a different search term or use \`/help\` without arguments to browse all commands.`,
+						ephemeral: true
+					});
 				}
-				const searchPages = createSearchEmbeds(searchResults, searchQuery, client);
-				return createPaginatedMenu(interaction, searchPages);
+
+				// Create and display paginated embeds for search results
+				const searchEmbeds = createSearchEmbeds(results, searchQuery, client);
+				return createPaginatedMenu(interaction, searchEmbeds);
 			}
 
 			// Default Help Menu (No options provided)
@@ -309,7 +343,7 @@ module.exports = {
 
 		} catch (error) {
 			console.error('Error executing help command:', error);
-			handleError(interaction, error); // Use your error handler
+			handleError(interaction, error);
 		}
 	},
 };
