@@ -140,6 +140,14 @@ const loadEvents = (dir) => {
 
 // Load commands and events from their respective directories
 loadCommands(path.join(__dirname, 'bot/commands'));
+
+// Add this code to refresh the help command with all available categories
+const helpCommand = client.commands.get('help');
+if (helpCommand && helpCommand.refreshData) {
+	Logger.log('COMMANDS', 'Refreshing help command categories', 'info');
+	helpCommand.refreshData(client);
+}
+
 loadEvents(path.join(__dirname, 'bot/events'));
 
 /**

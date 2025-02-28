@@ -85,60 +85,61 @@ function getCommandCountByCategory(organizedCommands) {
 	return counts;
 }
 
-// Function to create a paginated menu (improved collector handling)
+// Function to create a paginated menu without requiring fetchReply
 async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 	if (!pages || pages.length === 0) {
 		return interaction.reply({ content: 'No pages to display.', ephemeral: true });
 	}
 
-	// Store page state in a Map using the message ID as key
+	// Store page state in a Map using interaction user ID as key
 	if (!interaction.client.helpMenuState) {
 		interaction.client.helpMenuState = new Map();
 	}
 
-	const menuMessage = await interaction.reply({
+	// Send the initial reply
+	await interaction.reply({
 		embeds: [pages[0]],
-		components: [...initialComponents, ...(pages.length > 1 ? [createNavigationRow(0, pages.length)] : [])],
-		withResponse: true,
+		components: [...initialComponents, ...(pages.length > 1 ? [createNavigationRow(0, pages.length)] : [])]
 	});
 
-	// Initialize the state for this message
-	interaction.client.helpMenuState.set(menuMessage.id, {
+	// Generate a unique ID for this help session
+	const helpSessionId = `help_${interaction.user.id}_${Date.now()}`;
+
+	// Initialize the state for this help session
+	interaction.client.helpMenuState.set(helpSessionId, {
 		currentPage: 0,
 		pages: pages,
-		initialComponents: initialComponents
+		initialComponents: initialComponents,
+		userId: interaction.user.id,
+		channelId: interaction.channelId,
+		createdAt: Date.now()
 	});
 
 	if (pages.length <= 1 && initialComponents.length === 0) return; // No need for collector
 
-	const collector = menuMessage.createMessageComponentCollector({
-		filter: i => i.user.id === interaction.user.id,
-		time: THEME.TIMEOUT_MS,
-	});
+	// We'll set up a listener in the main client interaction create event
+	// This is handled in the execute method below
 
-	collector.on('collect', async i => {
-		const state = interaction.client.helpMenuState.get(menuMessage.id) || {
-			currentPage: 0,
-			pages: pages,
-			initialComponents: initialComponents
-		};
-
-		await handleHelpInteraction(i, interaction, menuMessage.id);
-	});
-
-	collector.on('end', () => {
-		if (menuMessage.editable) {
-			const expiredEmbed = EmbedBuilder.from(menuMessage.embeds[0])
-				.setFooter({ text: 'This help menu has expired. Use /help again to get a fresh menu.' });
-
-			menuMessage.edit({ embeds: [expiredEmbed], components: [] }).catch(() => { });
+	// Set a timeout to remove the state after the timeout period
+	setTimeout(() => {
+		// If this help session still exists, clean it up
+		if (interaction.client.helpMenuState.has(helpSessionId)) {
+			// Try to edit the original message if possible
+			interaction.editReply({
+				embeds: [
+					EmbedBuilder.from(pages[0])
+						.setFooter({ text: 'This help menu has expired. Use /help again to get a fresh menu.' })
+				],
+				components: []
+			}).catch(() => { }); // Ignore errors if we can't edit
 
 			// Clean up the state
-			if (interaction.client.helpMenuState) {
-				interaction.client.helpMenuState.delete(menuMessage.id);
-			}
+			interaction.client.helpMenuState.delete(helpSessionId);
 		}
-	});
+	}, THEME.TIMEOUT_MS);
+
+	// Return the session ID so it can be used in the execute method
+	return helpSessionId;
 }
 
 async function handleHelpInteraction(i, originalInteraction, messageId) {
@@ -292,6 +293,25 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			components: [createHelpTypeRow()],
 		});
 	}
+	else if (i.customId === 'help_close') {
+		// Create a closed embed that shows the menu was dismissed
+		const closedEmbed = new EmbedBuilder()
+			.setColor(THEME.COLOR)
+			.setDescription('Help menu closed. Use `/help` again if you need assistance.')
+			.setFooter({ text: 'Menu dismissed by user' });
+
+		// Update the message with the closed embed and no components
+		await i.update({
+			embeds: [closedEmbed],
+			components: []
+		});
+
+		// Clean up the help menu state
+		originalInteraction.client.helpMenuState.delete(messageId);
+
+		// Return early as we don't need to save state
+		return;
+	}
 
 	// Save the updated state
 	originalInteraction.client.helpMenuState.set(messageId, state);
@@ -364,6 +384,11 @@ function createHelpTypeRow() {
 			.setLabel('Support')
 			.setEmoji('❓')
 			.setStyle(ButtonStyle.Danger),
+		new ButtonBuilder()
+			.setCustomId('help_close')
+			.setLabel('Close')
+			.setEmoji('✖️')
+			.setStyle(ButtonStyle.Secondary),
 	);
 }
 
@@ -503,22 +528,35 @@ function createAllCommandsEmbeds(commands, client) {
 	return pages;
 }
 
-// NEW: Create bot stats embed
+// NEW: Create bot stats embed with enhanced statistics
 function createBotStatsEmbed(client) {
-	// Calculate some stats
+	// Calculate basic stats
 	const serverCount = client.guilds?.cache?.size || 'N/A';
 	const channelCount = client.channels?.cache?.size || 'N/A';
 	const userCount = client.users?.cache?.size || 'N/A';
 	const uptime = formatUptime(client.uptime);
 	const commandCount = client.commands?.size || 'N/A';
 
-	// Get memory usage
+	// Calculate more detailed stats
+	const textChannelCount = client.channels?.cache?.filter(c => c.type === 0).size || 'N/A';
+	const voiceChannelCount = client.channels?.cache?.filter(c => c.type === 2).size || 'N/A';
+	const categoryCount = client.channels?.cache?.filter(c => c.type === 4).size || 'N/A';
+
+	// Calculate bot age
+	const botAge = formatBotAge(client.user.createdTimestamp);
+
+	// Get system metrics
 	const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+	const totalMemory = (process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2);
+	const cpuUsage = process.cpuUsage();
+	const cpuUsagePercent = ((cpuUsage.user + cpuUsage.system) / 1000000).toFixed(2);
 
-	// Discord.js version (if available)
+	// Get platform details
+	const platform = process.platform;
+	const arch = process.arch;
+
+	// Get Discord.js and Node.js versions
 	const djsVersion = require('discord.js').version || 'Unknown';
-
-	// Node.js version
 	const nodeVersion = process.version;
 
 	return new EmbedBuilder()
@@ -527,28 +565,73 @@ function createBotStatsEmbed(client) {
 		.setThumbnail(client.user.displayAvatarURL())
 		.addFields([
 			{
-				name: '🤖 Bot Information', value:
-					`• **Name:** ${client.user.username}\n` +
-					`• **Created:** <t:${Math.floor(client.user.createdTimestamp / 1000)}:R>\n` +
+				name: '🤖 Bot Information',
+				value: `• **Name:** ${client.user.username}\n` +
+					`• **ID:** \`${client.user.id}\`\n` +
+					`• **Created:** <t:${Math.floor(client.user.createdTimestamp / 1000)}:R> (${botAge})\n` +
 					`• **Commands:** ${commandCount}\n` +
-					`• **Uptime:** ${uptime}`, inline: false
+					`• **Uptime:** ${uptime}`,
+				inline: false
 			},
 			{
-				name: '📊 Usage Statistics', value:
-					`• **Servers:** ${serverCount}\n` +
-					`• **Channels:** ${channelCount}\n` +
+				name: '📊 Usage Statistics',
+				value: `• **Servers:** ${serverCount}\n` +
 					`• **Users:** ${userCount}\n` +
-					`• **Memory:** ${memoryUsage} MB`, inline: true
+					`• **Channels:** ${channelCount} total\n` +
+					`  ↳ ${textChannelCount} text | ${voiceChannelCount} voice | ${categoryCount} categories`,
+				inline: true
 			},
 			{
-				name: '🛠️ Technical Details', value:
-					`• **Node.js:** ${nodeVersion}\n` +
+				name: '🛠️ Technical Details',
+				value: `• **Node.js:** ${nodeVersion}\n` +
 					`• **Discord.js:** v${djsVersion}\n` +
-					`• **Ping:** ${client.ws.ping || 'N/A'} ms`, inline: true
+					`• **Platform:** ${formatPlatform(platform)} (${arch})\n` +
+					`• **Ping:** ${client.ws.ping || 'N/A'} ms`,
+				inline: true
+			},
+			{
+				name: '💻 System Resources',
+				value: `• **Memory Usage:** ${memoryUsage} MB / ${totalMemory} MB\n` +
+					`• **CPU Usage:** ${cpuUsagePercent}ms\n` +
+					`• **Process PID:** ${process.pid}`,
+				inline: false
 			}
 		])
-		.setFooter({ text: 'Bot statistics are updated in real-time' })
+		.setFooter({ text: 'Bot statistics are updated in real-time • Last refreshed' })
 		.setTimestamp();
+}
+
+// Helper function to format bot age in a readable way
+function formatBotAge(timestamp) {
+	const now = Date.now();
+	const diff = now - timestamp;
+
+	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+	const months = Math.floor(days / 30);
+	const years = Math.floor(days / 365);
+
+	if (years > 0) {
+		return `${years} year${years !== 1 ? 's' : ''}, ${months % 12} month${months % 12 !== 1 ? 's' : ''}`;
+	} else if (months > 0) {
+		return `${months} month${months !== 1 ? 's' : ''}, ${days % 30} day${days % 30 !== 1 ? 's' : ''}`;
+	} else {
+		return `${days} day${days !== 1 ? 's' : ''}`;
+	}
+}
+
+// Helper function to format platform names nicely
+function formatPlatform(platform) {
+	const platforms = {
+		'win32': 'Windows',
+		'darwin': 'macOS',
+		'linux': 'Linux',
+		'freebsd': 'FreeBSD',
+		'openbsd': 'OpenBSD',
+		'sunos': 'SunOS',
+		'aix': 'AIX'
+	};
+
+	return platforms[platform] || platform;
 }
 
 // NEW: Create support embed
@@ -683,9 +766,15 @@ function createSearchEmbeds(results, searchQuery, client) {
 }
 
 // Add this function to dynamically build command data
-function buildCommandData(existingCategories = []) {
-	// Ensure we have some default categories if none are provided yet
-	const categories = existingCategories.length > 0 ? existingCategories : ['info', 'utility', 'moderation', 'fun'];
+function buildCommandData(client = null) {
+	// Get categories dynamically from the commands if client is available
+	let categories = ['info', 'utility', 'moderation', 'fun']; // Default fallback categories
+
+	if (client && client.commands) {
+		// Get actual categories from existing commands
+		const organizedCategories = organizeCommandsByCategory(client.commands);
+		categories = Object.keys(organizedCategories);
+	}
 
 	const categoryChoices = categories.map(category => ({
 		name: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
@@ -710,8 +799,8 @@ module.exports = {
 	data: buildCommandData(),
 
 	// Method to refresh command data with current categories
-	refreshData(categories = []) {
-		this.data = buildCommandData(categories);
+	refreshData(client) {
+		this.data = buildCommandData(client);
 		return this.data;
 	},
 
@@ -807,10 +896,42 @@ module.exports = {
 			const helpTypeRow = createHelpTypeRow();
 			const categoryMenuRow = createCategoryMenuRow(Object.keys(organizedCommands));
 
-			// Send the interactive help menu using the same collection handling as pagination
-			const helpPages = [mainHelpEmbed]; // Create a single-page array
-			await createPaginatedMenu(interaction, helpPages, [helpTypeRow, categoryMenuRow]);
+			// Send the interactive help menu
+			const helpPages = [mainHelpEmbed];
+			const helpSessionId = await createPaginatedMenu(
+				interaction,
+				helpPages,
+				[helpTypeRow, categoryMenuRow]
+			);
 
+			// Set up a one-time collector for this interaction
+			if (!client.helpCollectors) {
+				client.helpCollectors = new Map();
+			}
+
+			// Store the help session ID in the collector map
+			client.helpCollectors.set(interaction.user.id, helpSessionId);
+
+			// Add a listener for component interactions if not already added
+			if (!client.helpInteractionHandler) {
+				client.helpInteractionHandler = async (buttonInteraction) => {
+					// Check if this is a help menu interaction
+					if (!buttonInteraction.isButton() && !buttonInteraction.isStringSelectMenu()) return;
+
+					// Find matching help session
+					const sessionId = client.helpCollectors.get(buttonInteraction.user.id);
+					if (!sessionId) return;
+
+					const state = client.helpMenuState.get(sessionId);
+					if (!state) return;
+
+					// Process the interaction
+					await handleHelpInteraction(buttonInteraction, interaction, sessionId);
+				};
+
+				// Add the handler to the client's interactionCreate event
+				client.on('interactionCreate', client.helpInteractionHandler);
+			}
 		} catch (error) {
 			handleError(interaction, error);
 		}
