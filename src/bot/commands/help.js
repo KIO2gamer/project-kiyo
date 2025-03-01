@@ -9,7 +9,7 @@ const {
 } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { handleError } = require('../../utils/errorHandler.js');
+const { handleError } = require('../utils/errorHandler.js');
 
 // Theme configuration - Expanded with more customization options
 const THEME = {

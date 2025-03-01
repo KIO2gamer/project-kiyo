@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const axios = require('axios');
-const { handleError } = require('../../utils/errorHandler');
+const { handleError } = require('../utils/errorHandler');
 require('dotenv').config();
 
 module.exports = {

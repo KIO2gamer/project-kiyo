@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const ChatHistory = require('./../../../database/ChatHistory');
-const { handleError } = require('./../../utils/errorHandler');
+const ChatHistory = require('../../database/ChatHistory');
+const { handleError } = require('../utils/errorHandler');
 
 module.exports = {
 	data: new SlashCommandBuilder()
