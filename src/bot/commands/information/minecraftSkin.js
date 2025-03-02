@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 const NodeCache = require('node-cache');
-const { handleError } = require('./../../utils/errorHandler.js');
+const { handleError } = require('../../utils/errorHandler.js');
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 minutes (TTL: Time To Live, checkperiod: how often to check for expired entries)
 const ASHCON_API_BASE = 'https://api.ashcon.app/mojang/v2/user/';

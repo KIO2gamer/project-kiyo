@@ -1,10 +1,10 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { handleError } = require('../utils/errorHandler');
+const { handleError } = require('../../utils/errorHandler');
 const {
 	formatCategorizedPermissions,
 	splitPermissionText,
 	getPermissionDescription
-} = require('../utils/permissionFormatter');
+} = require('../../utils/permissionFormatter');
 
 module.exports = {
 	description_full:

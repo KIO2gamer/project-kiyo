@@ -9,7 +9,7 @@ const {
 } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { handleError } = require('../utils/errorHandler.js');
+const { handleError } = require('../../utils/errorHandler.js');
 
 // Theme configuration - Expanded with more customization options
 const THEME = {
@@ -24,56 +24,50 @@ const THEME = {
 
 // Enhanced emoji mapping for categories with more descriptive emojis
 const CATEGORY_EMOJIS = {
-	admin: '⚖️',
-	channels: '📚',
-	customs: '🎨',
-	fun: '🎮',
-	games: '🎯',
-	info: 'ℹ️',
-	moderation: '🛡️',
-	roles: '👑',
-	setup: '⚙️',
-	tickets: '🎫',
-	utility: '🧰',
-	youtube: '📺',
-	music: '🎵',
-	economy: '💰',
-	levels: '📊',
-	voice: '🎤',
-	others: '📌'
+	core: '⚙️',
+	customization: '🎨',
+	entertainment: '🎮',
+	information: 'ℹ️',
+	interaction: '💬',
+	management: '🛠️'
 };
 
-// Function to ensure all categories have an emoji
+// Function to ensure all categories have an emoji (Modified to use predefined categories)
 function updateCategoryEmojis(categories) {
-	// Add any missing categories with default emoji
-	categories.forEach(category => {
+	const validCategories = ['core', 'customization', 'entertainment', 'information', 'interaction', 'management'];
+	validCategories.forEach(category => {
 		if (!CATEGORY_EMOJIS[category.toLowerCase()]) {
-			CATEGORY_EMOJIS[category.toLowerCase()] = '📌'; // Default emoji
+			CATEGORY_EMOJIS[category.toLowerCase()] = '📌'; // Default emoji if missing (shouldn't happen now)
 		}
 	});
 	return CATEGORY_EMOJIS;
 }
 
 // Function to get category emoji
-function getCategoryEmoji(category = 'general') {
+function getCategoryEmoji(category = 'core') { // Default to 'core' if category is not provided or invalid
 	return CATEGORY_EMOJIS[category.toLowerCase()] || '📌';
 }
 
-// Helper function to organize commands by category
+// Helper function to organize commands by category (Modified to use predefined categories)
 function organizeCommandsByCategory(commands) {
-	const categories = {};
+	const categories = {
+		core: [],
+		customization: [],
+		entertainment: [],
+		information: [],
+		interaction: [],
+		management: []
+	};
 	for (const command of commands.values()) {
-		const category = command.category?.toLowerCase() || 'general';
-		if (!categories[category]) {
-			categories[category] = [];
+		let category = command.category?.toLowerCase() || 'core'; // Default to 'core' if no category or invalid
+		if (!categories.hasOwnProperty(category)) {
+			category = 'core'; // Fallback to 'core' if category is not in predefined list
 		}
 		categories[category].push(command);
 	}
 
-	// Sort categories by name for consistency
-	return Object.fromEntries(
-		Object.entries(categories).sort((a, b) => a[0].localeCompare(b[0]))
-	);
+	// Sort categories by name for consistency (already sorted in object definition)
+	return categories;
 }
 
 // Helper function to count commands per category
@@ -230,7 +224,7 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 		state.currentPage = 0;
 		state.initialComponents = [
 			createHelpTypeRow(),
-			createCategoryMenuRow(Object.keys(organizedCommands))
+			createCategoryMenuRow(Object.keys(organizeCommandsByCategory(originalInteraction.client.commands)))
 		];
 
 		originalInteraction.client.helpMenuState.set(messageId, state);
@@ -663,7 +657,7 @@ function createCommandDetailEmbed(command, client) {
 		.setTitle(`\`/${command.data.name}\` Command Details`)
 		.setDescription(command.description_full || command.data.description || '*No detailed description provided.*')
 		.addFields([
-			{ name: 'Category', value: command.category ? `${getCategoryEmoji(command.category)} ${command.category}` : 'Others', inline: true },
+			{ name: 'Category', value: command.category ? `${getCategoryEmoji(command.category)} ${command.category}` : 'Core', inline: true }, // Default to 'Core' if no category
 			{ name: 'Usage', value: `\`${command.usage || `/${command.data.name}`}\``, inline: true },
 		])
 		.setFooter({ text: 'For general help, use /help without any arguments' });
@@ -751,8 +745,8 @@ function createSearchEmbeds(results, searchQuery, client) {
 		// Add each result with category info and formatting
 		pageResults.forEach(cmd => {
 			embed.addFields({
-				name: `${getCategoryEmoji(cmd.category || 'others')} /${cmd.data.name}`,
-				value: `**Category:** ${cmd.category || 'Others'}\n` +
+				name: `${getCategoryEmoji(cmd.category || 'core')} /${cmd.data.name}`, // Default to 'core' if no category
+				value: `**Category:** ${cmd.category || 'Core'}\n` + // Default to 'Core' if no category
 					`**Description:** ${cmd.data.description || 'No description.'}\n` +
 					`**Usage:** \`${cmd.usage || `/${cmd.data.name}`}\``,
 				inline: false
@@ -767,14 +761,8 @@ function createSearchEmbeds(results, searchQuery, client) {
 
 // Add this function to dynamically build command data
 function buildCommandData(client = null) {
-	// Get categories dynamically from the commands if client is available
-	let categories = ['info', 'utility', 'moderation', 'fun']; // Default fallback categories
-
-	if (client && client.commands) {
-		// Get actual categories from existing commands
-		const organizedCategories = organizeCommandsByCategory(client.commands);
-		categories = Object.keys(organizedCategories);
-	}
+	// Use the predefined categories
+	const categories = ['core', 'customization', 'entertainment', 'information', 'interaction', 'management'];
 
 	const categoryChoices = categories.map(category => ({
 		name: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
@@ -804,13 +792,13 @@ module.exports = {
 		return this.data;
 	},
 
-	category: 'info',
+	category: 'information', // Changed help command category to 'information' as it provides info
 	usage: '/help [command:command-name] [category:category-name] [search:keyword]',
 	description_full: 'The help command provides an interactive menu system for exploring all bot commands and features. You can view commands by category, search for specific functionality, or get detailed information about any command. The help system includes bot statistics, support resources, and easy navigation between different sections.',
 	examples: [
 		'/help',
 		'/help command:ping',
-		'/help category:fun',
+		'/help category:entertainment', // Example category changed to 'entertainment'
 		'/help search:roles'
 	],
 
@@ -823,9 +811,11 @@ module.exports = {
 
 			const commands = client.commands;
 
-			// Get all categories and update emoji mapping
+			// Use predefined categories and update emoji mapping
+			const categories = ['core', 'customization', 'entertainment', 'information', 'interaction', 'management'];
+			updateCategoryEmojis(categories);
 			const organizedCategories = organizeCommandsByCategory(commands);
-			updateCategoryEmojis(Object.keys(organizedCategories));
+
 
 			if (commandName) {
 				// Find the command by name
@@ -848,10 +838,9 @@ module.exports = {
 
 			if (categoryName) {
 				// Filter commands by the requested category
-				const categoryCommands = Array.from(commands.values())
-					.filter(cmd => cmd.category && cmd.category.toLowerCase() === categoryName.toLowerCase());
+				const categoryCommands = organizedCategories[categoryName.toLowerCase()];
 
-				if (!categoryCommands.length) {
+				if (!categoryCommands || categoryCommands.length === 0) {
 					return interaction.reply({
 						content: `⚠️ No commands found in the \`${categoryName}\` category. Use \`/help\` without arguments to see all available categories.`,
 						ephemeral: true
@@ -870,7 +859,7 @@ module.exports = {
 					const description = cmd.data?.description || cmd.description_full || '';
 					const usage = cmd.usage || '';
 					const examples = Array.isArray(cmd.examples) ? cmd.examples.join(' ') : '';
-					const category = cmd.category || '';
+					const category = cmd.category || 'core'; // Default to 'core' for search
 
 					const searchString = `${name} ${description} ${usage} ${examples} ${category}`.toLowerCase();
 					return searchString.includes(searchQuery.toLowerCase());
@@ -904,36 +893,62 @@ module.exports = {
 				[helpTypeRow, categoryMenuRow]
 			);
 
-			// Set up a one-time collector for this interaction
+			// Initialize help session tracking if needed
 			if (!client.helpCollectors) {
 				client.helpCollectors = new Map();
 			}
 
-			// Store the help session ID in the collector map
+			// Store session ID for this user
 			client.helpCollectors.set(interaction.user.id, helpSessionId);
 
-			// Add a listener for component interactions if not already added
+			// Set up the global interaction handler only once
 			if (!client.helpInteractionHandler) {
+				// Create a single reusable handler function
 				client.helpInteractionHandler = async (buttonInteraction) => {
-					// Check if this is a help menu interaction
+					// Skip if not a button or select menu interaction
 					if (!buttonInteraction.isButton() && !buttonInteraction.isStringSelectMenu()) return;
 
-					// Find matching help session
+					// Get the user's active help session
 					const sessionId = client.helpCollectors.get(buttonInteraction.user.id);
 					if (!sessionId) return;
 
+					// Get the state for this help session
 					const state = client.helpMenuState.get(sessionId);
 					if (!state) return;
 
-					// Process the interaction
+					// Only handle if the interaction is from the help menu user
+					if (buttonInteraction.user.id !== state.userId) return;
+
+					// Process the help menu interaction
 					await handleHelpInteraction(buttonInteraction, interaction, sessionId);
 				};
 
-				// Add the handler to the client's interactionCreate event
+				// Register the handler once
 				client.on('interactionCreate', client.helpInteractionHandler);
+
+				// Optional: Set up a cleanup interval to prevent memory leaks
+				if (!client.helpMenuCleanupInterval) {
+					client.helpMenuCleanupInterval = setInterval(() => {
+						const now = Date.now();
+
+						// Clean up expired help sessions
+						client.helpMenuState?.forEach((state, id) => {
+							if (now - state.createdAt > THEME.TIMEOUT_MS) {
+								client.helpMenuState.delete(id);
+
+								// Also remove from collectors map
+								for (const [userId, sessionId] of client.helpCollectors.entries()) {
+									if (sessionId === id) {
+										client.helpCollectors.delete(userId);
+									}
+								}
+							}
+						});
+					}, 60000); // Check every minute
+				}
 			}
 		} catch (error) {
 			handleError(interaction, error);
 		}
 	},
-};
+}

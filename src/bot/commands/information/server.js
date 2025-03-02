@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { handleError } = require('../utils/errorHandler');
+const { handleError } = require('../../utils/errorHandler');
 const moment = require('moment');
 
 module.exports = {
