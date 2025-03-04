@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ActionRowBuilder,
+	StringSelectMenuBuilder,
+} = require('discord.js');
 const axios = require('axios');
 const { handleError } = require('../utils/errorHandler');
 require('dotenv').config();
@@ -7,17 +12,21 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('game_info')
 		.setDescription('Get detailed information about a video game')
-		.addStringOption(option =>
-			option.setName('title')
+		.addStringOption((option) =>
+			option
+				.setName('title')
 				.setDescription('The title of the game to search for')
-				.setRequired(true)),
+				.setRequired(true),
+		),
 
 	async execute(interaction) {
 		await interaction.deferReply();
 		const gameTitle = interaction.options.getString('title');
 		const clientId = process.env.IGDB_CLIENT_ID;
 		if (!clientId || !process.env.IGDB_CLIENT_SECRET) {
-			return interaction.editReply('API keys not configured. Please contact the bot administrator.');
+			return interaction.editReply(
+				'API keys not configured. Please contact the bot administrator.',
+			);
 		}
 
 		// Helper: Get an access token from Twitch using your client credentials
@@ -28,7 +37,10 @@ module.exports = {
 			params.append('grant_type', 'client_credentials');
 
 			try {
-				const response = await axios.post('https://id.twitch.tv/oauth2/token', params);
+				const response = await axios.post(
+					'https://id.twitch.tv/oauth2/token',
+					params,
+				);
 				return response.data.access_token;
 			} catch (error) {
 				console.error('Error fetching access token:', error);
@@ -39,46 +51,59 @@ module.exports = {
 		// Helper: Build an embed with the game details
 		function createGameEmbed(gameData) {
 			const embed = new EmbedBuilder()
-				.setColor(0x0099FF)
+				.setColor(0x0099ff)
 				.setTitle(gameData.name)
-				.setThumbnail(gameData.cover ? `https:${gameData.cover.url}` : '')
+				.setThumbnail(
+					gameData.cover ? `https:${gameData.cover.url}` : '',
+				)
 				.addFields(
 					{
 						name: '📅 Released',
 						value: gameData.first_release_date
-							? new Date(gameData.first_release_date * 1000).toLocaleDateString()
+							? new Date(
+									gameData.first_release_date * 1000,
+								).toLocaleDateString()
 							: 'Unknown',
-						inline: true
+						inline: true,
 					},
 					{
 						name: '⭐ Rating',
 						value: gameData.rating
 							? `${gameData.rating.toFixed(1)}/100`
 							: 'Unknown',
-						inline: true
+						inline: true,
 					},
 					{
 						name: '🎮 Platforms',
-						value: gameData.platforms ? gameData.platforms.map(p => p.name).join(', ') : 'Unknown',
-						inline: false
+						value: gameData.platforms
+							? gameData.platforms.map((p) => p.name).join(', ')
+							: 'Unknown',
+						inline: false,
 					},
 					{
 						name: '🏷️ Genres',
-						value: gameData.genres ? gameData.genres.map(g => g.name).join(', ') : 'Unknown',
-						inline: true
-					}
+						value: gameData.genres
+							? gameData.genres.map((g) => g.name).join(', ')
+							: 'Unknown',
+						inline: true,
+					},
 				)
 				.setFooter({ text: 'Data provided by IGDB' });
 
 			// Only set URL if a valid one exists
-			if (gameData.websites && gameData.websites.length > 0 && gameData.websites[0].url) {
+			if (
+				gameData.websites &&
+				gameData.websites.length > 0 &&
+				gameData.websites[0].url
+			) {
 				embed.setURL(gameData.websites[0].url);
 			}
 
 			if (gameData.summary) {
-				const description = gameData.summary.length > 2000
-					? gameData.summary.substring(0, 1997) + '...'
-					: gameData.summary;
+				const description =
+					gameData.summary.length > 2000
+						? gameData.summary.substring(0, 1997) + '...'
+						: gameData.summary;
 				embed.setDescription(description);
 			}
 
@@ -100,20 +125,24 @@ module.exports = {
 				method: 'POST',
 				headers: {
 					'Client-ID': clientId,
-					'Authorization': `Bearer ${accessToken}`,
-					'Accept': 'application/json',
-					'Content-Type': 'text/plain'
+					Authorization: `Bearer ${accessToken}`,
+					Accept: 'application/json',
+					'Content-Type': 'text/plain',
 				},
-				data: query
+				data: query,
 			});
 
 			const games = response.data;
 			if (!games || games.length === 0) {
-				return interaction.editReply(`No games found with title "${gameTitle}"`);
+				return interaction.editReply(
+					`No games found with title "${gameTitle}"`,
+				);
 			}
 
 			// Check for an exact (case-insensitive) match
-			const exactMatch = games.find(game => game.name.toLowerCase() === gameTitle.toLowerCase());
+			const exactMatch = games.find(
+				(game) => game.name.toLowerCase() === gameTitle.toLowerCase(),
+			);
 			if (exactMatch) {
 				const embed = createGameEmbed(exactMatch);
 				return interaction.editReply({ embeds: [embed] });
@@ -128,8 +157,10 @@ module.exports = {
 			// Multiple results found: Present a select menu for the user to choose the correct game
 			const options = games.map((game, index) => ({
 				label: game.name.substring(0, 100), // Discord's limit for select menu labels
-				description: game.summary ? game.summary.substring(0, 50) : 'No summary available',
-				value: String(index)
+				description: game.summary
+					? game.summary.substring(0, 50)
+					: 'No summary available',
+				value: String(index),
 			}));
 
 			const selectMenu = new StringSelectMenuBuilder()
@@ -142,28 +173,44 @@ module.exports = {
 			const listEmbed = new EmbedBuilder()
 				.setTitle('Multiple Games Found')
 				.setDescription('Please select a game from the list below:')
-				.setColor(0x0099FF);
+				.setColor(0x0099ff);
 
-			await interaction.editReply({ embeds: [listEmbed], components: [row] });
+			await interaction.editReply({
+				embeds: [listEmbed],
+				components: [row],
+			});
 
 			// Create a collector to handle the user's selection
-			const filter = i => i.customId === 'select_game' && i.user.id === interaction.user.id;
-			const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000, max: 1 });
+			const filter = (i) =>
+				i.customId === 'select_game' &&
+				i.user.id === interaction.user.id;
+			const collector =
+				interaction.channel.createMessageComponentCollector({
+					filter,
+					time: 15000,
+					max: 1,
+				});
 
-			collector.on('collect', async i => {
+			collector.on('collect', async (i) => {
 				await i.deferUpdate();
 				const selectedIndex = parseInt(i.values[0]);
 				const selectedGame = games[selectedIndex];
 				const embed = createGameEmbed(selectedGame);
-				await interaction.editReply({ embeds: [embed], components: [] });
+				await interaction.editReply({
+					embeds: [embed],
+					components: [],
+				});
 			});
 
-			collector.on('end', async collected => {
+			collector.on('end', async (collected) => {
 				if (collected.size === 0) {
-					await interaction.editReply({ content: 'No selection made, please try the command again.', components: [] });
+					await interaction.editReply({
+						content:
+							'No selection made, please try the command again.',
+						components: [],
+					});
 				}
 			});
-
 		} catch (error) {
 			handleError('❌ Failed to fetch game data:', error);
 			console.log(error);

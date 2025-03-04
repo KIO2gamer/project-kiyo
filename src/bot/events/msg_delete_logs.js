@@ -3,7 +3,7 @@ const {
 	AuditLogEvent,
 	PermissionsBitField,
 	EmbedBuilder,
-	AttachmentBuilder
+	AttachmentBuilder,
 } = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 const { handleError } = require('./../utils/errorHandler');
@@ -27,7 +27,9 @@ module.exports = {
 					// Attempt to fetch the complete message data
 					message = await message.fetch().catch(() => null);
 					if (!message) {
-						Logger.warn('Could not fetch deleted partial message, skipping log');
+						Logger.warn(
+							'Could not fetch deleted partial message, skipping log',
+						);
 						return;
 					}
 				} catch (error) {
@@ -39,7 +41,9 @@ module.exports = {
 			// Check if message.author exists before checking bot property
 			// This prevents the TypeError when author is null
 			if (!message.author) {
-				Logger.warn('Message author information unavailable, skipping log');
+				Logger.warn(
+					'Message author information unavailable, skipping log',
+				);
 				return;
 			}
 
@@ -55,7 +59,7 @@ module.exports = {
 			}
 
 			// Fetch log channel configuration
-			const config = await MsgLogsConfig.findOne({}).catch(err => {
+			const config = await MsgLogsConfig.findOne({}).catch((err) => {
 				Logger.error('Failed to fetch message log configuration:', err);
 				return null;
 			});
@@ -66,9 +70,13 @@ module.exports = {
 			}
 
 			// Get log channel safely
-			const logChannel = await message.guild.channels.fetch(config.channelId).catch(() => null);
+			const logChannel = await message.guild.channels
+				.fetch(config.channelId)
+				.catch(() => null);
 			if (!logChannel) {
-				Logger.warn(`Invalid log channel ID in configuration: ${config.channelId}`);
+				Logger.warn(
+					`Invalid log channel ID in configuration: ${config.channelId}`,
+				);
 				return;
 			}
 
@@ -81,15 +89,19 @@ module.exports = {
 			const requiredPermissions = [
 				PermissionsBitField.Flags.SendMessages,
 				PermissionsBitField.Flags.EmbedLinks,
-				PermissionsBitField.Flags.AttachFiles
+				PermissionsBitField.Flags.AttachFiles,
 			];
 
 			try {
-				const botMember = await message.guild.members.fetch(message.client.user.id);
+				const botMember = await message.guild.members.fetch(
+					message.client.user.id,
+				);
 				const permissions = botMember.permissionsIn(logChannel);
 
 				if (!permissions.has(requiredPermissions)) {
-					Logger.warn(`Missing permissions in log channel ${logChannel.name}`);
+					Logger.warn(
+						`Missing permissions in log channel ${logChannel.name}`,
+					);
 					return;
 				}
 			} catch (error) {
@@ -105,18 +117,18 @@ module.exports = {
 					{
 						name: 'Author',
 						value: `${message.author.tag} (${message.author.id})`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: 'Channel',
 						value: `${message.channel.name} (${message.channel.id})`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: 'Message ID',
 						value: message.id,
-						inline: true
-					}
+						inline: true,
+					},
 				])
 				.setTimestamp();
 
@@ -128,40 +140,51 @@ module.exports = {
 				logEmbed.addFields({
 					name: 'Content',
 					value: content,
-					inline: false
+					inline: false,
 				});
 			} else {
 				logEmbed.addFields({
 					name: 'Content (truncated)',
 					value: content.substring(0, contentLimit - 3) + '...',
-					inline: false
+					inline: false,
 				});
 			}
 
 			// Try to fetch audit logs to determine deletion cause
 			try {
-				const auditLogs = await message.guild.fetchAuditLogs({
-					type: AuditLogEvent.MessageDelete,
-					limit: 5 // Fetch more entries to increase matching chances
-				}).catch(() => ({ entries: new Map() }));
+				const auditLogs = await message.guild
+					.fetchAuditLogs({
+						type: AuditLogEvent.MessageDelete,
+						limit: 5, // Fetch more entries to increase matching chances
+					})
+					.catch(() => ({ entries: new Map() }));
 
 				// Look for a matching audit log entry
-				const matchingEntry = auditLogs.entries.find(entry => {
+				const matchingEntry = auditLogs.entries.find((entry) => {
 					// Check if this audit log entry matches our deleted message
-					const isRecentDeletion = Date.now() - entry.createdTimestamp < 5000;
-					const matchesChannel = entry.extra?.channel?.id === message.channel.id;
-					const matchesAuthor = entry.target?.id === message.author.id;
+					const isRecentDeletion =
+						Date.now() - entry.createdTimestamp < 5000;
+					const matchesChannel =
+						entry.extra?.channel?.id === message.channel.id;
+					const matchesAuthor =
+						entry.target?.id === message.author.id;
 
-					return isRecentDeletion && (matchesChannel || matchesAuthor);
+					return (
+						isRecentDeletion && (matchesChannel || matchesAuthor)
+					);
 				});
 
 				if (matchingEntry) {
 					const { executor } = matchingEntry;
 
 					// Skip logging if this is a bot self-deletion
-					if (executor.id === message.client.user.id &&
-						matchingEntry.target.id === message.author.id) {
-						Logger.debug('Self-deletion detected, skipping logging.');
+					if (
+						executor.id === message.client.user.id &&
+						matchingEntry.target.id === message.author.id
+					) {
+						Logger.debug(
+							'Self-deletion detected, skipping logging.',
+						);
 						return;
 					}
 
@@ -169,7 +192,7 @@ module.exports = {
 					logEmbed.addFields({
 						name: 'Deleted By',
 						value: `${executor.tag} (${executor.id})`,
-						inline: true
+						inline: true,
 					});
 				}
 			} catch (error) {
@@ -183,7 +206,7 @@ module.exports = {
 				logEmbed.addFields({
 					name: 'Attachments',
 					value: `${message.attachments.size} attachment(s)`,
-					inline: true
+					inline: true,
 				});
 
 				// Process up to 5 attachments to avoid exceeding Discord limits
@@ -195,26 +218,40 @@ module.exports = {
 
 					try {
 						// Avoid downloading very large files
-						if (attachment.size > 8 * 1024 * 1024) { // 8MB limit
+						if (attachment.size > 8 * 1024 * 1024) {
+							// 8MB limit
 							logEmbed.addFields({
 								name: `Attachment ${attachmentCount + 1}`,
 								value: `[${attachment.name}](${attachment.url}) (too large to save: ${(attachment.size / 1024 / 1024).toFixed(2)}MB)`,
-								inline: true
+								inline: true,
 							});
 							continue;
 						}
 
-						const response = await fetch(attachment.url, { timeout: 5000 });
-						if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+						const response = await fetch(attachment.url, {
+							timeout: 5000,
+						});
+						if (!response.ok)
+							throw new Error(
+								`Failed to fetch: ${response.status}`,
+							);
 
-						const buffer = Buffer.from(await response.arrayBuffer());
-						attachments.push(new AttachmentBuilder(buffer, {
-							name: attachment.name || `attachment-${attachmentCount + 1}.${attachment.contentType?.split('/')[1] || 'bin'}`,
-							description: `${attachment.name} (${(attachment.size / 1024).toFixed(2)} KB)`
-						}));
+						const buffer = Buffer.from(
+							await response.arrayBuffer(),
+						);
+						attachments.push(
+							new AttachmentBuilder(buffer, {
+								name:
+									attachment.name ||
+									`attachment-${attachmentCount + 1}.${attachment.contentType?.split('/')[1] || 'bin'}`,
+								description: `${attachment.name} (${(attachment.size / 1024).toFixed(2)} KB)`,
+							}),
+						);
 						attachmentCount++;
 					} catch (error) {
-						Logger.warn(`Failed to fetch attachment: ${error.message}`);
+						Logger.warn(
+							`Failed to fetch attachment: ${error.message}`,
+						);
 					}
 				}
 			}
@@ -223,15 +260,14 @@ module.exports = {
 			try {
 				await logChannel.send({
 					embeds: [logEmbed],
-					files: attachments.length > 0 ? attachments : []
+					files: attachments.length > 0 ? attachments : [],
 				});
 			} catch (error) {
 				Logger.error('Failed to send log message:', error);
 			}
-
 		} catch (error) {
 			Logger.error('Error in MessageDelete event handler:', error);
 			await handleError(null, error, false);
 		}
-	}
+	},
 };

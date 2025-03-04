@@ -33,7 +33,7 @@ module.exports = {
 				.setTitle('✨ Credits ✨')
 				.setColor('#0099ff')
 				.setDescription(
-					'A big thank you to all the amazing contributors who helped make this bot possible!'
+					'A big thank you to all the amazing contributors who helped make this bot possible!',
 				)
 				.setTimestamp()
 				.setFooter({ text: 'Thanks to all the contributors!' });
@@ -44,7 +44,7 @@ module.exports = {
 			// Map contributors to embed fields, using a command link if available
 			const fields = contributors.map((contributor) => {
 				const command = guildCommands.find(
-					(cmd) => cmd.name === contributor.command
+					(cmd) => cmd.name === contributor.command,
 				);
 				const commandLink = command
 					? `</${contributor.command}:${command.id}>`

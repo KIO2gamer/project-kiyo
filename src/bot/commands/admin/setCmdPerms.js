@@ -100,9 +100,11 @@ module.exports = {
 		}
 
 		await interaction.reply({
-			content: `Successfully ${allowed ? 'allowed' : 'denied'
-				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
-				} on command ${commandName}`,
+			content: `Successfully ${
+				allowed ? 'allowed' : 'denied'
+			} permissions for ${
+				role ? `role ${role.name}` : `user ${user.tag}`
+			} on command ${commandName}`,
 			ephemeral: true,
 		});
 	},

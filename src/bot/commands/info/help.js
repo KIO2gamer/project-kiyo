@@ -17,7 +17,8 @@ const THEME = {
 	ICON: 'https://cdn.discordapp.com/embed/avatars/0.png', // Default Discord avatar
 	TIMEOUT_MS: 180000, // 3 minutes timeout for menus (increased from 2)
 	ITEMS_PER_PAGE: 8, // Reduced for better readability
-	FOOTER_TEXT: 'Use the buttons below to navigate • Command times out after 3 minutes',
+	FOOTER_TEXT:
+		'Use the buttons below to navigate • Command times out after 3 minutes',
 	SUPPORT_SERVER: 'https://discord.gg/yourserver', // Add your support server link
 	COMMAND_PREFIX: '/', // For showing command usage
 };
@@ -40,13 +41,13 @@ const CATEGORY_EMOJIS = {
 	economy: '💰',
 	levels: '📊',
 	voice: '🎤',
-	others: '📌'
+	others: '📌',
 };
 
 // Function to ensure all categories have an emoji
 function updateCategoryEmojis(categories) {
 	// Add any missing categories with default emoji
-	categories.forEach(category => {
+	categories.forEach((category) => {
 		if (!CATEGORY_EMOJIS[category.toLowerCase()]) {
 			CATEGORY_EMOJIS[category.toLowerCase()] = '📌'; // Default emoji
 		}
@@ -72,7 +73,7 @@ function organizeCommandsByCategory(commands) {
 
 	// Sort categories by name for consistency
 	return Object.fromEntries(
-		Object.entries(categories).sort((a, b) => a[0].localeCompare(b[0]))
+		Object.entries(categories).sort((a, b) => a[0].localeCompare(b[0])),
 	);
 }
 
@@ -88,7 +89,10 @@ function getCommandCountByCategory(organizedCommands) {
 // Function to create a paginated menu without requiring fetchReply
 async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 	if (!pages || pages.length === 0) {
-		return interaction.reply({ content: 'No pages to display.', ephemeral: true });
+		return interaction.reply({
+			content: 'No pages to display.',
+			ephemeral: true,
+		});
 	}
 
 	// Store page state in a Map using interaction user ID as key
@@ -99,7 +103,10 @@ async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 	// Send the initial reply
 	await interaction.reply({
 		embeds: [pages[0]],
-		components: [...initialComponents, ...(pages.length > 1 ? [createNavigationRow(0, pages.length)] : [])]
+		components: [
+			...initialComponents,
+			...(pages.length > 1 ? [createNavigationRow(0, pages.length)] : []),
+		],
 	});
 
 	// Generate a unique ID for this help session
@@ -112,7 +119,7 @@ async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 		initialComponents: initialComponents,
 		userId: interaction.user.id,
 		channelId: interaction.channelId,
-		createdAt: Date.now()
+		createdAt: Date.now(),
 	});
 
 	if (pages.length <= 1 && initialComponents.length === 0) return; // No need for collector
@@ -125,13 +132,16 @@ async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 		// If this help session still exists, clean it up
 		if (interaction.client.helpMenuState.has(helpSessionId)) {
 			// Try to edit the original message if possible
-			interaction.editReply({
-				embeds: [
-					EmbedBuilder.from(pages[0])
-						.setFooter({ text: 'This help menu has expired. Use /help again to get a fresh menu.' })
-				],
-				components: []
-			}).catch(() => { }); // Ignore errors if we can't edit
+			interaction
+				.editReply({
+					embeds: [
+						EmbedBuilder.from(pages[0]).setFooter({
+							text: 'This help menu has expired. Use /help again to get a fresh menu.',
+						}),
+					],
+					components: [],
+				})
+				.catch(() => {}); // Ignore errors if we can't edit
 
 			// Clean up the state
 			interaction.client.helpMenuState.delete(helpSessionId);
@@ -146,8 +156,13 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 	// Get the current state
 	const state = originalInteraction.client.helpMenuState.get(messageId) || {
 		currentPage: 0,
-		pages: [createMainHelpEmbed(originalInteraction.client, organizeCommandsByCategory(originalInteraction.client.commands))],
-		initialComponents: []
+		pages: [
+			createMainHelpEmbed(
+				originalInteraction.client,
+				organizeCommandsByCategory(originalInteraction.client.commands),
+			),
+		],
+		initialComponents: [],
 	};
 
 	// Handle navigation buttons
@@ -157,17 +172,19 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			embeds: [state.pages[state.currentPage]],
 			components: [
 				...state.initialComponents,
-				createNavigationRow(state.currentPage, state.pages.length)
+				createNavigationRow(state.currentPage, state.pages.length),
 			],
 		});
-	}
-	else if (i.customId === 'next') {
-		state.currentPage = Math.min(state.pages.length - 1, state.currentPage + 1);
+	} else if (i.customId === 'next') {
+		state.currentPage = Math.min(
+			state.pages.length - 1,
+			state.currentPage + 1,
+		);
 		await i.update({
 			embeds: [state.pages[state.currentPage]],
 			components: [
 				...state.initialComponents,
-				createNavigationRow(state.currentPage, state.pages.length)
+				createNavigationRow(state.currentPage, state.pages.length),
 			],
 		});
 	}
@@ -177,26 +194,41 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 		await i.deferUpdate();
 
 		// Get commands for the selected category
-		const commands = Array.from(originalInteraction.client.commands.values())
-			.filter(cmd => cmd.category && cmd.category.toLowerCase() === categoryName.toLowerCase());
+		const commands = Array.from(
+			originalInteraction.client.commands.values(),
+		).filter(
+			(cmd) =>
+				cmd.category &&
+				cmd.category.toLowerCase() === categoryName.toLowerCase(),
+		);
 
 		if (!commands.length) {
 			await i.followUp({
 				content: `⚠️ No commands found in the \`${categoryName}\` category.`,
-				ephemeral: true
+				ephemeral: true,
 			});
 			return;
 		}
 
 		// Display category-specific embeds
-		const categoryEmbeds = createCategoryCommandEmbeds(categoryName, commands, originalInteraction.client);
+		const categoryEmbeds = createCategoryCommandEmbeds(
+			categoryName,
+			commands,
+			originalInteraction.client,
+		);
 
 		// Update state with new pages
 		state.pages = categoryEmbeds;
 		state.currentPage = 0;
 		state.initialComponents = [
 			createHelpTypeRow(),
-			createCategoryMenuRow(Object.keys(organizeCommandsByCategory(originalInteraction.client.commands)))
+			createCategoryMenuRow(
+				Object.keys(
+					organizeCommandsByCategory(
+						originalInteraction.client.commands,
+					),
+				),
+			),
 		];
 
 		// Save updated state
@@ -208,7 +240,7 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 				embeds: [categoryEmbeds[0]],
 				components: [
 					...state.initialComponents,
-					createNavigationRow(0, categoryEmbeds.length)
+					createNavigationRow(0, categoryEmbeds.length),
 				],
 			});
 		} else {
@@ -222,15 +254,20 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 	// Handle help type buttons
 	else if (i.customId === 'help_home') {
 		// Return to main help page
-		const organizedCommands = organizeCommandsByCategory(originalInteraction.client.commands);
-		const mainHelpEmbed = createMainHelpEmbed(originalInteraction.client, organizedCommands);
+		const organizedCommands = organizeCommandsByCategory(
+			originalInteraction.client.commands,
+		);
+		const mainHelpEmbed = createMainHelpEmbed(
+			originalInteraction.client,
+			organizedCommands,
+		);
 
 		// Update state
 		state.pages = [mainHelpEmbed];
 		state.currentPage = 0;
 		state.initialComponents = [
 			createHelpTypeRow(),
-			createCategoryMenuRow(Object.keys(organizedCommands))
+			createCategoryMenuRow(Object.keys(organizedCommands)),
 		];
 
 		originalInteraction.client.helpMenuState.set(messageId, state);
@@ -239,12 +276,15 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			embeds: [mainHelpEmbed],
 			components: state.initialComponents,
 		});
-	}
-	else if (i.customId === 'help_commands') {
+	} else if (i.customId === 'help_commands') {
 		// Show all commands in a paginated list
-		const allCommands = Array.from(originalInteraction.client.commands.values())
-			.sort((a, b) => a.data.name.localeCompare(b.data.name));
-		const allCommandEmbeds = createAllCommandsEmbeds(allCommands, originalInteraction.client);
+		const allCommands = Array.from(
+			originalInteraction.client.commands.values(),
+		).sort((a, b) => a.data.name.localeCompare(b.data.name));
+		const allCommandEmbeds = createAllCommandsEmbeds(
+			allCommands,
+			originalInteraction.client,
+		);
 
 		// Update state with new pages
 		state.pages = allCommandEmbeds;
@@ -257,11 +297,12 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			embeds: [allCommandEmbeds[0]],
 			components: [
 				createHelpTypeRow(),
-				...(allCommandEmbeds.length > 1 ? [createNavigationRow(0, allCommandEmbeds.length)] : [])
+				...(allCommandEmbeds.length > 1
+					? [createNavigationRow(0, allCommandEmbeds.length)]
+					: []),
 			],
 		});
-	}
-	else if (i.customId === 'help_stats') {
+	} else if (i.customId === 'help_stats') {
 		// Show bot statistics
 		const statsEmbed = createBotStatsEmbed(originalInteraction.client);
 
@@ -276,8 +317,7 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			embeds: [statsEmbed],
 			components: [createHelpTypeRow()],
 		});
-	}
-	else if (i.customId === 'help_support') {
+	} else if (i.customId === 'help_support') {
 		// Show support information
 		const supportEmbed = createSupportEmbed(originalInteraction.client);
 
@@ -292,18 +332,19 @@ async function handleHelpInteraction(i, originalInteraction, messageId) {
 			embeds: [supportEmbed],
 			components: [createHelpTypeRow()],
 		});
-	}
-	else if (i.customId === 'help_close') {
+	} else if (i.customId === 'help_close') {
 		// Create a closed embed that shows the menu was dismissed
 		const closedEmbed = new EmbedBuilder()
 			.setColor(THEME.COLOR)
-			.setDescription('Help menu closed. Use `/help` again if you need assistance.')
+			.setDescription(
+				'Help menu closed. Use `/help` again if you need assistance.',
+			)
 			.setFooter({ text: 'Menu dismissed by user' });
 
 		// Update the message with the closed embed and no components
 		await i.update({
 			embeds: [closedEmbed],
-			components: []
+			components: [],
 		});
 
 		// Clean up the help menu state
@@ -348,13 +389,13 @@ function createCategoryMenuRow(categories) {
 		.setMinValues(1);
 
 	// Add each category as an option with proper formatting and emoji
-	categories.forEach(category => {
+	categories.forEach((category) => {
 		selectMenu.addOptions(
 			new StringSelectMenuOptionBuilder()
 				.setLabel(category.charAt(0).toUpperCase() + category.slice(1))
 				.setValue(category)
 				.setDescription(`View all ${category} commands`)
-				.setEmoji(getCategoryEmoji(category))
+				.setEmoji(getCategoryEmoji(category)),
 		);
 	});
 
@@ -406,27 +447,33 @@ function createMainHelpEmbed(client, organizedCommands) {
 
 	return new EmbedBuilder()
 		.setColor(THEME.COLOR)
-		.setAuthor({ name: `${client.user.username} Help Center`, iconURL: client.user.displayAvatarURL() })
+		.setAuthor({
+			name: `${client.user.username} Help Center`,
+			iconURL: client.user.displayAvatarURL(),
+		})
 		.setTitle('Interactive Help System')
 		.setDescription(
 			`Welcome to the interactive help menu! Here you can explore all available commands and features.\n\n` +
-			`**Key Statistics:**\n` +
-			`• **Commands:** ${totalCommands} commands across ${categories.length} categories\n` +
-			`• **Servers:** Currently serving ${serverCount} Discord servers\n` +
-			`• **Uptime:** ${uptime}\n\n` +
-			`Use the buttons below to explore different sections of the help system or select a specific category from the dropdown menu.`
+				`**Key Statistics:**\n` +
+				`• **Commands:** ${totalCommands} commands across ${categories.length} categories\n` +
+				`• **Servers:** Currently serving ${serverCount} Discord servers\n` +
+				`• **Uptime:** ${uptime}\n\n` +
+				`Use the buttons below to explore different sections of the help system or select a specific category from the dropdown menu.`,
 		)
 		.addFields({
 			name: '📚 Available Categories',
-			value: categories.map(category =>
-				`${getCategoryEmoji(category)} **${category.charAt(0).toUpperCase() + category.slice(1)}** (${commandCounts[category]} commands)`
-			).join('\n'),
-			inline: false
+			value: categories
+				.map(
+					(category) =>
+						`${getCategoryEmoji(category)} **${category.charAt(0).toUpperCase() + category.slice(1)}** (${commandCounts[category]} commands)`,
+				)
+				.join('\n'),
+			inline: false,
 		})
 		.addFields({
 			name: '🔍 Need Help with a Specific Command?',
 			value: 'Use `/help command:[command name]` to get detailed information about any command.',
-			inline: false
+			inline: false,
 		})
 		.setFooter({ text: THEME.FOOTER_TEXT })
 		.setTimestamp();
@@ -462,21 +509,26 @@ function createCategoryCommandEmbeds(categoryName, categoryCommands, client) {
 		const embed = new EmbedBuilder()
 			.setColor(THEME.COLOR)
 			.setTitle(categoryTitle)
-			.setDescription(`Here are the commands in the **${categoryName}** category. Select any command with \`/help command:[name]\` for more details.`)
+			.setDescription(
+				`Here are the commands in the **${categoryName}** category. Select any command with \`/help command:[name]\` for more details.`,
+			)
 			.setThumbnail(client.user.displayAvatarURL());
 
 		// Add each command with more detailed formatting
-		pageCommands.forEach(cmd => {
+		pageCommands.forEach((cmd) => {
 			embed.addFields({
 				name: `/${cmd.data.name}`,
-				value: `${cmd.data.description || 'No description provided.'}\n` +
+				value:
+					`${cmd.data.description || 'No description provided.'}\n` +
 					`${cmd.usage ? `**Usage:** \`${cmd.usage}\`` : ''}` +
 					`${cmd.examples && cmd.examples.length ? `\n**Example:** \`${cmd.examples[0]}\`` : ''}`,
-				inline: false
+				inline: false,
 			});
 		});
 
-		embed.setFooter({ text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(categoryCommands.length / itemsPerPage)}` });
+		embed.setFooter({
+			text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(categoryCommands.length / itemsPerPage)}`,
+		});
 		pages.push(embed);
 	}
 
@@ -486,7 +538,9 @@ function createCategoryCommandEmbeds(categoryName, categoryCommands, client) {
 			new EmbedBuilder()
 				.setColor(THEME.COLOR)
 				.setTitle(categoryTitle)
-				.setDescription(`There are currently no commands in the **${categoryName}** category.`)
+				.setDescription(
+					`There are currently no commands in the **${categoryName}** category.`,
+				),
 		);
 	}
 
@@ -506,22 +560,26 @@ function createAllCommandsEmbeds(commands, client) {
 		const embed = new EmbedBuilder()
 			.setColor(THEME.COLOR)
 			.setTitle('All Bot Commands')
-			.setDescription(`Below is a list of all available commands. Use \`/help command:[name]\` for detailed information about any command.`)
+			.setDescription(
+				`Below is a list of all available commands. Use \`/help command:[name]\` for detailed information about any command.`,
+			)
 			.setThumbnail(client.user.displayAvatarURL());
 
 		// Add compact command listing
 		embed.addFields({
 			name: 'Available Commands',
 			value: pageCommands
-				.map(cmd => {
+				.map((cmd) => {
 					const emoji = getCategoryEmoji(cmd.category);
 					return `${emoji} \`/${cmd.data.name}\` - ${cmd.data.description?.substring(0, 50) || 'No description'}${cmd.data.description?.length > 50 ? '...' : ''}`;
 				})
 				.join('\n'),
-			inline: false
+			inline: false,
 		});
 
-		embed.setFooter({ text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(commands.length / itemsPerPage)} • Total: ${commands.length} commands` });
+		embed.setFooter({
+			text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(commands.length / itemsPerPage)} • Total: ${commands.length} commands`,
+		});
 		pages.push(embed);
 	}
 
@@ -538,18 +596,28 @@ function createBotStatsEmbed(client) {
 	const commandCount = client.commands?.size || 'N/A';
 
 	// Calculate more detailed stats
-	const textChannelCount = client.channels?.cache?.filter(c => c.type === 0).size || 'N/A';
-	const voiceChannelCount = client.channels?.cache?.filter(c => c.type === 2).size || 'N/A';
-	const categoryCount = client.channels?.cache?.filter(c => c.type === 4).size || 'N/A';
+	const textChannelCount =
+		client.channels?.cache?.filter((c) => c.type === 0).size || 'N/A';
+	const voiceChannelCount =
+		client.channels?.cache?.filter((c) => c.type === 2).size || 'N/A';
+	const categoryCount =
+		client.channels?.cache?.filter((c) => c.type === 4).size || 'N/A';
 
 	// Calculate bot age
 	const botAge = formatBotAge(client.user.createdTimestamp);
 
 	// Get system metrics
-	const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
-	const totalMemory = (process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2);
+	const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(
+		2,
+	);
+	const totalMemory = (process.memoryUsage().heapTotal / 1024 / 1024).toFixed(
+		2,
+	);
 	const cpuUsage = process.cpuUsage();
-	const cpuUsagePercent = ((cpuUsage.user + cpuUsage.system) / 1000000).toFixed(2);
+	const cpuUsagePercent = (
+		(cpuUsage.user + cpuUsage.system) /
+		1000000
+	).toFixed(2);
 
 	// Get platform details
 	const platform = process.platform;
@@ -566,38 +634,44 @@ function createBotStatsEmbed(client) {
 		.addFields([
 			{
 				name: '🤖 Bot Information',
-				value: `• **Name:** ${client.user.username}\n` +
+				value:
+					`• **Name:** ${client.user.username}\n` +
 					`• **ID:** \`${client.user.id}\`\n` +
 					`• **Created:** <t:${Math.floor(client.user.createdTimestamp / 1000)}:R> (${botAge})\n` +
 					`• **Commands:** ${commandCount}\n` +
 					`• **Uptime:** ${uptime}`,
-				inline: false
+				inline: false,
 			},
 			{
 				name: '📊 Usage Statistics',
-				value: `• **Servers:** ${serverCount}\n` +
+				value:
+					`• **Servers:** ${serverCount}\n` +
 					`• **Users:** ${userCount}\n` +
 					`• **Channels:** ${channelCount} total\n` +
 					`  ↳ ${textChannelCount} text | ${voiceChannelCount} voice | ${categoryCount} categories`,
-				inline: true
+				inline: true,
 			},
 			{
 				name: '🛠️ Technical Details',
-				value: `• **Node.js:** ${nodeVersion}\n` +
+				value:
+					`• **Node.js:** ${nodeVersion}\n` +
 					`• **Discord.js:** v${djsVersion}\n` +
 					`• **Platform:** ${formatPlatform(platform)} (${arch})\n` +
 					`• **Ping:** ${client.ws.ping || 'N/A'} ms`,
-				inline: true
+				inline: true,
 			},
 			{
 				name: '💻 System Resources',
-				value: `• **Memory Usage:** ${memoryUsage} MB / ${totalMemory} MB\n` +
+				value:
+					`• **Memory Usage:** ${memoryUsage} MB / ${totalMemory} MB\n` +
 					`• **CPU Usage:** ${cpuUsagePercent}ms\n` +
 					`• **Process PID:** ${process.pid}`,
-				inline: false
-			}
+				inline: false,
+			},
 		])
-		.setFooter({ text: 'Bot statistics are updated in real-time • Last refreshed' })
+		.setFooter({
+			text: 'Bot statistics are updated in real-time • Last refreshed',
+		})
 		.setTimestamp();
 }
 
@@ -622,13 +696,13 @@ function formatBotAge(timestamp) {
 // Helper function to format platform names nicely
 function formatPlatform(platform) {
 	const platforms = {
-		'win32': 'Windows',
-		'darwin': 'macOS',
-		'linux': 'Linux',
-		'freebsd': 'FreeBSD',
-		'openbsd': 'OpenBSD',
-		'sunos': 'SunOS',
-		'aix': 'AIX'
+		win32: 'Windows',
+		darwin: 'macOS',
+		linux: 'Linux',
+		freebsd: 'FreeBSD',
+		openbsd: 'OpenBSD',
+		sunos: 'SunOS',
+		aix: 'AIX',
 	};
 
 	return platforms[platform] || platform;
@@ -639,18 +713,34 @@ function createSupportEmbed(client) {
 	return new EmbedBuilder()
 		.setColor(THEME.COLOR)
 		.setTitle('Support Information')
-		.setDescription(`Need help with ${client.user.username}? Here's how to get support and additional resources.`)
+		.setDescription(
+			`Need help with ${client.user.username}? Here's how to get support and additional resources.`,
+		)
 		.addFields([
-			{ name: '📚 Documentation', value: 'Check out our documentation for detailed guides and tutorials on how to use all features.', inline: false },
 			{
-				name: '🔗 Useful Links', value:
+				name: '📚 Documentation',
+				value: 'Check out our documentation for detailed guides and tutorials on how to use all features.',
+				inline: false,
+			},
+			{
+				name: '🔗 Useful Links',
+				value:
 					`• [Support Server](${THEME.SUPPORT_SERVER})\n` +
 					`• [Invite Bot](https://discord.com/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands)\n` +
 					`• [GitHub Repository](https://github.com/yourusername/yourrepo)\n` +
-					`• [Report a Bug](${THEME.SUPPORT_SERVER})`, inline: false
+					`• [Report a Bug](${THEME.SUPPORT_SERVER})`,
+				inline: false,
 			},
-			{ name: '📞 Direct Support', value: 'Join our support server and open a ticket in the #support channel to get help from our team.', inline: false },
-			{ name: '🤔 Frequently Asked Questions', value: 'Most common questions are answered in the #faq channel of our support server.', inline: false }
+			{
+				name: '📞 Direct Support',
+				value: 'Join our support server and open a ticket in the #support channel to get help from our team.',
+				inline: false,
+			},
+			{
+				name: '🤔 Frequently Asked Questions',
+				value: 'Most common questions are answered in the #faq channel of our support server.',
+				inline: false,
+			},
 		])
 		.setFooter({ text: 'Thank you for using our bot!' })
 		.setTimestamp();
@@ -661,19 +751,35 @@ function createCommandDetailEmbed(command, client) {
 	const embed = new EmbedBuilder()
 		.setColor(THEME.COLOR)
 		.setTitle(`\`/${command.data.name}\` Command Details`)
-		.setDescription(command.description_full || command.data.description || '*No detailed description provided.*')
+		.setDescription(
+			command.description_full ||
+				command.data.description ||
+				'*No detailed description provided.*',
+		)
 		.addFields([
-			{ name: 'Category', value: command.category ? `${getCategoryEmoji(command.category)} ${command.category}` : 'Others', inline: true },
-			{ name: 'Usage', value: `\`${command.usage || `/${command.data.name}`}\``, inline: true },
+			{
+				name: 'Category',
+				value: command.category
+					? `${getCategoryEmoji(command.category)} ${command.category}`
+					: 'Others',
+				inline: true,
+			},
+			{
+				name: 'Usage',
+				value: `\`${command.usage || `/${command.data.name}`}\``,
+				inline: true,
+			},
 		])
-		.setFooter({ text: 'For general help, use /help without any arguments' });
+		.setFooter({
+			text: 'For general help, use /help without any arguments',
+		});
 
 	// Add permissions with more details
 	if (command.permissions && command.permissions.length) {
 		embed.addFields({
 			name: '🔑 Required Permissions',
 			value: formatPermissions(command.permissions),
-			inline: false
+			inline: false,
 		});
 	}
 
@@ -681,8 +787,8 @@ function createCommandDetailEmbed(command, client) {
 	if (command.examples && command.examples.length > 0) {
 		embed.addFields({
 			name: '📝 Examples',
-			value: command.examples.map(ex => `• \`${ex}\``).join('\n'),
-			inline: false
+			value: command.examples.map((ex) => `• \`${ex}\``).join('\n'),
+			inline: false,
 		});
 	}
 
@@ -691,11 +797,13 @@ function createCommandDetailEmbed(command, client) {
 	if (options && options.length > 0) {
 		embed.addFields({
 			name: '⚙️ Options',
-			value: options.map(opt => {
-				const required = opt.required ? '(Required)' : '(Optional)';
-				return `• \`${opt.name}\`: ${opt.description} ${required}`;
-			}).join('\n'),
-			inline: false
+			value: options
+				.map((opt) => {
+					const required = opt.required ? '(Required)' : '(Optional)';
+					return `• \`${opt.name}\`: ${opt.description} ${required}`;
+				})
+				.join('\n'),
+			inline: false,
 		});
 	}
 
@@ -704,7 +812,7 @@ function createCommandDetailEmbed(command, client) {
 		embed.addFields({
 			name: '⏱️ Cooldown',
 			value: `${command.cooldown} seconds`,
-			inline: true
+			inline: true,
 		});
 	}
 
@@ -727,9 +835,17 @@ function formatPermissions(permissions) {
 		// Add more mappings as needed
 	};
 
-	return permissions.map(perm => {
-		return readablePermissions[perm] || perm.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-	}).join(', ');
+	return permissions
+		.map((perm) => {
+			return (
+				readablePermissions[perm] ||
+				perm
+					.replace(/_/g, ' ')
+					.toLowerCase()
+					.replace(/\b\w/g, (l) => l.toUpperCase())
+			);
+		})
+		.join(', ');
 }
 
 // Function to create embeds for search results (improved layout)
@@ -745,21 +861,26 @@ function createSearchEmbeds(results, searchQuery, client) {
 		const embed = new EmbedBuilder()
 			.setColor(THEME.COLOR)
 			.setTitle(`Search Results for "${searchQuery}"`)
-			.setDescription(`Found ${results.length} commands matching your search. Use \`/help command:[name]\` to see detailed information for any command.`)
+			.setDescription(
+				`Found ${results.length} commands matching your search. Use \`/help command:[name]\` to see detailed information for any command.`,
+			)
 			.setThumbnail(client.user.displayAvatarURL());
 
 		// Add each result with category info and formatting
-		pageResults.forEach(cmd => {
+		pageResults.forEach((cmd) => {
 			embed.addFields({
 				name: `${getCategoryEmoji(cmd.category || 'others')} /${cmd.data.name}`,
-				value: `**Category:** ${cmd.category || 'Others'}\n` +
+				value:
+					`**Category:** ${cmd.category || 'Others'}\n` +
 					`**Description:** ${cmd.data.description || 'No description.'}\n` +
 					`**Usage:** \`${cmd.usage || `/${cmd.data.name}`}\``,
-				inline: false
+				inline: false,
 			});
 		});
 
-		embed.setFooter({ text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(results.length / itemsPerPage)}` });
+		embed.setFooter({
+			text: `Page ${Math.floor(i / itemsPerPage) + 1} of ${Math.ceil(results.length / itemsPerPage)}`,
+		});
 		pages.push(embed);
 	}
 	return pages;
@@ -776,22 +897,33 @@ function buildCommandData(client = null) {
 		categories = Object.keys(organizedCategories);
 	}
 
-	const categoryChoices = categories.map(category => ({
+	const categoryChoices = categories.map((category) => ({
 		name: `${category.charAt(0).toUpperCase() + category.slice(1)}`,
 		value: category,
 	}));
 
 	return new SlashCommandBuilder()
 		.setName('help')
-		.setDescription('Displays interactive help information for bot commands and features.')
-		.addStringOption(option => option.setName('command').setDescription('Get details for a specific command.'))
-		.addStringOption(option =>
-			option.setName('category')
+		.setDescription(
+			'Displays interactive help information for bot commands and features.',
+		)
+		.addStringOption((option) =>
+			option
+				.setName('command')
+				.setDescription('Get details for a specific command.'),
+		)
+		.addStringOption((option) =>
+			option
+				.setName('category')
 				.setDescription('View commands within a specific category.')
 				.setRequired(false)
-				.addChoices(...categoryChoices)
+				.addChoices(...categoryChoices),
 		)
-		.addStringOption(option => option.setName('search').setDescription('Search for commands by keyword.'));
+		.addStringOption((option) =>
+			option
+				.setName('search')
+				.setDescription('Search for commands by keyword.'),
+		);
 }
 
 module.exports = {
@@ -806,12 +938,13 @@ module.exports = {
 
 	category: 'info',
 	usage: '/help [command:command-name] [category:category-name] [search:keyword]',
-	description_full: 'The help command provides an interactive menu system for exploring all bot commands and features. You can view commands by category, search for specific functionality, or get detailed information about any command. The help system includes bot statistics, support resources, and easy navigation between different sections.',
+	description_full:
+		'The help command provides an interactive menu system for exploring all bot commands and features. You can view commands by category, search for specific functionality, or get detailed information about any command. The help system includes bot statistics, support resources, and easy navigation between different sections.',
 	examples: [
 		'/help',
 		'/help command:ping',
 		'/help category:fun',
-		'/help search:roles'
+		'/help search:roles',
 	],
 
 	async execute(interaction) {
@@ -829,15 +962,19 @@ module.exports = {
 
 			if (commandName) {
 				// Find the command by name
-				const command = commands.get(commandName) ||
+				const command =
+					commands.get(commandName) ||
 					Array.from(commands.values()).find(
-						cmd => cmd.data && cmd.data.name.toLowerCase() === commandName.toLowerCase()
+						(cmd) =>
+							cmd.data &&
+							cmd.data.name.toLowerCase() ===
+								commandName.toLowerCase(),
 					);
 
 				if (!command) {
 					return interaction.reply({
 						content: `⚠️ No command found with name \`${commandName}\`. Use \`/help\` without arguments to see all available commands.`,
-						ephemeral: true
+						ephemeral: true,
 					});
 				}
 
@@ -848,60 +985,85 @@ module.exports = {
 
 			if (categoryName) {
 				// Filter commands by the requested category
-				const categoryCommands = Array.from(commands.values())
-					.filter(cmd => cmd.category && cmd.category.toLowerCase() === categoryName.toLowerCase());
+				const categoryCommands = Array.from(commands.values()).filter(
+					(cmd) =>
+						cmd.category &&
+						cmd.category.toLowerCase() ===
+							categoryName.toLowerCase(),
+				);
 
 				if (!categoryCommands.length) {
 					return interaction.reply({
 						content: `⚠️ No commands found in the \`${categoryName}\` category. Use \`/help\` without arguments to see all available categories.`,
-						ephemeral: true
+						ephemeral: true,
 					});
 				}
 
 				// Create and display paginated embeds for the category
-				const categoryEmbeds = createCategoryCommandEmbeds(categoryName, categoryCommands, client);
-				return createPaginatedMenu(interaction, categoryEmbeds, [createHelpTypeRow()]);
+				const categoryEmbeds = createCategoryCommandEmbeds(
+					categoryName,
+					categoryCommands,
+					client,
+				);
+				return createPaginatedMenu(interaction, categoryEmbeds, [
+					createHelpTypeRow(),
+				]);
 			}
 
 			if (searchQuery) {
 				// Search for commands matching the query
-				const results = Array.from(commands.values()).filter(cmd => {
+				const results = Array.from(commands.values()).filter((cmd) => {
 					const name = cmd.data?.name || '';
-					const description = cmd.data?.description || cmd.description_full || '';
+					const description =
+						cmd.data?.description || cmd.description_full || '';
 					const usage = cmd.usage || '';
-					const examples = Array.isArray(cmd.examples) ? cmd.examples.join(' ') : '';
+					const examples = Array.isArray(cmd.examples)
+						? cmd.examples.join(' ')
+						: '';
 					const category = cmd.category || '';
 
-					const searchString = `${name} ${description} ${usage} ${examples} ${category}`.toLowerCase();
+					const searchString =
+						`${name} ${description} ${usage} ${examples} ${category}`.toLowerCase();
 					return searchString.includes(searchQuery.toLowerCase());
 				});
 
 				if (!results.length) {
 					return interaction.reply({
 						content: `⚠️ No commands found matching \`${searchQuery}\`. Try a different search term or use \`/help\` without arguments to browse all commands.`,
-						ephemeral: true
+						ephemeral: true,
 					});
 				}
 
 				// Create and display paginated embeds for search results
-				const searchEmbeds = createSearchEmbeds(results, searchQuery, client);
-				return createPaginatedMenu(interaction, searchEmbeds, [createHelpTypeRow()]);
+				const searchEmbeds = createSearchEmbeds(
+					results,
+					searchQuery,
+					client,
+				);
+				return createPaginatedMenu(interaction, searchEmbeds, [
+					createHelpTypeRow(),
+				]);
 			}
 
 			// Default Help Menu (No options provided)
 			const organizedCommands = organizeCommandsByCategory(commands);
-			const mainHelpEmbed = createMainHelpEmbed(client, organizedCommands);
+			const mainHelpEmbed = createMainHelpEmbed(
+				client,
+				organizedCommands,
+			);
 
 			// Create the rows of components for the main help menu
 			const helpTypeRow = createHelpTypeRow();
-			const categoryMenuRow = createCategoryMenuRow(Object.keys(organizedCommands));
+			const categoryMenuRow = createCategoryMenuRow(
+				Object.keys(organizedCommands),
+			);
 
 			// Send the interactive help menu
 			const helpPages = [mainHelpEmbed];
 			const helpSessionId = await createPaginatedMenu(
 				interaction,
 				helpPages,
-				[helpTypeRow, categoryMenuRow]
+				[helpTypeRow, categoryMenuRow],
 			);
 
 			// Set up a one-time collector for this interaction
@@ -916,17 +1078,27 @@ module.exports = {
 			if (!client.helpInteractionHandler) {
 				client.helpInteractionHandler = async (buttonInteraction) => {
 					// Check if this is a help menu interaction
-					if (!buttonInteraction.isButton() && !buttonInteraction.isStringSelectMenu()) return;
+					if (
+						!buttonInteraction.isButton() &&
+						!buttonInteraction.isStringSelectMenu()
+					)
+						return;
 
 					// Find matching help session
-					const sessionId = client.helpCollectors.get(buttonInteraction.user.id);
+					const sessionId = client.helpCollectors.get(
+						buttonInteraction.user.id,
+					);
 					if (!sessionId) return;
 
 					const state = client.helpMenuState.get(sessionId);
 					if (!state) return;
 
 					// Process the interaction
-					await handleHelpInteraction(buttonInteraction, interaction, sessionId);
+					await handleHelpInteraction(
+						buttonInteraction,
+						interaction,
+						sessionId,
+					);
 				};
 
 				// Add the handler to the client's interactionCreate event

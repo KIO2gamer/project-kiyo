@@ -13,10 +13,10 @@ A versatile Discord bot packed with moderation, entertainment, and utility comma
 - **Moderation:** Commands to help moderators manage the server effectively including ban, kick, mute, warn, channel management, and message purging.
 - **Entertainment:** Fun and engaging commands to keep users entertained with memes, games (hangman, lyric quiz), and interactive experiences.
 - **Utility:** Useful tools including translation, weather forecasts, calculators, search functionality, and YouTube information.
-- **YouTube Integration:** 
-  - Subscriber role assignment based on verified YouTube channel subscriber counts
-  - OAuth2 authentication system for secure YouTube account verification
-  - Automatic role updates based on subscriber milestones
+- **YouTube Integration:**
+    - Subscriber role assignment based on verified YouTube channel subscriber counts
+    - OAuth2 authentication system for secure YouTube account verification
+    - Automatic role updates based on subscriber milestones
 - **Server Management:** Comprehensive server information, user statistics, and role management tools.
 - **Customization:** Easily extendable command structure organized by categories.
 
@@ -55,10 +55,10 @@ Get Kiyo up and running in a few simple steps:
     DISCORD_CLIENT_SECRET=your_discord_client_secret
     DISCORD_REDIRECT_URI=your_discord_redirect_uri
     DISCORD_GUILD_IDS=your_discord_guild_ids
-    
+
     # Database Configuration
     MONGODB_URI=your_mongodb_uri
-    
+
     # API Keys
     YOUTUBE_API_KEY=your_youtube_api_key
     GOOGLE_API_KEY=your_google_api_key

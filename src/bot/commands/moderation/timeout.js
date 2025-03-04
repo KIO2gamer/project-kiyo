@@ -142,10 +142,10 @@ module.exports = {
 			const currentTime = Date.now();
 			const newTimeoutDuration =
 				targetUser.communicationDisabledUntilTimestamp &&
-					targetUser.communicationDisabledUntilTimestamp > currentTime
+				targetUser.communicationDisabledUntilTimestamp > currentTime
 					? targetUser.communicationDisabledUntilTimestamp -
-					currentTime +
-					durationMs
+						currentTime +
+						durationMs
 					: durationMs;
 
 			if (newTimeoutDuration <= 0) {

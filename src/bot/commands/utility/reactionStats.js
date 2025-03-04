@@ -141,10 +141,12 @@ module.exports = {
 		const embed = new EmbedBuilder()
 			.setTitle('Reaction Stats')
 			.setDescription(
-				`Reaction statistics from ${channel ? `<#${channel.id}>` : 'the server'
-				} for the ${timeframe === 'all'
-					? 'entire server history'
-					: `past ${timeframe}`
+				`Reaction statistics from ${
+					channel ? `<#${channel.id}>` : 'the server'
+				} for the ${
+					timeframe === 'all'
+						? 'entire server history'
+						: `past ${timeframe}`
 				}`,
 			)
 			.addFields([

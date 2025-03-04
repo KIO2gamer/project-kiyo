@@ -1,4 +1,9 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const {
+	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+} = require('discord.js');
 
 /**
  * Handles and logs errors that occur during command execution.
@@ -40,14 +45,16 @@ async function handleError(...args) {
 	if (!interaction) return;
 
 	// Create a shortened error message if the full error is too long
-	const shortError = errorMessage.substring(0, 1000) + (errorMessage.length > 1000 ? '...' : '');
+	const shortError =
+		errorMessage.substring(0, 1000) +
+		(errorMessage.length > 1000 ? '...' : '');
 
 	// Build an embed to notify the user about the error
 	const errorEmbed = new EmbedBuilder()
 		.setTitle('⚠️ An error occurred')
 		.setDescription(
 			'There was a problem executing the command. Please try again later.\n' +
-			'If you need more details, click the button below.'
+				'If you need more details, click the button below.',
 		)
 		.setColor('#5865F2')
 		.setTimestamp();
@@ -57,21 +64,34 @@ async function handleError(...args) {
 		new ButtonBuilder()
 			.setCustomId('show_full_error')
 			.setLabel('Show Full Error')
-			.setStyle(ButtonStyle.Danger)
+			.setStyle(ButtonStyle.Danger),
 	);
 
 	try {
 		const response = sent
 			? await sent.edit({ embeds: [errorEmbed], components: [row] })
 			: await (interaction.replied || interaction.deferred
-				? interaction.editReply({ embeds: [errorEmbed], components: [row], ephemeral: true })
-				: interaction.reply({ embeds: [errorEmbed], components: [row], ephemeral: true }));
+					? interaction.editReply({
+							embeds: [errorEmbed],
+							components: [row],
+							ephemeral: true,
+						})
+					: interaction.reply({
+							embeds: [errorEmbed],
+							components: [row],
+							ephemeral: true,
+						}));
 
 		// Create a collector for the button interaction with a 60-second timeout
-		const collector = response.createMessageComponentCollector({ time: 60000 });
+		const collector = response.createMessageComponentCollector({
+			time: 60000,
+		});
 
 		collector.on('collect', async (i) => {
-			if (i.customId === 'show_full_error' && i.user.id === interaction.user.id) {
+			if (
+				i.customId === 'show_full_error' &&
+				i.user.id === interaction.user.id
+			) {
 				const fullErrorEmbed = new EmbedBuilder()
 					.setTitle('🔍 Full Error Trace')
 					.setDescription(`\`\`\`js\n${errorMessage}\n\`\`\``)
@@ -84,10 +104,12 @@ async function handleError(...args) {
 
 		collector.on('end', async () => {
 			// Disable the button after the collector ends
-			await response.edit({ components: [] }).catch(() => { });
+			await response.edit({ components: [] }).catch(() => {});
 		});
 	} catch (sendError) {
-		console.error(`[${timestamp}] ❌ Failed to send error message:\n${sendError.stack || sendError.message}`);
+		console.error(
+			`[${timestamp}] ❌ Failed to send error message:\n${sendError.stack || sendError.message}`,
+		);
 	}
 }
 

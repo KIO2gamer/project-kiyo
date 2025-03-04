@@ -7,7 +7,7 @@ const {
 	DISCORD_CLIENT_ID,
 	DISCORD_TOKEN,
 	MONGODB_URI,
-	DISCORD_GUILD_IDS = ''
+	DISCORD_GUILD_IDS = '',
 } = process.env;
 
 // Validate critical environment variables
@@ -28,7 +28,7 @@ const {
 	GatewayIntentBits,
 	Partials,
 	REST,
-	Routes
+	Routes,
 } = require('discord.js');
 const Logger = require('./../logger');
 
@@ -46,11 +46,7 @@ const client = new Client({
 		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildPresences,
 	],
-	partials: [
-		Partials.Message,
-		Partials.Channel,
-		Partials.Reaction
-	]
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
 client.commands = new Collection();
@@ -67,7 +63,11 @@ const loadFiles = (dir, callback) => {
 		try {
 			stat = fs.statSync(filePath);
 		} catch (error) {
-			Logger.log('FILES', `Error accessing ${filePath}: ${error.message}`, 'warning');
+			Logger.log(
+				'FILES',
+				`Error accessing ${filePath}: ${error.message}`,
+				'warning',
+			);
 			return;
 		}
 		if (stat.isDirectory()) {
@@ -79,7 +79,7 @@ const loadFiles = (dir, callback) => {
 	};
 
 	fs.readdirSync(dir)
-		.map(file => path.join(dir, file))
+		.map((file) => path.join(dir, file))
 		.forEach(processFile);
 };
 
@@ -96,7 +96,11 @@ const loadCommands = (dir) => {
 			try {
 				commandCache.set(filePath, require(filePath));
 			} catch (error) {
-				Logger.log('COMMANDS', `Failed to require ${filePath}: ${error.message}`, 'warning');
+				Logger.log(
+					'COMMANDS',
+					`Failed to require ${filePath}: ${error.message}`,
+					'warning',
+				);
 				return;
 			}
 		}
@@ -104,7 +108,7 @@ const loadCommands = (dir) => {
 		if (command?.data?.name && command.execute) {
 			client.commands.set(command.data.name, command);
 			if (command.data.aliases && Array.isArray(command.data.aliases)) {
-				command.data.aliases.forEach(alias => {
+				command.data.aliases.forEach((alias) => {
 					client.commands.set(alias, command);
 				});
 			}
@@ -125,7 +129,11 @@ const loadEvents = (dir) => {
 		try {
 			event = require(filePath);
 		} catch (error) {
-			Logger.log('EVENTS', `Failed to require ${filePath}: ${error.message}`, 'warning');
+			Logger.log(
+				'EVENTS',
+				`Failed to require ${filePath}: ${error.message}`,
+				'warning',
+			);
 			return;
 		}
 		const execute = (...args) => event.execute(...args);
@@ -160,12 +168,16 @@ const connectToMongoDB = async () => {
 	Logger.log('DATABASE', 'Establishing database connection', 'info');
 	try {
 		mongoose.set('strictQuery', false);
-		await mongoose.connect(MONGODB_URI).catch(err => {
+		await mongoose.connect(MONGODB_URI).catch((err) => {
 			handleError('❌ MongoDB Connection Error:', err);
 		});
 		Logger.log('DATABASE', 'Database connection established', 'success');
 	} catch (error) {
-		Logger.log('DATABASE', `Database connection failed: ${error.message}`, 'error');
+		Logger.log(
+			'DATABASE',
+			`Database connection failed: ${error.message}`,
+			'error',
+		);
 		process.exit(1);
 	}
 };
@@ -183,11 +195,19 @@ const deployCommandsToGuild = async (rest, guildId, commands) => {
 	try {
 		await rest.put(
 			Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-			{ body: commands }
+			{ body: commands },
 		);
-		Logger.log('DEPLOY', `Deployed ${commands.length} modules to ${guildId}`, 'success');
+		Logger.log(
+			'DEPLOY',
+			`Deployed ${commands.length} modules to ${guildId}`,
+			'success',
+		);
 	} catch (error) {
-		Logger.log('DEPLOY', `Deployment failed for ${guildId}: ${error.message}`, 'error');
+		Logger.log(
+			'DEPLOY',
+			`Deployment failed for ${guildId}: ${error.message}`,
+			'error',
+		);
 	}
 };
 
@@ -209,7 +229,11 @@ const deployCommands = async () => {
 				commands.push(command.data.toJSON());
 			}
 		} catch (error) {
-			Logger.log('DEPLOY', `Failed to load command from ${filePath}: ${error.message}`, 'warning');
+			Logger.log(
+				'DEPLOY',
+				`Failed to load command from ${filePath}: ${error.message}`,
+				'warning',
+			);
 		}
 	});
 
@@ -217,13 +241,21 @@ const deployCommands = async () => {
 
 	try {
 		// Clear global commands first
-		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: [] });
+		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), {
+			body: [],
+		});
 		// Deploy to each guild concurrently
 		await Promise.all(
-			GUILD_IDS.map(guildId => deployCommandsToGuild(rest, guildId, commands))
+			GUILD_IDS.map((guildId) =>
+				deployCommandsToGuild(rest, guildId, commands),
+			),
 		);
 	} catch (error) {
-		Logger.log('DEPLOY', `Failed to deploy command modules: ${error.message}`, 'error');
+		Logger.log(
+			'DEPLOY',
+			`Failed to deploy command modules: ${error.message}`,
+			'error',
+		);
 	}
 };
 
@@ -238,10 +270,7 @@ const deployCommands = async () => {
 const initializeBot = async () => {
 	try {
 		// Parallelize DB connection and command deployment
-		await Promise.all([
-			connectToMongoDB(),
-			deployCommands()
-		]);
+		await Promise.all([connectToMongoDB(), deployCommands()]);
 		await client.login(DISCORD_TOKEN);
 		Logger.log('BOT', 'Initialization complete', 'success');
 	} catch (error) {

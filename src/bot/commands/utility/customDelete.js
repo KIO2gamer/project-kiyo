@@ -98,8 +98,9 @@ module.exports = {
 			if (confirmation.customId === 'delete_confirm') {
 				await cc.deleteOne({ _id: cc_record._id });
 				await interaction.reply({
-					content: `Custom command "${command_name}"${alias_name ? ` (alias: ${alias_name})` : ''
-						} deleted successfully!`,
+					content: `Custom command "${command_name}"${
+						alias_name ? ` (alias: ${alias_name})` : ''
+					} deleted successfully!`,
 					components: [],
 				});
 			} else {

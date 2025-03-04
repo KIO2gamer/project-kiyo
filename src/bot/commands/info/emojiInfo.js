@@ -24,11 +24,16 @@ module.exports = {
 		try {
 			if (!emojiName) {
 				const allEmojis = interaction.guild.emojis.cache
-					.map((emoji) => `${emoji} - \`<:${emoji.name}:${emoji.id}>\``)
+					.map(
+						(emoji) =>
+							`${emoji} - \`<:${emoji.name}:${emoji.id}>\``,
+					)
 					.join('\n');
 				const embed = new EmbedBuilder()
 					.setTitle(`All Emojis in ${interaction.guild.name}`)
-					.setDescription(allEmojis || 'No custom emojis in this server.')
+					.setDescription(
+						allEmojis || 'No custom emojis in this server.',
+					)
 					.setColor('#00ff00');
 
 				return interaction.reply({ embeds: [embed], split: true });
@@ -48,7 +53,11 @@ module.exports = {
 				.addFields(
 					{ name: 'Emoji Name', value: emoji.name, inline: true },
 					{ name: 'Emoji ID', value: emoji.id, inline: true },
-					{ name: 'Emoji URL', value: emoji.imageURL(), inline: true },
+					{
+						name: 'Emoji URL',
+						value: emoji.imageURL(),
+						inline: true,
+					},
 					{
 						name: 'Emoji Created At',
 						value: emoji.createdAt.toDateString(),
@@ -62,8 +71,7 @@ module.exports = {
 				);
 
 			await interaction.reply({ embeds: [embed] });
-		}
-		catch (error) {
+		} catch (error) {
 			handleError('❌ Failed to execute command:', error);
 			await handleError(interaction, error);
 		}

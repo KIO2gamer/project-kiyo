@@ -8,97 +8,128 @@ const mongoUri = process.env.MONGODB_URI;
 let isConnected = false;
 
 async function connectToDatabase() {
-    if (!isConnected) {
-        try {
-            await mongoose.connect(mongoUri, { bufferCommands: false });
-            isConnected = true;
-            console.log('✅ MongoDB connection established successfully');
-        } catch (error) {
-            handleError('❌ MongoDB connection error:', error);
-            throw error;
-        }
-    }
+	if (!isConnected) {
+		try {
+			await mongoose.connect(mongoUri, { bufferCommands: false });
+			isConnected = true;
+			console.log('✅ MongoDB connection established successfully');
+		} catch (error) {
+			handleError('❌ MongoDB connection error:', error);
+			throw error;
+		}
+	}
 }
 
 function handleError(message, ...args) {
-    console.error(message, ...args);
+	console.error(message, ...args);
 }
 
 const algorithm = 'aes-256-cbc';
 
 function decrypt(text) {
-    try {
-        const [ivHex, encryptedTextHex, ...secretKeyHex] = text.split(':');
-        const iv = Buffer.from(ivHex, 'hex');
-        const encryptedText = Buffer.from(encryptedTextHex, 'hex');
-        const secretKey = Buffer.from(secretKeyHex.join(':'), 'hex');
-        const decipher = crypto.createDecipheriv(algorithm, secretKey, iv);
-        const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
-        return decrypted.toString();
-    } catch (error) {
-        handleError('❌ Decryption error:', error);
-        throw new Error('Failed to decrypt state parameter. Please try again.');
-    }
+	try {
+		const [ivHex, encryptedTextHex, ...secretKeyHex] = text.split(':');
+		const iv = Buffer.from(ivHex, 'hex');
+		const encryptedText = Buffer.from(encryptedTextHex, 'hex');
+		const secretKey = Buffer.from(secretKeyHex.join(':'), 'hex');
+		const decipher = crypto.createDecipheriv(algorithm, secretKey, iv);
+		const decrypted = Buffer.concat([
+			decipher.update(encryptedText),
+			decipher.final(),
+		]);
+		return decrypted.toString();
+	} catch (error) {
+		handleError('❌ Decryption error:', error);
+		throw new Error('Failed to decrypt state parameter. Please try again.');
+	}
 }
 
 exports.handler = async function (event) {
-    try {
-        await connectToDatabase();
-        const { code, state } = getCodeAndState(event);
+	try {
+		await connectToDatabase();
+		const { code, state } = getCodeAndState(event);
 
-        if (!code || !state) {
-            return createErrorResponse(400, 'Missing authorization code or state parameter.');
-        }
+		if (!code || !state) {
+			return createErrorResponse(
+				400,
+				'Missing authorization code or state parameter.',
+			);
+		}
 
-        try {
-            const decryptedState = decrypt(state);
-            const accessToken = await exchangeCodeForToken(code);
+		try {
+			const decryptedState = decrypt(state);
+			const accessToken = await exchangeCodeForToken(code);
 
-            if (!accessToken) {
-                return createErrorResponse(401, 'Failed to obtain access token from Discord.');
-            }
+			if (!accessToken) {
+				return createErrorResponse(
+					401,
+					'Failed to obtain access token from Discord.',
+				);
+			}
 
-            const youtubeConnections = await getYouTubeConnections(accessToken);
-            const userInfo = await getDiscordUserInfo(accessToken);
+			const youtubeConnections = await getYouTubeConnections(accessToken);
+			const userInfo = await getDiscordUserInfo(accessToken);
 
-            if (youtubeConnections.length === 0) {
-                return createErrorResponse(
-                    404,
-                    'No YouTube connections found for this Discord account.',
-                    'Please connect your YouTube account to Discord first, then try again.'
-                );
-            }
+			if (youtubeConnections.length === 0) {
+				return createErrorResponse(
+					404,
+					'No YouTube connections found for this Discord account.',
+					'Please connect your YouTube account to Discord first, then try again.',
+				);
+			}
 
-            await saveOAuthRecord(decryptedState, code, youtubeConnections, userInfo);
-            return createSuccessResponse(youtubeConnections.length, decryptedState, userInfo);
-        } catch (error) {
-            handleError('❌ Error processing OAuth flow:', error);
-            return createErrorResponse(500, 'An unexpected error occurred while processing your request.', error.message);
-        }
-    } catch (error) {
-        handleError('❌ Critical error in handler:', error);
-        return createErrorResponse(500, 'A critical error occurred. Please try again later.');
-    }
+			await saveOAuthRecord(
+				decryptedState,
+				code,
+				youtubeConnections,
+				userInfo,
+			);
+			return createSuccessResponse(
+				youtubeConnections.length,
+				decryptedState,
+				userInfo,
+			);
+		} catch (error) {
+			handleError('❌ Error processing OAuth flow:', error);
+			return createErrorResponse(
+				500,
+				'An unexpected error occurred while processing your request.',
+				error.message,
+			);
+		}
+	} catch (error) {
+		handleError('❌ Critical error in handler:', error);
+		return createErrorResponse(
+			500,
+			'A critical error occurred. Please try again later.',
+		);
+	}
 };
 
 function getCodeAndState(event) {
-    try {
-        const urlParams = new URLSearchParams(event.queryStringParameters);
-        return {
-            code: urlParams.get('code'),
-            state: urlParams.get('state'),
-        };
-    } catch (error) {
-        handleError('❌ Error parsing query parameters:', error);
-        return { code: null, state: null };
-    }
+	try {
+		const urlParams = new URLSearchParams(event.queryStringParameters);
+		return {
+			code: urlParams.get('code'),
+			state: urlParams.get('state'),
+		};
+	} catch (error) {
+		handleError('❌ Error parsing query parameters:', error);
+		return { code: null, state: null };
+	}
 }
 
 // --- HTML Generating Functions ---
 
-function generateHtmlResponse(title, statusCode, message, additionalMessage = '', buttonHtml = '') {
-    const headingClass = title.toLowerCase(); // Use title to dynamically generate heading class
-    return `
+function generateHtmlResponse(
+	title,
+	statusCode,
+	message,
+	additionalMessage = '',
+	buttonHtml = '',
+) {
+	const headingClass = title.toLowerCase(); // Use title to dynamically generate heading class
+	return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -196,168 +227,198 @@ function generateHtmlResponse(title, statusCode, message, additionalMessage = ''
     `;
 }
 
-function createErrorResponse(statusCode, message, additionalMessage = 'Please ensure both code and state are provided in the request.') {
-    const html = generateHtmlResponse(
-        'Error',
-        statusCode,
-        message,
-        additionalMessage
-    );
+function createErrorResponse(
+	statusCode,
+	message,
+	additionalMessage = 'Please ensure both code and state are provided in the request.',
+) {
+	const html = generateHtmlResponse(
+		'Error',
+		statusCode,
+		message,
+		additionalMessage,
+	);
 
-    return {
-        statusCode,
-        headers: { 'Content-Type': 'text/html' },
-        body: html
-    };
+	return {
+		statusCode,
+		headers: { 'Content-Type': 'text/html' },
+		body: html,
+	};
 }
 
 async function exchangeCodeForToken(code) {
-    try {
-        const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                client_id: process.env.DISCORD_CLIENT_ID,
-                client_secret: process.env.DISCORD_CLIENT_SECRET,
-                grant_type: 'authorization_code',
-                code,
-                redirect_uri: process.env.DISCORD_REDIRECT_URI,
-            }),
-        });
+	try {
+		const tokenResponse = await fetch(
+			'https://discord.com/api/oauth2/token',
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					client_id: process.env.DISCORD_CLIENT_ID,
+					client_secret: process.env.DISCORD_CLIENT_SECRET,
+					grant_type: 'authorization_code',
+					code,
+					redirect_uri: process.env.DISCORD_REDIRECT_URI,
+				}),
+			},
+		);
 
-        if (!tokenResponse.ok) {
-            const errorData = await tokenResponse.json();
-            handleError('❌ Discord token exchange error:', errorData);
-            return null;
-        }
+		if (!tokenResponse.ok) {
+			const errorData = await tokenResponse.json();
+			handleError('❌ Discord token exchange error:', errorData);
+			return null;
+		}
 
-        const tokenData = await tokenResponse.json();
-        return tokenData.access_token;
-    } catch (error) {
-        handleError('❌ Error exchanging code for token:', error);
-        return null;
-    }
+		const tokenData = await tokenResponse.json();
+		return tokenData.access_token;
+	} catch (error) {
+		handleError('❌ Error exchanging code for token:', error);
+		return null;
+	}
 }
 
 async function getDiscordUserInfo(accessToken) {
-    try {
-        const userResponse = await fetch('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
+	try {
+		const userResponse = await fetch('https://discord.com/api/users/@me', {
+			headers: { Authorization: `Bearer ${accessToken}` },
+		});
 
-        if (!userResponse.ok) {
-            handleError('❌ Discord user info error:', userResponse.status, userResponse.statusText);
-            return null;
-        }
+		if (!userResponse.ok) {
+			handleError(
+				'❌ Discord user info error:',
+				userResponse.status,
+				userResponse.statusText,
+			);
+			return null;
+		}
 
-        return await userResponse.json();
-    } catch (error) {
-        handleError('❌ Error fetching Discord user info:', error);
-        return null;
-    }
+		return await userResponse.json();
+	} catch (error) {
+		handleError('❌ Error fetching Discord user info:', error);
+		return null;
+	}
 }
 
 async function getYouTubeConnections(accessToken) {
-    try {
-        const connectionsResponse = await fetch('https://discord.com/api/users/@me/connections', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
+	try {
+		const connectionsResponse = await fetch(
+			'https://discord.com/api/users/@me/connections',
+			{
+				headers: { Authorization: `Bearer ${accessToken}` },
+			},
+		);
 
-        if (!connectionsResponse.ok) {
-            handleError("❌ Discord connections API error:", connectionsResponse.status, connectionsResponse.statusText);
-            const errorData = await connectionsResponse.json();
-            handleError("Discord connections API error details:", errorData);
-            return []; // Return empty array on API error
-        }
+		if (!connectionsResponse.ok) {
+			handleError(
+				'❌ Discord connections API error:',
+				connectionsResponse.status,
+				connectionsResponse.statusText,
+			);
+			const errorData = await connectionsResponse.json();
+			handleError('Discord connections API error details:', errorData);
+			return []; // Return empty array on API error
+		}
 
-        const connectionsData = await connectionsResponse.json();
+		const connectionsData = await connectionsResponse.json();
 
-        if (!Array.isArray(connectionsData)) {
-            handleError("❌ Error: connectionsData is not an array:", connectionsData);
-            return []; // Return empty array if not an array
-        }
+		if (!Array.isArray(connectionsData)) {
+			handleError(
+				'❌ Error: connectionsData is not an array:',
+				connectionsData,
+			);
+			return []; // Return empty array if not an array
+		}
 
-        const youtubeConnections = connectionsData.filter(connection => connection.type === 'youtube');
-        console.log(`✅ Found ${youtubeConnections.length} YouTube connections`);
+		const youtubeConnections = connectionsData.filter(
+			(connection) => connection.type === 'youtube',
+		);
+		console.log(
+			`✅ Found ${youtubeConnections.length} YouTube connections`,
+		);
 
-        return youtubeConnections;
-    } catch (error) {
-        handleError('❌ Error fetching YouTube connections:', error);
-        return [];
-    }
+		return youtubeConnections;
+	} catch (error) {
+		handleError('❌ Error fetching YouTube connections:', error);
+		return [];
+	}
 }
 
 async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
-    try {
-        const { interactionId, guildId, channelId } = JSON.parse(state);
+	try {
+		const { interactionId, guildId, channelId } = JSON.parse(state);
 
-        const oauthRecord = new OAuthCode({
-            interactionId,
-            code,
-            youtubeConnections: youtubeConnections.map(conn => ({
-                id: conn.id,
-                name: conn.name,
-                verified: conn.verified
-            })),
-            guildId,
-            channelId,
-            userInfo: userInfo ? {
-                id: userInfo.id,
-                username: userInfo.username,
-                discriminator: userInfo.discriminator,
-                avatar: userInfo.avatar
-            } : null,
-            createdAt: new Date()
-        });
+		const oauthRecord = new OAuthCode({
+			interactionId,
+			code,
+			youtubeConnections: youtubeConnections.map((conn) => ({
+				id: conn.id,
+				name: conn.name,
+				verified: conn.verified,
+			})),
+			guildId,
+			channelId,
+			userInfo: userInfo
+				? {
+						id: userInfo.id,
+						username: userInfo.username,
+						discriminator: userInfo.discriminator,
+						avatar: userInfo.avatar,
+					}
+				: null,
+			createdAt: new Date(),
+		});
 
-        await oauthRecord.save();
-        console.log(`✅ OAuth record saved for interaction ${interactionId}`);
-    } catch (error) {
-        handleError('❌ Error saving OAuth record:', error);
-        throw new Error('Failed to save authorization data');
-    }
+		await oauthRecord.save();
+		console.log(`✅ OAuth record saved for interaction ${interactionId}`);
+	} catch (error) {
+		handleError('❌ Error saving OAuth record:', error);
+		throw new Error('Failed to save authorization data');
+	}
 }
 
 async function createSuccessResponse(connectionsLength, state, userInfo) {
-    try {
-        const { guildId, channelId } = JSON.parse(state);
-        const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
+	try {
+		const { guildId, channelId } = JSON.parse(state);
+		const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
 
-        let userInfoHtml = '';
-        if (userInfo) {
-            const avatarUrl = userInfo.avatar
-                ? `https://cdn.discordapp.com/avatars/${userInfo.id}/${userInfo.avatar}.png?size=128`
-                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+		let userInfoHtml = '';
+		if (userInfo) {
+			const avatarUrl = userInfo.avatar
+				? `https://cdn.discordapp.com/avatars/${userInfo.id}/${userInfo.avatar}.png?size=128`
+				: 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-            userInfoHtml = `
+			userInfoHtml = `
             <div class="user-info">
                 <img src="${avatarUrl}" alt="Discord Avatar" class="avatar">
                 <span class="username">${userInfo.username}</span>
             </div>`;
-        }
+		}
 
-        const buttonHtml = `
+		const buttonHtml = `
         ${userInfoHtml}
         <p>You can now return to Discord and continue using the bot.</p>
         <a href="${discordDeepLink}" class="button">Return to Discord</a>`;
 
-        const html = generateHtmlResponse(
-            'Success',
-            null,
-            'Your YouTube connections have been successfully linked!',
-            `Number of connections: ${connectionsLength}`,
-            buttonHtml
-        );
+		const html = generateHtmlResponse(
+			'Success',
+			null,
+			'Your YouTube connections have been successfully linked!',
+			`Number of connections: ${connectionsLength}`,
+			buttonHtml,
+		);
 
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'text/html' },
-            body: html
-        };
-    } catch (error) {
-        handleError('❌ Error creating success response:', error);
-        return createErrorResponse(500, 'An error occurred while creating the success response');
-    }
+		return {
+			statusCode: 200,
+			headers: { 'Content-Type': 'text/html' },
+			body: html,
+		};
+	} catch (error) {
+		handleError('❌ Error creating success response:', error);
+		return createErrorResponse(
+			500,
+			'An error occurred while creating the success response',
+		);
+	}
 }

@@ -27,14 +27,10 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(target.id);
 
 		if (member.roles.cache.has(role.id)) {
-			return interaction.reply(
-				`${target} already has the ${role} role.`,
-			);
+			return interaction.reply(`${target} already has the ${role} role.`);
 		}
 
 		await member.roles.add(role);
-		return interaction.reply(
-			`${target} has been given the ${role} role.`,
-		);
+		return interaction.reply(`${target} has been given the ${role} role.`);
 	},
 };

@@ -9,7 +9,7 @@ const { getChannelType } = require('../utils/channelTypes');
 const {
 	formatCategorizedPermissions,
 	splitPermissionText,
-	formatChannelPermissions
+	formatChannelPermissions,
 } = require('../utils/permissionFormatter');
 
 module.exports = {
@@ -23,7 +23,9 @@ module.exports = {
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('channel_info')
-		.setDescription('Provides detailed information about a specific channel')
+		.setDescription(
+			'Provides detailed information about a specific channel',
+		)
 		.addChannelOption((option) =>
 			option
 				.setName('channel')
@@ -36,87 +38,101 @@ module.exports = {
 		try {
 			// Get permissions using the utility function
 			const getPermissions = (channel, guild) => {
-				const permissions = channel.permissionsFor(guild.roles.everyone);
+				const permissions = channel.permissionsFor(
+					guild.roles.everyone,
+				);
 				if (!permissions) return 'No permissions';
 
 				// Use the utility function for formatting categorized permissions
 				return formatCategorizedPermissions(permissions, {
 					checkmark: true,
 					headers: true,
-					maxLength: 1024
+					maxLength: 1024,
 				});
 			};
 
 			// Initialize the embed
 			const embed = new EmbedBuilder()
-				.setTitle(`${getChannelIcon(channel)} Channel Info: ${channel.name}`)
+				.setTitle(
+					`${getChannelIcon(channel)} Channel Info: ${channel.name}`,
+				)
 				.setColor(interaction.guild.members.me.displayHexColor)
 				.setThumbnail(interaction.guild.iconURL())
 				.addFields(
 					{ name: '📋 ID', value: `\`${channel.id}\``, inline: true },
-					{ name: '📁 Type', value: getChannelType(channel), inline: true },
+					{
+						name: '📁 Type',
+						value: getChannelType(channel),
+						inline: true,
+					},
 					{
 						name: '🕒 Created',
 						value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
-						inline: true
-					}
+						inline: true,
+					},
 				);
 
 			// Add fields based on channel type
-			if (channel.type === ChannelType.GuildText ||
-				channel.type === ChannelType.GuildAnnouncement) {
+			if (
+				channel.type === ChannelType.GuildText ||
+				channel.type === ChannelType.GuildAnnouncement
+			) {
 				embed.addFields(
 					{
 						name: '📢 Topic',
 						value: channel.topic || 'No topic set',
-						inline: false
+						inline: false,
 					},
 					{
 						name: '🔞 NSFW',
 						value: channel.nsfw ? 'Yes' : 'No',
-						inline: true
+						inline: true,
 					},
 					{
 						name: '⏱️ Rate Limit',
 						value: channel.rateLimitPerUser
 							? `${channel.rateLimitPerUser} seconds`
 							: 'No slow mode',
-						inline: true
+						inline: true,
 					},
 					{
 						name: '🧵 Threads',
 						value: channel.threads?.cache.size
 							? `${channel.threads.cache.size} active threads`
 							: 'No active threads',
-						inline: true
-					}
+						inline: true,
+					},
 				);
 			}
 
 			// Voice channel specific info
-			if (channel.type === ChannelType.GuildVoice ||
-				channel.type === ChannelType.GuildStageVoice) {
+			if (
+				channel.type === ChannelType.GuildVoice ||
+				channel.type === ChannelType.GuildStageVoice
+			) {
 				embed.addFields(
 					{
 						name: '🎤 Bitrate',
 						value: `${channel.bitrate / 1000} kbps`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '👥 User Limit',
-						value: channel.userLimit ? `${channel.userLimit} users` : 'Unlimited',
-						inline: true
+						value: channel.userLimit
+							? `${channel.userLimit} users`
+							: 'Unlimited',
+						inline: true,
 					},
 					{
 						name: '🔊 Members Connected',
 						value: `${channel.members.size} members`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '🎥 Video Quality',
 						value: channel.videoQualityMode === 1 ? 'Auto' : 'Full',
-						inline: true
-					}
+						inline: true,
+					},
 				);
 			}
 
@@ -126,20 +142,22 @@ module.exports = {
 					{
 						name: '📢 Topic',
 						value: channel.topic || 'No topic set',
-						inline: false
+						inline: false,
 					},
 					{
 						name: '📝 Posts',
 						value: `${channel.threads?.cache.size || 0} posts`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '🏷️ Available Tags',
 						value: channel.availableTags?.length
-							? channel.availableTags.map(tag => tag.name).join(', ')
+							? channel.availableTags
+									.map((tag) => tag.name)
+									.join(', ')
 							: 'No tags configured',
-						inline: false
-					}
+						inline: false,
+					},
 				);
 			}
 
@@ -149,19 +167,19 @@ module.exports = {
 					{
 						name: '📂 Category',
 						value: channel.parent.name,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '📊 Position',
 						value: `${channel.position + 1} of ${channel.parent.children.cache.size}`,
-						inline: true
-					}
+						inline: true,
+					},
 				);
 			} else if (channel.type !== ChannelType.GuildCategory) {
 				embed.addFields({
 					name: '📂 Category',
 					value: 'None (Top-level channel)',
-					inline: true
+					inline: true,
 				});
 			}
 
@@ -174,9 +192,12 @@ module.exports = {
 			// Add each part as a separate field
 			for (let i = 0; i < permissionParts.length; i++) {
 				embed.addFields({
-					name: i === 0 ? '🔐 Default Permissions' : '🔐 Default Permissions (continued)',
+					name:
+						i === 0
+							? '🔐 Default Permissions'
+							: '🔐 Default Permissions (continued)',
 					value: permissionParts[i],
-					inline: false
+					inline: false,
 				});
 			}
 
@@ -190,15 +211,23 @@ module.exports = {
 // Helper function to get an appropriate emoji based on channel type
 function getChannelIcon(channel) {
 	switch (channel.type) {
-		case ChannelType.GuildText: return '💬';
-		case ChannelType.GuildVoice: return '🔊';
-		case ChannelType.GuildCategory: return '📂';
-		case ChannelType.GuildAnnouncement: return '📢';
+		case ChannelType.GuildText:
+			return '💬';
+		case ChannelType.GuildVoice:
+			return '🔊';
+		case ChannelType.GuildCategory:
+			return '📂';
+		case ChannelType.GuildAnnouncement:
+			return '📢';
 		case ChannelType.AnnouncementThread:
 		case ChannelType.PublicThread:
-		case ChannelType.PrivateThread: return '🧵';
-		case ChannelType.GuildStageVoice: return '🎭';
-		case ChannelType.GuildForum: return '📋';
-		default: return '📝';
+		case ChannelType.PrivateThread:
+			return '🧵';
+		case ChannelType.GuildStageVoice:
+			return '🎭';
+		case ChannelType.GuildForum:
+			return '📋';
+		default:
+			return '📝';
 	}
 }

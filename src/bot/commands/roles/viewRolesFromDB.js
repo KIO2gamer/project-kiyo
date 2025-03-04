@@ -29,7 +29,8 @@ module.exports = {
 					roles
 						.map(
 							(role, index) =>
-								`${index + 1}. **${role.roleName}** (ID: \`${role.roleID
+								`${index + 1}. **${role.roleName}** (ID: \`${
+									role.roleID
 								}\`, Color: \`${role.roleColor}\`)`,
 						)
 						.join('\n'),

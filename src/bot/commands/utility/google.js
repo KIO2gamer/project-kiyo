@@ -2,8 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 const GOOGLE_BLUE = '#4285F4'; // Google Blue color
-const GOOGLE_RED = '#EA4335';  // Google Red color for errors
-const MAX_RESULTS = 5;         // Number of search results to display
+const GOOGLE_RED = '#EA4335'; // Google Red color for errors
+const MAX_RESULTS = 5; // Number of search results to display
 const MAX_SNIPPET_LENGTH = 200; // Max characters for snippet in embed
 
 module.exports = {
@@ -31,7 +31,9 @@ module.exports = {
 		const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
 		if (!apiKey || !searchEngineId) {
-			handleError('Google API key or Search Engine ID not found in environment variables.');
+			handleError(
+				'Google API key or Search Engine ID not found in environment variables.',
+			);
 			return interaction.reply({
 				embeds: [
 					new EmbedBuilder()
@@ -79,7 +81,9 @@ module.exports = {
 				.setDescription(
 					`Here are the top ${results.length} search results for your query:\n\n`, // Introduction in description
 				)
-				.setURL(`https://www.google.com/search?q=${encodeURIComponent(query)}`) // Link to Google search page
+				.setURL(
+					`https://www.google.com/search?q=${encodeURIComponent(query)}`,
+				) // Link to Google search page
 				.setTimestamp()
 				.setFooter({ text: 'Powered by Google Custom Search' }); // Footer for attribution
 
@@ -103,7 +107,6 @@ module.exports = {
 			embed.setDescription(embed.data.description + resultList); // Append results to description
 
 			await interaction.reply({ embeds: [embed], ephemeral: true });
-
 		} catch (error) {
 			handleError('Error performing Google search:', error);
 			let errorMessage =
