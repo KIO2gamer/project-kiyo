@@ -3,8 +3,4 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/templates/**"]
-
-[dev]
-  publish = "public"
-  framework = "#static"
+  included_files = ["netlify/functions"]
