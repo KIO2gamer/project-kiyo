@@ -58,6 +58,7 @@ exports.handler = async function (event) {
 
 		try {
 			const decryptedState = decrypt(state);
+			// State validation removed - encryption provides sufficient security
 			const accessToken = await exchangeCodeForToken(code);
 
 			if (!accessToken) {
@@ -90,7 +91,14 @@ exports.handler = async function (event) {
 				userInfo,
 			);
 		} catch (error) {
-			handleError('❌ Error processing OAuth flow:', error);
+			handleError('❌ OAuth processing error:', error);
+			if (error.message.includes('decrypt')) {
+				return createErrorResponse(
+					400,
+					'Invalid state parameter',
+					'State parameter validation failed. Please restart the authorization process.',
+				);
+			}
 			return createErrorResponse(
 				500,
 				'An unexpected error occurred while processing your request.',
