@@ -30,10 +30,7 @@
 		"api",
 		"discord.js"
 	],
-	"author": {
-		"name": "KIO2gamer",
-		"url": "https://kio2gamer.carrd.co/"
-	},
+	"author": "KIO2gamer (https://kio2gamer.carrd.co/)",
 	"contributors": [
 		{
 			"name": "Neon",
@@ -58,7 +55,6 @@
 		"@discord/embedded-app-sdk": "^1.8.1",
 		"@google/generative-ai": "^0.21.0",
 		"@iamtraction/google-translate": "^2.0.1",
-		"aifiles": "^1.0.2",
 		"axios": "^1.7.8",
 		"chalk": "^4.1.2",
 		"common-tags": "^1.8.2",
@@ -82,7 +78,7 @@
 		"husky": "^8.0.3",
 		"jsdoc": "^4.0.2",
 		"lint-staged": "^15.0.2",
-		"nodemon": "^3.1.7",
+		"nodemon": "^3.1.9",
 		"prettier": "^3.4.1",
 		"rimraf": "^5.0.1"
 	},
@@ -101,5 +97,8 @@
 	"funding": {
 		"type": "github",
 		"url": "https://github.com/sponsors/KIO2gamer"
+	},
+	"directories": {
+		"doc": "docs"
 	}
 }
