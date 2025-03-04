@@ -10,16 +10,21 @@ A versatile Discord bot packed with moderation, entertainment, and utility comma
 
 ## ✨ Features
 
-- **Moderation:** Commands to help moderators manage the server effectively (e.g., ban, kick, mute, warn). _(Add specific moderation features here)_
-- **Entertainment:** Fun and engaging commands to keep users entertained (e.g., games, image commands, meme generation). _(Add specific entertainment features here)_
-- **Utility:** Useful tools and commands to provide information and enhance server functionality (e.g., weather, calculator, search, YouTube info). _(Add specific utility features here)_
-- **YouTube Subscriber Roles:** Automatically assign roles to users based on their YouTube subscriber counts, encouraging community engagement.
-- **And more!** Explore the [commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) to discover all the features Kiyo has to offer.
+- **Moderation:** Commands to help moderators manage the server effectively including ban, kick, mute, warn, channel management, and message purging.
+- **Entertainment:** Fun and engaging commands to keep users entertained with memes, games (hangman, lyric quiz), and interactive experiences.
+- **Utility:** Useful tools including translation, weather forecasts, calculators, search functionality, and YouTube information.
+- **YouTube Integration:** 
+  - Subscriber role assignment based on verified YouTube channel subscriber counts
+  - OAuth2 authentication system for secure YouTube account verification
+  - Automatic role updates based on subscriber milestones
+- **Server Management:** Comprehensive server information, user statistics, and role management tools.
+- **Customization:** Easily extendable command structure organized by categories.
 
 ## 🛠️ Requirements
 
 - **Node.js:** version 18.0.0 or higher ([Download Node.js](https://nodejs.org/))
 - **npm:** (usually comes with Node.js) or any other Node.js package manager like [yarn](https://yarnpkg.com/) or [pnpm](https://pnpm.io/)
+- **MongoDB:** for data persistence and user information storage
 
 ## 🚀 Installation
 
@@ -44,23 +49,28 @@ Get Kiyo up and running in a few simple steps:
     - Add the necessary environment variables as listed below. **Ensure you replace the placeholder values with your actual credentials and IDs.**
 
     ```plaintext
+    # Discord Configuration
     DISCORD_TOKEN=your_discord_token
-    IGDB_CLIENT_SECRET=your_igdb_client_secret
-    DISCORD_CLIENT_SECRET=your_discord_client_secret
-    MONGODB_URI=your_mongodb_uri
-    DISCORD_REDIRECT_URI=your_discord_redirect_uri
-    GOOGLE_SEARCH_ENGINE_ID=your_google_search_engine_id
-    IGDB_CLIENT_ID=your_igdb_client_id
     DISCORD_CLIENT_ID=your_discord_client_id
+    DISCORD_CLIENT_SECRET=your_discord_client_secret
+    DISCORD_REDIRECT_URI=your_discord_redirect_uri
     DISCORD_GUILD_IDS=your_discord_guild_ids
-    GOOGLE_API_KEY=your_google_api_key
+    
+    # Database Configuration
+    MONGODB_URI=your_mongodb_uri
+    
+    # API Keys
     YOUTUBE_API_KEY=your_youtube_api_key
-    PEXELS_API_KEY=your_pexels_api_key
+    GOOGLE_API_KEY=your_google_api_key
+    GOOGLE_SEARCH_ENGINE_ID=your_google_search_engine_id
     WEATHER_API_KEY=your_weather_api_key
+    PEXELS_API_KEY=your_pexels_api_key
     TENOR_API_KEY=your_tenor_api_key
     GIPHY_API_KEY=your_giphy_api_key
     MUSIXMATCH_API_KEY=your_musixmatch_api_key
     GEMINI_API_KEY=your_gemini_api_key
+    IGDB_CLIENT_ID=your_igdb_client_id
+    IGDB_CLIENT_SECRET=your_igdb_client_secret
     ```
 
     **Important:** Keep your `.env` file secure and **do not commit it to your Git repository** if it contains sensitive information. It's already in `.gitignore`, but double-check!
@@ -72,6 +82,21 @@ Get Kiyo up and running in a few simple steps:
     ```
 
     The bot should now be online and ready to use in your Discord server.
+
+## 🤖 Command Structure
+
+Kiyo's commands are organized into categories for easy management:
+
+- **Admin:** Server administration commands (reload, modify channels)
+- **Fun:** Entertainment commands (memes, games)
+- **Games:** Interactive games (hangman, lyric quiz)
+- **Info:** Informational commands (help, server stats, user info)
+- **Moderation:** Moderation tools (ban, kick, warn)
+- **Roles:** Role management commands (YouTube subscriber roles)
+- **Setup:** Server setup commands
+- **Utility:** Utility tools (translation, weather, search)
+
+Each command follows a consistent structure with descriptions, usage examples, and permission requirements.
 
 ## ☁️ Deployment
 
@@ -88,7 +113,7 @@ Get your own instance of Kiyo deployed!
 2.  **Connect to your remote repository:**
 
     ```sh
-    git remote add origin https://github.com/KIO2gamer/project-kiyo.git
+    git remote add origin https://github.com/yourusername/your-repo-name.git
     git branch -M main
     git push -u origin main
     ```
@@ -116,7 +141,7 @@ Get your own instance of Kiyo deployed!
         - [AWS EC2](https://aws.amazon.com/ec2/)
         - [Google Cloud Compute Engine](https://cloud.google.com/compute)
         - [DigitalOcean](https://www.digitalocean.com/)
-        - _(Add links and basic instructions for other platforms if you want to support them)_
+        - [Railway](https://railway.app/)
 
 ## 🤝 Contributing
 
