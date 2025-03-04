@@ -5,16 +5,14 @@ const { handleError } = require('./../../utils/errorHandler');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_preview')
-		.setDescription('Previews a custom command')
+		.setDescription('Preview a custom command')
 		.addStringOption((option) =>
 			option
 				.setName('name')
-				.setDescription(
-					'The name or alias of the custom command to preview',
-				)
+				.setDescription('The name of the command to preview')
 				.setRequired(true),
 		),
-	category: 'customs',
+	category: 'utility',
 	description_full: "Previews a custom command stored in the bot's database.",
 	usage: '/custom_preview <name_or_alias>',
 	examples: ['/custom_preview hello'],

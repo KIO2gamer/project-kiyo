@@ -24,13 +24,14 @@ module.exports = {
 				.setDescription('The alternate name of the command')
 				.setRequired(false),
 		),
-	category: 'customs',
-	description_full: "Adds a custom command to the bot's database.",
-	usage: '/custom_add <name:command_name> <message:response_message> [alias_name:alternate_name]',
+	description_full:
+		'Add a custom command to the server.',
+	usage: '/custom_add [name] [message] [alias]',
 	examples: [
-		'/custom_add name:hello message:Hello!',
-		'/custom_add name:hello message:Hi! alias_name:hey',
+		'/custom_add name:hello message:Hello World!',
+		'/custom_add name:greet message:Hi there! alias:hi',
 	],
+	category: 'utility',
 	/**
 	 * Executes the custom command addition process.
 	 *

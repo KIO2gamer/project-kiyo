@@ -5,26 +5,14 @@ const { handleError } = require('./../../utils/errorHandler');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_edit')
-		.setDescription('Edits an existing custom command')
+		.setDescription('Edits a custom command')
 		.addStringOption((option) =>
 			option
 				.setName('name')
-				.setDescription('The name or alias of the command to edit')
+				.setDescription('The name of the command to edit')
 				.setRequired(true),
-		)
-		.addStringOption((option) =>
-			option
-				.setName('new_message')
-				.setDescription('The new response message for the command')
-				.setRequired(true),
-		)
-		.addStringOption((option) =>
-			option
-				.setName('new_alias')
-				.setDescription('A new alias for the command (optional)')
-				.setRequired(false),
 		),
-	category: 'customs',
+	category: 'utility',
 	description_full: "Edits an existing custom command in the bot's database.",
 	usage: '/custom_edit <name:command_name_or_alias> <new_message:updated_response> [new_alias:new_alternate_name]',
 	examples: [

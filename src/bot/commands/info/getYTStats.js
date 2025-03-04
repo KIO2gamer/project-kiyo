@@ -3,14 +3,15 @@ const { google } = require('googleapis');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('youtube_stats')
+		.setName('ytstats')
 		.setDescription('Get YouTube channel statistics')
 		.addStringOption((option) =>
 			option
 				.setName('channel')
-				.setDescription('YouTube channel ID, URL, handle, or video URL')
+				.setDescription('The YouTube channel name or URL')
 				.setRequired(true),
 		),
+	category: 'info',
 	description_full:
 		'Get YouTube channel statistics for a given channel ID, URL, handle, or video URL.',
 	usage: '/youtube_stats <channel_link / channel_id / channel_handle / video_link>',

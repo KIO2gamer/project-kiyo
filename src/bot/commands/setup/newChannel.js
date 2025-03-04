@@ -16,7 +16,7 @@ module.exports = {
 		'/new_channel name:VIP Room type:Text category:Chat', // Creates a text channel named "VIP Room" under the "Chat" category
 		'/new_channel name:News type:Announcement category:Main topic:Get all updates of the server!!!', // Creates an announcement channel with a topic
 	],
-	category: 'channels',
+	category: 'setup',
 	data: new SlashCommandBuilder()
 		.setName('new_channel')
 		.setDescription('Creates a new channel.')

@@ -5,14 +5,14 @@ const { handleError } = require('./../../utils/errorHandler');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_delete')
-		.setDescription('Deletes an existing custom command')
+		.setDescription('Deletes a custom command')
 		.addStringOption((option) =>
 			option
 				.setName('name')
-				.setDescription('The name or alias of the command to delete')
+				.setDescription('The name of the command to delete')
 				.setRequired(true),
 		),
-	category: 'customs',
+	category: 'utility',
 	description_full:
 		"Deletes an existing custom command from the bot's database.",
 	usage: '/custom_delete <name:command_name_or_alias>',

@@ -14,7 +14,7 @@ module.exports = {
 				)
 				.setRequired(true),
 		),
-	category: 'customs',
+	category: 'utility',
 	description_full:
 		"Runs a specified custom command stored in the bot's database.",
 	usage: '/custom_run <name_or_alias>',

@@ -11,8 +11,14 @@ const { handleError } = require('./../../utils/errorHandler');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_list')
-		.setDescription('Lists all custom commands'),
-	category: 'customs',
+		.setDescription('Lists all custom commands')
+		.addStringOption((option) =>
+			option
+				.setName('search')
+				.setDescription('Search for a specific command')
+				.setRequired(false),
+		),
+	category: 'utility',
 	description_full: "Lists all custom commands stored in the bot's database.",
 	usage: '/custom_list',
 	examples: ['/custom_list'],
