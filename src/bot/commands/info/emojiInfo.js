@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { EmbedBuilder } = require('discord.js');
-const { handleError } = require('../../utils/errorHandler.js');
+const { handleError } = require('../utils/errorHandler.js');
 
 module.exports = {
 	description_full:

@@ -8,7 +8,7 @@ module.exports = {
 		'/8ball Will I win the lottery today?',
 		'/8ball Is this the best day of my life?',
 	],
-	category: 'entertainment',
+	category: 'fun',
 	data: new SlashCommandBuilder()
 		.setName('8ball')
 		.setDescription('Ask the magic 8ball a question.')
