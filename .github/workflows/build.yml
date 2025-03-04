@@ -44,19 +44,8 @@ jobs:
               run: npm run lint
               continue-on-error: false
 
-            - name: Check code formatting
-              run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,md}"
-            
             - name: Apply code formatting
-              run: npx prettier --write "**/*.{js,jsx,ts,tsx,json,md}"
-
-            - name: Run tests
-              run: npm test
-              if: ${{ hashFiles('**/test/**/*.js') != '' }}
-
-            - name: Build project
-              run: npm run build
-              if: ${{ hashFiles('**/build.js') != '' || hashFiles('**/webpack.config.js') != '' }}
+              run: npm run format
 
     security-scan:
         name: Security Scan

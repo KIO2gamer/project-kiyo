@@ -195,9 +195,7 @@ module.exports = {
 				try {
 					await interaction.guild.members.unban(targetUser.id);
 				} catch (error) {
-					handleError(
-						`Failed to unban ${targetUser.tag}: ${error}`,
-					);
+					handleError(`Failed to unban ${targetUser.tag}: ${error}`);
 				}
 			}, durationMs);
 		} catch (error) {

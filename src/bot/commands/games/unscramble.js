@@ -20,7 +20,9 @@ module.exports = {
 
 		const words = await loadWords();
 		if (!words) {
-			return interaction.editReply('Could not load words for Unscramble. Please try again later.');
+			return interaction.editReply(
+				'Could not load words for Unscramble. Please try again later.',
+			);
 		}
 
 		const wordToUnscramble = selectRandomWord(words);
@@ -32,11 +34,11 @@ module.exports = {
 		await interaction.editReply({ embeds: [gameEmbed] });
 
 		const messageCollector = interaction.channel.createMessageCollector({
-			filter: m => !m.author.bot && gameActive, // Any non-bot user can guess
+			filter: (m) => !m.author.bot && gameActive, // Any non-bot user can guess
 			time: GAME_TIMEOUT_MS,
 		});
 
-		messageCollector.on('collect', async message => {
+		messageCollector.on('collect', async (message) => {
 			const guess = message.content.trim().toLowerCase();
 
 			if (guess === wordToUnscramble.toLowerCase()) {
@@ -45,19 +47,36 @@ module.exports = {
 				messageCollector.stop('win');
 				return;
 			} else {
-				message.react(INCORRECT_GUESS_EMOJI).catch(error => handleError('Failed to react to message:', error)); // React with wrong emoji
+				message
+					.react(INCORRECT_GUESS_EMOJI)
+					.catch((error) =>
+						handleError('Failed to react to message:', error),
+					); // React with wrong emoji
 			}
 		});
 
 		messageCollector.on('end', (_, reason) => {
 			if (reason === 'time') {
-				const timeoutEmbed = createEndEmbed('Time\'s Up!', `${TIME_UP_EMOJI} No one unscrambled it in time! The word was **${wordToUnscramble}**.`, false);
+				const timeoutEmbed = createEndEmbed(
+					"Time's Up!",
+					`${TIME_UP_EMOJI} No one unscrambled it in time! The word was **${wordToUnscramble}**.`,
+					false,
+				);
 				interaction.followUp({ embeds: [timeoutEmbed] });
 			} else if (reason === 'win') {
-				const winEmbed = createEndEmbed('We Have a Winner!', `${CORRECT_GUESS_EMOJI} Congratulations **<@${winner.id}>**! You unscrambled **${scrambledWord}** to **${wordToUnscramble}**!`, true); // Announce the winner
+				const winEmbed = createEndEmbed(
+					'We Have a Winner!',
+					`${CORRECT_GUESS_EMOJI} Congratulations **<@${winner.id}>**! You unscrambled **${scrambledWord}** to **${wordToUnscramble}**!`,
+					true,
+				); // Announce the winner
 				interaction.followUp({ embeds: [winEmbed] });
-			} else if (reason === 'idle') { // If the collector ends without a win/lose reason (e.g., channel inactivity)
-				const gameoverEmbed = createEndEmbed('Game Over!', `${GAME_OVER_EMOJI} No one guessed the word. The word was **${wordToUnscramble}**.`, false);
+			} else if (reason === 'idle') {
+				// If the collector ends without a win/lose reason (e.g., channel inactivity)
+				const gameoverEmbed = createEndEmbed(
+					'Game Over!',
+					`${GAME_OVER_EMOJI} No one guessed the word. The word was **${wordToUnscramble}**.`,
+					false,
+				);
 				interaction.followUp({ embeds: [gameoverEmbed] });
 			}
 		});
@@ -69,7 +88,10 @@ module.exports = {
 async function loadWords() {
 	try {
 		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
-		return data.split('\n').map(word => word.trim()).filter(word => word);
+		return data
+			.split('\n')
+			.map((word) => word.trim())
+			.filter((word) => word);
 	} catch (error) {
 		handleError('Failed to load words:', error);
 		return null;
@@ -90,21 +112,24 @@ function scrambleWord(word) {
 
 	const scrambledWord = letters.join('');
 	// Ensure scrambled word is different from the original
-	if (scrambledWord === word && word.length > 2) { // For very short words, scrambling might result in the same word
+	if (scrambledWord === word && word.length > 2) {
+		// For very short words, scrambling might result in the same word
 		return scrambleWord(word); // Recursive call to scramble again if it's the same, for words longer than 2 chars
 	}
 	return scrambledWord;
 }
 
-
 function createGameEmbed(scrambledWord) {
 	return new EmbedBuilder()
 		.setColor(SCRAMBLE_EMBED_COLOR)
 		.setTitle('Multiplayer Unscramble Challenge! 🔤') // Updated title for multiplayer
-		.setDescription(`Unscramble the following word:\n\n**\`${scrambledWord.toUpperCase()}\`**\n\nType your guess in the chat! First to guess correctly wins!`) // Updated description for multiplayer
-		.setFooter({ text: `Game expires in ${GAME_TIMEOUT_MS / 60000} minutes. Good luck everyone!` }); // Updated footer for multiplayer
+		.setDescription(
+			`Unscramble the following word:\n\n**\`${scrambledWord.toUpperCase()}\`**\n\nType your guess in the chat! First to guess correctly wins!`,
+		) // Updated description for multiplayer
+		.setFooter({
+			text: `Game expires in ${GAME_TIMEOUT_MS / 60000} minutes. Good luck everyone!`,
+		}); // Updated footer for multiplayer
 }
-
 
 function createEndEmbed(title, description, isWin) {
 	return new EmbedBuilder()

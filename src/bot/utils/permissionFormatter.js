@@ -19,7 +19,7 @@ const PERMISSION_CATEGORIES = {
 		'MANAGE_ROLES',
 		'MANAGE_WEBHOOKS',
 		'MANAGE_EMOJIS_AND_STICKERS',
-		'MANAGE_EVENTS'
+		'MANAGE_EVENTS',
 	],
 	general: [
 		'VIEW_CHANNEL',
@@ -27,7 +27,7 @@ const PERMISSION_CATEGORIES = {
 		'CHANGE_NICKNAME',
 		'USE_EXTERNAL_EMOJIS',
 		'USE_EXTERNAL_STICKERS',
-		'USE_APPLICATION_COMMANDS'
+		'USE_APPLICATION_COMMANDS',
 	],
 	text: [
 		'SEND_MESSAGES',
@@ -41,7 +41,7 @@ const PERMISSION_CATEGORIES = {
 		'SEND_MESSAGES_IN_THREADS',
 		'CREATE_PUBLIC_THREADS',
 		'CREATE_PRIVATE_THREADS',
-		'USE_EXTERNAL_STICKERS'
+		'USE_EXTERNAL_STICKERS',
 	],
 	voice: [
 		'CONNECT',
@@ -51,8 +51,8 @@ const PERMISSION_CATEGORIES = {
 		'PRIORITY_SPEAKER',
 		'MUTE_MEMBERS',
 		'DEAFEN_MEMBERS',
-		'MOVE_MEMBERS'
-	]
+		'MOVE_MEMBERS',
+	],
 };
 
 // Icons for each category
@@ -62,7 +62,7 @@ const CATEGORY_ICONS = {
 	general: '🔹',
 	text: '💬',
 	voice: '🔊',
-	other: '⚙️'
+	other: '⚙️',
 };
 
 // Human-readable descriptions for permissions
@@ -118,32 +118,32 @@ const PERMISSION_DESCRIPTIONS = {
  */
 function formatCategorizedPermissions(permissions, options = {}) {
 	// Set default options
-	const {
-		checkmark = true,
-		headers = true,
-		maxLength = 1024
-	} = options;
+	const { checkmark = true, headers = true, maxLength = 1024 } = options;
 
 	// Convert permissions to array if it's a BitField
 	const permsArray = Array.isArray(permissions)
 		? permissions
-		: permissions.toArray ? permissions.toArray() : [];
+		: permissions.toArray
+			? permissions.toArray()
+			: [];
 
-	if (permsArray.length === 0) return "No permissions";
+	if (permsArray.length === 0) return 'No permissions';
 
 	// Check for Administrator which grants all permissions
 	if (permsArray.includes('ADMINISTRATOR')) {
-		return "🔑 **Administrator** - *Grants all permissions*";
+		return '🔑 **Administrator** - *Grants all permissions*';
 	}
 
 	// Categorize the permissions
 	const categorized = {};
 	const uncategorized = [];
 
-	permsArray.forEach(perm => {
+	permsArray.forEach((perm) => {
 		let placed = false;
 
-		for (const [category, categoryPerms] of Object.entries(PERMISSION_CATEGORIES)) {
+		for (const [category, categoryPerms] of Object.entries(
+			PERMISSION_CATEGORIES,
+		)) {
 			if (categoryPerms.includes(perm)) {
 				if (!categorized[category]) categorized[category] = [];
 				categorized[category].push(perm);
@@ -156,7 +156,7 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	});
 
 	// Format permissions within each category
-	const formatPerm = p => {
+	const formatPerm = (p) => {
 		const formattedName = p.replace(/_/g, ' ').toLowerCase();
 		return checkmark ? `✅ ${formattedName}` : `• ${formattedName}`;
 	};
@@ -165,12 +165,19 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	let result = [];
 
 	// Add categorized permissions
-	for (const category of ['advanced', 'moderation', 'general', 'text', 'voice']) {
+	for (const category of [
+		'advanced',
+		'moderation',
+		'general',
+		'text',
+		'voice',
+	]) {
 		if (categorized[category] && categorized[category].length) {
 			const perms = categorized[category].map(formatPerm).join('\n');
-			result.push(headers
-				? `${CATEGORY_ICONS[category]} **${category.charAt(0).toUpperCase() + category.slice(1)}:**\n${perms}`
-				: perms
+			result.push(
+				headers
+					? `${CATEGORY_ICONS[category]} **${category.charAt(0).toUpperCase() + category.slice(1)}:**\n${perms}`
+					: perms,
 			);
 		}
 	}
@@ -178,9 +185,8 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	// Add uncategorized permissions
 	if (uncategorized.length) {
 		const perms = uncategorized.map(formatPerm).join('\n');
-		result.push(headers
-			? `${CATEGORY_ICONS.other} **Other:**\n${perms}`
-			: perms
+		result.push(
+			headers ? `${CATEGORY_ICONS.other} **Other:**\n${perms}` : perms,
 		);
 	}
 
@@ -211,7 +217,7 @@ function formatPermissions(permissions, options = {}) {
 		if (includeAll) {
 			// Generate list of all possible permissions
 			const allPerms = Object.keys(PermissionsBitField.Flags);
-			denied = allPerms.filter(perm => !allowed.includes(perm));
+			denied = allPerms.filter((perm) => !allowed.includes(perm));
 		}
 	} else if (Array.isArray(permissions)) {
 		// Handle permission array
@@ -220,7 +226,7 @@ function formatPermissions(permissions, options = {}) {
 
 	// No permissions to display
 	if (allowed.length === 0 && denied.length === 0) {
-		return "No permissions to display";
+		return 'No permissions to display';
 	}
 
 	// Format based on categorization preference
@@ -229,35 +235,47 @@ function formatPermissions(permissions, options = {}) {
 
 		// Format allowed permissions if any
 		if (allowed.length > 0) {
-			result.push(formatCategorizedPermissions(allowed, {
-				maxLength: maxLength / 2
-			}));
+			result.push(
+				formatCategorizedPermissions(allowed, {
+					maxLength: maxLength / 2,
+				}),
+			);
 		}
 
 		// Format denied permissions if any
 		if (denied.length > 0) {
 			const formattedDenied = formatCategorizedPermissions(denied, {
 				checkmark: false,
-				maxLength: maxLength / 2
+				maxLength: maxLength / 2,
 			}).replace(/•/g, '❌');
 
-			result.push("**Denied Permissions:**\n" + formattedDenied);
+			result.push('**Denied Permissions:**\n' + formattedDenied);
 		}
 
-		return result.join("\n\n").substring(0, maxLength);
+		return result.join('\n\n').substring(0, maxLength);
 	} else {
 		// Simple list format
 		let result = [];
 
 		if (allowed.length > 0) {
-			result.push("**Allowed:**\n" + allowed.map(p => `✅ ${p.replace(/_/g, ' ').toLowerCase()}`).join('\n'));
+			result.push(
+				'**Allowed:**\n' +
+					allowed
+						.map((p) => `✅ ${p.replace(/_/g, ' ').toLowerCase()}`)
+						.join('\n'),
+			);
 		}
 
 		if (denied.length > 0) {
-			result.push("**Denied:**\n" + denied.map(p => `❌ ${p.replace(/_/g, ' ').toLowerCase()}`).join('\n'));
+			result.push(
+				'**Denied:**\n' +
+					denied
+						.map((p) => `❌ ${p.replace(/_/g, ' ').toLowerCase()}`)
+						.join('\n'),
+			);
 		}
 
-		return result.join("\n\n").substring(0, maxLength);
+		return result.join('\n\n').substring(0, maxLength);
 	}
 }
 
@@ -302,12 +320,16 @@ function splitPermissionText(permissionText, maxLength = 1024) {
  */
 function comparePermissions(basePerms, comparePerms) {
 	// Convert inputs to arrays
-	const baseArray = Array.isArray(basePerms) ? basePerms : basePerms.toArray();
-	const compareArray = Array.isArray(comparePerms) ? comparePerms : comparePerms.toArray();
+	const baseArray = Array.isArray(basePerms)
+		? basePerms
+		: basePerms.toArray();
+	const compareArray = Array.isArray(comparePerms)
+		? comparePerms
+		: comparePerms.toArray();
 
 	// Find differences
-	const added = compareArray.filter(perm => !baseArray.includes(perm));
-	const removed = baseArray.filter(perm => !compareArray.includes(perm));
+	const added = compareArray.filter((perm) => !baseArray.includes(perm));
+	const removed = baseArray.filter((perm) => !compareArray.includes(perm));
 
 	return { added, removed };
 }
@@ -323,7 +345,7 @@ function formatPermissionDifferences(differences, options = {}) {
 	const { added, removed } = differences;
 
 	if (added.length === 0 && removed.length === 0) {
-		return "No permission differences";
+		return 'No permission differences';
 	}
 
 	const formatPerm = (perm) => {
@@ -336,11 +358,15 @@ function formatPermissionDifferences(differences, options = {}) {
 	const sections = [];
 
 	if (added.length > 0) {
-		sections.push(`**Added Permissions:**\n${added.map(p => `✅ ${formatPerm(p)}`).join('\n')}`);
+		sections.push(
+			`**Added Permissions:**\n${added.map((p) => `✅ ${formatPerm(p)}`).join('\n')}`,
+		);
 	}
 
 	if (removed.length > 0) {
-		sections.push(`**Removed Permissions:**\n${removed.map(p => `❌ ${formatPerm(p)}`).join('\n')}`);
+		sections.push(
+			`**Removed Permissions:**\n${removed.map((p) => `❌ ${formatPerm(p)}`).join('\n')}`,
+		);
 	}
 
 	return sections.join('\n\n').substring(0, maxLength);
@@ -401,23 +427,29 @@ function formatChannelPermissions(channel, target, options = {}) {
 
 	// If we're only showing differences
 	if (showOverwritesOnly) {
-		const { added, removed } = comparePermissions(basePermissions, overwritePermissions);
+		const { added, removed } = comparePermissions(
+			basePermissions,
+			overwritePermissions,
+		);
 
 		if (added.length === 0 && removed.length === 0) {
-			return "No permission overwrites for this channel";
+			return 'No permission overwrites for this channel';
 		}
 
-		return formatPermissionDifferences({ added, removed }, {
-			maxLength,
-			includeDescriptions: true
-		});
+		return formatPermissionDifferences(
+			{ added, removed },
+			{
+				maxLength,
+				includeDescriptions: true,
+			},
+		);
 	}
 
 	// Otherwise format the full channel permissions
 	return formatCategorizedPermissions(overwritePermissions, {
 		maxLength,
 		checkmark: true,
-		headers: true
+		headers: true,
 	});
 }
 
@@ -438,5 +470,5 @@ module.exports = {
 	getPermissionDescription,
 	formatPermissionWithDescription,
 	getPermissionCategory,
-	formatChannelPermissions
+	formatChannelPermissions,
 };

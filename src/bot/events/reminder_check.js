@@ -40,9 +40,7 @@ module.exports = {
 						// After sending the reminder, delete it from the database
 						await Reminder.findByIdAndDelete(reminder._id);
 					} catch (error) {
-						handleError(
-							`Error sending reminder: ${error.message}`,
-						);
+						handleError(`Error sending reminder: ${error.message}`);
 						// Optionally, update the reminder status to 'failed'
 						await Reminder.findByIdAndUpdate(reminder._id, {
 							status: 'failed',

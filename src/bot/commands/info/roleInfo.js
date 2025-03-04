@@ -3,7 +3,7 @@ const { handleError } = require('../utils/errorHandler');
 const {
 	formatCategorizedPermissions,
 	splitPermissionText,
-	getPermissionDescription
+	getPermissionDescription,
 } = require('../utils/permissionFormatter');
 
 module.exports = {
@@ -31,13 +31,17 @@ module.exports = {
 
 			// Calculate number of members with this role
 			const memberCount = role.members.size;
-			const memberPercentage = Math.round((memberCount / interaction.guild.memberCount) * 100);
+			const memberPercentage = Math.round(
+				(memberCount / interaction.guild.memberCount) * 100,
+			);
 
 			// Create the embed with role information
 			const embed = new EmbedBuilder()
 				.setTitle(`Role Information: ${role.name}`)
-				.setColor(role.color || 0x5865F2) // Use role color or Discord blurple
-				.setThumbnail(role.iconURL({ size: 128, dynamic: true }) || null)
+				.setColor(role.color || 0x5865f2) // Use role color or Discord blurple
+				.setThumbnail(
+					role.iconURL({ size: 128, dynamic: true }) || null,
+				)
 				.addFields(
 					// General section
 					{
@@ -47,9 +51,9 @@ module.exports = {
 							`**Created:** <t:${Math.floor(role.createdTimestamp / 1000)}:R>`,
 							`**Color:** ${role.hexColor}`,
 							`**Position:** ${positionFromBottom} of ${totalRoles} (from bottom)`,
-							`**Members:** ${memberCount} (${memberPercentage}% of server)`
+							`**Members:** ${memberCount} (${memberPercentage}% of server)`,
 						].join('\n'),
-						inline: false
+						inline: false,
 					},
 
 					// Properties section
@@ -59,19 +63,26 @@ module.exports = {
 							`**Hoisted:** ${role.hoist ? 'Yes *(shown separately)*' : 'No'}`,
 							`**Mentionable:** ${role.mentionable ? 'Yes' : 'No'}`,
 							`**Managed:** ${role.managed ? 'Yes *(integration/bot role)*' : 'No'}`,
-							role.tags ? `**Tags:** ${JSON.stringify(role.tags)}` : '',
-							`**Mention:** <@&${role.id}>`
-						].filter(Boolean).join('\n'),
-						inline: true
-					}
+							role.tags
+								? `**Tags:** ${JSON.stringify(role.tags)}`
+								: '',
+							`**Mention:** <@&${role.id}>`,
+						]
+							.filter(Boolean)
+							.join('\n'),
+						inline: true,
+					},
 				);
 
 			// Add permissions using the utility function
-			const formattedPerms = formatCategorizedPermissions(role.permissions, {
-				checkmark: true,
-				headers: true,
-				maxLength: 4096 // Allow function to format all permissions, we'll split them later
-			});
+			const formattedPerms = formatCategorizedPermissions(
+				role.permissions,
+				{
+					checkmark: true,
+					headers: true,
+					maxLength: 4096, // Allow function to format all permissions, we'll split them later
+				},
+			);
 
 			// Split permission text if necessary
 			const permissionParts = splitPermissionText(formattedPerms);
@@ -79,9 +90,12 @@ module.exports = {
 			// Add each part as a separate field
 			for (let i = 0; i < permissionParts.length; i++) {
 				embed.addFields({
-					name: i === 0 ? '🔐 Permissions' : '🔐 Permissions (continued)',
+					name:
+						i === 0
+							? '🔐 Permissions'
+							: '🔐 Permissions (continued)',
 					value: permissionParts[i],
-					inline: false
+					inline: false,
 				});
 			}
 
@@ -91,19 +105,19 @@ module.exports = {
 					embed.addFields({
 						name: '🤖 Bot Role',
 						value: `This role is managed by <@${role.tags.botId}>`,
-						inline: false
+						inline: false,
 					});
 				} else if (role.tags.integrationId) {
 					embed.addFields({
 						name: '🔌 Integration Role',
 						value: `This role is managed by an integration (ID: ${role.tags.integrationId})`,
-						inline: false
+						inline: false,
 					});
 				} else if (role.tags.premiumSubscriberRole) {
 					embed.addFields({
 						name: '✨ Server Booster Role',
 						value: 'This is the Server Booster role',
-						inline: false
+						inline: false,
 					});
 				}
 			}
@@ -111,24 +125,34 @@ module.exports = {
 			// Add permission explanation section if the role has fewer than 5 permissions
 			// This gives more context for simple roles
 			const permList = role.permissions.toArray();
-			if (permList.length > 0 && permList.length <= 5 && !permList.includes('ADMINISTRATOR')) {
-				const permDescriptions = permList.map(perm => {
-					const name = perm.replace(/_/g, ' ').toLowerCase();
-					const description = getPermissionDescription(perm);
-					return `**${name}**: ${description}`;
-				}).join('\n\n');
+			if (
+				permList.length > 0 &&
+				permList.length <= 5 &&
+				!permList.includes('ADMINISTRATOR')
+			) {
+				const permDescriptions = permList
+					.map((perm) => {
+						const name = perm.replace(/_/g, ' ').toLowerCase();
+						const description = getPermissionDescription(perm);
+						return `**${name}**: ${description}`;
+					})
+					.join('\n\n');
 
 				embed.addFields({
 					name: '📚 Permission Explanations',
 					value: permDescriptions,
-					inline: false
+					inline: false,
 				});
 			}
 
-			embed.setFooter({
-				text: `Requested by ${interaction.user.tag}`,
-				iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-			}).setTimestamp();
+			embed
+				.setFooter({
+					text: `Requested by ${interaction.user.tag}`,
+					iconURL: interaction.user.displayAvatarURL({
+						dynamic: true,
+					}),
+				})
+				.setTimestamp();
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {

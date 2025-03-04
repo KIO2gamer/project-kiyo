@@ -9,10 +9,10 @@ const he = require('he');
 
 // Constants for styling and timeouts
 const PRIMARY_COLOR = '#7289DA'; // Discord Blurple
-const CORRECT_COLOR = '#4CAF50';  // Green
-const WRONG_COLOR = '#F44336';    // Red
-const TIMEOUT_COLOR = '#FFA000';  // Orange/Amber
-const TRIVIA_TIMEOUT = 20000;     // 20 seconds for answering
+const CORRECT_COLOR = '#4CAF50'; // Green
+const WRONG_COLOR = '#F44336'; // Red
+const TIMEOUT_COLOR = '#FFA000'; // Orange/Amber
+const TRIVIA_TIMEOUT = 20000; // 20 seconds for answering
 const ANSWER_BUTTON_LABELS = ['A', 'B', 'C', 'D'];
 const API_ENDPOINT = 'https://opentdb.com/api.php?amount=1&type=multiple';
 
@@ -32,19 +32,30 @@ module.exports = {
 			const questionData = await fetchTriviaQuestion();
 			if (!questionData) {
 				return interaction.editReply({
-					content: '⚠️ Failed to fetch trivia question. Please try again later.',
+					content:
+						'⚠️ Failed to fetch trivia question. Please try again later.',
 					ephemeral: true,
 				});
 			}
 
-			const { triviaEmbed, correctIndex } = createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
+			const { triviaEmbed, correctIndex } =
+				createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
 			const answerRow = createAnswerRow();
 
-			const reply = await interaction.editReply({ embeds: [triviaEmbed], components: [answerRow] }); // Get the message object after editReply
+			const reply = await interaction.editReply({
+				embeds: [triviaEmbed],
+				components: [answerRow],
+			}); // Get the message object after editReply
 
 			const collector = createButtonCollector(interaction);
-			handleCollectorEvents(collector, interaction, reply, questionData, triviaEmbed.data.fields, correctIndex); // Pass correctIndex
-
+			handleCollectorEvents(
+				collector,
+				interaction,
+				reply,
+				questionData,
+				triviaEmbed.data.fields,
+				correctIndex,
+			); // Pass correctIndex
 		} catch (error) {
 			handleError('Trivia command error:', error);
 			await interaction.editReply({
@@ -83,15 +94,17 @@ function decodeHtmlEntities(text) {
 
 function createTriviaEmbed(questionData) {
 	const decodedQuestion = decodeHtmlEntities(questionData.question);
-	const incorrectAnswers = questionData.incorrect_answers.map(decodeHtmlEntities);
+	const incorrectAnswers =
+		questionData.incorrect_answers.map(decodeHtmlEntities);
 	const correctAnswer = decodeHtmlEntities(questionData.correct_answer);
-	const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
+	const allAnswers = [...incorrectAnswers, correctAnswer].sort(
+		() => Math.random() - 0.5,
+	);
 	const correctIndex = allAnswers.indexOf(correctAnswer);
 
 	console.log(`Correct Answer from API: ${correctAnswer}`); // Debug log
 	console.log(`All Answers Array: ${JSON.stringify(allAnswers)}`); // Debug log
 	console.log(`Correct Index (calculated): ${correctIndex}`); // Debug log
-
 
 	const embed = new EmbedBuilder()
 		.setColor(PRIMARY_COLOR)
@@ -116,7 +129,6 @@ function createAnswerFields(answers) {
 	}));
 }
 
-
 function createAnswerRow() {
 	return new ActionRowBuilder().addComponents(
 		ANSWER_BUTTON_LABELS.map((letter) =>
@@ -128,21 +140,28 @@ function createAnswerRow() {
 	);
 }
 
-
 function createButtonCollector(interaction) {
 	const filter = (i) =>
-		ANSWER_BUTTON_LABELS.includes(i.customId) && i.user.id === interaction.user.id;
+		ANSWER_BUTTON_LABELS.includes(i.customId) &&
+		i.user.id === interaction.user.id;
 	return interaction.channel.createMessageComponentCollector({
 		filter,
 		time: TRIVIA_TIMEOUT,
 	});
 }
 
-
-function handleCollectorEvents(collector, interaction, reply, questionData, answerFields, correctAnswerIndex) { // Added correctAnswerIndex parameter
+function handleCollectorEvents(
+	collector,
+	interaction,
+	reply,
+	questionData,
+	answerFields,
+	correctAnswerIndex,
+) {
+	// Added correctAnswerIndex parameter
 	let answered = false;
 	// Removed: const correctAnswerIndex = reply.embeds[0]?.correctAnswerIndex; // No longer needed from embed
-	const answers = answerFields.map(field => field.value); // Extract answers from embed fields
+	const answers = answerFields.map((field) => field.value); // Extract answers from embed fields
 
 	collector.on('collect', async (i) => {
 		answered = true;
@@ -150,22 +169,44 @@ function handleCollectorEvents(collector, interaction, reply, questionData, answ
 		const userAnswerIndex = ANSWER_BUTTON_LABELS.indexOf(i.customId); // userAnswerIndex from button click
 		const isCorrect = userAnswerIndex === correctAnswerIndex;
 
-		const resultEmbed = createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction);
+		const resultEmbed = createResultEmbed(
+			isCorrect,
+			answers,
+			correctAnswerIndex,
+			userAnswerIndex,
+			interaction,
+		);
 		await i.update({ embeds: [resultEmbed], components: [] });
 	});
 
 	collector.on('end', async (collected) => {
 		if (!answered) {
-			const timeoutEmbed = createTimeoutEmbed(answers, correctAnswerIndex);
-			await interaction.followUp({ embeds: [timeoutEmbed], components: [] }); // Use followUp for timeout message
+			const timeoutEmbed = createTimeoutEmbed(
+				answers,
+				correctAnswerIndex,
+			);
+			await interaction.followUp({
+				embeds: [timeoutEmbed],
+				components: [],
+			}); // Use followUp for timeout message
 		}
 	});
 }
 
-
-function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction) { // Correct Answer Index parameter
-	console.log(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
-	console.log(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+function createResultEmbed(
+	isCorrect,
+	answers,
+	correctAnswerIndex,
+	userAnswerIndex,
+	interaction,
+) {
+	// Correct Answer Index parameter
+	console.log(
+		`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`,
+	); // Debug log
+	console.log(
+		`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`,
+	); // Debug log
 
 	const resultEmbed = new EmbedBuilder()
 		.setColor(isCorrect ? CORRECT_COLOR : WRONG_COLOR)
@@ -174,16 +215,22 @@ function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerInd
 				? "🎉 Correct Answer! You're a Trivia Star! 🎉"
 				: '😢 Not quite, but keep trying! 🌟',
 		)
-		.setDescription(`The right answer is **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`) // Safe access and fallback
+		.setDescription(
+			`The right answer is **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`,
+		) // Safe access and fallback
 		.addFields(
 			{
 				name: 'Your Choice',
-				value: answers?.[userAnswerIndex] || '*Error: Your Answer Missing*', // Safe access and fallback
+				value:
+					answers?.[userAnswerIndex] ||
+					'*Error: Your Answer Missing*', // Safe access and fallback
 				inline: true,
 			},
 			{
 				name: 'Correct Choice',
-				value: answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*', // Safe access and fallback
+				value:
+					answers?.[correctAnswerIndex] ||
+					'*Error: Correct Answer Missing*', // Safe access and fallback
 				inline: true,
 			},
 		)
@@ -193,13 +240,19 @@ function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerInd
 	return resultEmbed;
 }
 
-
-function createTimeoutEmbed(answers, correctAnswerIndex) { // Correct Answer Index parameter
-	console.log(`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
-	console.log(`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+function createTimeoutEmbed(answers, correctAnswerIndex) {
+	// Correct Answer Index parameter
+	console.log(
+		`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`,
+	); // Debug log
+	console.log(
+		`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`,
+	); // Debug log
 	return new EmbedBuilder()
 		.setColor(TIMEOUT_COLOR)
 		.setTitle("⏰ Time's Up! No answer in time. ⏱️")
-		.setDescription(`The correct answer was **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`) // Safe access and fallback
-		.setFooter({ text: 'Don\'t worry, there\'s always next question!' });
+		.setDescription(
+			`The correct answer was **${answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*'}**.`,
+		) // Safe access and fallback
+		.setFooter({ text: "Don't worry, there's always next question!" });
 }

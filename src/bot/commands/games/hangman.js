@@ -59,8 +59,16 @@ module.exports = {
 			const msg = await interaction.editReply({ embeds: [gameEmbed] });
 
 			const collector = createCollector(interaction, gameActive); // Pass gameActive to collector
-			startGameCollector(collector, interaction, msg, word, gameState, gameEmbed, gameActive, winner); // Pass gameActive and winner
-
+			startGameCollector(
+				collector,
+				interaction,
+				msg,
+				word,
+				gameState,
+				gameEmbed,
+				gameActive,
+				winner,
+			); // Pass gameActive and winner
 		} catch (error) {
 			handleError('Multiplayer Hangman game error:', error);
 			await interaction.editReply(
@@ -118,7 +126,9 @@ function createGameEmbed(gameState, thumbnail) {
 				inline: true,
 			},
 		)
-		.setFooter({ text: 'Type a letter to make a guess - anyone can join!' }); // Multiplayer footer
+		.setFooter({
+			text: 'Type a letter to make a guess - anyone can join!',
+		}); // Multiplayer footer
 }
 
 function getGuessedLettersDisplay(guessedLetters) {
@@ -127,9 +137,11 @@ function getGuessedLettersDisplay(guessedLetters) {
 		: 'None yet!';
 }
 
-function createCollector(interaction, gameActive) { // Added gameActive parameter
+function createCollector(interaction, gameActive) {
+	// Added gameActive parameter
 	const filter = (m) =>
-		!m.author.bot && gameActive && // Any non-bot user can guess while game is active
+		!m.author.bot &&
+		gameActive && // Any non-bot user can guess while game is active
 		m.content.length === 1 &&
 		/[a-z]/i.test(m.content);
 	return interaction.channel.createMessageCollector({
@@ -138,7 +150,17 @@ function createCollector(interaction, gameActive) { // Added gameActive paramete
 	});
 }
 
-function startGameCollector(collector, interaction, msg, word, gameState, gameEmbed, gameActive, winner) { // Added gameActive and winner parameters
+function startGameCollector(
+	collector,
+	interaction,
+	msg,
+	word,
+	gameState,
+	gameEmbed,
+	gameActive,
+	winner,
+) {
+	// Added gameActive and winner parameters
 	collector.on('collect', async (m) => {
 		const letter = m.content.toLowerCase();
 		if (gameState.guessedLetters.includes(letter)) {
@@ -179,7 +201,13 @@ function startGameCollector(collector, interaction, msg, word, gameState, gameEm
 	});
 }
 
-async function handleCorrectGuess(message, letter, gameState, gameEmbed, gameMessage) {
+async function handleCorrectGuess(
+	message,
+	letter,
+	gameState,
+	gameEmbed,
+	gameMessage,
+) {
 	updateWordState(letter, gameState);
 	gameEmbed.setDescription(
 		`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``,
@@ -193,7 +221,10 @@ async function handleCorrectGuess(message, letter, gameState, gameEmbed, gameMes
 function updateWordState(letter, gameState) {
 	let newWordState = '';
 	for (let i = 0; i < gameState.word.length; i++) {
-		if (gameState.word[i] === letter || gameState.guessedLetters.includes(gameState.word[i])) {
+		if (
+			gameState.word[i] === letter ||
+			gameState.guessedLetters.includes(gameState.word[i])
+		) {
 			newWordState += gameState.word[i] + ' ';
 		} else {
 			newWordState += '_ ';
@@ -202,11 +233,18 @@ function updateWordState(letter, gameState) {
 	gameState.wordState = newWordState.trim();
 }
 
-
-async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) {
+async function handleIncorrectGuess(
+	message,
+	gameState,
+	gameEmbed,
+	gameMessage,
+) {
 	gameState.remainingGuesses--;
-	const funnyMessage = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
-	const reply = await message.reply(`😅 ${funnyMessage} - Nice try, ${message.author}!`); // Mention the user who guessed incorrectly
+	const funnyMessage =
+		funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+	const reply = await message.reply(
+		`😅 ${funnyMessage} - Nice try, ${message.author}!`,
+	); // Mention the user who guessed incorrectly
 	// setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
 
 	gameEmbed
@@ -217,7 +255,10 @@ async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) 
 		.setFields([
 			{
 				name: '💪 Guesses Left (Shared)', // Indicate shared guesses
-				value: gameState.remainingGuesses > 0 ? '❤️'.repeat(gameState.remainingGuesses) : 'None left!',
+				value:
+					gameState.remainingGuesses > 0
+						? '❤️'.repeat(gameState.remainingGuesses)
+						: 'None left!',
 				inline: true,
 			},
 			{
@@ -228,7 +269,6 @@ async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) 
 		]);
 }
 
-
 async function handleGuess(message) {
 	const reply = await message.reply(
 		`${message.author}, you've already guessed that letter! Try another one.`, // Mention the user who repeated guess
@@ -236,7 +276,6 @@ async function handleGuess(message) {
 	// setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
 	// message.delete(); // Keeping messages for multiplayer context - No user message deletion
 }
-
 
 function checkGameOver(gameState) {
 	return gameState.remainingGuesses <= 0;
@@ -254,7 +293,7 @@ async function handleTimeout(msg, gameState) {
 			`Looks like time ran out for all of you! The word was **${gameState.word}**.`, // Multiplayer timeout description
 		)
 		.setFooter({
-			text: "Maybe teamwork makes the dream work... next time!", // Multiplayer timeout footer
+			text: 'Maybe teamwork makes the dream work... next time!', // Multiplayer timeout footer
 		});
 	await msg.edit({ embeds: [gameEmbed] });
 }
@@ -272,8 +311,8 @@ async function handleGameOver(msg, gameState) {
 	await msg.edit({ embeds: [gameEmbed] });
 }
 
-
-async function handleWin(msg, gameState, winner) { // Added winner parameter
+async function handleWin(msg, gameState, winner) {
+	// Added winner parameter
 	const gameEmbed = new EmbedBuilder()
 		.setColor(WIN_COLOR)
 		.setTitle(`🎊 We Have a Winner! 🎊 Congratulations, ${winner}!`) // Multiplayer win title - Announce winner

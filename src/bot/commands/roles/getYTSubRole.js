@@ -20,8 +20,11 @@ function encrypt(text, secretKey, iv) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('get_yt_sub_role')
-		.setDescription('Assign a role based on your YouTube subscriber count.'),
-	description_full: 'Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.',
+		.setDescription(
+			'Assign a role based on your YouTube subscriber count.',
+		),
+	description_full:
+		'Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.',
 	usage: '/get_yt_sub_role',
 	examples: ['/get_yt_sub_role'],
 	category: 'roles',
@@ -59,21 +62,27 @@ module.exports = {
 							},
 						],
 						'Secure verification process.',
-					)
+					),
 				],
 			});
 
-			const oauthData = await getAuthorizationDataFromMongoDB(interaction.id);
+			const oauthData = await getAuthorizationDataFromMongoDB(
+				interaction.id,
+			);
 			if (!oauthData?.youtubeConnections?.length) {
 				throw new Error('No YouTube connections found.');
 			}
 
-			const { youtubeChannelId, subscriberCount } = await getHighestSubscriberCount(oauthData.youtubeConnections);
+			const { youtubeChannelId, subscriberCount } =
+				await getHighestSubscriberCount(oauthData.youtubeConnections);
 			if (subscriberCount === null) {
 				throw new Error('Failed to retrieve subscriber count.');
 			}
 
-			const roleName = await assignSubscriberRole(interaction.member, subscriberCount);
+			const roleName = await assignSubscriberRole(
+				interaction.member,
+				subscriberCount,
+			);
 			await interaction.editReply({
 				embeds: [
 					createEmbed(
@@ -94,17 +103,23 @@ module.exports = {
 								name: '🔗 YouTube Channel',
 								value: `[View Channel](https://www.youtube.com/channel/${youtubeChannelId})`,
 								inline: false,
-							}
+							},
 						],
 						'Thank you for verifying!',
-					)
+					),
 				],
 			});
 		} catch (error) {
 			handleError(error);
 			await interaction.editReply({
 				embeds: [
-					createEmbed('❌ Error', error.message, [], 'Please try again later.', 0xff0000),
+					createEmbed(
+						'❌ Error',
+						error.message,
+						[],
+						'Please try again later.',
+						0xff0000,
+					),
 				],
 			});
 		}
@@ -115,7 +130,13 @@ function generateDiscordOAuthUrl(state) {
 	return `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}&response_type=code&scope=identify%20connections&state=${encodeURIComponent(state)}`;
 }
 
-function createEmbed(title, description, fields = [], footerText, color = 0x0099ff) {
+function createEmbed(
+	title,
+	description,
+	fields = [],
+	footerText,
+	color = 0x0099ff,
+) {
 	return {
 		color,
 		title,
@@ -145,15 +166,24 @@ async function getHighestSubscriberCount(youtubeConnections) {
 	for (const connection of youtubeConnections) {
 		const count = await getYouTubeSubscriberCount(connection.id);
 		if (count > highest.subscriberCount) {
-			highest = { youtubeChannelId: connection.id, subscriberCount: count };
+			highest = {
+				youtubeChannelId: connection.id,
+				subscriberCount: count,
+			};
 		}
 	}
 	return highest;
 }
 
 async function getYouTubeSubscriberCount(channelId) {
-	const response = await youtube.channels.list({ part: 'statistics', id: channelId });
-	return parseInt(response.data.items[0]?.statistics?.subscriberCount || 0, 10);
+	const response = await youtube.channels.list({
+		part: 'statistics',
+		id: channelId,
+	});
+	return parseInt(
+		response.data.items[0]?.statistics?.subscriberCount || 0,
+		10,
+	);
 }
 
 async function assignSubscriberRole(member, subscriberCount) {
@@ -169,7 +199,7 @@ async function assignSubscriberRole(member, subscriberCount) {
 		{ max: 1000000, name: '500K - 999.9K Subs' },
 		{ max: Infinity, name: '1M+ Subs' },
 	];
-	const roleName = ranges.find(range => subscriberCount < range.max).name;
+	const roleName = ranges.find((range) => subscriberCount < range.max).name;
 	const roleData = await RoleSchema.findOne({ roleName });
 	if (!roleData) throw new Error(`Role "${roleName}" not found.`);
 	await member.roles.add(roleData.roleID);

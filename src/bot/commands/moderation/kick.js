@@ -142,7 +142,7 @@ module.exports = {
 						.setTitle('ERROR')
 						.setDescription(
 							error.message ??
-							'An error occurred while trying to kick the user',
+								'An error occurred while trying to kick the user',
 						)
 						.setColor('Red')
 						.setFooter({

@@ -35,9 +35,7 @@ module.exports = {
 				{ upsert: true, new: true },
 			);
 
-			await interaction.reply(
-				`Message logs channel set to: ${channel}`,
-			);
+			await interaction.reply(`Message logs channel set to: ${channel}`);
 		} catch (error) {
 			handleError('Error setting message logs channel:', error);
 			await interaction.reply({

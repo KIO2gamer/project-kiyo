@@ -6,15 +6,16 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('server')
 		.setDescription('Displays server information and statistics')
-		.addSubcommand(subcommand =>
+		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('info')
-				.setDescription('Get basic information about this server'))
-		.addSubcommand(subcommand =>
+				.setDescription('Get basic information about this server'),
+		)
+		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('stats')
 				.setDescription('Get detailed server statistics')
-				.addStringOption(option =>
+				.addStringOption((option) =>
 					option
 						.setName('timeframe')
 						.setDescription('The timeframe to calculate stats for')
@@ -25,8 +26,9 @@ module.exports = {
 							{ name: 'Last 30 Days', value: '30d' },
 							{ name: 'Last Month', value: '1M' },
 							{ name: 'All Time', value: 'all' },
-						)
-				)),
+						),
+				),
+		),
 	description_full:
 		'Provides comprehensive information and statistics about the server. Use "/server info" for general server details, or "/server stats" with an optional timeframe to view activity statistics.',
 	category: 'info',
@@ -35,7 +37,7 @@ module.exports = {
 		'/server info',
 		'/server stats',
 		'/server stats timeframe: Last 24 Hours',
-		'/server stats timeframe: Last 7 Days'
+		'/server stats timeframe: Last 7 Days',
 	],
 
 	async execute(interaction) {
@@ -51,7 +53,7 @@ module.exports = {
 			handleError('Error executing server command:', error);
 			await handleError(interaction, error);
 		}
-	}
+	},
 };
 
 async function sendServerInfo(interaction) {
@@ -63,32 +65,51 @@ async function sendServerInfo(interaction) {
 		const serverAge = formatAge(guild.createdTimestamp);
 
 		// Get feature flags in a readable format
-		const features = guild.features.length > 0
-			? guild.features.map(f => `• ${formatFeature(f)}`).join('\n')
-			: 'No special features';
+		const features =
+			guild.features.length > 0
+				? guild.features.map((f) => `• ${formatFeature(f)}`).join('\n')
+				: 'No special features';
 
 		// Get channel counts
-		const textChannels = guild.channels.cache.filter(c => c.type === 0).size;
-		const voiceChannels = guild.channels.cache.filter(c => c.type === 2).size;
-		const categoryChannels = guild.channels.cache.filter(c => c.type === 4).size;
-		const forumChannels = guild.channels.cache.filter(c => c.type === 15).size;
-		const threadChannels = guild.channels.cache.filter(c => [11, 12].includes(c.type)).size;
+		const textChannels = guild.channels.cache.filter(
+			(c) => c.type === 0,
+		).size;
+		const voiceChannels = guild.channels.cache.filter(
+			(c) => c.type === 2,
+		).size;
+		const categoryChannels = guild.channels.cache.filter(
+			(c) => c.type === 4,
+		).size;
+		const forumChannels = guild.channels.cache.filter(
+			(c) => c.type === 15,
+		).size;
+		const threadChannels = guild.channels.cache.filter((c) =>
+			[11, 12].includes(c.type),
+		).size;
 		const totalChannels = guild.channels.cache.size;
 
 		// Get member stats
-		const botCount = guild.members.cache.filter(m => m.user.bot).size;
+		const botCount = guild.members.cache.filter((m) => m.user.bot).size;
 		const humanCount = guild.memberCount - botCount;
 
 		// Status counts
-		const onlineCount = guild.members.cache.filter(m => m.presence?.status === 'online').size;
-		const idleCount = guild.members.cache.filter(m => m.presence?.status === 'idle').size;
-		const dndCount = guild.members.cache.filter(m => m.presence?.status === 'dnd').size;
-		const offlineCount = guild.members.cache.filter(m => !m.presence || m.presence.status === 'offline').size;
+		const onlineCount = guild.members.cache.filter(
+			(m) => m.presence?.status === 'online',
+		).size;
+		const idleCount = guild.members.cache.filter(
+			(m) => m.presence?.status === 'idle',
+		).size;
+		const dndCount = guild.members.cache.filter(
+			(m) => m.presence?.status === 'dnd',
+		).size;
+		const offlineCount = guild.members.cache.filter(
+			(m) => !m.presence || m.presence.status === 'offline',
+		).size;
 
 		// Create embed
 		const embed = new EmbedBuilder()
 			.setTitle(`${guild.name} - Server Information`)
-			.setColor(0x00AE86)
+			.setColor(0x00ae86)
 			.setThumbnail(guild.iconURL({ dynamic: true, size: 512 }))
 			.setImage(guild.bannerURL({ size: 1024 }) || null)
 			.addFields(
@@ -102,7 +123,7 @@ async function sendServerInfo(interaction) {
 						`**Age:** ${serverAge}`,
 						`**Region:** ${guild.preferredLocale}`,
 					].join('\n'),
-					inline: false
+					inline: false,
 				},
 
 				// Moderation section
@@ -111,9 +132,9 @@ async function sendServerInfo(interaction) {
 					value: [
 						`**Verification:** ${getVerificationLevelText(guild.verificationLevel)}`,
 						`**MFA Requirement:** ${getMfaLevelText(guild.mfaLevel)}`,
-						`**Content Filter:** ${getContentFilterLevel(guild.explicitContentFilter)}`
+						`**Content Filter:** ${getContentFilterLevel(guild.explicitContentFilter)}`,
 					].join('\n'),
-					inline: true
+					inline: true,
 				},
 
 				// Stats section
@@ -125,9 +146,9 @@ async function sendServerInfo(interaction) {
 						`**Bots:** ${botCount}`,
 						`**Online:** ${onlineCount}`,
 						`**Idle/DND:** ${idleCount + dndCount}`,
-						`**Offline:** ${offlineCount}`
+						`**Offline:** ${offlineCount}`,
 					].join('\n'),
-					inline: true
+					inline: true,
 				},
 
 				// Channel section
@@ -139,9 +160,9 @@ async function sendServerInfo(interaction) {
 						`**Voice:** ${voiceChannels}`,
 						`**Categories:** ${categoryChannels}`,
 						`**Forums:** ${forumChannels}`,
-						`**Threads:** ${threadChannels}`
+						`**Threads:** ${threadChannels}`,
 					].join('\n'),
-					inline: true
+					inline: true,
 				},
 
 				// Customization section
@@ -152,9 +173,9 @@ async function sendServerInfo(interaction) {
 						`**Emojis:** ${guild.emojis.cache.size}`,
 						`**Stickers:** ${guild.stickers?.cache.size || 0}`,
 						`**Boost Tier:** ${formatBoostTier(guild.premiumTier)}`,
-						`**Boosts:** ${guild.premiumSubscriptionCount || 0}`
+						`**Boosts:** ${guild.premiumSubscriptionCount || 0}`,
 					].join('\n'),
-					inline: true
+					inline: true,
 				},
 
 				// System section
@@ -164,10 +185,10 @@ async function sendServerInfo(interaction) {
 						`**System Channel:** ${guild.systemChannel ? `<#${guild.systemChannel.id}>` : 'None'}`,
 						`**Rules Channel:** ${guild.rulesChannel ? `<#${guild.rulesChannel.id}>` : 'None'}`,
 						`**AFK Channel:** ${guild.afkChannel ? `<#${guild.afkChannel.id}>` : 'None'}`,
-						`**AFK Timeout:** ${guild.afkTimeout / 60} minutes`
+						`**AFK Timeout:** ${guild.afkTimeout / 60} minutes`,
 					].join('\n'),
-					inline: true
-				}
+					inline: true,
+				},
 			);
 
 		// Add server description if present
@@ -180,7 +201,7 @@ async function sendServerInfo(interaction) {
 			embed.addFields({
 				name: '🌟 Special Features',
 				value: features,
-				inline: false
+				inline: false,
 			});
 		}
 
@@ -189,14 +210,15 @@ async function sendServerInfo(interaction) {
 			embed.addFields({
 				name: '🔗 Vanity URL',
 				value: `discord.gg/${guild.vanityURLCode}`,
-				inline: true
+				inline: true,
 			});
 		}
 
-		embed.setFooter({
-			text: `Requested by ${interaction.user.tag}`,
-			iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-		})
+		embed
+			.setFooter({
+				text: `Requested by ${interaction.user.tag}`,
+				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+			})
 			.setTimestamp();
 
 		await interaction.reply({ embeds: [embed] });
@@ -219,7 +241,9 @@ async function sendServerStats(interaction) {
 		await interaction.editReply({ embeds: [embed] });
 	} catch (error) {
 		handleError('Error fetching server stats:', error);
-		await interaction.editReply('An error occurred while fetching server statistics.');
+		await interaction.editReply(
+			'An error occurred while fetching server statistics.',
+		);
 	}
 }
 
@@ -245,18 +269,19 @@ async function collectServerStats(guild, startDate) {
 	const channels = guild.channels.cache;
 
 	// Calculate member join/leave count
-	const joins = members.filter(member => member.joinedAt >= startDate).size;
+	const joins = members.filter((member) => member.joinedAt >= startDate).size;
 
 	// Get basic counts
 	const stats = {
 		totalMembers: guild.memberCount,
 		newMembers: joins,
-		humanMembers: members.filter(m => !m.user.bot).size,
-		botMembers: members.filter(m => m.user.bot).size,
-		textChannels: channels.filter(c => c.isTextBased() && c.type !== 4).size,
-		voiceChannels: channels.filter(c => c.isVoiceBased()).size,
-		categoryChannels: channels.filter(c => c.type === 4).size,
-		threadChannels: channels.filter(c => [11, 12].includes(c.type)).size,
+		humanMembers: members.filter((m) => !m.user.bot).size,
+		botMembers: members.filter((m) => m.user.bot).size,
+		textChannels: channels.filter((c) => c.isTextBased() && c.type !== 4)
+			.size,
+		voiceChannels: channels.filter((c) => c.isVoiceBased()).size,
+		categoryChannels: channels.filter((c) => c.type === 4).size,
+		threadChannels: channels.filter((c) => [11, 12].includes(c.type)).size,
 		roles: guild.roles.cache.size,
 		emojis: guild.emojis.cache.size,
 		stickers: guild.stickers?.cache.size || 0,
@@ -264,7 +289,7 @@ async function collectServerStats(guild, startDate) {
 		reactionsGiven: 0,
 		voiceMinutes: 0, // Placeholder for voice activity (would need additional tracking)
 		mostActiveChannel: { name: 'N/A', messages: 0 },
-		mostActiveMembers: []
+		mostActiveMembers: [],
 	};
 
 	// Track message counts by member and channel
@@ -272,11 +297,21 @@ async function collectServerStats(guild, startDate) {
 	const channelActivity = new Map();
 
 	// Process text channels
-	const textChannels = channels.filter(channel => channel.isTextBased() && !channel.isThread() && channel.type !== 4);
+	const textChannels = channels.filter(
+		(channel) =>
+			channel.isTextBased() && !channel.isThread() && channel.type !== 4,
+	);
 	const channelPromises = textChannels.map(async (channel) => {
 		// Check permissions before fetching
-		if (!channel.permissionsFor(guild.members.me).has('ReadMessageHistory')) {
-			return { messageCount: 0, reactionCount: 0, channelId: channel.id, channelName: channel.name };
+		if (
+			!channel.permissionsFor(guild.members.me).has('ReadMessageHistory')
+		) {
+			return {
+				messageCount: 0,
+				reactionCount: 0,
+				channelId: channel.id,
+				channelName: channel.name,
+			};
 		}
 
 		try {
@@ -286,21 +321,24 @@ async function collectServerStats(guild, startDate) {
 			let fetchMore = true;
 
 			while (fetchMore) {
-				const messages = await channel.messages.fetch({
-					limit: 100,
-					before: lastId,
-				}).catch(() => ({ size: 0, last: null })); // Handle potential fetch errors
+				const messages = await channel.messages
+					.fetch({
+						limit: 100,
+						before: lastId,
+					})
+					.catch(() => ({ size: 0, last: null })); // Handle potential fetch errors
 
 				if (!messages.size) break;
 
 				// Filter and process relevant messages
-				const relevantMessages = Array.from(messages.values())
-					.filter(msg => msg.createdAt >= startDate);
+				const relevantMessages = Array.from(messages.values()).filter(
+					(msg) => msg.createdAt >= startDate,
+				);
 
 				messageCount += relevantMessages.length;
 
 				// Process each message for reactions and member activity
-				relevantMessages.forEach(msg => {
+				relevantMessages.forEach((msg) => {
 					// Count reactions
 					reactionCount += msg.reactions.cache.size;
 
@@ -311,7 +349,7 @@ async function collectServerStats(guild, startDate) {
 							memberActivity.set(authorId, {
 								id: authorId,
 								tag: msg.author.tag,
-								messages: 1
+								messages: 1,
 							});
 						} else {
 							const userData = memberActivity.get(authorId);
@@ -331,14 +369,27 @@ async function collectServerStats(guild, startDate) {
 				channelActivity.set(channel.id, {
 					id: channel.id,
 					name: channel.name,
-					messages: messageCount
+					messages: messageCount,
 				});
 			}
 
-			return { messageCount, reactionCount, channelId: channel.id, channelName: channel.name };
+			return {
+				messageCount,
+				reactionCount,
+				channelId: channel.id,
+				channelName: channel.name,
+			};
 		} catch (error) {
-			console.error(`Error fetching messages from ${channel.name}:`, error);
-			return { messageCount: 0, reactionCount: 0, channelId: channel.id, channelName: channel.name };
+			console.error(
+				`Error fetching messages from ${channel.name}:`,
+				error,
+			);
+			return {
+				messageCount: 0,
+				reactionCount: 0,
+				channelId: channel.id,
+				channelName: channel.name,
+			};
 		}
 	});
 
@@ -346,7 +397,7 @@ async function collectServerStats(guild, startDate) {
 	const channelResults = await Promise.all(channelPromises);
 
 	// Calculate totals and find most active channels/members
-	channelResults.forEach(result => {
+	channelResults.forEach((result) => {
 		stats.messagesSent += result.messageCount;
 		stats.reactionsGiven += result.reactionCount;
 
@@ -355,7 +406,7 @@ async function collectServerStats(guild, startDate) {
 			stats.mostActiveChannel = {
 				name: result.channelName,
 				id: result.channelId,
-				messages: result.messageCount
+				messages: result.messageCount,
 			};
 		}
 	});
@@ -370,7 +421,10 @@ async function collectServerStats(guild, startDate) {
 
 function createStatsEmbed(guild, timeframe, stats) {
 	// Format the description based on timeframe
-	const timeframeText = timeframe === 'all' ? 'all time' : `the past ${getReadableTimeframe(timeframe)}`;
+	const timeframeText =
+		timeframe === 'all'
+			? 'all time'
+			: `the past ${getReadableTimeframe(timeframe)}`;
 
 	// Calculate message rate
 	let messageRate = 'N/A';
@@ -383,14 +437,19 @@ function createStatsEmbed(guild, timeframe, stats) {
 	}
 
 	// Format most active members
-	const activeMembers = stats.mostActiveMembers.length > 0
-		? stats.mostActiveMembers.map((m, i) =>
-			`${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`).join('\n')
-		: 'No message activity recorded';
+	const activeMembers =
+		stats.mostActiveMembers.length > 0
+			? stats.mostActiveMembers
+					.map(
+						(m, i) =>
+							`${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`,
+					)
+					.join('\n')
+			: 'No message activity recorded';
 
 	const embed = new EmbedBuilder()
 		.setTitle(`${guild.name} - Server Statistics`)
-		.setColor(0x5865F2) // Discord Blurple
+		.setColor(0x5865f2) // Discord Blurple
 		.setDescription(`Statistical overview for ${timeframeText}`)
 		.setThumbnail(guild.iconURL({ dynamic: true }))
 		.addFields(
@@ -403,7 +462,7 @@ function createStatsEmbed(guild, timeframe, stats) {
 					`**Humans:** ${stats.humanMembers}`,
 					`**Bots:** ${stats.botMembers}`,
 				].join('\n'),
-				inline: true
+				inline: true,
 			},
 
 			// Channel stats section
@@ -416,7 +475,7 @@ function createStatsEmbed(guild, timeframe, stats) {
 					`**Threads:** ${stats.threadChannels}`,
 					`**Roles:** ${stats.roles}`,
 				].join('\n'),
-				inline: true
+				inline: true,
 			},
 
 			// Message stats section
@@ -429,7 +488,7 @@ function createStatsEmbed(guild, timeframe, stats) {
 					`**Emojis Available:** ${stats.emojis}`,
 					`**Stickers Available:** ${stats.stickers}`,
 				].join('\n'),
-				inline: true
+				inline: true,
 			},
 
 			// Activity highlights section
@@ -438,14 +497,14 @@ function createStatsEmbed(guild, timeframe, stats) {
 				value: [
 					`**Most Active Channel:** ${stats.mostActiveChannel.messages > 0 ? `<#${stats.mostActiveChannel.id}> (${stats.mostActiveChannel.messages} messages)` : 'No channel activity'}`,
 					'\n**Most Active Members:**',
-					activeMembers
+					activeMembers,
 				].join('\n'),
-				inline: false
-			}
+				inline: false,
+			},
 		)
 		.setFooter({
 			text: `Data collected at ${new Date().toLocaleString()}`,
-			iconURL: guild.iconURL({ dynamic: true })
+			iconURL: guild.iconURL({ dynamic: true }),
 		})
 		.setTimestamp();
 
@@ -459,7 +518,7 @@ function getVerificationLevelText(level) {
 		1: 'Low (Email verified)',
 		2: 'Medium (Registered >5m)',
 		3: 'High (Member >10m)',
-		4: 'Very High (Verified phone)'
+		4: 'Very High (Verified phone)',
 	};
 	return levels[level] || 'Unknown';
 }
@@ -472,7 +531,7 @@ function getContentFilterLevel(level) {
 	const levels = {
 		0: 'Disabled',
 		1: 'Medium (No roles)',
-		2: 'High (Everyone)'
+		2: 'High (Everyone)',
 	};
 	return levels[level] || 'Unknown';
 }
@@ -482,7 +541,7 @@ function formatBoostTier(tier) {
 		0: 'None',
 		1: 'Tier 1',
 		2: 'Tier 2',
-		3: 'Tier 3'
+		3: 'Tier 3',
 	};
 	return tiers[tier] || 'Unknown';
 }
@@ -519,7 +578,7 @@ function formatCamelCase(str) {
 	return str
 		.replace(/_/g, ' ')
 		.toLowerCase()
-		.replace(/\b\w/g, char => char.toUpperCase());
+		.replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function formatAge(timestamp) {
@@ -545,7 +604,7 @@ function getReadableTimeframe(timeframe) {
 		'7d': '7 days',
 		'30d': '30 days',
 		'1M': 'month',
-		'all': 'all time'
+		all: 'all time',
 	};
 	return mapping[timeframe] || timeframe;
 }
@@ -556,7 +615,7 @@ function getTimeframeDays(timeframe) {
 		'7d': 7,
 		'30d': 30,
 		'1M': 30,
-		'all': 0
+		all: 0,
 	};
 	return mapping[timeframe] || 0;
 }
@@ -565,7 +624,7 @@ function getPositionEmoji(position) {
 	const emojis = {
 		1: '🥇',
 		2: '🥈',
-		3: '🥉'
+		3: '🥉',
 	};
 	return emojis[position] || `${position}.`;
 }
