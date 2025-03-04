@@ -4,13 +4,13 @@ const {
 	PermissionsBitField,
 	ChannelType,
 } = require('discord.js');
-const { handleError } = require('../utils/errorHandler');
-const { getChannelType } = require('../utils/channelTypes');
+const { handleError } = require('./../../utils/errorHandler');
+const { getChannelType } = require('./../../utils/channelTypes');
 const {
 	formatCategorizedPermissions,
 	splitPermissionText,
 	formatChannelPermissions,
-} = require('../utils/permissionFormatter');
+} = require('./../../utils/permissionFormatter');
 
 module.exports = {
 	description_full:
@@ -153,8 +153,8 @@ module.exports = {
 						name: '🏷️ Available Tags',
 						value: channel.availableTags?.length
 							? channel.availableTags
-									.map((tag) => tag.name)
-									.join(', ')
+								.map((tag) => tag.name)
+								.join(', ')
 							: 'No tags configured',
 						inline: false,
 					},

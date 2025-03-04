@@ -5,7 +5,7 @@ const {
 	StringSelectMenuBuilder,
 } = require('discord.js');
 const axios = require('axios');
-const { handleError } = require('../utils/errorHandler');
+const { handleError } = require('./../../utils/errorHandler');
 require('dotenv').config();
 
 module.exports = {
@@ -61,8 +61,8 @@ module.exports = {
 						name: '📅 Released',
 						value: gameData.first_release_date
 							? new Date(
-									gameData.first_release_date * 1000,
-								).toLocaleDateString()
+								gameData.first_release_date * 1000,
+							).toLocaleDateString()
 							: 'Unknown',
 						inline: true,
 					},

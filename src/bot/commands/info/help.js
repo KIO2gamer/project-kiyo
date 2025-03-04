@@ -9,7 +9,7 @@ const {
 } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { handleError } = require('../utils/errorHandler.js');
+const { handleError } = require('./../../utils/errorHandler.js');
 
 // Theme configuration - Expanded with more customization options
 const THEME = {
@@ -141,7 +141,7 @@ async function createPaginatedMenu(interaction, pages, initialComponents = []) {
 					],
 					components: [],
 				})
-				.catch(() => {}); // Ignore errors if we can't edit
+				.catch(() => { }); // Ignore errors if we can't edit
 
 			// Clean up the state
 			interaction.client.helpMenuState.delete(helpSessionId);
@@ -454,11 +454,11 @@ function createMainHelpEmbed(client, organizedCommands) {
 		.setTitle('Interactive Help System')
 		.setDescription(
 			`Welcome to the interactive help menu! Here you can explore all available commands and features.\n\n` +
-				`**Key Statistics:**\n` +
-				`• **Commands:** ${totalCommands} commands across ${categories.length} categories\n` +
-				`• **Servers:** Currently serving ${serverCount} Discord servers\n` +
-				`• **Uptime:** ${uptime}\n\n` +
-				`Use the buttons below to explore different sections of the help system or select a specific category from the dropdown menu.`,
+			`**Key Statistics:**\n` +
+			`• **Commands:** ${totalCommands} commands across ${categories.length} categories\n` +
+			`• **Servers:** Currently serving ${serverCount} Discord servers\n` +
+			`• **Uptime:** ${uptime}\n\n` +
+			`Use the buttons below to explore different sections of the help system or select a specific category from the dropdown menu.`,
 		)
 		.addFields({
 			name: '📚 Available Categories',
@@ -753,8 +753,8 @@ function createCommandDetailEmbed(command, client) {
 		.setTitle(`\`/${command.data.name}\` Command Details`)
 		.setDescription(
 			command.description_full ||
-				command.data.description ||
-				'*No detailed description provided.*',
+			command.data.description ||
+			'*No detailed description provided.*',
 		)
 		.addFields([
 			{
@@ -968,7 +968,7 @@ module.exports = {
 						(cmd) =>
 							cmd.data &&
 							cmd.data.name.toLowerCase() ===
-								commandName.toLowerCase(),
+							commandName.toLowerCase(),
 					);
 
 				if (!command) {
@@ -989,7 +989,7 @@ module.exports = {
 					(cmd) =>
 						cmd.category &&
 						cmd.category.toLowerCase() ===
-							categoryName.toLowerCase(),
+						categoryName.toLowerCase(),
 				);
 
 				if (!categoryCommands.length) {

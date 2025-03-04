@@ -3,8 +3,8 @@ const {
 	PermissionFlagsBits,
 	EmbedBuilder,
 } = require('discord.js');
-const { handleError } = require('../utils/errorHandler');
-const { getChannelType } = require('../utils/channelTypes');
+const { handleError } = require('./../../utils/errorHandler');
+const { getChannelType } = require('./../../utils/channelTypes');
 
 module.exports = {
 	description_full:
@@ -36,8 +36,7 @@ module.exports = {
 				.setTitle('Channel Deleted!')
 				.setColor('Red')
 				.setDescription(
-					`The ${getChannelType(channel)} ${
-						channel.id
+					`The ${getChannelType(channel)} ${channel.id
 					} has been successfully deleted.`,
 				)
 				.setTimestamp();

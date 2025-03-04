@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { handleError } = require('../utils/errorHandler');
+const { handleError } = require('./../../utils/errorHandler');
 const moment = require('moment');
 
 module.exports = {
@@ -440,11 +440,11 @@ function createStatsEmbed(guild, timeframe, stats) {
 	const activeMembers =
 		stats.mostActiveMembers.length > 0
 			? stats.mostActiveMembers
-					.map(
-						(m, i) =>
-							`${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`,
-					)
-					.join('\n')
+				.map(
+					(m, i) =>
+						`${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`,
+				)
+				.join('\n')
 			: 'No message activity recorded';
 
 	const embed = new EmbedBuilder()
