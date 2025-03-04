@@ -46,6 +46,9 @@ jobs:
 
             - name: Check code formatting
               run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,md}"
+            
+            - name: Apply code formatting
+              run: npx prettier --write "**/*.{js,jsx,ts,tsx,json,md}"
 
             - name: Run tests
               run: npm test
