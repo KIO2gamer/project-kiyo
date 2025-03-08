@@ -1,6 +1,7 @@
 // Load environment variables
 require('dotenv').config();
 const { handleError } = require('./bot/utils/errorHandler');
+const { startDashboard } = require('./dashboard');
 
 // Environment Variables
 const {
@@ -273,6 +274,9 @@ const initializeBot = async () => {
 		await Promise.all([connectToMongoDB(), deployCommands()]);
 		await client.login(DISCORD_TOKEN);
 		Logger.log('BOT', 'Initialization complete', 'success');
+		
+		// Start the dashboard
+		startDashboard(client);
 	} catch (error) {
 		Logger.log('BOT', `Initialization failed: ${error.message}`, 'error');
 		process.exit(1);

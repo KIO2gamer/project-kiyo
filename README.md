@@ -45,35 +45,45 @@ Get Kiyo up and running in a few simple steps:
 
 3.  **Configuration:**
 
-    - Create a `.env` file in the root directory of the project.
-    - Add the necessary environment variables as listed below. **Ensure you replace the placeholder values with your actual credentials and IDs.**
+        - Create a `.env` file in the root directory of the project.
+        - Add the necessary environment variables as listed below. **Ensure you replace the placeholder values with your actual credentials and IDs.**
 
-    ```plaintext
-    # Discord Configuration
-    DISCORD_TOKEN=your_discord_token
-    DISCORD_CLIENT_ID=your_discord_client_id
-    DISCORD_CLIENT_SECRET=your_discord_client_secret
-    DISCORD_REDIRECT_URI=your_discord_redirect_uri
-    DISCORD_GUILD_IDS=your_discord_guild_ids
+        ```plaintext
+        # Discord Configuration
+        DISCORD_TOKEN=your_discord_token
+        DISCORD_CLIENT_ID=your_discord_client_id
+        DISCORD_CLIENT_SECRET=your_discord_client_secret
+        DISCORD_REDIRECT_URI=your_discord_redirect_uri
+        DISCORD_GUILD_IDS=your_discord_guild_ids
 
-    # Database Configuration
-    MONGODB_URI=your_mongodb_uri
+        # Database Configuration
+        MONGODB_URI=your_mongodb_uri
 
-    # API Keys
-    YOUTUBE_API_KEY=your_youtube_api_key
-    GOOGLE_API_KEY=your_google_api_key
-    GOOGLE_SEARCH_ENGINE_ID=your_google_search_engine_id
-    WEATHER_API_KEY=your_weather_api_key
-    PEXELS_API_KEY=your_pexels_api_key
-    TENOR_API_KEY=your_tenor_api_key
-    GIPHY_API_KEY=your_giphy_api_key
-    MUSIXMATCH_API_KEY=your_musixmatch_api_key
-    GEMINI_API_KEY=your_gemini_api_key
-    IGDB_CLIENT_ID=your_igdb_client_id
-    IGDB_CLIENT_SECRET=your_igdb_client_secret
+        # API Keys
+        YOUTUBE_API_KEY=your_youtube_api_key
+        GOOGLE_API_KEY=your_google_api_key
+        GOOGLE_SEARCH_ENGINE_ID=your_google_search_engine_id
+        WEATHER_API_KEY=your_weather_api_key
+        PEXELS_API_KEY=your_pexels_api_key
+        TENOR_API_KEY=your_tenor_api_key
+        GIPHY_API_KEY=your_giphy_api_key
+        MUSIXMATCH_API_KEY=your_musixmatch_api_key
+        GEMINI_API_KEY=your_gemini_api_key
+        IGDB_CLIENT_ID=your_igdb_client_id
+        IGDB_CLIENT_SECRET=your_igdb_client_secret
+
+        # Dashboard Configuration
+        DISCORD_CLIENT_ID=your_client_id
+        DISCORD_CLIENT_SECRET=your_client_secret
+        DISCORD_REDIRECT_URI=http://localhost:3000
+        DASHBOARD_SECRET=your_random_secret_key
+        DASHBOARD_PORT=3000
+
     ```
 
-    **Important:** Keep your `.env` file secure and **do not commit it to your Git repository** if it contains sensitive information. It's already in `.gitignore`, but double-check!
+        **Important:** Keep your `.env` file secure and **do not commit it to your Git repository** if it contains sensitive information. It's already in `.gitignore`, but double-check!
+
+    ```
 
 4.  **Start the bot:**
 

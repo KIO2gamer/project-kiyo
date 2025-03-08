@@ -1,0 +1,60 @@
+dashboard/views/home.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= botName %> Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('partials/navbar') %>
+  
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <h1 class="display-4"><%= botName %> Dashboard</h1>
+        <p class="lead">A versatile Discord bot with moderation, entertainment, and utility features.</p>
+        
+        <div class="my-5">
+          <% if (isAuthenticated) { %>
+            <a href="/dashboard" class="btn btn-primary btn-lg">Go to Dashboard</a>
+          <% } else { %>
+            <a href="/auth/discord" class="btn btn-primary btn-lg">Login with Discord</a>
+          <% } %>
+        </div>
+        
+        <div class="row mt-5">
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Moderation</h5>
+                <p class="card-text">Powerful tools to manage your Discord server effectively.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Entertainment</h5>
+                <p class="card-text">Fun commands to keep your community engaged.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Utility</h5>
+                <p class="card-text">Helpful commands for everyday Discord tasks.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

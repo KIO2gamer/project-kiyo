@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commands - <%= guild.name %> - Kiyo Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+  
+  <div class="container py-4">
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard/servers/<%= guild.id %>"><%= guild.name %></a></li>
+            <li class="breadcrumb-item active" aria-current="page">Commands</li>
+          </ol>
+        </nav>
+        
+        <h1>Commands</h1>
+        <p class="lead">View and configure commands for <%= guild.name %></p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <a class="nav-link" href="/dashboard/servers/<%= guild.id %>">Overview</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Commands</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/dashboard/servers/<%= guild.id %>/settings">Settings</a>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <input type="text" class="form-control" id="commandSearch" placeholder="Search commands...">
+            </div>
+            
+            <% Object.keys(groupedCommands).forEach(category => { %>
+              <div class="mb-4 command-category">
+                <h3><%= category %></h3>
+                <div class="list-group">
+                  <% groupedCommands[category].forEach(command => { %>
+                    <div class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1"><%= command.name %></h5>
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" role="switch" id="command-<%= command.name %>" checked>
+                        </div>
+                      </div>
+                      <p class="mb-1"><%= command.description %></p>
+                      <small class="text-muted">Usage: /<%= command.name %> <%= command.options ? command.options.map(opt => `[${opt.name}]`).join(' ') : '' %></small>
+                    </div>
+                  <% }); %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Simple command search functionality
+    document.getElementById('commandSearch').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const commandItems = document.querySelectorAll('.list-group-item');
+      
+      commandItems.forEach(item => {
+        const commandName = item.querySelector('h5').textContent.toLowerCase();
+        const commandDesc = item.querySelector('p').textContent.toLowerCase();
+        
+        if (commandName.includes(searchTerm) || commandDesc.includes(searchTerm)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      
+      // Hide/show categories based on if they have any visible commands
+      const categories = document.querySelectorAll('.command-category');
+      categories.forEach(category => {
+        const visibleCommands = category.querySelectorAll('.list-group-item[style=""]').length;
+        category.style.display = visibleCommands > 0 ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
