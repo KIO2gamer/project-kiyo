@@ -87,7 +87,7 @@ module.exports = {
 				error,
 				await interaction.reply({
 					content: 'An error occurred while creating the channel.',
-					ephemeral: true,
+					flags: 64,
 				}),
 			);
 		}

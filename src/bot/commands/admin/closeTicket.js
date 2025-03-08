@@ -32,7 +32,7 @@ module.exports = {
 		if (!interaction.channel.name.startsWith('ticket-')) {
 			return interaction.reply({
 				content: 'This command can only be used in ticket channels.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -59,7 +59,7 @@ module.exports = {
 
 			await interaction.reply({
 				content: 'Ticket closed successfully.',
-				ephemeral: true,
+				flags: 64,
 			});
 			await interaction.channel.delete();
 		} catch (error) {
@@ -68,13 +68,13 @@ module.exports = {
 				interaction.reply({
 					content:
 						'I cannot send messages to that user as their DMs are turned off.',
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			} else {
 				interaction.reply({
 					content: 'An error occurred while closing the ticket.',
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			}

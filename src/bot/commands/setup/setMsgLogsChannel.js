@@ -41,7 +41,7 @@ module.exports = {
 			await interaction.reply({
 				content:
 					'An error occurred while setting the message logs channel.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

@@ -1,6 +1,24 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+
+// Category emoji mapping
+const CATEGORY_EMOJIS = {
+	'admin': '⚙️',
+	'fun': '🎲',
+	'games': '🎮',
+	'info': 'ℹ️',
+	'moderation': '🛡️',
+	'roles': '👑',
+	'setup': '🔧',
+	'utility': '🛠️'
+};
+
+// Constants
+const EMBED_COLOR = '#3498db';
+const MAX_FIELD_LENGTH = 1024;
+const MAX_FIELDS_PER_EMBED = 25;
+const PAGINATION_TIMEOUT = 180000; // 3 minutes
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -15,9 +33,17 @@ module.exports = {
 				.setDescription('Search for commands by keyword')
 				.setRequired(false))
 		.addStringOption(option =>
-			option.setName('category')
+			option
+				.setName('category')
 				.setDescription('Filter commands by category')
-				.setRequired(false)),
+				.setRequired(false)
+				.addChoices(
+					...Object.entries(CATEGORY_EMOJIS).map(([category, emoji]) => ({
+						name: `${emoji} ${category.charAt(0).toUpperCase() + category.slice(1)}`,
+						value: category
+					}))
+				)
+		),
 	description_full: 'Displays comprehensive help information for all bot commands. You can view all commands grouped by category, get detailed information about specific commands, search for commands using keywords, or filter commands by category.',
 	usage: '/help [command:command_name] [search:keyword] [category:category_name]',
 	examples: [
@@ -50,7 +76,6 @@ module.exports = {
 // Get all commands recursively from the commands directory
 async function getAllCommands() {
 	const commands = [];
-	// Fix the path to point to the commands directory
 	const commandsPath = path.join(__dirname, '..');
 
 	try {
@@ -104,8 +129,8 @@ async function handleCommandDetails(interaction, commandName, commands) {
 
 	const embed = new EmbedBuilder()
 		.setTitle(`Command: /${command.data.name}`)
-		.setDescription(command.data.description || 'No description available')
-		.setColor('#3498db');
+		.setDescription(command.description_full || command.data.description || 'No description available')
+		.setColor(EMBED_COLOR);
 
 	// Add command options if they exist
 	if (command.data.options && command.data.options.length > 0) {
@@ -118,6 +143,11 @@ async function handleCommandDetails(interaction, commandName, commands) {
 		embed.addFields({ name: 'Options', value: optionsText });
 	}
 
+	// Add usage if it exists
+	if (command.usage) {
+		embed.addFields({ name: 'Usage', value: command.usage });
+	}
+
 	// Add examples if they exist
 	if (command.examples) {
 		embed.addFields({
@@ -126,11 +156,25 @@ async function handleCommandDetails(interaction, commandName, commands) {
 		});
 	}
 
-	// Add category information
+	// Add category information with emoji
+	const categoryEmoji = CATEGORY_EMOJIS[command.category?.toLowerCase()] || '📁';
 	embed.addFields({
 		name: 'Category',
-		value: command.category || 'Uncategorized'
+		value: `${categoryEmoji} ${command.category || 'Uncategorized'}`
 	});
+
+	// Find similar commands (in the same category)
+	const similarCommands = commands
+		.filter(cmd => cmd.category === command.category && cmd.data.name !== command.data.name)
+		.slice(0, 5)
+		.map(cmd => `\`/${cmd.data.name}\``);
+
+	if (similarCommands.length > 0) {
+		embed.addFields({
+			name: 'Similar Commands',
+			value: similarCommands.join(', ')
+		});
+	}
 
 	return interaction.reply({ embeds: [embed], flags: 64 });
 }
@@ -161,11 +205,6 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 		});
 	}
 
-	const embed = new EmbedBuilder()
-		.setTitle(`Search Results: "${searchQuery}"`)
-		.setDescription(`Found ${results.length} command(s)`)
-		.setColor('#3498db');
-
 	// Group results by category
 	const groupedResults = {};
 	results.forEach(cmd => {
@@ -176,15 +215,45 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 		groupedResults[category].push(`\`/${cmd.data.name}\` - ${cmd.data.description}`);
 	});
 
-	// Add each category as a field
-	Object.entries(groupedResults).forEach(([category, cmds]) => {
-		embed.addFields({
-			name: `📂 ${category}`,
-			value: cmds.join('\n')
-		});
-	});
+	// Create pages for pagination
+	const pages = [];
+	const categoriesPerPage = 3; // Number of categories to show per page
+	const categories = Object.entries(groupedResults);
 
-	return interaction.reply({ embeds: [embed], flags: 64 });
+	// Create pages with a maximum of 3 categories per page
+	for (let i = 0; i < categories.length; i += categoriesPerPage) {
+		const embed = new EmbedBuilder()
+			.setTitle(`Search Results: "${searchQuery}"`)
+			.setDescription(`Found ${results.length} command(s)`)
+			.setColor(EMBED_COLOR)
+			.setFooter({
+				text: `Page ${Math.floor(i / categoriesPerPage) + 1} of ${Math.ceil(categories.length / categoriesPerPage)}`
+			});
+
+		const pageCategories = categories.slice(i, i + categoriesPerPage);
+
+		for (const [category, cmds] of pageCategories) {
+			const categoryEmoji = CATEGORY_EMOJIS[category.toLowerCase()] || '📁';
+
+			// Split commands into chunks to avoid exceeding Discord's character limit
+			const chunks = splitIntoChunks(cmds.join('\n'), MAX_FIELD_LENGTH);
+
+			for (let j = 0; j < chunks.length; j++) {
+				const fieldName = j === 0 ?
+					`${categoryEmoji} ${category}` :
+					`${categoryEmoji} ${category} (continued)`;
+
+				embed.addFields({
+					name: fieldName,
+					value: chunks[j] || 'No commands available'
+				});
+			}
+		}
+
+		pages.push(embed);
+	}
+
+	await sendPagination(interaction, pages);
 }
 
 async function handleCategoryFilter(interaction, categoryFilter, commands) {
@@ -208,23 +277,62 @@ async function handleCategoryFilter(interaction, categoryFilter, commands) {
 		(cmd.category || 'Uncategorized') === category
 	);
 
-	const embed = new EmbedBuilder()
-		.setTitle(`Commands in category: ${category}`)
-		.setDescription(`${categoryCommands.length} command(s) available`)
-		.setColor('#3498db');
+	const categoryEmoji = CATEGORY_EMOJIS[category.toLowerCase()] || '📁';
 
-	categoryCommands.forEach(cmd => {
+	// Create pages (10 commands per page)
+	const pages = [];
+	const commandsPerPage = 10;
+
+	for (let i = 0; i < categoryCommands.length; i += commandsPerPage) {
+		const pageCommands = categoryCommands.slice(i, i + commandsPerPage);
+
+		const embed = new EmbedBuilder()
+			.setTitle(`${categoryEmoji} Commands in category: ${category}`)
+			.setDescription(`${categoryCommands.length} command(s) available`)
+			.setColor(EMBED_COLOR)
+			.setFooter({
+				text: `Page ${Math.floor(i / commandsPerPage) + 1} of ${Math.ceil(categoryCommands.length / commandsPerPage)}`
+			});
+
+		const commandList = pageCommands.map(cmd =>
+			`\`/${cmd.data.name}\` - ${cmd.data.description || 'No description'}`
+		).join('\n');
+
 		embed.addFields({
-			name: `/${cmd.data.name}`,
-			value: cmd.data.description || 'No description available'
+			name: 'Commands',
+			value: commandList || 'No commands available in this category.'
 		});
-	});
 
-	return interaction.reply({ embeds: [embed], flags: 64 });
+		pages.push(embed);
+	}
+
+	// If there are no pages, create one empty page
+	if (pages.length === 0) {
+		const embed = new EmbedBuilder()
+			.setTitle(`${categoryEmoji} Commands in category: ${category}`)
+			.setDescription('0 commands available')
+			.setColor(EMBED_COLOR);
+
+		embed.addFields({
+			name: 'Commands',
+			value: 'No commands available in this category.'
+		});
+
+		pages.push(embed);
+	}
+
+	await sendPagination(interaction, pages);
 }
 
 async function handleGeneralHelp(interaction, commands) {
-	// Group commands by category
+	// Calculate uptime based on client uptime
+	const uptime = formatUptime(interaction.client.uptime);
+
+	// Calculate key statistics
+	const totalCommands = commands.length;
+	const serverCount = interaction.client.guilds.cache.size;
+
+	// Group commands by category for pagination
 	const groupedCommands = {};
 	commands.forEach(cmd => {
 		const category = cmd.category || 'Uncategorized';
@@ -234,22 +342,231 @@ async function handleGeneralHelp(interaction, commands) {
 		groupedCommands[category].push(cmd);
 	});
 
-	const embed = new EmbedBuilder()
-		.setTitle('Bot Commands Help')
-		.setDescription('Use `/help command:name` for detailed information about a specific command.')
-		.setColor('#3498db')
-		.setFooter({
-			text: 'Tip: Try /help search:keyword or /help category:name'
+	// Create first page (overview)
+	const overviewEmbed = new EmbedBuilder()
+		.setTitle('Kiyo Help Center')
+		.setDescription('Welcome to the interactive help menu! Here you can explore all available\ncommands and features.')
+		.setColor(EMBED_COLOR)
+		.addFields(
+			{
+				name: 'Key Statistics:',
+				value: `• Commands: ${totalCommands} commands across ${Object.keys(groupedCommands).length} categories\n• Servers: Currently serving ${serverCount} Discord servers\n• Uptime: ${uptime}`,
+				inline: false
+			}
+		);
+
+	// Add categories with their command counts
+	const categoriesField = Object.entries(groupedCommands)
+		.map(([category, cmds]) => {
+			const emoji = CATEGORY_EMOJIS[category.toLowerCase()] || '📁';
+			return `${emoji} ${category} (${cmds.length} commands)`;
+		})
+		.join('\n');
+
+	overviewEmbed.addFields({
+		name: '📑 Available Categories',
+		value: categoriesField,
+		inline: false
+	});
+
+	overviewEmbed.addFields({
+		name: '🔍 Navigation Help',
+		value: 'Use the buttons below to navigate through pages of categories and commands.\nYou can also use `/help command:[name]`, `/help search:[keyword]`, or `/help category:[name]` for more specific information.',
+		inline: false
+	});
+
+	overviewEmbed.setFooter({
+		text: 'Page 1 - Overview'
+	});
+
+	// Create category pages (one page per category)
+	const categoryPages = [];
+	categoryPages.push(overviewEmbed); // First page is overview
+
+	Object.entries(groupedCommands).forEach(([category, cmds]) => {
+		const categoryEmoji = CATEGORY_EMOJIS[category.toLowerCase()] || '📁';
+
+		const embed = new EmbedBuilder()
+			.setTitle(`${categoryEmoji} ${category} Commands`)
+			.setDescription(`${cmds.length} commands available in this category`)
+			.setColor(EMBED_COLOR);
+
+		// Split commands into chunks if needed
+		const commandList = cmds.map(cmd =>
+			`\`/${cmd.data.name}\` - ${cmd.data.description || 'No description'}`
+		);
+
+		const chunks = splitIntoChunks(commandList.join('\n'), MAX_FIELD_LENGTH);
+
+		for (let i = 0; i < chunks.length; i++) {
+			embed.addFields({
+				name: i === 0 ? 'Commands' : 'Commands (continued)',
+				value: chunks[i]
+			});
+		}
+
+		embed.setFooter({
+			text: `Page ${categoryPages.length + 1} - ${category}`
 		});
 
-	// Add each category as a field
-	Object.entries(groupedCommands).forEach(([category, cmds]) => {
-		const commandList = cmds.map(cmd => `\`/${cmd.data.name}\` - ${cmd.data.description}`).join('\n');
-		embed.addFields({
-			name: `📂 ${category} (${cmds.length})`,
-			value: commandList
+		categoryPages.push(embed);
+	});
+
+	await sendPagination(interaction, categoryPages);
+}
+
+// Helper function to handle pagination with buttons
+async function sendPagination(interaction, pages) {
+	if (pages.length === 1) {
+		// If there's only one page, just send it without buttons
+		return interaction.reply({
+			embeds: [pages[0]],
+			flags: 64
+		});
+	}
+
+	let currentPage = 0;
+
+	// Create buttons for navigation
+	const createButtons = (currentPage) => {
+		const firstButton = new ButtonBuilder()
+			.setCustomId('first')
+			.setLabel('First')
+			.setStyle(ButtonStyle.Secondary)
+			.setDisabled(currentPage === 0);
+
+		const prevButton = new ButtonBuilder()
+			.setCustomId('prev')
+			.setLabel('◀')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(currentPage === 0);
+
+		const pageInfoButton = new ButtonBuilder()
+			.setCustomId('info')
+			.setLabel(`${currentPage + 1} / ${pages.length}`)
+			.setStyle(ButtonStyle.Secondary)
+			.setDisabled(true);
+
+		const nextButton = new ButtonBuilder()
+			.setCustomId('next')
+			.setLabel('▶')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(currentPage === pages.length - 1);
+
+		const lastButton = new ButtonBuilder()
+			.setCustomId('last')
+			.setLabel('Last')
+			.setStyle(ButtonStyle.Secondary)
+			.setDisabled(currentPage === pages.length - 1);
+
+		const closeButton = new ButtonBuilder()
+			.setCustomId('close')
+			.setLabel('Close')
+			.setStyle(ButtonStyle.Danger);
+
+		const row = new ActionRowBuilder()
+			.addComponents(firstButton, prevButton, pageInfoButton, nextButton, lastButton);
+
+		const closeRow = new ActionRowBuilder()
+			.addComponents(closeButton);
+
+		return [row, closeRow];
+	};
+
+	// Send initial message with buttons
+	const message = await interaction.reply({
+		embeds: [pages[currentPage]],
+		components: createButtons(currentPage),
+		flags: 64,
+		withResponse: true
+	});
+
+	// Create collector for button interactions
+	const collector = message.createMessageComponentCollector({
+		componentType: ComponentType.Button,
+		time: PAGINATION_TIMEOUT
+	});
+
+	collector.on('collect', async (i) => {
+		// Handle user's button press
+		switch (i.customId) {
+			case 'first':
+				currentPage = 0;
+				break;
+			case 'prev':
+				currentPage = Math.max(0, currentPage - 1);
+				break;
+			case 'next':
+				currentPage = Math.min(pages.length - 1, currentPage + 1);
+				break;
+			case 'last':
+				currentPage = pages.length - 1;
+				break;
+			case 'close':
+				collector.stop('closed');
+				return;
+		}
+
+		// Update the message with new page and buttons
+		await i.update({
+			embeds: [pages[currentPage]],
+			components: createButtons(currentPage)
 		});
 	});
 
-	return interaction.reply({ embeds: [embed], flags: 64 });
+	collector.on('end', async (collected, reason) => {
+		// When timeout or manually closed, remove buttons
+		if (reason === 'time' || reason === 'closed') {
+			try {
+				await message.edit({
+					components: [],
+					embeds: [
+						pages[currentPage].setFooter({
+							text: `${pages[currentPage].data.footer?.text || ''} • Pagination expired`
+						})
+					]
+				});
+			} catch (error) {
+				console.error('Error updating message after pagination ended:', error);
+			}
+		}
+	});
+}
+
+// Helper to format milliseconds to a readable uptime string
+function formatUptime(ms) {
+	const seconds = Math.floor((ms / 1000) % 60);
+	const minutes = Math.floor((ms / (1000 * 60)) % 60);
+	const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+	const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+
+	const parts = [];
+	if (days > 0) parts.push(`${days}d`);
+	if (hours > 0) parts.push(`${hours}h`);
+	if (minutes > 0) parts.push(`${minutes}m`);
+	if (seconds > 0) parts.push(`${seconds}s`);
+
+	return parts.join(' ') || '0s';
+}
+
+// Helper to split text into chunks that fit within Discord's limits
+function splitIntoChunks(text, maxLength) {
+	const chunks = [];
+	let currentChunk = '';
+
+	const lines = text.split('\n');
+	for (const line of lines) {
+		if (currentChunk.length + line.length + 1 > maxLength) {
+			chunks.push(currentChunk);
+			currentChunk = line;
+		} else {
+			currentChunk += (currentChunk ? '\n' : '') + line;
+		}
+	}
+
+	if (currentChunk) {
+		chunks.push(currentChunk);
+	}
+
+	return chunks;
 }

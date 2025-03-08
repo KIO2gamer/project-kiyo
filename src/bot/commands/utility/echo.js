@@ -52,7 +52,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: `I don't have permission to send messages in ${channel}.`,
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -73,7 +73,7 @@ module.exports = {
 
 			await interaction.reply({
 				content: `Message echoed successfully in ${channel}.`,
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError(
@@ -82,7 +82,7 @@ module.exports = {
 				await interaction.reply({
 					content:
 						'There was an error trying to execute that command.',
-					ephemeral: true,
+					flags: 64,
 				}),
 			);
 		}

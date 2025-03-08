@@ -50,7 +50,7 @@ module.exports = {
 		if (channel.type !== 0) {
 			return interaction.reply({
 				content: 'This command can only be used in text channels.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -77,13 +77,13 @@ module.exports = {
 			await channel.send({ embeds: [embed], components: [ticketRow] });
 			await interaction.followUp({
 				content: 'Ticket message sent!',
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError('Error sending ticket message:', error);
 			interaction.followUp({
 				content: 'There was an error sending the message.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

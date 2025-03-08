@@ -61,14 +61,14 @@ module.exports = {
 				return interaction.reply({
 					content:
 						'Please provide at least two options for the poll.',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
 			if (durationHours <= 0 || durationHours > MAX_POLL_DURATION_HOURS) {
 				return interaction.reply({
 					content: `Duration must be between 1 and ${MAX_POLL_DURATION_HOURS} hours.`,
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -90,7 +90,7 @@ module.exports = {
 			handleError(error);
 			await interaction.reply({
 				content: 'An error occurred while creating the poll.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

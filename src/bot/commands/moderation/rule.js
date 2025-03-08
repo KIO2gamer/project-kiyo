@@ -73,7 +73,7 @@ module.exports = {
 			default:
 				return interaction.reply({
 					content: 'Input a valid number from 1 to 11.',
-					ephemeral: true,
+					flags: 64,
 				});
 		}
 	},

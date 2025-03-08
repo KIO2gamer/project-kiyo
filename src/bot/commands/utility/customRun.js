@@ -45,7 +45,7 @@ module.exports = {
 			if (!customCommand) {
 				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found.`,
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			}

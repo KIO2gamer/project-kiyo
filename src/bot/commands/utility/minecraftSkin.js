@@ -32,7 +32,7 @@ module.exports = {
 		if (cachedEmbed) {
 			await interaction.reply({
 				embeds: [cachedEmbed],
-				ephemeral: true,
+				flags: 64,
 			});
 			return;
 		}
@@ -51,7 +51,7 @@ module.exports = {
 					.setTimestamp();
 				await interaction.reply({
 					embeds: [notFoundEmbed],
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			}
@@ -65,7 +65,7 @@ module.exports = {
 
 			await interaction.reply({
 				embeds: [infoEmbed],
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError('Error fetching Minecraft player data:', error);

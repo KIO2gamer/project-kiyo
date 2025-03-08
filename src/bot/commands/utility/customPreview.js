@@ -39,7 +39,7 @@ module.exports = {
 			if (!customCommand) {
 				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found.`,
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			}
@@ -58,7 +58,7 @@ module.exports = {
 
 			await interaction.reply({
 				embeds: [embed],
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError(interaction, error);

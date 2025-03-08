@@ -86,7 +86,7 @@ module.exports = {
 								'Oops! Something went wrong while fetching a song. Please try again later.',
 							),
 					],
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 

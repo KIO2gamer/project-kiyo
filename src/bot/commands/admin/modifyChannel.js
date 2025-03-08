@@ -213,7 +213,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: 'I do not have permission to manage channels.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -224,7 +224,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: 'You do not have permission to manage channels.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -232,7 +232,7 @@ module.exports = {
 			return interaction.reply({
 				content:
 					"Please specify what you'd like to modify (channel name or permissions).",
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -317,7 +317,7 @@ module.exports = {
 				if (!channelUpdated) {
 					return interaction.reply({
 						content: channelResponse,
-						ephemeral: true,
+						flags: 64,
 					});
 				} else {
 					response += channelResponse;
@@ -328,7 +328,7 @@ module.exports = {
 			if (updated) {
 				await interaction.reply({
 					content: response.slice(0, -2),
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 		} catch (error) {

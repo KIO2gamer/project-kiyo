@@ -56,19 +56,19 @@ module.exports = {
 				});
 				await interaction.reply({
 					content: `Image successfully posted: ${options}`,
-					ephemeral: true,
+					flags: 64,
 				});
 			} else {
 				await interaction.reply({
 					content: 'There is no such option available',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 		} catch (error) {
 			handleError('Error posting image:', error);
 			await interaction.reply({
 				content: `An error occurred: ${error.message}`,
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

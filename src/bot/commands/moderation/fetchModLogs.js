@@ -102,7 +102,7 @@ module.exports = {
 					return interaction.reply({
 						content:
 							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
-						ephemeral: true,
+						flags: 64,
 					});
 				}
 			}
@@ -124,7 +124,7 @@ module.exports = {
 			if (logs.length === 0) {
 				return interaction.reply({
 					content: 'No moderation logs found.',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -217,7 +217,7 @@ module.exports = {
 			// Only one reply if an error occurs:
 			await interaction.reply({
 				content: 'Failed to retrieve logs.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

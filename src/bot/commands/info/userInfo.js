@@ -112,11 +112,11 @@ function generateUserFields(user, member) {
 	// Format client status with emojis
 	const clientStatusText = Object.keys(clientStatus).length
 		? Object.entries(clientStatus)
-				.map(
-					([platform, status]) =>
-						`${getStatusEmoji(platform)} ${platform}: ${status}`,
-				)
-				.join('\n')
+			.map(
+				([platform, status]) =>
+					`${getStatusEmoji(platform)} ${platform}: ${status}`,
+			)
+			.join('\n')
 		: 'No devices active';
 
 	return [
@@ -158,14 +158,14 @@ function generateUserFields(user, member) {
 		...(presence.activities?.filter((a) => a.type !== ActivityType.Custom)
 			.length
 			? [
-					{
-						name: '🎯 Activities',
-						value: presence.activities
-							.filter((a) => a.type !== ActivityType.Custom)
-							.map(getActivityName)
-							.join('\n\n'),
-					},
-				]
+				{
+					name: '🎯 Activities',
+					value: presence.activities
+						.filter((a) => a.type !== ActivityType.Custom)
+						.map(getActivityName)
+						.join('\n\n'),
+				},
+			]
 			: []),
 
 		// Section 5: Key Permissions
@@ -234,7 +234,7 @@ module.exports = {
 			if (!member) {
 				return interaction.reply({
 					content: 'That user is not a member of this server.',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -299,7 +299,7 @@ module.exports = {
 			console.error('Error in user_info command:', error);
 			await interaction.reply({
 				content: 'An error occurred while fetching user information.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

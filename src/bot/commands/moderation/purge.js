@@ -36,7 +36,7 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.reply({
 			content: 'Processing purge command...',
-			ephemeral: true,
+			flags: 64,
 		});
 		const amount = interaction.options.getInteger('amount');
 		const user = interaction.options.getUser('user');
@@ -66,7 +66,7 @@ module.exports = {
 							)
 							.setColor('Yellow'),
 					],
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -87,7 +87,7 @@ module.exports = {
 				embed.addFields({ name: 'Target User', value: user.tag });
 			}
 
-			await interaction.followUp({ embeds: [embed], ephemeral: true });
+			await interaction.followUp({ embeds: [embed], flags: 64 });
 
 			// Log the purge action
 			const logChannel = interaction.guild.channels.cache.find(
@@ -122,7 +122,7 @@ module.exports = {
 						)
 						.setColor('Red'),
 				],
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

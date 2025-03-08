@@ -56,7 +56,7 @@ module.exports = {
 
 			await interaction.reply({
 				content: `Custom command "${name}" added successfully!`,
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError(interaction, error);

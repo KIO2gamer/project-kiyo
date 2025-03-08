@@ -293,7 +293,7 @@ module.exports = {
 				return i.reply({
 					content:
 						'You are not allowed to interact with these buttons.',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 

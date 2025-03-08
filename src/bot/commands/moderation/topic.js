@@ -14,8 +14,8 @@ module.exports = {
 		.setDescription('Sends a message about changing the topic.')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers |
-				PermissionFlagsBits.KickMembers |
-				PermissionFlagsBits.ManageChannels,
+			PermissionFlagsBits.KickMembers |
+			PermissionFlagsBits.ManageChannels,
 		)
 		.addUserOption((option) =>
 			option
@@ -51,13 +51,13 @@ module.exports = {
 			return interaction.reply({
 				content:
 					'No users provided. Please specify at least one user to change the topic.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
 		await interaction.reply({
 			content: 'Topic change message sent.',
-			ephemeral: true,
+			flags: 64,
 		});
 		await interaction.channel.send(
 			`${userMentions}\n**Please change the topic immediately. Failing to do so will result in a mute/ban.**`,

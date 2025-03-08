@@ -43,7 +43,7 @@ module.exports = {
 							'The Google Search command is not properly configured by the server administrator.\n\nPlease inform them to set up the `GOOGLE_API_KEY` and `GOOGLE_SEARCH_ENGINE_ID` environment variables.',
 						),
 				],
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -71,7 +71,7 @@ module.exports = {
 								`Unfortunately, Google Custom Search did not return any relevant results for the query: \`${query}\`. \n\nPlease try a different or broader search term.`,
 							),
 					],
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -106,7 +106,7 @@ module.exports = {
 
 			embed.setDescription(embed.data.description + resultList); // Append results to description
 
-			await interaction.reply({ embeds: [embed], ephemeral: true });
+			await interaction.reply({ embeds: [embed], flags: 64 });
 		} catch (error) {
 			handleError('Error performing Google search:', error);
 			let errorMessage =
@@ -128,7 +128,7 @@ module.exports = {
 						.setTitle('⚠️ Search Error')
 						.setDescription(errorMessage),
 				],
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

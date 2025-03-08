@@ -54,7 +54,7 @@ async function handleError(...args) {
 		.setTitle('⚠️ An error occurred')
 		.setDescription(
 			'There was a problem executing the command. Please try again later.\n' +
-				'If you need more details, click the button below.',
+			'If you need more details, click the button below.',
 		)
 		.setColor('#5865F2')
 		.setTimestamp();
@@ -71,16 +71,16 @@ async function handleError(...args) {
 		const response = sent
 			? await sent.edit({ embeds: [errorEmbed], components: [row] })
 			: await (interaction.replied || interaction.deferred
-					? interaction.editReply({
-							embeds: [errorEmbed],
-							components: [row],
-							ephemeral: true,
-						})
-					: interaction.reply({
-							embeds: [errorEmbed],
-							components: [row],
-							ephemeral: true,
-						}));
+				? interaction.editReply({
+					embeds: [errorEmbed],
+					components: [row],
+					flags: 64,
+				})
+				: interaction.reply({
+					embeds: [errorEmbed],
+					components: [row],
+					flags: 64,
+				}));
 
 		// Create a collector for the button interaction with a 60-second timeout
 		const collector = response.createMessageComponentCollector({
@@ -104,7 +104,7 @@ async function handleError(...args) {
 
 		collector.on('end', async () => {
 			// Disable the button after the collector ends
-			await response.edit({ components: [] }).catch(() => {});
+			await response.edit({ components: [] }).catch(() => { });
 		});
 	} catch (sendError) {
 		console.error(

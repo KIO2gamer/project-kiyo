@@ -34,7 +34,7 @@ module.exports = {
 				return interaction.editReply({
 					content:
 						'⚠️ Failed to fetch trivia question. Please try again later.',
-					ephemeral: true,
+					flags: 64,
 				});
 			}
 
@@ -61,7 +61,7 @@ module.exports = {
 			await interaction.editReply({
 				content:
 					'🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

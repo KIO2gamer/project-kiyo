@@ -47,7 +47,7 @@ module.exports = {
 			if (!customCommand) {
 				await interaction.reply({
 					content: `Custom command or alias "${name}" not found!`,
-					ephemeral: true,
+					flags: 64,
 				});
 				return;
 			}
@@ -59,7 +59,7 @@ module.exports = {
 
 			const confirmationResponse = await interaction.reply({
 				content: confirmMessage,
-				ephemeral: true,
+				flags: 64,
 				components: [
 					{
 						type: 1,

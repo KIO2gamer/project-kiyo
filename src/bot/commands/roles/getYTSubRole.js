@@ -31,7 +31,7 @@ module.exports = {
 
 	async execute(interaction) {
 		try {
-			await interaction.deferReply({ ephemeral: true });
+			await interaction.deferReply({ flags: 64 });
 
 			const state = JSON.stringify({
 				interactionId: interaction.id,

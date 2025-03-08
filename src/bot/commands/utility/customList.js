@@ -108,7 +108,7 @@ module.exports = {
 				} else {
 					i.editReply({
 						content: 'You cannot use these buttons.',
-						ephemeral: true,
+						flags: 64,
 					});
 				}
 			});

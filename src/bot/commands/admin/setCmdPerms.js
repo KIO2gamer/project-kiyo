@@ -61,7 +61,7 @@ module.exports = {
 		if (interaction.user.id !== process.env.OWNER_ID) {
 			return await interaction.reply({
 				content: 'Only the bot owner can use this command!',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -73,7 +73,7 @@ module.exports = {
 		if (!role && !user) {
 			return await interaction.reply({
 				content: 'You must specify either a role or user!',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -82,7 +82,7 @@ module.exports = {
 		if (!command) {
 			return await interaction.reply({
 				content: 'That command does not exist!',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -100,12 +100,10 @@ module.exports = {
 		}
 
 		await interaction.reply({
-			content: `Successfully ${
-				allowed ? 'allowed' : 'denied'
-			} permissions for ${
-				role ? `role ${role.name}` : `user ${user.tag}`
-			} on command ${commandName}`,
-			ephemeral: true,
+			content: `Successfully ${allowed ? 'allowed' : 'denied'
+				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
+				} on command ${commandName}`,
+			flags: 64,
 		});
 	},
 };

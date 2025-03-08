@@ -40,7 +40,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: '❌ You do not have permission to use this command.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -48,7 +48,7 @@ module.exports = {
 		await interaction.reply({
 			content:
 				'⚠️ **DANGER**: This will permanently delete ALL data in the database. Are you absolutely sure?\nType `CONFIRM` to proceed.',
-			ephemeral: true,
+			flags: 64,
 		});
 
 		try {
@@ -96,7 +96,7 @@ module.exports = {
 					interaction.followUp({
 						content:
 							'❌ Command timed out. Database wipe cancelled.',
-						ephemeral: true,
+						flags: 64,
 					});
 				}
 			});
@@ -104,7 +104,7 @@ module.exports = {
 			handleError('Command error:', error);
 			await interaction.followUp({
 				content: '❌ An error occurred while executing the command.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

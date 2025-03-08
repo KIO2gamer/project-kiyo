@@ -54,7 +54,7 @@ module.exports = {
 		if (!commandPath) {
 			return interaction.reply({
 				content: `There is no command with name \`${commandName}\`!`,
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 
@@ -66,13 +66,13 @@ module.exports = {
 			interaction.client.commands.set(newCommand.data.name, newCommand);
 			await interaction.reply({
 				content: `Command \`${commandName}\` was reloaded!`,
-				ephemeral: true,
+				flags: 64,
 			});
 		} catch (error) {
 			handleError(error);
 			await interaction.reply({
 				content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},
@@ -136,7 +136,7 @@ module.exports = {
 
 		await interaction.reply({
 			content: 'All commands reloaded!',
-			ephemeral: true,
+			flags: 64,
 		});
 	},
 };

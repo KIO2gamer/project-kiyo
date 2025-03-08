@@ -19,7 +19,7 @@ module.exports = {
 
 		if (interaction.customId === 'open-ticket') {
 			try {
-				await interaction.deferReply({ ephemeral: true });
+				await interaction.deferReply({ flags: 64 });
 
 				// Fetch the ticket category ID from the database
 				const config = await TicketConfig.findOne();

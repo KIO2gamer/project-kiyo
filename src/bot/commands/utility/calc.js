@@ -58,7 +58,7 @@ module.exports = {
 			await interaction.reply({
 				content:
 					'Invalid mathematical expression. Please check your input.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},

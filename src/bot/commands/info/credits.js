@@ -64,7 +64,7 @@ module.exports = {
 			await interaction.reply({
 				content:
 					'There was an error fetching the credits. Please try again later.',
-				ephemeral: true,
+				flags: 64,
 			});
 		}
 	},
