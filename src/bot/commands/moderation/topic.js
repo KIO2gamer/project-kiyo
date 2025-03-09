@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Sends a message to the specified users, requesting them to change the current topic.',
@@ -51,13 +53,13 @@ module.exports = {
 			return interaction.reply({
 				content:
 					'No users provided. Please specify at least one user to change the topic.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
 		await interaction.reply({
 			content: 'Topic change message sent.',
-			flags: 64,
+			flags: MessageFlags.Ephemeral,
 		});
 		await interaction.channel.send(
 			`${userMentions}\n**Please change the topic immediately. Failing to do so will result in a mute/ban.**`,

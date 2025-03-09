@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.',

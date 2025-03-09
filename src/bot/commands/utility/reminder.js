@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const Reminder = require('./../../../database/reminderStorage');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reminder')

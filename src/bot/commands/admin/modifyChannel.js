@@ -1,339 +1,262 @@
 const {
 	SlashCommandBuilder,
-	PermissionsBitField,
+	PermissionFlagsBits,
 	ChannelType,
+	EmbedBuilder,
 } = require('discord.js');
-const { handleError } = require('./../../utils/errorHandler.js');
+const { handleError } = require('../../utils/errorHandler');
+
+async function handleChannelUpdate(channel, newName, permissionChoice, toggleChoice, role) {
+	try {
+		let response = '';
+		let updated = false;
+
+		// Handle name change if provided
+		if (newName && newName !== channel.name) {
+			try {
+				await channel.setName(newName);
+				response += `• Channel name changed to \`${newName}\`\n`;
+				updated = true;
+			} catch (error) {
+				throw new Error(`Failed to update channel name: ${error.message}`);
+			}
+		}
+
+		// Handle permission changes if provided
+		if (permissionChoice && role) {
+			try {
+				const currentPerms = channel.permissionsFor(role);
+				const newPerms = {};
+
+				switch (permissionChoice) {
+					case 'view':
+						newPerms.ViewChannel = toggleChoice;
+						break;
+					case 'send':
+						newPerms.SendMessages = toggleChoice;
+						break;
+					case 'manage':
+						newPerms.ManageMessages = toggleChoice;
+						break;
+					default:
+						throw new Error('Invalid permission choice');
+				}
+
+				await channel.permissionOverwrites.edit(role, newPerms);
+				response += `• ${toggleChoice ? 'Enabled' : 'Disabled'} \`${permissionChoice}\` permission for role \`${role.name}\`\n`;
+				updated = true;
+			} catch (error) {
+				throw new Error(`Failed to update permissions: ${error.message}`);
+			}
+		}
+
+		return { response, updated };
+	} catch (error) {
+		throw error;
+	}
+}
 
 module.exports = {
 	description_full:
-		'This command allows you to modify the properties of an existing text or voice channel. You can change the channel name and manage channel permissions for specific roles or everyone. Choose either the "text" or "voice" subcommand to specify the channel type.',
-	usage: '/modify_channel [text/voice] [channel] <newname> <permissions> <toggle> <role>',
+		'Modify channel settings including name and permissions.',
+	usage: '/modifychannel <subcommand> <channel> [options]',
 	examples: [
-		'/modify_channel text channel:text_old newname:text_new',
-		'/modify_channel text channel:text_old permissions:View Channel toggle:Off',
-		'/modify_channel voice channel:voice_channel permissions:Speak toggle:On role:@role',
+		'/modifychannel text #general new_name:announcements',
+		'/modifychannel voice "Voice Chat" permission:view toggle:true role:@Member',
 	],
-	category: 'channels',
+	category: 'admin',
 	data: new SlashCommandBuilder()
-		.setName('modify_channel')
-		.setDescription('Modify a text or voice channel.')
+		.setName('modifychannel')
+		.setDescription('Modify channel settings')
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('text')
-				.setDescription('Modify text channel permissions')
+				.setDescription('Modify a text channel')
 				.addChannelOption((option) =>
 					option
 						.setName('channel')
 						.setDescription('The text channel to modify')
-						.setRequired(true)
-						.addChannelTypes(ChannelType.GuildText),
+						.addChannelTypes(ChannelType.GuildText)
+						.setRequired(true),
 				)
 				.addStringOption((option) =>
 					option
-						.setName('newname')
-						.setDescription('The new name for the channel')
+						.setName('new_name')
+						.setDescription('New name for the channel')
 						.setRequired(false),
 				)
 				.addStringOption((option) =>
 					option
 						.setName('permission')
-						.setDescription(
-							'Permission to modify for the text channel',
-						)
+						.setDescription('Permission to modify')
 						.setRequired(false)
 						.addChoices(
-							{ name: 'View Channel', value: 'ViewChannel' },
-							{
-								name: 'Manage Channels',
-								value: 'ManageChannels',
-							},
-							{ name: 'Manage Roles', value: 'ManageRoles' },
-							{ name: 'Add Reactions', value: 'AddReactions' },
-							{ name: 'Send Messages', value: 'SendMessages' },
-							{
-								name: 'Send TTS Messages',
-								value: 'SendTtsMessages',
-							},
-							{
-								name: 'Manage Messages',
-								value: 'ManageMessages',
-							},
-							{ name: 'Embed Links', value: 'EmbedLinks' },
-							{ name: 'Attach Files', value: 'AttachFiles' },
-							{
-								name: 'Read Message History',
-								value: 'ReadMessageHistory',
-							},
-							{
-								name: 'Mention Everyone',
-								value: 'MentionEveryone',
-							},
-							{
-								name: 'Use External Emojis',
-								value: 'UseExternalEmojis',
-							},
-							{
-								name: 'Manage Webhooks',
-								value: 'ManageWebhooks',
-							},
-							{ name: 'Manage Threads', value: 'ManageThreads' },
-							{
-								name: 'Create Public Threads',
-								value: 'CreatePublicThreads',
-							},
-							{
-								name: 'Create Private Threads',
-								value: 'CreatePrivateThreads',
-							},
-							{
-								name: 'Use External Stickers',
-								value: 'UseExternalStickers',
-							},
-							{
-								name: 'Send Messages In Threads',
-								value: 'SendMessagesInThreads',
-							},
-							{
-								name: 'Use Embedded Activities',
-								value: 'UseEmbeddedActivities',
-							},
-							{
-								name: 'Send Voice Messages',
-								value: 'SendVoiceMessages',
-							},
-							{ name: 'Send Polls', value: 'SendPolls' },
+							{ name: 'View Channel', value: 'view' },
+							{ name: 'Send Messages', value: 'send' },
+							{ name: 'Manage Messages', value: 'manage' },
 						),
 				)
-				.addStringOption((option) =>
+				.addBooleanOption((option) =>
 					option
 						.setName('toggle')
-						.setDescription('Toggle permission on or off')
-						.setRequired(false)
-						.addChoices(
-							{ name: 'On', value: 'on' },
-							{ name: 'Off', value: 'off' },
-						),
+						.setDescription('Enable or disable the permission')
+						.setRequired(false),
 				)
 				.addRoleOption((option) =>
 					option
 						.setName('role')
-						.setDescription(
-							'The role to modify permissions for (leave empty for everyone)',
-						)
+						.setDescription('Role to modify permissions for')
 						.setRequired(false),
 				),
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName('voice')
-				.setDescription('Modify voice channel permissions')
+				.setDescription('Modify a voice channel')
 				.addChannelOption((option) =>
 					option
 						.setName('channel')
 						.setDescription('The voice channel to modify')
-						.setRequired(true)
-						.addChannelTypes(ChannelType.GuildVoice),
+						.addChannelTypes(ChannelType.GuildVoice)
+						.setRequired(true),
 				)
 				.addStringOption((option) =>
 					option
-						.setName('newname')
-						.setDescription('The new name for the channel')
+						.setName('new_name')
+						.setDescription('New name for the channel')
 						.setRequired(false),
 				)
 				.addStringOption((option) =>
 					option
 						.setName('permission')
-						.setDescription(
-							'Permission to modify for the voice channel',
-						)
+						.setDescription('Permission to modify')
 						.setRequired(false)
 						.addChoices(
-							{ name: 'View Channel', value: 'ViewChannel' },
-							{
-								name: 'Manage Channels',
-								value: 'ManageChannels',
-							},
-							{ name: 'Manage Roles', value: 'ManageRoles' },
-							{ name: 'Connect', value: 'Connect' },
-							{ name: 'Speak', value: 'Speak' },
-							{ name: 'Mute Members', value: 'MuteMembers' },
-							{ name: 'Deafen Members', value: 'DeafenMembers' },
-							{ name: 'Move Members', value: 'MoveMembers' },
-							{ name: 'Use VAD', value: 'UseVAD' },
-							{
-								name: 'Priority Speaker',
-								value: 'PrioritySpeaker',
-							},
-							{ name: 'Stream', value: 'Stream' },
-							{
-								name: 'Manage Webhooks',
-								value: 'ManageWebhooks',
-							},
-							{
-								name: 'Create Instant Invite',
-								value: 'CreateInstantInvite',
-							},
+							{ name: 'View Channel', value: 'view' },
+							{ name: 'Connect', value: 'connect' },
+							{ name: 'Speak', value: 'speak' },
 						),
 				)
-				.addStringOption((option) =>
+				.addBooleanOption((option) =>
 					option
 						.setName('toggle')
-						.setDescription('Toggle permission on or off')
-						.setRequired(false)
-						.addChoices(
-							{ name: 'On', value: 'on' },
-							{ name: 'Off', value: 'off' },
-						),
+						.setDescription('Enable or disable the permission')
+						.setRequired(false),
 				)
 				.addRoleOption((option) =>
 					option
 						.setName('role')
-						.setDescription(
-							'The role to modify permissions for (leave empty for everyone)',
-						)
+						.setDescription('Role to modify permissions for')
 						.setRequired(false),
 				),
-		),
+		)
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
 	async execute(interaction) {
-		const subcommand = interaction.options.getSubcommand();
-		const channel = interaction.options.getChannel('channel');
-		const newChannelName = interaction.options.getString('newname');
-		const permissionChoice = interaction.options.getString('permission');
-		const toggleChoice = interaction.options.getString('toggle');
-		const role =
-			interaction.options.getRole('role') ||
-			interaction.guild.roles.everyone;
-
-		if (
-			!interaction.guild.members.me.permissions.has(
-				PermissionsBitField.Flags.ManageChannels,
-			)
-		) {
-			return interaction.reply({
-				content: 'I do not have permission to manage channels.',
-				flags: 64,
-			});
-		}
-
-		if (
-			!interaction.member.permissions.has(
-				PermissionsBitField.Flags.ManageChannels,
-			)
-		) {
-			return interaction.reply({
-				content: 'You do not have permission to manage channels.',
-				flags: 64,
-			});
-		}
-
-		if (!newChannelName && !permissionChoice) {
-			return interaction.reply({
-				content:
-					"Please specify what you'd like to modify (channel name or permissions).",
-				flags: 64,
-			});
-		}
-
 		try {
-			let updated = false;
-			let response = 'Channel modified: ';
+			await interaction.deferReply({ ephemeral: true });
 
-			async function updateChannelName(channel, newChannelName) {
-				if (newChannelName) {
-					await channel.setName(newChannelName);
-					return `Name changed to \`${newChannelName}\`, `;
-				}
-				return '';
+			const subcommand = interaction.options.getSubcommand();
+			const channel = interaction.options.getChannel('channel');
+			const newChannelName = interaction.options.getString('new_name');
+			const permissionChoice = interaction.options.getString('permission');
+			const toggleChoice = interaction.options.getBoolean('toggle');
+			const role = interaction.options.getRole('role');
+
+			// Validate inputs
+			if (!newChannelName && !permissionChoice) {
+				await handleError(
+					interaction,
+					new Error('No modifications specified'),
+					'VALIDATION',
+					'Please specify either a new name or permission changes.'
+				);
+				return;
 			}
 
-			async function updateChannelPermission(
-				channel,
-				permissionChoice,
-				toggleChoice,
-				role,
-			) {
-				if (permissionChoice && toggleChoice) {
-					const permissionFlag =
-						PermissionsBitField.Flags[permissionChoice];
-					const currentOverwrites =
-						channel.permissionOverwrites.cache.get(role.id);
-					const currentPermissions = currentOverwrites
-						? currentOverwrites.allow
-						: new PermissionsBitField();
-					const isPermissionSet =
-						currentPermissions.has(permissionFlag);
-
-					if (
-						(toggleChoice === 'on' && isPermissionSet) ||
-						(toggleChoice === 'off' && !isPermissionSet)
-					) {
-						return `The permission \`${permissionChoice}\` is already set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name}\`.`;
-					}
-
-					await channel.permissionOverwrites.edit(role, {
-						[permissionFlag]: toggleChoice === 'on',
-					});
-					return `Permission \`${permissionChoice}\` set to \`${toggleChoice.toUpperCase()}\` for role \`${role.name}\`, `;
-				}
-				return '';
+			if (permissionChoice && (toggleChoice === null || !role)) {
+				await handleError(
+					interaction,
+					new Error('Incomplete permission options'),
+					'VALIDATION',
+					'When modifying permissions, both toggle and role options are required.'
+				);
+				return;
 			}
 
-			async function handleChannelUpdate(
+			if (newChannelName && (newChannelName.length < 1 || newChannelName.length > 100)) {
+				await handleError(
+					interaction,
+					new Error('Invalid channel name length'),
+					'VALIDATION',
+					'Channel name must be between 1 and 100 characters.'
+				);
+				return;
+			}
+
+			// Check bot permissions
+			if (!channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.ManageChannels)) {
+				await handleError(
+					interaction,
+					new Error('Missing permissions'),
+					'PERMISSION',
+					'I do not have permission to modify this channel.'
+				);
+				return;
+			}
+
+			// Attempt to modify channel
+			const { response, updated } = await handleChannelUpdate(
 				channel,
 				newChannelName,
 				permissionChoice,
 				toggleChoice,
-				role,
-			) {
-				let response = '';
-				response += await updateChannelName(channel, newChannelName);
-				const permissionResponse = await updateChannelPermission(
-					channel,
-					permissionChoice,
-					toggleChoice,
-					role,
-				);
-
-				if (permissionResponse.startsWith('The permission')) {
-					return { response: permissionResponse, updated: false };
-				} else {
-					response += permissionResponse;
-					return { response, updated: true };
-				}
-			}
-
-			if (subcommand === 'text' || subcommand === 'voice') {
-				const { response: channelResponse, updated: channelUpdated } =
-					await handleChannelUpdate(
-						channel,
-						newChannelName,
-						permissionChoice,
-						toggleChoice,
-						role,
-					);
-
-				if (!channelUpdated) {
-					return interaction.reply({
-						content: channelResponse,
-						flags: 64,
-					});
-				} else {
-					response += channelResponse;
-					updated = true;
-				}
-			}
+				role
+			);
 
 			if (updated) {
-				await interaction.reply({
-					content: response.slice(0, -2),
-					flags: 64,
-				});
+				const successEmbed = new EmbedBuilder()
+					.setTitle('Channel Modified')
+					.setDescription(`Successfully modified ${channel}:\n${response}`)
+					.setColor('Green')
+					.setFooter({
+						text: `Modified by ${interaction.user.tag}`,
+						iconURL: interaction.user.displayAvatarURL()
+					})
+					.setTimestamp();
+
+				await interaction.editReply({ embeds: [successEmbed] });
+			} else {
+				await handleError(
+					interaction,
+					new Error('No changes made'),
+					'VALIDATION',
+					'No changes were made to the channel.'
+				);
 			}
 		} catch (error) {
-			handleError('Error modifying channel:', error);
-			await handleError(interaction, error);
+			if (error.code === 50013) {
+				await handleError(
+					interaction,
+					error,
+					'PERMISSION',
+					'I do not have permission to modify this channel.'
+				);
+			} else if (error.code === 50035) {
+				await handleError(
+					interaction,
+					error,
+					'VALIDATION',
+					'Invalid channel settings provided.'
+				);
+			} else {
+				await handleError(
+					interaction,
+					error,
+					'COMMAND_EXECUTION',
+					'An error occurred while modifying the channel.'
+				);
+			}
 		}
 	},
 };

@@ -2,6 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 const moment = require('moment');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('server')

@@ -16,6 +16,8 @@ const TRIVIA_TIMEOUT = 20000; // 20 seconds for answering
 const ANSWER_BUTTON_LABELS = ['A', 'B', 'C', 'D'];
 const API_ENDPOINT = 'https://opentdb.com/api.php?amount=1&type=multiple';
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Tests your knowledge with a multiple-choice trivia question.',
@@ -34,7 +36,7 @@ module.exports = {
 				return interaction.editReply({
 					content:
 						'⚠️ Failed to fetch trivia question. Please try again later.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -61,7 +63,7 @@ module.exports = {
 			await interaction.editReply({
 				content:
 					'🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

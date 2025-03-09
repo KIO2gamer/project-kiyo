@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Ends a poll from a specific message, preventing further voting.',

@@ -6,6 +6,8 @@ const GOOGLE_RED = '#EA4335'; // Google Red color for errors
 const MAX_RESULTS = 5; // Number of search results to display
 const MAX_SNIPPET_LENGTH = 200; // Max characters for snippet in embed
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Searches Google for the given query and displays the top results.',
@@ -43,7 +45,7 @@ module.exports = {
 							'The Google Search command is not properly configured by the server administrator.\n\nPlease inform them to set up the `GOOGLE_API_KEY` and `GOOGLE_SEARCH_ENGINE_ID` environment variables.',
 						),
 				],
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -71,7 +73,7 @@ module.exports = {
 								`Unfortunately, Google Custom Search did not return any relevant results for the query: \`${query}\`. \n\nPlease try a different or broader search term.`,
 							),
 					],
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -106,7 +108,7 @@ module.exports = {
 
 			embed.setDescription(embed.data.description + resultList); // Append results to description
 
-			await interaction.reply({ embeds: [embed], flags: 64 });
+			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
 			handleError('Error performing Google search:', error);
 			let errorMessage =
@@ -128,7 +130,7 @@ module.exports = {
 						.setTitle('⚠️ Search Error')
 						.setDescription(errorMessage),
 				],
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

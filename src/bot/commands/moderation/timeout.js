@@ -6,6 +6,8 @@ const {
 const ms = require('ms');
 const moderationLogs = require('./../../../database/moderationLogs');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Timeouts a member for the specified duration and reason.',
@@ -142,10 +144,10 @@ module.exports = {
 			const currentTime = Date.now();
 			const newTimeoutDuration =
 				targetUser.communicationDisabledUntilTimestamp &&
-				targetUser.communicationDisabledUntilTimestamp > currentTime
+					targetUser.communicationDisabledUntilTimestamp > currentTime
 					? targetUser.communicationDisabledUntilTimestamp -
-						currentTime +
-						durationMs
+					currentTime +
+					durationMs
 					: durationMs;
 
 			if (newTimeoutDuration <= 0) {

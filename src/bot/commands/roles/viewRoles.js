@@ -4,6 +4,8 @@ const {
 	PermissionsBitField,
 } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Lists all the roles in the server, sorted by their position hierarchy, and shows the number of members who have each role.',

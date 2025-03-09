@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'The bot virtually flips a coin and reveals the result (Heads or Tails). You can also bet on the outcome!',
@@ -29,9 +31,8 @@ module.exports = {
 			imageMedia = 'https://i.imgur.com/u1pmQMV.png';
 		}
 
-		let description = `The coin landed on **${
-			result.charAt(0).toUpperCase() + result.slice(1)
-		}**!`;
+		let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)
+			}**!`;
 
 		if (bet) {
 			if (bet === result) {

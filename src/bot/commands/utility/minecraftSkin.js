@@ -8,6 +8,8 @@ const ASHCON_API_BASE = 'https://api.ashcon.app/mojang/v2/user/';
 const EMBED_COLOR = '#2ECC71'; // A more visually appealing color for embeds
 const ERROR_COLOR = '#E74C3C'; // Color for error embeds
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Retrieves general information about a Minecraft player from the Ashcon API, including their username, UUID, and skin.',
@@ -32,7 +34,7 @@ module.exports = {
 		if (cachedEmbed) {
 			await interaction.reply({
 				embeds: [cachedEmbed],
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -51,7 +53,7 @@ module.exports = {
 					.setTimestamp();
 				await interaction.reply({
 					embeds: [notFoundEmbed],
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			}
@@ -65,7 +67,7 @@ module.exports = {
 
 			await interaction.reply({
 				embeds: [infoEmbed],
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		} catch (error) {
 			handleError('Error fetching Minecraft player data:', error);

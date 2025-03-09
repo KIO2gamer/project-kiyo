@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
 const Role = require('../../../database/roleStorage.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'Removes a role from the database.',
 	usage: '/delete_role_from_data <role:role>',

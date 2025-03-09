@@ -6,6 +6,8 @@ const {
 const { handleError } = require('./../../utils/errorHandler');
 const { getChannelType } = require('./../../utils/channelTypes');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'This command permanently deletes a specified channel from the server. Please use caution as this action is irreversible.',

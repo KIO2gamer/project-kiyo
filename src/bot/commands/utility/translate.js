@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const translate = require('@iamtraction/google-translate');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Translates the provided text into the specified target language. Use language codes like "en" (English), "es" (Spanish), "fr" (French), etc.',

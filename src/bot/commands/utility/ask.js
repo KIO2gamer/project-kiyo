@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ask_gemini')

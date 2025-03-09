@@ -7,6 +7,8 @@ const {
 const MAX_POLL_DURATION_HOURS = 32;
 const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Creates a poll with the given question, options, and duration.',
@@ -61,14 +63,14 @@ module.exports = {
 				return interaction.reply({
 					content:
 						'Please provide at least two options for the poll.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
 			if (durationHours <= 0 || durationHours > MAX_POLL_DURATION_HOURS) {
 				return interaction.reply({
 					content: `Duration must be between 1 and ${MAX_POLL_DURATION_HOURS} hours.`,
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -90,7 +92,7 @@ module.exports = {
 			handleError(error);
 			await interaction.reply({
 				content: 'An error occurred while creating the poll.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

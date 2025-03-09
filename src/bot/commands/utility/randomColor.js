@@ -10,6 +10,8 @@
  */
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Generates a random color and displays it along with its hexadecimal code.',
@@ -32,6 +34,6 @@ module.exports = {
 				`**Here is your random hex color code:** \n \`#${randomHex}\``,
 			)
 			.setThumbnail(`https://www.colorhexa.com/${randomHex}.png`);
-		await interaction.reply({ embeds: [embed], flags: 64 });
+		await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 	},
 };

@@ -32,6 +32,8 @@ const funnyMessages = [
 	"Uh-oh! That letter's social distancing from this word!",
 ];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'A thrilling multiplayer game of hangman!',
 	usage: '/hangman',

@@ -63,7 +63,7 @@ module.exports = {
 				try {
 					await interaction.reply({
 						content: 'There was an error while processing this interaction.',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					});
 				} catch (replyError) {
 					// Ignore reply errors as the interaction might have expired
@@ -92,7 +92,7 @@ module.exports = {
 			if (!interaction.replied && !interaction.deferred) {
 				await interaction.reply({
 					content: 'There was an error while executing this command.',
-					ephemeral: true
+					flags: MessageFlags.Ephemeral
 				});
 			}
 		}
@@ -145,7 +145,7 @@ module.exports = {
 					Logger.log('BUTTONS', `No handler for button: ${interaction.customId}`, 'warning');
 					await interaction.reply({
 						content: 'This button is not currently configured.',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					});
 				}
 				break;
@@ -181,7 +181,7 @@ module.exports = {
 					Logger.log('SELECT_MENU', `No handler for select menu: ${interaction.customId}`, 'warning');
 					await interaction.reply({
 						content: 'This selection menu is not currently configured.',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					});
 				}
 				break;
@@ -221,7 +221,7 @@ module.exports = {
 					Logger.log('MODAL', `No handler for modal: ${interaction.customId}`, 'warning');
 					await interaction.reply({
 						content: 'This form submission could not be processed.',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					});
 				}
 				break;

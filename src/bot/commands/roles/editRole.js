@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Edits the properties (name, color, hoist, mentionable) of an existing role. Requires the "Manage Roles" permission.',

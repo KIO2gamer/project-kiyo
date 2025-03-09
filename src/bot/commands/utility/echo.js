@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the "Manage Channels" permission to prevent misuse.',
@@ -52,7 +54,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: `I don't have permission to send messages in ${channel}.`,
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -73,7 +75,7 @@ module.exports = {
 
 			await interaction.reply({
 				content: `Message echoed successfully in ${channel}.`,
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		} catch (error) {
 			handleError(
@@ -82,7 +84,7 @@ module.exports = {
 				await interaction.reply({
 					content:
 						'There was an error trying to execute that command.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				}),
 			);
 		}

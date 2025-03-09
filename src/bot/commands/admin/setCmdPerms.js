@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('set_cmd_perms')
@@ -61,7 +63,7 @@ module.exports = {
 		if (interaction.user.id !== process.env.OWNER_ID) {
 			return await interaction.reply({
 				content: 'Only the bot owner can use this command!',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -73,7 +75,7 @@ module.exports = {
 		if (!role && !user) {
 			return await interaction.reply({
 				content: 'You must specify either a role or user!',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -82,7 +84,7 @@ module.exports = {
 		if (!command) {
 			return await interaction.reply({
 				content: 'That command does not exist!',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -103,7 +105,7 @@ module.exports = {
 			content: `Successfully ${allowed ? 'allowed' : 'denied'
 				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
 				} on command ${commandName}`,
-			flags: 64,
+			flags: MessageFlags.Ephemeral,
 		});
 	},
 };

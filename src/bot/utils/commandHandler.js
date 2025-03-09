@@ -163,7 +163,7 @@ class CommandHandler {
 		if (cooldownResult !== false) {
 			await interaction.reply({
 				content: `Please wait ${cooldownResult.toFixed(1)} more seconds before reusing the \`${commandName}\` command.`,
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 			return;
 		}
@@ -172,7 +172,7 @@ class CommandHandler {
 		if (!this.checkPermissions(interaction, command)) {
 			await interaction.reply({
 				content: 'You do not have permission to use this command.',
-				ephemeral: true
+				flags: MessageFlags.Ephemeral
 			});
 			return;
 		}
@@ -187,7 +187,7 @@ class CommandHandler {
 				if (validationResult !== true) {
 					await interaction.reply({
 						content: validationResult || 'Command validation failed.',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					});
 					return;
 				}

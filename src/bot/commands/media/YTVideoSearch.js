@@ -15,6 +15,8 @@ const youtube = google.youtube({
 
 const pageSize = 3; // Number of results per page
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ytvideo')
@@ -293,7 +295,7 @@ module.exports = {
 				return i.reply({
 					content:
 						'You are not allowed to interact with these buttons.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 

@@ -6,6 +6,8 @@ const {
 const moderationLogs = require('./../../../database/moderationLogs');
 const ms = require('ms'); // Use ms library to parse duration strings
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Temporarily bans a member for the specified duration and reason.',

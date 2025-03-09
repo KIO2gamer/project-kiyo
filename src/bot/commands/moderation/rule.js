@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays a specific rule from the server’s rules list. The number of the rule to be displayed is specified as an argument.',
@@ -73,7 +75,7 @@ module.exports = {
 			default:
 				return interaction.reply({
 					content: 'Input a valid number from 1 to 11.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 		}
 	},

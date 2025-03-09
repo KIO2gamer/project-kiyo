@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Get ready to laugh! This command fetches and displays a random, SFW meme from the vast expanse of the internet.',

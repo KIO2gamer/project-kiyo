@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const cc = require('./../../../database/customCommands');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_delete')
@@ -44,7 +46,7 @@ module.exports = {
 			if (!cc_record) {
 				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found!`,
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			}
@@ -58,7 +60,7 @@ module.exports = {
 
 			const confirmationResponse = await interaction.reply({
 				content: confirmMessage,
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 				components: [
 					{
 						type: 1,

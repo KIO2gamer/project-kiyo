@@ -353,7 +353,7 @@ class Command {
 	async execute(interaction) {
 		await interaction.reply({
 			content: 'This command has not been implemented yet!',
-			ephemeral: true
+			flags: MessageFlags.Ephemeral
 		});
 
 		Logger.log('COMMANDS', `Command ${this.name} has no execute method implemented`, 'warning');

@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const mongoose = require('mongoose');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('clear_db')
@@ -40,7 +42,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: '❌ You do not have permission to use this command.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -48,7 +50,7 @@ module.exports = {
 		await interaction.reply({
 			content:
 				'⚠️ **DANGER**: This will permanently delete ALL data in the database. Are you absolutely sure?\nType `CONFIRM` to proceed.',
-			flags: 64,
+			flags: MessageFlags.Ephemeral,
 		});
 
 		try {
@@ -96,7 +98,7 @@ module.exports = {
 					interaction.followUp({
 						content:
 							'❌ Command timed out. Database wipe cancelled.',
-						flags: 64,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 			});
@@ -104,7 +106,7 @@ module.exports = {
 			handleError('Command error:', error);
 			await interaction.followUp({
 				content: '❌ An error occurred while executing the command.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

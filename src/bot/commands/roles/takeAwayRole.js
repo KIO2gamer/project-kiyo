@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'Removes the specified role from the specified user.',
 	usage: '/take_away_role <target:user> <role:role>',

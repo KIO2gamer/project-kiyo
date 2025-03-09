@@ -2,6 +2,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Edits the reason for a specific log entry or a range of log entries.',

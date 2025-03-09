@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Fetches the current answers/votes for a poll from a specific message.',

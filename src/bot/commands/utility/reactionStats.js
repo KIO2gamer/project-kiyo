@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const moment = require('moment');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays statistics on reactions used in a specific channel or across the entire server. It shows the top 5 most used reactions and the top 5 users who react the most, within a specified timeframe or for the entire server history.',
@@ -141,12 +143,10 @@ module.exports = {
 		const embed = new EmbedBuilder()
 			.setTitle('Reaction Stats')
 			.setDescription(
-				`Reaction statistics from ${
-					channel ? `<#${channel.id}>` : 'the server'
-				} for the ${
-					timeframe === 'all'
-						? 'entire server history'
-						: `past ${timeframe}`
+				`Reaction statistics from ${channel ? `<#${channel.id}>` : 'the server'
+				} for the ${timeframe === 'all'
+					? 'entire server history'
+					: `past ${timeframe}`
 				}`,
 			)
 			.addFields([

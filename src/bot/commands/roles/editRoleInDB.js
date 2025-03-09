@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
 const Role = require('../../../database/roleStorage.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Edits the name and/or color of a role stored in the database. Provide either the name, color, or both to update.',

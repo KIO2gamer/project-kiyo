@@ -10,6 +10,8 @@ const {
 	EmbedBuilder,
 } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Closes the current ticket channel. Requires the "Manage Channels" permission.',
@@ -32,7 +34,7 @@ module.exports = {
 		if (!interaction.channel.name.startsWith('ticket-')) {
 			return interaction.reply({
 				content: 'This command can only be used in ticket channels.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -59,7 +61,7 @@ module.exports = {
 
 			await interaction.reply({
 				content: 'Ticket closed successfully.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 			await interaction.channel.delete();
 		} catch (error) {
@@ -68,13 +70,13 @@ module.exports = {
 				interaction.reply({
 					content:
 						'I cannot send messages to that user as their DMs are turned off.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			} else {
 				interaction.reply({
 					content: 'An error occurred while closing the ticket.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			}

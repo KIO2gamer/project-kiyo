@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
 const Role = require('../../../database/roleStorage.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Adds a role to the database. Useful for managing roles that your bot might need to reference.',

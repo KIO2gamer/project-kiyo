@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const moderationLogs = require('../../../database/moderationLogs');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Deletes a moderation log or a range of logs by log number or range.',

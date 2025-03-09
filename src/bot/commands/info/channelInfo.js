@@ -13,197 +13,266 @@ const {
 } = require('./../../utils/permissionFormatter');
 
 module.exports = {
-	description_full:
-		'Provides detailed information about a specific channel, including its ID, type, creation date, topic, position, permissions, and more specialized details based on channel type.',
+	description_full: 'Provides detailed information about a specific channel, including its ID, type, creation date, topic, position, permissions, and more specialized details based on channel type.',
 	usage: '/channel_info <channel>',
 	examples: [
 		'/channel_info #general',
-		'/channel_info 123456789012345678 (channel ID)',
+		'/channel_info #voice-chat',
+		'/channel_info #announcements',
+		'/channel_info 123456789012345678 (channel ID)'
 	],
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('channel_info')
-		.setDescription(
-			'Provides detailed information about a specific channel',
-		)
-		.addChannelOption((option) =>
+		.setDescription('Provides detailed information about a specific channel')
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('The channel to get information about')
-				.setRequired(true),
+				.setRequired(true)
 		),
+
 	async execute(interaction) {
-		const channel = interaction.options.getChannel('channel');
-
 		try {
-			// Get permissions using the utility function
-			const getPermissions = (channel, guild) => {
-				const permissions = channel.permissionsFor(
-					guild.roles.everyone,
-				);
-				if (!permissions) return 'No permissions';
+			await interaction.deferReply();
 
-				// Use the utility function for formatting categorized permissions
-				return formatCategorizedPermissions(permissions, {
-					checkmark: true,
-					headers: true,
-					maxLength: 1024,
-				});
-			};
+			const channel = interaction.options.getChannel('channel');
 
-			// Initialize the embed
-			const embed = new EmbedBuilder()
-				.setTitle(
-					`${getChannelIcon(channel)} Channel Info: ${channel.name}`,
-				)
-				.setColor(interaction.guild.members.me.displayHexColor)
-				.setThumbnail(interaction.guild.iconURL())
-				.addFields(
-					{ name: '📋 ID', value: `\`${channel.id}\``, inline: true },
-					{
-						name: '📁 Type',
-						value: getChannelType(channel),
-						inline: true,
-					},
-					{
-						name: '🕒 Created',
-						value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
-						inline: true,
-					},
+			// Validate channel
+			if (!channel) {
+				await handleError(
+					interaction,
+					new Error('Invalid channel'),
+					'VALIDATION',
+					'The specified channel could not be found.'
 				);
-
-			// Add fields based on channel type
-			if (
-				channel.type === ChannelType.GuildText ||
-				channel.type === ChannelType.GuildAnnouncement
-			) {
-				embed.addFields(
-					{
-						name: '📢 Topic',
-						value: channel.topic || 'No topic set',
-						inline: false,
-					},
-					{
-						name: '🔞 NSFW',
-						value: channel.nsfw ? 'Yes' : 'No',
-						inline: true,
-					},
-					{
-						name: '⏱️ Rate Limit',
-						value: channel.rateLimitPerUser
-							? `${channel.rateLimitPerUser} seconds`
-							: 'No slow mode',
-						inline: true,
-					},
-					{
-						name: '🧵 Threads',
-						value: channel.threads?.cache.size
-							? `${channel.threads.cache.size} active threads`
-							: 'No active threads',
-						inline: true,
-					},
-				);
+				return;
 			}
 
-			// Voice channel specific info
-			if (
-				channel.type === ChannelType.GuildVoice ||
-				channel.type === ChannelType.GuildStageVoice
-			) {
-				embed.addFields(
-					{
-						name: '🎤 Bitrate',
-						value: `${channel.bitrate / 1000} kbps`,
-						inline: true,
-					},
-					{
-						name: '👥 User Limit',
-						value: channel.userLimit
-							? `${channel.userLimit} users`
-							: 'Unlimited',
-						inline: true,
-					},
-					{
-						name: '🔊 Members Connected',
-						value: `${channel.members.size} members`,
-						inline: true,
-					},
-					{
-						name: '🎥 Video Quality',
-						value: channel.videoQualityMode === 1 ? 'Auto' : 'Full',
-						inline: true,
-					},
-				);
-			}
+			try {
+				// Get permissions using the utility function
+				const getPermissions = (channel, guild) => {
+					const permissions = channel.permissionsFor(guild.roles.everyone);
+					if (!permissions) return 'No permissions';
 
-			// Forum channel specific info
-			if (channel.type === ChannelType.GuildForum) {
-				embed.addFields(
-					{
-						name: '📢 Topic',
-						value: channel.topic || 'No topic set',
-						inline: false,
-					},
-					{
-						name: '📝 Posts',
-						value: `${channel.threads?.cache.size || 0} posts`,
-						inline: true,
-					},
-					{
-						name: '🏷️ Available Tags',
-						value: channel.availableTags?.length
-							? channel.availableTags
-								.map((tag) => tag.name)
-								.join(', ')
-							: 'No tags configured',
-						inline: false,
-					},
-				);
-			}
+					return formatCategorizedPermissions(permissions, {
+						checkmark: true,
+						headers: true,
+						maxLength: 1024,
+					});
+				};
 
-			// Add category and position info for all channel types
-			if (channel.parent) {
-				embed.addFields(
-					{
+				// Get channel activity statistics
+				const getChannelStats = async (channel) => {
+					if (channel.type === ChannelType.GuildText) {
+						try {
+							const messages = await channel.messages.fetch({ limit: 100 });
+							const uniqueAuthors = new Set(messages.map(m => m.author.id)).size;
+							const lastMessage = messages.first();
+
+							return {
+								messageCount: messages.size,
+								uniqueAuthors,
+								lastMessageAt: lastMessage ? lastMessage.createdTimestamp : null
+							};
+						} catch {
+							return null;
+						}
+					}
+					return null;
+				};
+
+				// Initialize the embed
+				const embed = new EmbedBuilder()
+					.setTitle(`${getChannelIcon(channel)} Channel Info: ${channel.name}`)
+					.setColor(interaction.guild.members.me.displayHexColor)
+					.setThumbnail(interaction.guild.iconURL({ dynamic: true, size: 128 }))
+					.addFields(
+						{ name: '📋 ID', value: `\`${channel.id}\``, inline: true },
+						{ name: '📁 Type', value: getChannelType(channel), inline: true },
+						{
+							name: '🕒 Created',
+							value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
+							inline: true
+						}
+					);
+
+				// Add fields based on channel type
+				if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement) {
+					const stats = await getChannelStats(channel);
+
+					embed.addFields(
+						{
+							name: '📢 Topic',
+							value: channel.topic || 'No topic set',
+							inline: false
+						},
+						{
+							name: '🔞 NSFW',
+							value: channel.nsfw ? 'Yes' : 'No',
+							inline: true
+						},
+						{
+							name: '⏱️ Rate Limit',
+							value: channel.rateLimitPerUser
+								? `${channel.rateLimitPerUser} seconds`
+								: 'No slow mode',
+							inline: true
+						}
+					);
+
+					if (stats) {
+						embed.addFields(
+							{
+								name: '📊 Recent Activity',
+								value: [
+									`**Messages:** ${stats.messageCount} (last 100)`,
+									`**Unique Authors:** ${stats.uniqueAuthors}`,
+									stats.lastMessageAt
+										? `**Last Message:** <t:${Math.floor(stats.lastMessageAt / 1000)}:R>`
+										: '**Last Message:** No messages'
+								].join('\n'),
+								inline: false
+							}
+						);
+					}
+
+					// Add thread information if available
+					if (channel.threads?.cache.size) {
+						const activeThreads = channel.threads.cache.filter(thread => !thread.archived);
+						const archivedThreads = channel.threads.cache.filter(thread => thread.archived);
+
+						embed.addFields({
+							name: '🧵 Threads',
+							value: [
+								`**Active:** ${activeThreads.size}`,
+								`**Archived:** ${archivedThreads.size}`,
+								`**Total:** ${channel.threads.cache.size}`
+							].join('\n'),
+							inline: true
+						});
+					}
+				}
+
+				// Voice channel specific info
+				if (channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice) {
+					const connectedMembers = channel.members.map(member => member.user.tag);
+
+					embed.addFields(
+						{
+							name: '🎤 Audio Settings',
+							value: [
+								`**Bitrate:** ${channel.bitrate / 1000} kbps`,
+								`**Region:** ${channel.rtcRegion || 'Auto'}`,
+								`**Quality Mode:** ${channel.videoQualityMode === 1 ? 'Auto' : 'Full'}`
+							].join('\n'),
+							inline: true
+						},
+						{
+							name: '👥 Capacity',
+							value: [
+								`**Current:** ${channel.members.size} members`,
+								`**Limit:** ${channel.userLimit ? `${channel.userLimit} users` : 'Unlimited'}`
+							].join('\n'),
+							inline: true
+						}
+					);
+
+					if (connectedMembers.length > 0) {
+						embed.addFields({
+							name: '🎧 Connected Members',
+							value: connectedMembers.map(tag => `• ${tag}`).join('\n').substring(0, 1024),
+							inline: false
+						});
+					}
+				}
+
+				// Forum channel specific info
+				if (channel.type === ChannelType.GuildForum) {
+					const activePosts = channel.threads?.cache.filter(thread => !thread.archived);
+					const archivedPosts = channel.threads?.cache.filter(thread => thread.archived);
+
+					embed.addFields(
+						{
+							name: '📢 Topic',
+							value: channel.topic || 'No topic set',
+							inline: false
+						},
+						{
+							name: '📝 Posts',
+							value: [
+								`**Active:** ${activePosts?.size || 0}`,
+								`**Archived:** ${archivedPosts?.size || 0}`,
+								`**Total:** ${channel.threads?.cache.size || 0}`
+							].join('\n'),
+							inline: true
+						}
+					);
+
+					if (channel.availableTags?.length) {
+						embed.addFields({
+							name: '🏷️ Available Tags',
+							value: channel.availableTags
+								.map(tag => `• ${tag.emoji ? tag.emoji + ' ' : ''}${tag.name}`)
+								.join('\n'),
+							inline: false
+						});
+					}
+				}
+
+				// Add category and position info for all channel types
+				if (channel.parent) {
+					const siblings = channel.parent.children.cache;
+					const position = siblings.keyArray().indexOf(channel.id) + 1;
+
+					embed.addFields(
+						{
+							name: '📂 Category',
+							value: channel.parent.name,
+							inline: true
+						},
+						{
+							name: '📊 Position',
+							value: `${position} of ${siblings.size}`,
+							inline: true
+						}
+					);
+				} else if (channel.type !== ChannelType.GuildCategory) {
+					embed.addFields({
 						name: '📂 Category',
-						value: channel.parent.name,
-						inline: true,
-					},
-					{
-						name: '📊 Position',
-						value: `${channel.position + 1} of ${channel.parent.children.cache.size}`,
-						inline: true,
-					},
+						value: 'None (Top-level channel)',
+						inline: true
+					});
+				}
+
+				// Add permissions info
+				const permissionText = getPermissions(channel, interaction.guild);
+				const permissionParts = splitPermissionText(permissionText);
+
+				for (let i = 0; i < permissionParts.length; i++) {
+					embed.addFields({
+						name: i === 0 ? '🔐 Default Permissions' : '🔐 Default Permissions (continued)',
+						value: permissionParts[i],
+						inline: false
+					});
+				}
+
+				await interaction.editReply({ embeds: [embed] });
+			} catch (error) {
+				await handleError(
+					interaction,
+					error,
+					'DATA_COLLECTION',
+					'Failed to collect channel information. Some details may be incomplete.'
 				);
-			} else if (channel.type !== ChannelType.GuildCategory) {
-				embed.addFields({
-					name: '📂 Category',
-					value: 'None (Top-level channel)',
-					inline: true,
-				});
 			}
-
-			// Add permissions info - using the utility function and splitting if needed
-			const permissionText = getPermissions(channel, interaction.guild);
-
-			// Use the splitPermissionText utility function to handle long permission lists
-			const permissionParts = splitPermissionText(permissionText);
-
-			// Add each part as a separate field
-			for (let i = 0; i < permissionParts.length; i++) {
-				embed.addFields({
-					name:
-						i === 0
-							? '🔐 Default Permissions'
-							: '🔐 Default Permissions (continued)',
-					value: permissionParts[i],
-					inline: false,
-				});
-			}
-
-			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			await handleError(interaction, error);
+			await handleError(
+				interaction,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while retrieving channel information.'
+			);
 		}
 	},
 };

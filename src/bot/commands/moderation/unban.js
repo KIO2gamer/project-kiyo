@@ -5,6 +5,8 @@ const {
 } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Unbans a member from the server with the specified reason.',

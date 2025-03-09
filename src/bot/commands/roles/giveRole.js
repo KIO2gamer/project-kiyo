@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'Assigns the specified role to the specified user.',
 	usage: '/give_role <target:user> <role:role>',

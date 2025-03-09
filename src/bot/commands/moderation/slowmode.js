@@ -6,6 +6,8 @@ const {
 const ms = require('ms');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'This command allows you to set a slowmode for a channel. Slowmode limits how often users can send messages in the specified channel. You can set the slowmode duration using common time units (e.g., 10s, 5m, 1h).',

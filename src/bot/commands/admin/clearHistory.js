@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const ChatHistory = require('./../../../database/ChatHistory');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('clear_history')

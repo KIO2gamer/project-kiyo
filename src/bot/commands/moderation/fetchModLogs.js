@@ -17,6 +17,8 @@ const ACTION_CHOICES = [
 	{ name: 'Unban', value: 'unban' },
 ];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays the moderation logs with various filtering options.',
@@ -102,7 +104,7 @@ module.exports = {
 					return interaction.reply({
 						content:
 							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
-						flags: 64,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 			}
@@ -124,7 +126,7 @@ module.exports = {
 			if (logs.length === 0) {
 				return interaction.reply({
 					content: 'No moderation logs found.',
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -188,7 +190,7 @@ module.exports = {
 			const message = await interaction.reply({
 				embeds: [initialEmbed],
 				components: initialButtons,
-				withResponse: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			const collector = message.createMessageComponentCollector({
@@ -217,7 +219,7 @@ module.exports = {
 			// Only one reply if an error occurs:
 			await interaction.reply({
 				content: 'Failed to retrieve logs.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

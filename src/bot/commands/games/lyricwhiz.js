@@ -50,6 +50,8 @@ const GENRES_KEYWORDS = [
 	// Add more genres/keywords as you like!
 ];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	category: 'games',
 	data: new SlashCommandBuilder()
@@ -86,7 +88,7 @@ module.exports = {
 								'Oops! Something went wrong while fetching a song. Please try again later.',
 							),
 					],
-					flags: 64,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 

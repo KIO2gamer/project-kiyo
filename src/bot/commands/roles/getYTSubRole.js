@@ -17,6 +17,8 @@ function encrypt(text, secretKey, iv) {
 	return `${iv.toString('hex')}:${encrypted.toString('hex')}:${secretKey.toString('hex')}`;
 }
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('get_yt_sub_role')
@@ -31,7 +33,7 @@ module.exports = {
 
 	async execute(interaction) {
 		try {
-			await interaction.deferReply({ flags: 64 });
+			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 			const state = JSON.stringify({
 				interactionId: interaction.id,

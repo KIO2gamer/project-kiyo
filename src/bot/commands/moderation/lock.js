@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'This command locks a specified text or announcement channel, preventing users from sending messages in it. If no channel is specified, it will lock the channel the command is used in.',

@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'This command unlocks a specified channel or the current channel if no channel is specified.',

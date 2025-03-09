@@ -2,6 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler.js');
 const Role = require('../../../database/roleStorage.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays a list of roles that have been stored in the database.',
@@ -29,8 +31,7 @@ module.exports = {
 					roles
 						.map(
 							(role, index) =>
-								`${index + 1}. **${role.roleName}** (ID: \`${
-									role.roleID
+								`${index + 1}. **${role.roleName}** (ID: \`${role.roleID
 								}\`, Color: \`${role.roleColor}\`)`,
 						)
 						.join('\n'),

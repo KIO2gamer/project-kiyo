@@ -10,6 +10,8 @@ const INCORRECT_GUESS_EMOJI = '❌';
 const TIME_UP_EMOJI = '⏰';
 const GAME_OVER_EMOJI = '🏁';
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('unscramble')

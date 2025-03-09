@@ -157,7 +157,7 @@ const initDevelopmentMode = (client) => {
 					content: success
 						? `Command \`${commandName}\` was reloaded successfully!`
 						: `Failed to reload command \`${commandName}\`.`,
-					ephemeral: true
+					flags: MessageFlags.Ephemeral
 				});
 			}
 		});

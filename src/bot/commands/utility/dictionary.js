@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 const axios = require('axios');
-const { handleError } = require('./../../utils/errorHandler'); // Import errorHandler
+const { handleError } = require('../../utils/errorHandler');
 
 module.exports = {
 	category: 'utility',
@@ -22,31 +22,60 @@ module.exports = {
 			const response = await axios.get(apiUrl);
 			const data = response.data[0];
 
-			if (data) {
-				const definition = data.meanings[0].definitions[0].definition;
-				const partOfSpeech = data.meanings[0].partOfSpeech;
-
-				const embed = new EmbedBuilder()
-					.setTitle(word)
-					.setDescription(definition)
-					.addFields({
-						name: 'Part of Speech',
-						value: partOfSpeech,
-					})
-					.setFooter({
-						text: 'Powered by DictionaryAPI',
-						iconURL: 'https://i.imgur.com/AfFp7pu.png',
-					})
-					.setTimestamp();
-				await interaction.reply({ embeds: [embed] });
-			} else {
-				await interaction.reply(
-					`Sorry, I couldn't find a definition for "${word}".`,
+			if (!data) {
+				// Use handleError for validation errors
+				await handleError(
+					interaction,
+					new Error(`No definition found for "${word}"`),
+					'VALIDATION'
 				);
+				return;
 			}
+
+			const definition = data.meanings[0].definitions[0].definition;
+			const partOfSpeech = data.meanings[0].partOfSpeech;
+
+			const embed = new EmbedBuilder()
+				.setTitle(word)
+				.setDescription(definition)
+				.addFields({
+					name: 'Part of Speech',
+					value: partOfSpeech,
+				})
+				.setFooter({
+					text: 'Powered by DictionaryAPI',
+					iconURL: 'https://i.imgur.com/AfFp7pu.png',
+				})
+				.setTimestamp();
+
+			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			// Use the errorHandler to handle and log the error
-			await handleError(interaction, error);
+			// Handle different types of errors appropriately
+			if (error.response) {
+				if (error.response.status === 404) {
+					await handleError(
+						interaction,
+						new Error(`Could not find definition for "${word}"`),
+						'VALIDATION'
+					);
+				} else {
+					await handleError(
+						interaction,
+						error,
+						'API',
+						`Error accessing dictionary API: ${error.response.status}`
+					);
+				}
+			} else if (error.request) {
+				await handleError(
+					interaction,
+					error,
+					'API',
+					'Dictionary API is not responding'
+				);
+			} else {
+				await handleError(interaction, error);
+			}
 		}
 	},
 };

@@ -40,6 +40,8 @@ const vm = require('vm');
 const allowedRoles = ['938469752882479166'];
 const allowedUsers = ['764513584125444146'];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Evaluates provided JavaScript code. WARNING: This command is extremely dangerous and should only be used for debugging in a controlled environment. Never use it in a production bot.',
@@ -68,7 +70,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: 'You do not have permission to use this command.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 

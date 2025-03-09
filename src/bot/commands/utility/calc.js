@@ -11,6 +11,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const math = require('mathjs'); // Import mathjs
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	category: 'utility',
 	data: new SlashCommandBuilder()
@@ -58,7 +60,7 @@ module.exports = {
 			await interaction.reply({
 				content:
 					'Invalid mathematical expression. Please check your input.',
-				flags: 64,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},
