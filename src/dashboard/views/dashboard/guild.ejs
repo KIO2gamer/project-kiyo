@@ -1,0 +1,146 @@
+<div class="space-y-6">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <div class="flex items-center space-x-4 mb-6">
+            <% if (guild.icon) { %>
+                <img src="https://cdn.discordapp.com/icons/<%= guild.id %>/<%= guild.icon %>.png" 
+                     alt="<%= guild.name %>"
+                     class="w-20 h-20 rounded-full">
+            <% } else { %>
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
+                    <span class="text-3xl font-bold text-gray-600">
+                        <%= guild.name.charAt(0) %>
+                    </span>
+                </div>
+            <% } %>
+            <div>
+                <h1 class="text-3xl font-bold"><%= guild.name %></h1>
+                <p class="text-gray-600">Server Settings</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- General Settings -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold">General Settings</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Prefix</label>
+                    <input type="text" class="w-full p-2 border rounded-md" value="!" placeholder="Command prefix">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Welcome Channel</label>
+                    <select class="w-full p-2 border rounded-md">
+                        <option value="">Select channel</option>
+                        <!-- Channels will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Moderation Settings -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold">Moderation Settings</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Auto-Mod Level</label>
+                    <select class="w-full p-2 border rounded-md">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Log Channel</label>
+                    <select class="w-full p-2 border rounded-md">
+                        <option value="">Select channel</option>
+                        <!-- Channels will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 pt-6 border-t">
+            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+                Save Changes
+            </button>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Moderation Module -->
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-xl font-semibold mb-4">Moderation</h3>
+            <div class="space-y-4">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Auto-Moderation</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Anti-Spam</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Bad Word Filter</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Welcome Module -->
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-xl font-semibold mb-4">Welcome System</h3>
+            <div class="space-y-4">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Welcome Messages</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Welcome Role</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Farewell Messages</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Utility Module -->
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-xl font-semibold mb-4">Utility Features</h3>
+            <div class="space-y-4">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Level System</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Custom Commands</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
+                    <span>Auto-Roles</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Add event listeners for form submission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Add your form submission logic here
+        });
+    }
+
+    // Add event listeners for checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', async (e) => {
+            // Add your checkbox change logic here
+        });
+    });
+});
+</script> 

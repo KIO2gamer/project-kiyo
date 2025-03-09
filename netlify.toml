@@ -1,6 +1,22 @@
 [build]
   functions = "netlify/functions"
+  publish = "dist"
+  command = "npm run build"
 
 [functions]
   node_bundler = "esbuild"
   included_files = ["netlify/functions"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[build.environment]
+  NODE_VERSION = "18"

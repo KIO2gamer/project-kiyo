@@ -10,6 +10,10 @@
 	"scripts": {
 		"start": "node src/index.js",
 		"dev": "nodemon src/index.js",
+		"dashboard": "node src/dashboard/index.js",
+		"dev:dashboard": "nodemon src/dashboard/index.js",
+		"build": "npm run build:dashboard",
+		"build:dashboard": "mkdir -p dist && cp -r src/dashboard/public dist/ && cp -r src/dashboard/views dist/ && cp src/dashboard/index.js dist/ && cp -r src/dashboard/routes dist/",
 		"lint": "eslint .",
 		"lint:fix": "eslint --fix .",
 		"format": "prettier --config .prettierrc.json --write .",
@@ -78,6 +82,7 @@
 		"node-fetch": "^2.7.0",
 		"passport": "^0.7.0",
 		"passport-discord": "^0.1.4",
+		"serverless-http": "^3.2.0",
 		"winston": "^3.17.0"
 	},
 	"devDependencies": {

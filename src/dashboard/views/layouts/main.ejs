@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Kiyo Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex-shrink-0 text-xl font-bold">
+                        Kiyo Bot
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="/" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Home</a>
+                            <% if (locals.user) { %>
+                                <a href="/dashboard" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Dashboard</a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <% if (locals.user) { %>
+                        <div class="flex items-center">
+                            <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" 
+                                 alt="Avatar"
+                                 class="h-8 w-8 rounded-full">
+                            <span class="ml-2 text-sm"><%= user.username %></span>
+                            <a href="/auth/logout" class="ml-4 px-3 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700">
+                                Logout
+                            </a>
+                        </div>
+                    <% } else { %>
+                        <a href="/auth/discord" class="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700">
+                            Login with Discord
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <%- body %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-8">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-sm">
+                &copy; <%= new Date().getFullYear() %> Kiyo Bot. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html> 
