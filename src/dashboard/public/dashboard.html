@@ -48,15 +48,11 @@
 			<a href="/commands">Commands</a>
 			<a href="/settings">Settings</a>
 			<a href="/stats">Statistics</a>
-			<a href="/logout">Logout</a>
+			<a href="/logout" id="logout-link" style="display: none">Logout</a>
 		</nav>
 		<div class="container">
-			<div class="card">
-				<h2>Welcome, User!</h2>
-				<p>Manage your Discord bot settings and view statistics.</p>
-				<button onclick="window.location.href='/auth/discord'">
-					Login with Discord
-				</button>
+			<div class="card" id="login-card">
+				<!-- This content will be updated based on authentication state -->
 			</div>
 			<div class="card">
 				<h3>Bot Statistics</h3>
@@ -68,10 +64,41 @@
 			</div>
 		</div>
 		<script>
-			// Dummy data load example, replace with actual API calls if needed
+			// Dummy data load example, replace with API calls if needed
 			document.getElementById('servers-count').innerText = 12;
 			document.getElementById('users-count').innerText = 340;
 			document.getElementById('uptime').innerText = '3 days, 4 hours';
+
+			// Simulated authentication example.
+			// In production, you could update this based on secure cookie/session data.
+			const user = JSON.parse(
+				localStorage.getItem('discord_user') || 'null',
+			);
+			const loginCard = document.getElementById('login-card');
+			const logoutLink = document.getElementById('logout-link');
+
+			if (user && user.username) {
+				loginCard.innerHTML = `
+					<h2>Welcome, ${user.username}!</h2>
+					<p>You are logged in via Discord.</p>
+					<button id="logout-button">Logout</button>
+				`;
+				logoutLink.style.display = 'inline';
+
+				// Logout handler clears the local storage token and reloads the page.
+				document
+					.getElementById('logout-button')
+					.addEventListener('click', () => {
+						localStorage.removeItem('discord_user');
+						window.location.reload();
+					});
+			} else {
+				loginCard.innerHTML = `
+					<h2>Welcome, Guest!</h2>
+					<p>Please log in with Discord to access your dashboard.</p>
+					<button onclick="window.location.href='/auth/discord'">Login with Discord</button>
+				`;
+			}
 		</script>
 	</body>
 </html>
