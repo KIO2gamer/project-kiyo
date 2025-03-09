@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Kiyo Dashboard</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background: #f0f2f5;
+				color: #333;
+				margin: 0;
+				padding: 0;
+			}
+			header {
+				background: #7289da;
+				padding: 1em;
+				color: white;
+				text-align: center;
+			}
+			nav {
+				background: #2c2f33;
+				padding: 1em;
+			}
+			nav a {
+				color: white;
+				margin-right: 1em;
+				text-decoration: none;
+			}
+			.container {
+				padding: 1em;
+			}
+			.card {
+				background: white;
+				padding: 1em;
+				margin: 1em 0;
+				border-radius: 5px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Kiyo Discord Bot Dashboard</h1>
+		</header>
+		<nav>
+			<a href="/">Home</a>
+			<a href="/commands">Commands</a>
+			<a href="/settings">Settings</a>
+			<a href="/stats">Statistics</a>
+			<a href="/logout">Logout</a>
+		</nav>
+		<div class="container">
+			<div class="card">
+				<h2>Welcome, User!</h2>
+				<p>Manage your Discord bot settings and view statistics.</p>
+				<button onclick="window.location.href='/auth/discord'">
+					Login with Discord
+				</button>
+			</div>
+			<div class="card">
+				<h3>Bot Statistics</h3>
+				<ul>
+					<li>Servers: <span id="servers-count">Loading...</span></li>
+					<li>Users: <span id="users-count">Loading...</span></li>
+					<li>Uptime: <span id="uptime">Loading...</span></li>
+				</ul>
+			</div>
+		</div>
+		<script>
+			// Dummy data load example, replace with actual API calls if needed
+			document.getElementById('servers-count').innerText = 12;
+			document.getElementById('users-count').innerText = 340;
+			document.getElementById('uptime').innerText = '3 days, 4 hours';
+		</script>
+	</body>
+</html>
