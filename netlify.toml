@@ -1,11 +1,12 @@
 [build]
-  functions = "netlify/functions"
-  publish = "dist"
   command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
 
-[functions]
-  node_bundler = "esbuild"
-  included_files = ["netlify/functions"]
+[dev]
+  command = "npm run dev:dashboard"
+  port = 3000
+  publish = "dist"
 
 [[redirects]]
   from = "/api/*"
@@ -13,10 +14,23 @@
   status = 200
 
 [[redirects]]
+  from = "/auth/*"
+  to = "/.netlify/functions/dashboard/auth/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "/.netlify/functions/dashboard/dashboard/:splat"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = true
+
+[functions]
+  external_node_modules = ["express", "express-session", "passport", "passport-discord", "express-ejs-layouts"]
+  node_bundler = "esbuild"
 
 [build.environment]
   NODE_VERSION = "18"
