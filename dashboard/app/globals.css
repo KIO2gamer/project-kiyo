@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+body {
+	color: rgb(var(--foreground-rgb));
+	background: rgb(var(--background-end-rgb));
+}
+
+/* Add image constraints */
+img {
+	max-height: 200px;
+	width: auto;
+	object-fit: contain;
+}
+
+/* Add chart constraints */
+.tremor-Card-root {
+	max-height: 300px;
+	overflow: hidden;
+}
+
+.tremor-AreaChart-root,
+.tremor-BarChart-root,
+.tremor-DonutChart-root {
+	max-height: 250px !important;
+	width: 100%;
+}
+
+/* Adjust text sizes */
+.text-tremor-title {
+	font-size: 0.9rem !important;
+}
+
+.text-tremor-metric {
+	font-size: 1.5rem !important;
+}
+
+.tremor-Legend-root {
+	font-size: 0.8rem !important;
+}
