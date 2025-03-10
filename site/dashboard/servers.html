@@ -1,62 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Servers - Kiyo Dashboard</title>
 		<!-- Bootstrap CSS -->
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
 		<!-- Bootstrap Icons -->
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+			rel="stylesheet"
+		/>
 		<!-- Custom CSS -->
 		<link href="/assets/css/dashboard.css" rel="stylesheet" />
 	</head>
 	<body>
 		<div class="dashboard-container">
 			<!-- Sidebar -->
-			<nav id="sidebar" class="sidebar">
+			<aside class="sidebar">
 				<div class="sidebar-header">
-					<h3>Kiyo Bot</h3>
+					<img
+						src="/assets/img/logo.png"
+						alt="Kiyo"
+						class="sidebar-logo"
+					/>
+					<h1>Kiyo Dashboard</h1>
 				</div>
-				<div class="sidebar-content">
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<a href="/dashboard/home" class="nav-link">
-								<i class="bi bi-house-door"></i> Dashboard
-							</a>
+				<nav class="sidebar-nav">
+					<ul>
+						<li class="nav-item" id="nav-home">
+							<a href="/dashboard/home"
+								><i class="bi bi-house-door"></i> Home</a
+							>
 						</li>
-						<li class="nav-item">
-							<a href="/dashboard/servers" class="nav-link active">
-								<i class="bi bi-server"></i> Servers
-							</a>
+						<li class="nav-item" id="nav-servers">
+							<a href="/dashboard/servers"
+								><i class="bi bi-server"></i> Servers</a
+							>
 						</li>
-						<li class="nav-item">
-							<a href="/dashboard/commands" class="nav-link">
-								<i class="bi bi-code-slash"></i> Commands
-							</a>
+						<li class="nav-item" id="nav-commands">
+							<a href="/dashboard/commands"
+								><i class="bi bi-command"></i> Commands</a
+							>
 						</li>
-						<li class="nav-item">
-							<a href="/dashboard/settings" class="nav-link">
-								<i class="bi bi-gear"></i> Settings
-							</a>
+						<li class="nav-item" id="nav-settings">
+							<a href="/dashboard/settings"
+								><i class="bi bi-gear"></i> Settings</a
+							>
 						</li>
 					</ul>
-				</div>
+				</nav>
 				<div class="sidebar-footer">
-					<a href="/" class="nav-link">
-						<i class="bi bi-arrow-left"></i> Back to Site
+					<a href="/" class="btn btn-outline-light btn-sm">
+						<i class="bi bi-box-arrow-left"></i> Back to Site
 					</a>
 				</div>
-			</nav>
+			</aside>
 
 			<!-- Main Content -->
 			<main class="main-content">
 				<!-- Header -->
 				<header class="dashboard-header">
-					<div class="d-flex justify-content-between align-items-center">
+					<div
+						class="d-flex justify-content-between align-items-center"
+					>
 						<h2><i class="bi bi-server"></i> Manage Servers</h2>
 						<div class="user-profile" id="user-profile">
-							<div class="spinner-border spinner-border-sm text-light" role="status">
+							<div
+								class="spinner-border spinner-border-sm text-light"
+								role="status"
+							>
 								<span class="visually-hidden">Loading...</span>
 							</div>
 						</div>
@@ -68,21 +84,39 @@
 					<div class="row mb-4">
 						<div class="col-md-12">
 							<div class="card">
-								<div class="card-header d-flex justify-content-between align-items-center">
+								<div
+									class="card-header d-flex justify-content-between align-items-center"
+								>
 									<h5>
-										<i class="bi bi-server me-2"></i>Your Servers
+										<i class="bi bi-server me-2"></i>Your
+										Servers
 									</h5>
-									<a href="https://discord.com/api/oauth2/authorize" id="add-server-link" class="btn btn-sm btn-primary">
-										<i class="bi bi-plus-circle"></i> Add to Server
+									<a
+										href="https://discord.com/api/oauth2/authorize"
+										id="add-server-link"
+										class="btn btn-sm btn-primary"
+									>
+										<i class="bi bi-plus-circle"></i> Add to
+										Server
 									</a>
 								</div>
 								<div class="card-body">
-									<div id="servers-container" class="servers-grid">
+									<div
+										id="servers-container"
+										class="servers-grid"
+									>
 										<div class="text-center py-4">
-											<div class="spinner-border text-primary" role="status">
-												<span class="visually-hidden">Loading...</span>
+											<div
+												class="spinner-border text-primary"
+												role="status"
+											>
+												<span class="visually-hidden"
+													>Loading...</span
+												>
 											</div>
-											<p class="mt-2">Loading your servers...</p>
+											<p class="mt-2">
+												Loading your servers...
+											</p>
 										</div>
 									</div>
 								</div>
@@ -91,32 +125,64 @@
 					</div>
 
 					<!-- Selected Server Details (shown when a server is selected) -->
-					<div class="row mb-4" id="server-details-section" style="display: none;">
+					<div
+						class="row mb-4"
+						id="server-details-section"
+						style="display: none"
+					>
 						<div class="col-md-12">
 							<div class="card">
 								<div class="card-header">
-									<h5 id="selected-server-name">Server Details</h5>
+									<h5 id="selected-server-name">
+										Server Details
+									</h5>
 								</div>
 								<div class="card-body">
 									<div class="row">
 										<div class="col-md-4">
 											<div class="server-info-card">
 												<div class="text-center">
-													<img id="selected-server-icon" src="/assets/img/default-server.png" alt="Server Icon" class="server-icon-large mb-3">
-													<h4 id="selected-server-title">Server Name</h4>
+													<img
+														id="selected-server-icon"
+														src="/assets/img/default-server.png"
+														alt="Server Icon"
+														class="server-icon-large mb-3"
+													/>
+													<h4
+														id="selected-server-title"
+													>
+														Server Name
+													</h4>
 												</div>
 												<div class="server-stats mt-4">
 													<div class="stat-item">
-														<i class="bi bi-people"></i>
-														<span id="server-member-count">-</span> Members
+														<i
+															class="bi bi-people"
+														></i>
+														<span
+															id="server-member-count"
+															>-</span
+														>
+														Members
 													</div>
 													<div class="stat-item">
-														<i class="bi bi-chat-left-text"></i>
-														<span id="server-channel-count">-</span> Channels
+														<i
+															class="bi bi-chat-left-text"
+														></i>
+														<span
+															id="server-channel-count"
+															>-</span
+														>
+														Channels
 													</div>
 													<div class="stat-item">
-														<i class="bi bi-calendar3"></i>
-														<span id="server-creation-date">-</span>
+														<i
+															class="bi bi-calendar3"
+														></i>
+														<span
+															id="server-creation-date"
+															>-</span
+														>
 													</div>
 												</div>
 											</div>
@@ -124,33 +190,87 @@
 										<div class="col-md-8">
 											<h5>Server Management</h5>
 											<div class="list-group">
-												<a href="#" class="list-group-item list-group-item-action server-action" data-action="welcome">
-													<div class="d-flex w-100 justify-content-between">
-														<h6 class="mb-1">Welcome Messages</h6>
-														<i class="bi bi-chevron-right"></i>
+												<a
+													href="#"
+													class="list-group-item list-group-item-action server-action"
+													data-action="welcome"
+												>
+													<div
+														class="d-flex w-100 justify-content-between"
+													>
+														<h6 class="mb-1">
+															Welcome Messages
+														</h6>
+														<i
+															class="bi bi-chevron-right"
+														></i>
 													</div>
-													<p class="mb-1">Configure welcome messages and auto-roles for new members</p>
+													<p class="mb-1">
+														Configure welcome
+														messages and auto-roles
+														for new members
+													</p>
 												</a>
-												<a href="#" class="list-group-item list-group-item-action server-action" data-action="moderation">
-													<div class="d-flex w-100 justify-content-between">
-														<h6 class="mb-1">Moderation</h6>
-														<i class="bi bi-chevron-right"></i>
+												<a
+													href="#"
+													class="list-group-item list-group-item-action server-action"
+													data-action="moderation"
+												>
+													<div
+														class="d-flex w-100 justify-content-between"
+													>
+														<h6 class="mb-1">
+															Moderation
+														</h6>
+														<i
+															class="bi bi-chevron-right"
+														></i>
 													</div>
-													<p class="mb-1">Setup auto-moderation, word filters, and logging</p>
+													<p class="mb-1">
+														Setup auto-moderation,
+														word filters, and
+														logging
+													</p>
 												</a>
-												<a href="#" class="list-group-item list-group-item-action server-action" data-action="commands">
-													<div class="d-flex w-100 justify-content-between">
-														<h6 class="mb-1">Commands</h6>
-														<i class="bi bi-chevron-right"></i>
+												<a
+													href="#"
+													class="list-group-item list-group-item-action server-action"
+													data-action="commands"
+												>
+													<div
+														class="d-flex w-100 justify-content-between"
+													>
+														<h6 class="mb-1">
+															Commands
+														</h6>
+														<i
+															class="bi bi-chevron-right"
+														></i>
 													</div>
-													<p class="mb-1">Enable/disable bot commands for this server</p>
+													<p class="mb-1">
+														Enable/disable bot
+														commands for this server
+													</p>
 												</a>
-												<a href="#" class="list-group-item list-group-item-action server-action" data-action="stats">
-													<div class="d-flex w-100 justify-content-between">
-														<h6 class="mb-1">Server Statistics</h6>
-														<i class="bi bi-chevron-right"></i>
+												<a
+													href="#"
+													class="list-group-item list-group-item-action server-action"
+													data-action="stats"
+												>
+													<div
+														class="d-flex w-100 justify-content-between"
+													>
+														<h6 class="mb-1">
+															Server Statistics
+														</h6>
+														<i
+															class="bi bi-chevron-right"
+														></i>
 													</div>
-													<p class="mb-1">View detailed activity and usage statistics</p>
+													<p class="mb-1">
+														View detailed activity
+														and usage statistics
+													</p>
 												</a>
 											</div>
 										</div>
@@ -171,11 +291,14 @@
 			document.addEventListener('DOMContentLoaded', async () => {
 				// Load user profile
 				await loadUserProfile();
-				
+
 				// Update add server link with correct OAuth URL
-				const addServerLink = document.getElementById('add-server-link');
+				const addServerLink =
+					document.getElementById('add-server-link');
 				try {
-					const response = await fetch('/.netlify/functions/dashboardApi/config');
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/config',
+					);
 					if (response.ok) {
 						const data = await response.json();
 						if (data.inviteUrl) {
@@ -201,16 +324,19 @@
 
 			// Load user's servers
 			async function loadServers() {
-				const serversContainer = document.getElementById('servers-container');
+				const serversContainer =
+					document.getElementById('servers-container');
 
 				try {
-					const response = await fetch('/.netlify/functions/dashboardApi/guilds');
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/guilds',
+					);
 					if (!response.ok) {
 						throw new Error('Failed to fetch servers');
 					}
 
 					const data = await response.json();
-					
+
 					if (data.guilds.length === 0) {
 						serversContainer.innerHTML = `
 							<div class="alert alert-info m-0">
@@ -221,16 +347,16 @@
 					}
 
 					serversContainer.innerHTML = '';
-					
+
 					// Create server cards for each server
-					data.guilds.forEach(guild => {
+					data.guilds.forEach((guild) => {
 						const serverCard = document.createElement('div');
 						serverCard.className = 'server-card';
-						
+
 						const serverIcon = guild.icon
 							? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`
 							: '/assets/img/default-server.png';
-						
+
 						serverCard.innerHTML = `
 							<div class="server-icon">
 								<img src="${serverIcon}" alt="${guild.name}" loading="lazy">
@@ -240,26 +366,28 @@
 								<a href="/dashboard/servers?id=${guild.id}" class="btn btn-sm btn-primary">Manage</a>
 							</div>
 						`;
-						
+
 						serversContainer.appendChild(serverCard);
 					});
-
 				} catch (error) {
 					console.error('Error loading servers:', error);
-					serversContainer.innerHTML = '<div class="alert alert-danger">Failed to load servers. Please try again later.</div>';
+					serversContainer.innerHTML =
+						'<div class="alert alert-danger">Failed to load servers. Please try again later.</div>';
 				}
 			}
 
 			// Load user profile
 			async function loadUserProfile() {
 				try {
-					const response = await fetch('/.netlify/functions/dashboardApi/user');
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/user',
+					);
 					if (!response.ok) {
 						throw new Error('Failed to fetch user profile');
 					}
-					
+
 					const user = await response.json();
-					
+
 					document.getElementById('user-profile').innerHTML = `
 						<div class="d-flex align-items-center">
 							<span class="me-2">${user.username}</span>
@@ -271,7 +399,7 @@
 					`;
 				} catch (error) {
 					console.error('Error loading user profile:', error);
-					document.getElementById('user-profile').innerHTML = 
+					document.getElementById('user-profile').innerHTML =
 						'<div class="alert alert-danger p-2 m-0">Failed to load profile</div>';
 				}
 			}
@@ -279,51 +407,68 @@
 			// Load server details
 			async function loadServerDetails(serverId) {
 				try {
-					const response = await fetch(`/.netlify/functions/dashboardApi/guilds/${serverId}`);
+					const response = await fetch(
+						`/.netlify/functions/dashboardApi/guilds/${serverId}`,
+					);
 					if (!response.ok) {
 						throw new Error('Failed to fetch server details');
 					}
-					
+
 					const server = await response.json();
-					
+
 					// Show the server details section
-					document.getElementById('server-details-section').style.display = 'block';
-					
+					document.getElementById(
+						'server-details-section',
+					).style.display = 'block';
+
 					// Update server details
-					document.getElementById('selected-server-name').textContent = `${server.name} - Server Details`;
-					document.getElementById('selected-server-title').textContent = server.name;
-					
+					document.getElementById(
+						'selected-server-name',
+					).textContent = `${server.name} - Server Details`;
+					document.getElementById(
+						'selected-server-title',
+					).textContent = server.name;
+
 					// Set server icon
 					const serverIcon = server.icon
 						? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png?size=256`
 						: '/assets/img/default-server.png';
-					document.getElementById('selected-server-icon').src = serverIcon;
-					
+					document.getElementById('selected-server-icon').src =
+						serverIcon;
+
 					// Update stats
-					document.getElementById('server-member-count').textContent = server.memberCount || 'N/A';
-					document.getElementById('server-channel-count').textContent = server.channels || 'N/A';
-					
+					document.getElementById('server-member-count').textContent =
+						server.memberCount || 'N/A';
+					document.getElementById(
+						'server-channel-count',
+					).textContent = server.channels || 'N/A';
+
 					// Format creation date
-					const creationDate = server.createdAt 
+					const creationDate = server.createdAt
 						? new Date(server.createdAt).toLocaleDateString()
 						: 'Unknown';
-					document.getElementById('server-creation-date').textContent = creationDate;
+					document.getElementById(
+						'server-creation-date',
+					).textContent = creationDate;
 
 					// Add event listeners to management links
-					document.querySelectorAll('.server-action').forEach(link => {
-						link.addEventListener('click', function(e) {
-							e.preventDefault();
-							const action = this.getAttribute('data-action');
-							window.location.href = `/dashboard/servers/${action}?id=${serverId}`;
+					document
+						.querySelectorAll('.server-action')
+						.forEach((link) => {
+							link.addEventListener('click', function (e) {
+								e.preventDefault();
+								const action = this.getAttribute('data-action');
+								window.location.href = `/dashboard/servers/${action}?id=${serverId}`;
+							});
 						});
-					});
-
 				} catch (error) {
 					console.error('Error loading server details:', error);
-					document.getElementById('server-details-section').innerHTML = 
+					document.getElementById(
+						'server-details-section',
+					).innerHTML =
 						'<div class="alert alert-danger">Failed to load server details. Please try again later.</div>';
 				}
 			}
 		</script>
 	</body>
-</html></div></li>
+</html>

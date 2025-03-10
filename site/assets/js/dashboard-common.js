@@ -294,11 +294,75 @@ function initActiveSidebar() {
 	});
 }
 
-// Initialize components when DOM is loaded
+/**
+ * Initialize mobile navigation
+ */
+function initMobileNavigation() {
+	const sidebarToggle = document.querySelector('.navbar-toggle');
+	const sidebar = document.querySelector('.sidebar');
+
+	if (sidebarToggle && sidebar) {
+		sidebarToggle.addEventListener('click', () => {
+			sidebar.classList.toggle('show');
+		});
+
+		// Close sidebar when clicking outside on mobile
+		document.addEventListener('click', (e) => {
+			if (window.innerWidth < 992 &&
+				!e.target.closest('.sidebar') &&
+				!e.target.closest('.navbar-toggle')) {
+				sidebar.classList.remove('show');
+			}
+		});
+	}
+}
+
+/**
+ * Apply theme based on user settings
+ * @param {string} theme - Theme name: light, dark, or system
+ */
+function applyTheme(theme) {
+	// Get actual theme (resolve system preference)
+	const actualTheme = theme === 'system'
+		? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+		: theme;
+
+	// Apply theme classes
+	document.documentElement.setAttribute('data-bs-theme', actualTheme);
+	document.body.classList.remove('theme-light', 'theme-dark');
+	document.body.classList.add(`theme-${actualTheme}`);
+
+	// Store in localStorage for persistence
+	localStorage.setItem('kiyo-theme', theme);
+}
+
+// Initialize theme from saved preference
+function initializeTheme() {
+	const savedTheme = localStorage.getItem('kiyo-theme') || 'system';
+	applyTheme(savedTheme);
+
+	// Update radio buttons if on settings page
+	document.querySelectorAll('input[name="theme"]').forEach(radio => {
+		if (radio.value === savedTheme) {
+			radio.checked = true;
+		}
+	});
+
+	// Listen for system preference changes if using system theme
+	if (savedTheme === 'system') {
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+			applyTheme('system');
+		});
+	}
+}
+
+// Call when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
 	initActiveSidebar();
 	initBootstrapComponents();
 	loadUserProfile();
+	initMobileNavigation();
+	initializeTheme();
 });
 
 // Export functions for use in other scripts
@@ -309,3 +373,5 @@ window.postToApi = postToApi;
 window.showToast = showToast;
 window.logout = logout;
 window.formatTimestamp = formatTimestamp;
+window.applyTheme = applyTheme;
+window.initializeTheme = initializeTheme;
