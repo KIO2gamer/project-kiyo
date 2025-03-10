@@ -82,7 +82,7 @@ exports.handler = async (event) => {
 
 	// If no code is provided, redirect to Discord authorization
 	if (!code) {
-		const redirectUri = `${process.env.DISCORD_REDIRECT_URI}/dashboard`;
+		const redirectUri = `${process.env.DISCORD_REDIRECT_URI}/dashboardAuth`;
 		const clientId = process.env.DISCORD_CLIENT_ID;
 		const scope = 'identify guilds';
 
