@@ -6,3 +6,4 @@ dist
 logs
 extractCommands.js
 .qodo
+.github/copilot-instructions.md
