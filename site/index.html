@@ -185,24 +185,28 @@
 		<!-- Hero section -->
 		<header class="hero" id="main-content">
 			<div class="container text-center py-5">
-				<h1 class="display-4 fw-bold text-white mb-3 animate-fadeInUp">
+				<h1 class="display-3 fw-bold text-white mb-4 animate-fadeInUp">
 					Level Up Your Discord Server
 				</h1>
 				<p
-					class="lead text-white-75 mb-4 animate-fadeInUp"
-					style="animation-delay: 0.2s"
+					class="lead text-white mb-5 animate-fadeInUp mx-auto"
+					style="
+						animation-delay: 0.2s;
+						max-width: 800px;
+						font-size: 1.3rem;
+					"
 				>
 					Kiyo is a feature-rich Discord bot providing moderation, fun
 					games, utilities, and more. Customizable, reliable, and
 					constantly evolving.
 				</p>
 				<div
-					class="d-flex justify-content-center gap-3 flex-wrap animate-fadeInUp"
+					class="d-flex justify-content-center gap-4 flex-wrap animate-fadeInUp"
 					style="animation-delay: 0.4s"
 				>
 					<a
 						href="https://discord.com/oauth2/authorize?client_id=1155222493079015545&permissions=8&integration_type=0&scope=bot"
-						class="btn btn-primary btn-lg"
+						class="btn btn-primary btn-lg px-5 py-3"
 						target="_blank"
 						rel="noopener"
 					>
@@ -211,31 +215,34 @@
 					</a>
 					<a
 						href="/.netlify/functions/dashboardAuth"
-						class="btn btn-outline-light btn-lg"
+						class="btn btn-outline-light btn-lg px-5 py-3"
 					>
 						<i class="bi bi-gear me-2" aria-hidden="true"></i
 						>Dashboard Login
 					</a>
 				</div>
 				<div
-					class="mt-5 position-relative animate-fadeInUp"
+					class="dashboard-preview mt-5 position-relative animate-fadeInUp"
 					style="animation-delay: 0.6s"
 				>
+					<div
+						class="preview-badge position-absolute start-50 translate-x-50 top-0"
+						style="transform: translateY(-50%)"
+					>
+						<span
+							class="badge bg-primary px-4 py-2 rounded-pill fs-6"
+						>
+							Powerful Dashboard Included
+						</span>
+					</div>
 					<img
 						src="/assets/img/dashboard-preview.png"
 						alt="Preview of Kiyo's dashboard interface"
-						class="img-fluid rounded shadow-lg"
+						class="img-fluid rounded-4 shadow-lg"
 						width="1200"
 						height="600"
 						loading="lazy"
 					/>
-					<div
-						class="position-absolute start-0 end-0 bottom-0 p-3 text-center"
-					>
-						<span class="badge bg-primary px-3 py-2"
-							>Powerful Dashboard Included</span
-						>
-					</div>
 				</div>
 			</div>
 		</header>

@@ -7,11 +7,7 @@
 	--success-color: #57f287;
 	--warning-color: #fee75c;
 	--danger-color: #ed4245;
-	--bg-gradient: linear-gradient(
-		135deg,
-		var(--primary-color),
-		var(--accent-color)
-	);
+	--bg-gradient: linear-gradient(135deg, #8b5cf6, #d946ef);
 	--card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 	--transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -48,14 +44,22 @@ a:hover {
 
 /* Navbar */
 .navbar {
+	background-color: transparent;
+	padding: 1.5rem 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+}
+
+.navbar.scrolled {
 	background-color: rgba(35, 39, 42, 0.98);
+	position: fixed;
 	padding: 1rem 0;
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
 	box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-	position: sticky;
-	top: 0;
-	z-index: 1000;
 }
 
 .navbar-brand {
@@ -75,7 +79,7 @@ a:hover {
 }
 
 .navbar-dark .navbar-nav .nav-link {
-	color: rgba(255, 255, 255, 0.85);
+	color: rgba(255, 255, 255, 0.9);
 	padding: 0.5rem 1rem;
 	font-weight: 500;
 	position: relative;
@@ -108,7 +112,7 @@ a:hover {
 .hero {
 	background: var(--bg-gradient);
 	color: white;
-	padding: 8rem 0 6rem;
+	padding: 10rem 0 8rem;
 	position: relative;
 	overflow: hidden;
 }
@@ -142,17 +146,33 @@ a:hover {
 
 .hero h1 {
 	font-weight: 800;
-	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	margin-bottom: 1.5rem;
-	font-size: 3.5rem;
+	font-size: 4rem;
 	line-height: 1.2;
 }
 
 .hero .lead {
-	font-size: 1.25rem;
+	font-size: 1.3rem;
 	max-width: 800px;
-	margin: 0 auto 2rem;
-	opacity: 0.9;
+	margin: 0 auto 2.5rem;
+	opacity: 0.95;
+}
+
+.dashboard-preview {
+	margin-top: 4rem;
+	padding: 2rem;
+}
+
+.preview-badge {
+	transform: translateY(-50%) translateX(-50%);
+	z-index: 3;
+}
+
+.preview-badge .badge {
+	font-weight: 500;
+	letter-spacing: 0.5px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Feature Cards */
@@ -232,22 +252,31 @@ a:hover {
 
 /* Buttons */
 .btn {
-	padding: 0.75rem 1.5rem;
+	padding: 0.75rem 1.75rem;
 	font-weight: 600;
-	border-radius: 8px;
+	border-radius: 12px;
 	transition: var(--transition-smooth);
+	text-transform: none;
+	letter-spacing: 0.3px;
+}
+
+.btn-lg {
+	padding: 1rem 2.5rem;
+	font-size: 1.1rem;
 }
 
 .btn-primary {
-	background: var(--bg-gradient);
+	background: #fff;
+	color: var(--primary-color);
 	border: none;
-	box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+	box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 8px 25px rgba(88, 101, 242, 0.5);
-	background: linear-gradient(135deg, #4752c4, #d93c8f);
+	background: #fff;
+	color: var(--accent-color);
+	box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
 }
 
 .btn-outline-light {
