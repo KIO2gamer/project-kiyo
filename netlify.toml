@@ -3,6 +3,11 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/*"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
   from = "/auth/*"
   to = "/.netlify/functions/:splat"
   status = 200
