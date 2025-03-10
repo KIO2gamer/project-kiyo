@@ -3,6 +3,11 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/dashboard/*"
+  to = "/dashboard/home.html"
+  status = 200
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/dashboardApi/:splat"
   status = 200
@@ -10,9 +15,4 @@
 [[redirects]]
   from = "/auth"
   to = "/.netlify/functions/dashboardAuth"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard/*"
-  to = "/dashboard/home.html"
   status = 200
