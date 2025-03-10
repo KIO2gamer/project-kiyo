@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Authenticating... | Kiyo Bot</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+		/>
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<style>
+			body {
+				background-color: #2c2f33;
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+				margin: 0;
+			}
+			.auth-container {
+				max-width: 500px;
+				width: 100%;
+				padding: 2rem;
+				background-color: #23272a;
+				border-radius: 10px;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+				text-align: center;
+			}
+			.logo {
+				width: 120px;
+				height: auto;
+				margin-bottom: 1.5rem;
+			}
+			.spinner {
+				width: 3rem;
+				height: 3rem;
+				margin: 1.5rem auto;
+				border-width: 0.25rem;
+			}
+			.status-icon {
+				font-size: 3.5rem;
+				margin: 1rem 0;
+			}
+			.success-icon {
+				color: #5cb85c;
+			}
+			.error-icon {
+				color: #d9534f;
+			}
+			.message {
+				margin-bottom: 1.5rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="auth-container">
+			<img src="/assets/img/logo.png" alt="Kiyo Bot" class="logo" />
+			<h2 id="status-title">Authenticating...</h2>
+			<div
+				id="loading-spinner"
+				class="spinner-border text-primary spinner"
+				role="status"
+			>
+				<span class="visually-hidden">Loading...</span>
+			</div>
+			<div id="status-icon" class="status-icon d-none"></div>
+			<p id="status-message" class="message">
+				Please wait while we complete your authentication.
+			</p>
+			<div id="actions" class="d-none">
+				<a
+					href="/dashboard/home"
+					class="btn btn-primary d-none"
+					id="dashboard-btn"
+					>Go to Dashboard</a
+				>
+				<a href="/" class="btn btn-secondary d-none" id="home-btn"
+					>Back to Home</a
+				>
+				<button class="btn btn-warning d-none" id="retry-btn">
+					Try Again
+				</button>
+			</div>
+		</div>
+
+		<script>
+			// Parse URL query parameters
+			const urlParams = new URLSearchParams(window.location.search);
+			const code = urlParams.get('code');
+			const state = urlParams.get('state');
+			const error = urlParams.get('error');
+			const errorDescription = urlParams.get('error_description');
+
+			// Elements
+			const statusTitle = document.getElementById('status-title');
+			const loadingSpinner = document.getElementById('loading-spinner');
+			const statusIcon = document.getElementById('status-icon');
+			const statusMessage = document.getElementById('status-message');
+			const actions = document.getElementById('actions');
+			const dashboardBtn = document.getElementById('dashboard-btn');
+			const homeBtn = document.getElementById('home-btn');
+			const retryBtn = document.getElementById('retry-btn');
+
+			// Handle authentication error from Discord
+			if (error) {
+				showError(
+					`Authentication failed: ${error}`,
+					errorDescription || 'Please try again later.',
+				);
+				return;
+			}
+
+			// Validate parameters
+			if (!code || !state) {
+				showError(
+					'Missing required parameters',
+					'The authentication process is missing required parameters.',
+				);
+				return;
+			}
+
+			// Process authentication
+			processAuthentication();
+
+			async function processAuthentication() {
+				try {
+					// Call our authentication function with the code and state
+					const response = await fetch(
+						'/.netlify/functions/dashboardAuth',
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ code, state }),
+						},
+					);
+
+					// Handle response
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(
+							errorData.error || 'Authentication failed',
+						);
+					}
+
+					const data = await response.json();
+
+					// Authentication successful
+					showSuccess(
+						'Authentication successful!',
+						'You will be redirected to the dashboard shortly...',
+					);
+
+					// Redirect to dashboard after a short delay
+					setTimeout(() => {
+						window.location.href = '/dashboard/home';
+					}, 1500);
+				} catch (error) {
+					console.error('Authentication error:', error);
+					showError(
+						'Authentication failed',
+						error.message ||
+							'An unexpected error occurred. Please try again.',
+					);
+				}
+			}
+
+			function showSuccess(title, message) {
+				statusTitle.textContent = title;
+				statusMessage.textContent = message;
+
+				loadingSpinner.classList.add('d-none');
+				statusIcon.classList.remove('d-none');
+				statusIcon.classList.add('success-icon');
+				statusIcon.innerHTML = '<i class="bi bi-check-circle"></i>';
+
+				actions.classList.remove('d-none');
+				dashboardBtn.classList.remove('d-none');
+			}
+
+			function showError(title, message) {
+				statusTitle.textContent = title;
+				statusMessage.textContent = message;
+
+				loadingSpinner.classList.add('d-none');
+				statusIcon.classList.remove('d-none');
+				statusIcon.classList.add('error-icon');
+				statusIcon.innerHTML =
+					'<i class="bi bi-exclamation-circle"></i>';
+
+				actions.classList.remove('d-none');
+				homeBtn.classList.remove('d-none');
+				retryBtn.classList.remove('d-none');
+
+				// Set up retry button
+				retryBtn.addEventListener('click', () => {
+					window.location.href = '/.netlify/functions/dashboardAuth';
+				});
+			}
+		</script>
+	</body>
+</html>

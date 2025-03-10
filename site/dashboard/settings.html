@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kiyo - User Settings</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+		/>
+		<link rel="stylesheet" href="/assets/css/dashboard.css" />
+		<link
+			rel="shortcut icon"
+			href="/assets/img/favicon.ico"
+			type="image/x-icon"
+		/>
+	</head>
+	<body>
+		<div class="dashboard-container">
+			<!-- Sidebar -->
+			<aside class="sidebar">
+				<div class="sidebar-header">
+					<img
+						src="/assets/img/logo.png"
+						alt="Kiyo"
+						class="sidebar-logo"
+					/>
+					<h1>Kiyo Dashboard</h1>
+				</div>
+				<nav class="sidebar-nav">
+					<ul>
+						<li>
+							<a href="/dashboard/home"
+								><i class="bi bi-house-door"></i> Home</a
+							>
+						</li>
+						<li>
+							<a href="/dashboard/servers"
+								><i class="bi bi-server"></i> Servers</a
+							>
+						</li>
+						<li>
+							<a href="/dashboard/commands"
+								><i class="bi bi-command"></i> Commands</a
+							>
+						</li>
+						<li class="active">
+							<a href="/dashboard/settings"
+								><i class="bi bi-gear"></i> Settings</a
+							>
+						</li>
+					</ul>
+				</nav>
+				<div class="sidebar-footer">
+					<a href="/" class="btn btn-outline-light btn-sm">
+						<i class="bi bi-box-arrow-left"></i> Back to Site
+					</a>
+				</div>
+			</aside>
+
+			<!-- Main Content -->
+			<main class="main-content">
+				<header class="content-header">
+					<div
+						class="d-flex justify-content-between align-items-center"
+					>
+						<h2><i class="bi bi-gear"></i> User Settings</h2>
+						<div id="user-profile">
+							<!-- User profile loaded via JS -->
+							<span class="loading">Loading...</span>
+						</div>
+					</div>
+				</header>
+
+				<div class="content-body">
+					<!-- User Profile Section -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h4>Your Profile</h4>
+						</div>
+						<div class="card-body">
+							<div
+								class="row align-items-center"
+								id="profile-section"
+							>
+								<div class="col-md-2 text-center mb-3 mb-md-0">
+									<div class="profile-avatar-container">
+										<img
+											src="/assets/img/default-avatar.png"
+											alt="Profile"
+											id="profile-avatar"
+											class="profile-avatar"
+										/>
+									</div>
+								</div>
+								<div class="col-md-10">
+									<div class="mb-3 row">
+										<label class="col-sm-3 col-form-label"
+											>Username</label
+										>
+										<div class="col-sm-9">
+											<p
+												class="form-control-plaintext"
+												id="username-display"
+											>
+												Loading...
+											</p>
+										</div>
+									</div>
+									<div class="mb-3 row">
+										<label class="col-sm-3 col-form-label"
+											>Discord ID</label
+										>
+										<div class="col-sm-9">
+											<p
+												class="form-control-plaintext"
+												id="userid-display"
+											>
+												Loading...
+											</p>
+										</div>
+									</div>
+									<div class="mb-3 row">
+										<label class="col-sm-3 col-form-label"
+											>Connected Since</label
+										>
+										<div class="col-sm-9">
+											<p
+												class="form-control-plaintext"
+												id="connected-since"
+											>
+												Loading...
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Dashboard Preferences -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h4>Dashboard Preferences</h4>
+						</div>
+						<div class="card-body">
+							<form id="preferences-form">
+								<div class="mb-3">
+									<label class="form-label">Theme</label>
+									<div class="d-flex gap-3">
+										<div class="form-check">
+											<input
+												class="form-check-input"
+												type="radio"
+												name="theme"
+												id="theme-light"
+												value="light"
+											/>
+											<label
+												class="form-check-label"
+												for="theme-light"
+											>
+												Light
+											</label>
+										</div>
+										<div class="form-check">
+											<input
+												class="form-check-input"
+												type="radio"
+												name="theme"
+												id="theme-dark"
+												value="dark"
+												checked
+											/>
+											<label
+												class="form-check-label"
+												for="theme-dark"
+											>
+												Dark
+											</label>
+										</div>
+										<div class="form-check">
+											<input
+												class="form-check-input"
+												type="radio"
+												name="theme"
+												id="theme-system"
+												value="system"
+											/>
+											<label
+												class="form-check-label"
+												for="theme-system"
+											>
+												System Default
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<div class="mb-3">
+									<label for="default-page" class="form-label"
+										>Default Page</label
+									>
+									<select
+										class="form-select"
+										id="default-page"
+									>
+										<option value="home">
+											Dashboard Home
+										</option>
+										<option value="servers">
+											Server Management
+										</option>
+										<option value="commands">
+											Commands
+										</option>
+									</select>
+								</div>
+
+								<div class="form-check form-switch mb-3">
+									<input
+										class="form-check-input"
+										type="checkbox"
+										id="enable-notifications"
+										checked
+									/>
+									<label
+										class="form-check-label"
+										for="enable-notifications"
+										>Enable browser notifications</label
+									>
+									<div class="form-text">
+										Receive notifications about important
+										bot events
+									</div>
+								</div>
+
+								<button type="submit" class="btn btn-primary">
+									Save Preferences
+								</button>
+							</form>
+						</div>
+					</div>
+
+					<!-- Account Management -->
+					<div class="card mb-4">
+						<div class="card-header">
+							<h4>Account Management</h4>
+						</div>
+						<div class="card-body">
+							<div class="mb-4">
+								<h5>Connected Applications</h5>
+								<div class="list-group" id="connected-apps">
+									<div
+										class="list-group-item d-flex justify-content-between align-items-center"
+									>
+										<div>
+											<h6 class="mb-1">Discord</h6>
+											<small class="text-muted"
+												>Permissions: identify,
+												guilds</small
+											>
+										</div>
+										<span
+											class="badge bg-success rounded-pill"
+											>Connected</span
+										>
+									</div>
+									<div
+										class="list-group-item d-flex justify-content-between align-items-center"
+										id="youtube-connection"
+									>
+										<div>
+											<h6 class="mb-1">YouTube</h6>
+											<small
+												class="text-muted"
+												id="youtube-status"
+												>Checking connection
+												status...</small
+											>
+										</div>
+										<button
+											class="btn btn-sm btn-outline-secondary"
+											id="youtube-connect-btn"
+										>
+											Connect
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="d-flex flex-column gap-2">
+								<button
+									class="btn btn-outline-warning"
+									id="refresh-token-btn"
+								>
+									<i class="bi bi-arrow-clockwise me-2"></i
+									>Refresh OAuth Token
+								</button>
+
+								<button
+									class="btn btn-outline-danger"
+									id="revoke-access-btn"
+								>
+									<i class="bi bi-shield-exclamation me-2"></i
+									>Revoke Dashboard Access
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="/assets/js/dashboard-common.js"></script>
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				// Load user profile (from dashboard-common.js)
+				loadUserProfile();
+
+				// Load user details
+				loadUserDetails();
+
+				// Load saved preferences
+				loadUserPreferences();
+
+				// Check YouTube connection
+				checkYouTubeConnection();
+
+				// Set up form submission
+				document
+					.getElementById('preferences-form')
+					.addEventListener('submit', (e) => {
+						e.preventDefault();
+						saveUserPreferences();
+					});
+
+				// Set up buttons
+				document
+					.getElementById('refresh-token-btn')
+					.addEventListener('click', refreshOAuthToken);
+				document
+					.getElementById('revoke-access-btn')
+					.addEventListener('click', revokeAccess);
+				document
+					.getElementById('youtube-connect-btn')
+					.addEventListener('click', connectYouTube);
+			});
+
+			async function loadUserDetails() {
+				try {
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/profile',
+					);
+					if (!response.ok)
+						throw new Error('Failed to fetch user details');
+
+					const data = await response.json();
+
+					// Update profile display
+					document.getElementById('username-display').textContent =
+						data.username;
+					document.getElementById('userid-display').textContent =
+						data.id;
+
+					// Set avatar
+					if (data.avatar) {
+						document.getElementById('profile-avatar').src =
+							`https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png?size=128`;
+					}
+
+					// Set connected since date
+					const connectedSince = new Date(
+						data.connectedSince || Date.now(),
+					);
+					document.getElementById('connected-since').textContent =
+						connectedSince.toLocaleDateString();
+				} catch (error) {
+					console.error('Error loading user details:', error);
+					document.getElementById('profile-section').innerHTML = `
+          <div class="col-12 text-center">
+            <div class="alert alert-danger">
+              Failed to load profile data. Please try refreshing the page.
+            </div>
+          </div>
+        `;
+				}
+			}
+
+			function loadUserPreferences() {
+				// Load from localStorage
+				const preferences =
+					JSON.parse(localStorage.getItem('dashboardPreferences')) ||
+					{};
+
+				// Set theme
+				if (preferences.theme) {
+					document.querySelector(
+						`#theme-${preferences.theme}`,
+					).checked = true;
+				}
+
+				// Set default page
+				if (preferences.defaultPage) {
+					document.getElementById('default-page').value =
+						preferences.defaultPage;
+				}
+
+				// Set notifications
+				if (preferences.notifications !== undefined) {
+					document.getElementById('enable-notifications').checked =
+						preferences.notifications;
+				}
+			}
+
+			function saveUserPreferences() {
+				const preferences = {
+					theme: document.querySelector('input[name="theme"]:checked')
+						.value,
+					defaultPage: document.getElementById('default-page').value,
+					notifications: document.getElementById(
+						'enable-notifications',
+					).checked,
+				};
+
+				// Save to localStorage
+				localStorage.setItem(
+					'dashboardPreferences',
+					JSON.stringify(preferences),
+				);
+
+				// Apply theme immediately
+				applyTheme(preferences.theme);
+
+				// Show success message
+				const alert = document.createElement('div');
+				alert.className = 'alert alert-success mt-3';
+				alert.innerHTML =
+					'<i class="bi bi-check-circle me-2"></i>Preferences saved successfully!';
+
+				const form = document.getElementById('preferences-form');
+				form.appendChild(alert);
+
+				// Remove alert after 3 seconds
+				setTimeout(() => {
+					alert.remove();
+				}, 3000);
+			}
+
+			function applyTheme(theme) {
+				if (theme === 'system') {
+					theme = window.matchMedia('(prefers-color-scheme: dark)')
+						.matches
+						? 'dark'
+						: 'light';
+				}
+
+				document.body.classList.remove('theme-light', 'theme-dark');
+				document.body.classList.add(`theme-${theme}`);
+			}
+
+			async function checkYouTubeConnection() {
+				try {
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/connections/youtube',
+					);
+					const data = await response.json();
+
+					const statusEl = document.getElementById('youtube-status');
+					const buttonEl = document.getElementById(
+						'youtube-connect-btn',
+					);
+
+					if (data.connected) {
+						statusEl.textContent = `Connected as ${data.channelName}`;
+						buttonEl.textContent = 'Disconnect';
+						buttonEl.classList.replace(
+							'btn-outline-secondary',
+							'btn-outline-danger',
+						);
+					} else {
+						statusEl.textContent = 'Not connected';
+						buttonEl.textContent = 'Connect';
+						buttonEl.classList.replace(
+							'btn-outline-danger',
+							'btn-outline-secondary',
+						);
+					}
+				} catch (error) {
+					console.error('Error checking YouTube connection:', error);
+					document.getElementById('youtube-status').textContent =
+						'Failed to check connection';
+				}
+			}
+
+			async function connectYouTube() {
+				const button = document.getElementById('youtube-connect-btn');
+
+				if (button.textContent === 'Connect') {
+					// Redirect to YouTube OAuth flow
+					window.location.href =
+						'/.netlify/functions/dashboardApi/connections/youtube/authorize';
+				} else {
+					// Disconnect YouTube
+					button.disabled = true;
+					button.innerHTML =
+						'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Disconnecting...';
+
+					try {
+						const response = await fetch(
+							'/.netlify/functions/dashboardApi/connections/youtube/disconnect',
+							{
+								method: 'POST',
+							},
+						);
+
+						if (!response.ok)
+							throw new Error('Failed to disconnect');
+
+						// Refresh connection status
+						checkYouTubeConnection();
+					} catch (error) {
+						console.error('Error disconnecting YouTube:', error);
+						alert(
+							'Failed to disconnect YouTube. Please try again.',
+						);
+						button.disabled = false;
+						button.textContent = 'Disconnect';
+					}
+				}
+			}
+
+			async function refreshOAuthToken() {
+				const button = document.getElementById('refresh-token-btn');
+				button.disabled = true;
+				button.innerHTML =
+					'<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Refreshing...';
+
+				try {
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/refresh-token',
+						{
+							method: 'POST',
+						},
+					);
+
+					if (!response.ok)
+						throw new Error('Failed to refresh token');
+
+					// Show success message
+					const alert = document.createElement('div');
+					alert.className = 'alert alert-success';
+					alert.innerHTML =
+						'<i class="bi bi-check-circle me-2"></i>Token refreshed successfully!';
+
+					button.parentNode.insertBefore(alert, button.nextSibling);
+
+					// Remove alert after 3 seconds
+					setTimeout(() => {
+						alert.remove();
+					}, 3000);
+				} catch (error) {
+					console.error('Error refreshing token:', error);
+
+					// Show error message
+					const alert = document.createElement('div');
+					alert.className = 'alert alert-danger';
+					alert.innerHTML =
+						'<i class="bi bi-exclamation-triangle me-2"></i>Failed to refresh token. Please try again.';
+
+					button.parentNode.insertBefore(alert, button.nextSibling);
+
+					// Remove alert after 5 seconds
+					setTimeout(() => {
+						alert.remove();
+					}, 5000);
+				} finally {
+					button.disabled = false;
+					button.innerHTML =
+						'<i class="bi bi-arrow-clockwise me-2"></i>Refresh OAuth Token';
+				}
+			}
+
+			function revokeAccess() {
+				if (
+					confirm(
+						'Are you sure you want to revoke dashboard access? You will need to login again to access the dashboard.',
+					)
+				) {
+					window.location.href =
+						'/.netlify/functions/dashboardApi/logout?revoke=true';
+				}
+			}
+		</script>
+	</body>
+</html>

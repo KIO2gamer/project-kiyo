@@ -1,13 +1,18 @@
 [build]
-  publish = "src/dashboard/public"
+  publish = "site"
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/*"
-  to = "/dashboard.html"
+  from = "/api/*"
+  to = "/.netlify/functions/dashboardApi/:splat"
   status = 200
 
 [[redirects]]
-  from = "/auth/*"
-  to = "/.netlify/functions/:splat"
+  from = "/auth"
+  to = "/.netlify/functions/dashboardAuth"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/*"
+  to = "/dashboard/home.html"
   status = 200

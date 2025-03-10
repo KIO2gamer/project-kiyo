@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="Kiyo - A powerful, multipurpose Discord bot for moderation, entertainment, and utility features"
+		/>
+		<title>Kiyo Discord Bot | Home</title>
+		<!-- Bootstrap CSS -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Bootstrap Icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+		/>
+		<!-- Custom CSS -->
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<!-- Favicon -->
+		<link
+			rel="shortcut icon"
+			href="/assets/img/favicon.ico"
+			type="image/x-icon"
+		/>
+		<!-- Open Graph meta tags for better social sharing -->
+		<meta property="og:title" content="Kiyo Discord Bot" />
+		<meta
+			property="og:description"
+			content="A versatile Discord bot with moderation, entertainment, and utility commands"
+		/>
+		<meta
+			property="og:image"
+			content="https://kiyo-discord-bot.netlify.app/assets/img/logo.png"
+		/>
+		<meta
+			property="og:url"
+			content="https://kiyo-discord-bot.netlify.app"
+		/>
+	</head>
+	<body>
+		<!-- Navigation bar -->
+		<nav class="navbar navbar-expand-lg navbar-dark">
+			<div class="container">
+				<a class="navbar-brand d-flex align-items-center" href="/">
+					<img
+						src="/assets/img/logo.png"
+						alt="Kiyo"
+						height="40"
+						class="me-2"
+					/>
+					<span class="fw-bold">KIYO</span>
+				</a>
+				<button
+					class="navbar-toggler"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbarNav"
+					aria-controls="navbarNav"
+					aria-expanded="false"
+					aria-label="Toggle navigation"
+				>
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item">
+							<a class="nav-link active" href="/">Home</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#features">Features</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="#commands">Commands</a>
+						</li>
+						<li class="nav-item">
+							<a
+								class="nav-link"
+								href="https://discord.gg/y3GvzeZVJ3"
+								target="_blank"
+								>Support</a
+							>
+						</li>
+						<li class="nav-item">
+							<a
+								class="nav-link"
+								href="https://github.com/KIO2gamer/project-kiyo"
+								target="_blank"
+							>
+								<i class="bi bi-github"></i> GitHub
+							</a>
+						</li>
+						<li class="nav-item ms-2">
+							<a
+								class="nav-link btn btn-primary btn-sm px-3 text-white"
+								href="/.netlify/functions/dashboardAuth"
+							>
+								Dashboard
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Hero section -->
+		<header class="hero">
+			<div class="container text-center py-5">
+				<h1 class="display-4 fw-bold text-white mb-3">
+					Level Up Your Discord Server
+				</h1>
+				<p class="lead text-white-75 mb-4">
+					Kiyo is a feature-rich Discord bot providing moderation, fun
+					games, utilities, and more. Customizable, reliable, and
+					constantly evolving.
+				</p>
+				<div class="d-flex justify-content-center gap-3 flex-wrap">
+					<a
+						href="https://discord.com/oauth2/authorize?client_id=1155222493079015545&permissions=8&integration_type=0&scope=bot"
+						class="btn btn-primary btn-lg"
+					>
+						<i class="bi bi-plus-circle me-2"></i>Add to Discord
+					</a>
+					<a
+						href="/.netlify/functions/dashboardAuth"
+						class="btn btn-outline-light btn-lg"
+					>
+						<i class="bi bi-gear me-2"></i>Dashboard Login
+					</a>
+				</div>
+				<div class="mt-5 position-relative">
+					<img
+						src="/assets/img/dashboard-preview.png"
+						alt="Kiyo Dashboard Preview"
+						class="img-fluid rounded shadow-lg"
+						style="max-height: 350px"
+					/>
+					<div
+						class="position-absolute start-0 end-0 bottom-0 p-3 text-center"
+					>
+						<span class="badge bg-primary px-3 py-2"
+							>Powerful Dashboard Included</span
+						>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Stats counter -->
+		<section class="bg-gradient py-4 text-white">
+			<div class="container">
+				<div class="row text-center g-4">
+					<div class="col-md-3 col-6">
+						<div class="counter">
+							<h2 class="fw-bold mb-0" id="server-count">0</h2>
+							<p class="mb-0">Servers</p>
+						</div>
+					</div>
+					<div class="col-md-3 col-6">
+						<div class="counter">
+							<h2 class="fw-bold mb-0" id="user-count">0</h2>
+							<p class="mb-0">Users</p>
+						</div>
+					</div>
+					<div class="col-md-3 col-6">
+						<div class="counter">
+							<h2 class="fw-bold mb-0" id="command-count">0</h2>
+							<p class="mb-0">Commands</p>
+						</div>
+					</div>
+					<div class="col-md-3 col-6">
+						<div class="counter">
+							<h2 class="fw-bold mb-0" id="uptime">0</h2>
+							<p class="mb-0">Uptime</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Features section -->
+		<section id="features" class="py-5">
+			<div class="container">
+				<h2 class="text-center mb-5 section-header">
+					Why Choose Kiyo?
+				</h2>
+				<div class="row g-4">
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-shield-check"></i>
+								</div>
+								<h3 class="card-title h5">
+									Powerful Moderation
+								</h3>
+								<p class="card-text">
+									Keep your server safe with advanced
+									moderation tools including ban, kick, mute,
+									warn, and message purging. Automated
+									moderation helps you fight spam and
+									inappropriate content.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-controller"></i>
+								</div>
+								<h3 class="card-title h5">Fun & Games</h3>
+								<p class="card-text">
+									Entertain your community with interactive
+									games, memes, trivia challenges, and word
+									games including unscramble. Keep your server
+									engaged and lively.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-tools"></i>
+								</div>
+								<h3 class="card-title h5">Utility Tools</h3>
+								<p class="card-text">
+									Access translation services, weather
+									forecasts, calculators, search
+									functionality, and more. Practical tools to
+									make server management easier.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-gear-wide-connected"></i>
+								</div>
+								<h3 class="card-title h5">
+									Easy Configuration
+								</h3>
+								<p class="card-text">
+									Customize Kiyo to fit your server's needs
+									through an intuitive dashboard. Configure
+									roles, permissions, welcome messages, and
+									more with just a few clicks.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-door-open"></i>
+								</div>
+								<h3 class="card-title h5">Welcome System</h3>
+								<p class="card-text">
+									Create custom welcome messages with
+									automatic role assignment. Make new members
+									feel at home with personalized greetings.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-6">
+						<div class="card h-100 feature-card">
+							<div class="card-body text-center">
+								<div class="feature-icon mb-3">
+									<i class="bi bi-youtube"></i>
+								</div>
+								<h3 class="card-title h5">
+									YouTube Integration
+								</h3>
+								<p class="card-text">
+									Connect YouTube channels to get
+									notifications for new videos. Keep your
+									community updated with your latest content.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Commands preview section -->
+		<section id="commands" class="py-5 bg-light">
+			<div class="container">
+				<h2 class="text-center mb-5 section-header">
+					Popular Commands
+				</h2>
+				<div class="row justify-content-center">
+					<div class="col-lg-10">
+						<div class="table-responsive">
+							<table class="table table-hover command-table">
+								<thead>
+									<tr>
+										<th>Command</th>
+										<th>Description</th>
+										<th>Category</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><code>/help</code></td>
+										<td>
+											Shows a list of available commands
+											or info about a specific command
+										</td>
+										<td>
+											<span class="badge bg-info"
+												>Info</span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td><code>/ban</code></td>
+										<td>
+											Ban a user from the server with
+											optional reason
+										</td>
+										<td>
+											<span class="badge bg-danger"
+												>Moderation</span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td><code>/unscramble</code></td>
+										<td>Start a word unscrambling game</td>
+										<td>
+											<span class="badge bg-success"
+												>Games</span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td><code>/weather</code></td>
+										<td>
+											Get the current weather for a
+											specified location
+										</td>
+										<td>
+											<span
+												class="badge bg-warning text-dark"
+												>Utility</span
+											>
+										</td>
+									</tr>
+									<tr>
+										<td><code>/youtube</code></td>
+										<td>
+											Connect your YouTube channel or get
+											notifications
+										</td>
+										<td>
+											<span class="badge bg-danger"
+												>Integration</span
+											>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="text-center mt-4">
+							<a
+								href="/.netlify/functions/dashboardAuth"
+								class="btn btn-primary"
+							>
+								View All Commands in Dashboard
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- CTA section -->
+		<section class="cta-section text-white text-center py-5">
+			<div class="container">
+				<h2 class="mb-4">Ready to enhance your Discord server?</h2>
+				<p class="lead mb-4">
+					Join thousands of servers already using Kiyo for moderation,
+					entertainment, and utility features.
+				</p>
+				<a
+					href="https://discord.com/oauth2/authorize?client_id=1155222493079015545&permissions=8&integration_type=0&scope=bot"
+					class="btn btn-light btn-lg"
+				>
+					Add Kiyo to Discord
+				</a>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="footer mt-auto py-4">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6">
+						<h5>Kiyo Discord Bot</h5>
+						<p class="text-muted">
+							A versatile Discord bot with moderation,
+							entertainment, and utility commands.
+						</p>
+					</div>
+					<div class="col-md-3">
+						<h5>Links</h5>
+						<ul class="list-unstyled">
+							<li>
+								<a href="/.netlify/functions/dashboardAuth"
+									>Dashboard</a
+								>
+							</li>
+							<li>
+								<a
+									href="https://discord.gg/y3GvzeZVJ3"
+									target="_blank"
+									>Support Server</a
+								>
+							</li>
+							<li>
+								<a
+									href="https://github.com/KIO2gamer/project-kiyo"
+									target="_blank"
+									>GitHub</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div class="col-md-3">
+						<h5>Connect</h5>
+						<div class="social-links">
+							<a
+								href="https://github.com/KIO2gamer/project-kiyo"
+								target="_blank"
+								aria-label="GitHub"
+								><i class="bi bi-github"></i
+							></a>
+							<a
+								href="https://discord.gg/y3GvzeZVJ3"
+								target="_blank"
+								aria-label="Discord"
+								><i class="bi bi-discord"></i
+							></a>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="d-flex justify-content-between align-items-center">
+					<p class="mb-0">
+						Made with ❤️ by
+						<a href="https://github.com/KIO2gamer" target="_blank"
+							>KIO2gamer</a
+						>
+					</p>
+					<span class="text-muted">&copy; 2025 Kiyo Bot</span>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+		<!-- Stats counter script -->
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				// Fetch bot statistics
+				fetch('/.netlify/functions/dashboardApi/stats')
+					.then((response) => {
+						if (!response.ok)
+							throw new Error('Failed to load stats');
+						return response.json();
+					})
+					.then((data) => {
+						// Format and display stats with animation
+						animateCountUp('server-count', data.servers);
+						animateCountUp('user-count', data.users);
+						animateCountUp('command-count', data.commands);
+
+						// Format uptime in days
+						const uptimeDays = Math.floor(
+							data.uptime / (24 * 60 * 60),
+						);
+						document.getElementById('uptime').textContent =
+							uptimeDays + ' days';
+					})
+					.catch((error) => {
+						console.error('Error fetching stats:', error);
+						// Set fallback values if API fails
+						document.getElementById('server-count').textContent =
+							'100+';
+						document.getElementById('user-count').textContent =
+							'10,000+';
+						document.getElementById('command-count').textContent =
+							'30+';
+						document.getElementById('uptime').textContent = '99.9%';
+					});
+			});
+
+			// Animate count up function
+			function animateCountUp(elementId, targetValue) {
+				const element = document.getElementById(elementId);
+				const duration = 2000; // Animation duration in ms
+				const startTime = performance.now();
+				const startValue = 0;
+
+				function updateCounter(currentTime) {
+					const elapsedTime = currentTime - startTime;
+					if (elapsedTime < duration) {
+						const progress = elapsedTime / duration;
+						const currentValue = Math.floor(progress * targetValue);
+						element.textContent = currentValue.toLocaleString();
+						requestAnimationFrame(updateCounter);
+					} else {
+						element.textContent = targetValue.toLocaleString();
+					}
+				}
+
+				requestAnimationFrame(updateCounter);
+			}
+		</script>
+	</body>
+</html>

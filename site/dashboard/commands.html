@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Kiyo - Commands</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+		/>
+		<link rel="stylesheet" href="/assets/css/dashboard.css" />
+		<link
+			rel="shortcut icon"
+			href="/assets/img/favicon.ico"
+			type="image/x-icon"
+		/>
+	</head>
+	<body>
+		<div class="dashboard-container">
+			<!-- Sidebar -->
+			<aside class="sidebar">
+				<div class="sidebar-header">
+					<img
+						src="/assets/img/logo.png"
+						alt="Kiyo"
+						class="sidebar-logo"
+					/>
+					<h1>Kiyo Dashboard</h1>
+				</div>
+				<nav class="sidebar-nav">
+					<ul>
+						<li>
+							<a href="/dashboard/home"
+								><i class="bi bi-house-door"></i> Home</a
+							>
+						</li>
+						<li>
+							<a href="/dashboard/servers"
+								><i class="bi bi-server"></i> Servers</a
+							>
+						</li>
+						<li class="active">
+							<a href="/dashboard/commands"
+								><i class="bi bi-command"></i> Commands</a
+							>
+						</li>
+						<li>
+							<a href="/dashboard/settings"
+								><i class="bi bi-gear"></i> Settings</a
+							>
+						</li>
+					</ul>
+				</nav>
+				<div class="sidebar-footer">
+					<a href="/" class="btn btn-outline-light btn-sm">
+						<i class="bi bi-box-arrow-left"></i> Back to Site
+					</a>
+				</div>
+			</aside>
+
+			<!-- Main Content -->
+			<main class="main-content">
+				<header class="content-header">
+					<div
+						class="d-flex justify-content-between align-items-center"
+					>
+						<h2><i class="bi bi-command"></i> Commands</h2>
+						<div id="user-profile">
+							<!-- User profile filled by JavaScript -->
+							<span class="loading">Loading...</span>
+						</div>
+					</div>
+				</header>
+
+				<div class="content-body">
+					<!-- Search and Filter -->
+					<div class="card mb-4">
+						<div class="card-body">
+							<div class="row g-2">
+								<div class="col-md-6">
+									<div class="input-group">
+										<span class="input-group-text"
+											><i class="bi bi-search"></i
+										></span>
+										<input
+											type="text"
+											class="form-control"
+											id="command-search"
+											placeholder="Search commands..."
+										/>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<select
+										class="form-select"
+										id="category-filter"
+									>
+										<option value="all">
+											All Categories
+										</option>
+										<!-- Categories loaded via JavaScript -->
+									</select>
+								</div>
+								<div class="col-md-2">
+									<select
+										class="form-select"
+										id="type-filter"
+									>
+										<option value="all">All Types</option>
+										<option value="slash">
+											Slash Commands
+										</option>
+										<option value="text">
+											Text Commands
+										</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Commands List -->
+					<div class="card">
+						<div class="card-header">
+							<div
+								class="d-flex justify-content-between align-items-center"
+							>
+								<h5 class="mb-0">Commands List</h5>
+								<span
+									class="badge bg-primary"
+									id="command-count"
+									>0 commands</span
+								>
+							</div>
+						</div>
+						<div class="card-body p-0">
+							<div class="table-responsive">
+								<table class="table table-hover mb-0">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Description</th>
+											<th>Category</th>
+											<th>Type</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody id="commands-table-body">
+										<tr>
+											<td
+												colspan="5"
+												class="text-center py-3"
+											>
+												<div
+													class="spinner-border text-primary"
+													role="status"
+												>
+													<span
+														class="visually-hidden"
+														>Loading...</span
+													>
+												</div>
+												<p class="mt-2 text-muted">
+													Loading commands...
+												</p>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<!-- Command Details Modal -->
+			<div
+				class="modal fade"
+				id="commandModal"
+				tabindex="-1"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="modal-command-name">
+								Command Name
+							</h5>
+							<button
+								type="button"
+								class="btn-close"
+								data-bs-dismiss="modal"
+								aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body" id="modal-command-details">
+							<!-- Command details loaded via JavaScript -->
+						</div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								class="btn btn-secondary"
+								data-bs-dismiss="modal"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script>
+			// Command data structure
+			let allCommands = [];
+			let filteredCommands = [];
+			let categories = new Set();
+
+			// DOM elements
+			const commandsTableBody = document.getElementById(
+				'commands-table-body',
+			);
+			const commandCountBadge = document.getElementById('command-count');
+			const searchInput = document.getElementById('command-search');
+			const categoryFilter = document.getElementById('category-filter');
+			const typeFilter = document.getElementById('type-filter');
+			const commandModal = new bootstrap.Modal(
+				document.getElementById('commandModal'),
+			);
+
+			// Load user profile
+			async function loadUserProfile() {
+				try {
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/profile',
+					);
+					if (!response.ok) {
+						if (response.status === 401) {
+							window.location.href =
+								'/.netlify/functions/dashboardAuth';
+							return;
+						}
+						throw new Error('Failed to fetch profile');
+					}
+
+					const data = await response.json();
+
+					// Update profile UI
+					const userProfileEl =
+						document.getElementById('user-profile');
+					userProfileEl.innerHTML = `
+          <div class="d-flex align-items-center">
+            <img src="https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png?size=64" 
+              alt="${data.username}" class="avatar me-2">
+            <span class="username">${data.username}</span>
+            <a href="/logout" class="btn btn-sm btn-outline-light ms-3">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+          </div>
+        `;
+				} catch (error) {
+					console.error('Error loading user profile:', error);
+					document.getElementById('user-profile').innerHTML = `
+          <div class="alert alert-danger mb-0 py-1">Failed to load profile</div>
+        `;
+				}
+			}
+
+			// Load commands
+			async function loadCommands() {
+				try {
+					const response = await fetch(
+						'/.netlify/functions/dashboardApi/commands',
+					);
+					if (!response.ok)
+						throw new Error('Failed to fetch commands');
+
+					const data = await response.json();
+
+					// Store commands and extract categories
+					allCommands = data.commands.map((cmd) => {
+						categories.add(cmd.category);
+						return {
+							...cmd,
+							type: cmd.slash ? 'slash' : 'text',
+						};
+					});
+
+					// Populate category filter
+					categories.forEach((category) => {
+						const option = document.createElement('option');
+						option.value = category.toLowerCase();
+						option.textContent = category;
+						categoryFilter.appendChild(option);
+					});
+
+					// Initial display of all commands
+					filteredCommands = [...allCommands];
+					displayCommands();
+				} catch (error) {
+					console.error('Error loading commands:', error);
+					commandsTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-3">
+              <div class="alert alert-danger mb-0">
+                Failed to load commands. Please try again later.
+              </div>
+            </td>
+          </tr>
+        `;
+				}
+			}
+
+			// Display commands in the table
+			function displayCommands() {
+				// Update count badge
+				commandCountBadge.textContent = `${filteredCommands.length} commands`;
+
+				// Clear table
+				commandsTableBody.innerHTML = '';
+
+				if (filteredCommands.length === 0) {
+					commandsTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-3">
+              <div class="alert alert-info mb-0">
+                No commands match your search criteria.
+              </div>
+            </td>
+          </tr>
+        `;
+					return;
+				}
+
+				// Add each command to the table
+				filteredCommands.forEach((command) => {
+					const row = document.createElement('tr');
+
+					// Format the command name based on type
+					let nameDisplay;
+					if (command.type === 'slash') {
+						nameDisplay = `<span class="badge bg-primary me-1">/</span>${command.name}`;
+					} else {
+						nameDisplay = `<span class="badge bg-secondary me-1">!</span>${command.name}`;
+					}
+
+					row.innerHTML = `
+          <td>${nameDisplay}</td>
+          <td>${command.description || 'No description available'}</td>
+          <td><span class="badge bg-info text-dark">${command.category}</span></td>
+          <td>
+            ${
+				command.type === 'slash'
+					? '<span class="badge bg-primary">Slash</span>'
+					: '<span class="badge bg-secondary">Text</span>'
+			}
+          </td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary view-command" data-command="${command.name}">
+              <i class="bi bi-info-circle"></i> Details
+            </button>
+          </td>
+        `;
+
+					// Add event listener to view button
+					row.querySelector('.view-command').addEventListener(
+						'click',
+						() => {
+							showCommandDetails(command);
+						},
+					);
+
+					commandsTableBody.appendChild(row);
+				});
+			}
+
+			// Show command details in modal
+			function showCommandDetails(command) {
+				// Set modal title
+				document.getElementById('modal-command-name').textContent =
+					command.name;
+
+				// Build content
+				let content = `
+        <div class="mb-3">
+          <h6 class="fw-bold">Description</h6>
+          <p>${command.description || 'No description available'}</p>
+        </div>
+      `;
+
+				// Add usage information
+				if (command.usage) {
+					content += `
+          <div class="mb-3">
+            <h6 class="fw-bold">Usage</h6>
+            <div class="bg-light p-2 rounded">
+              ${command.type === 'slash' ? '/' : '!'}${command.name} ${command.usage}
+            </div>
+          </div>
+        `;
+				}
+
+				// Add examples if available
+				if (command.examples && command.examples.length > 0) {
+					content += `
+          <div class="mb-3">
+            <h6 class="fw-bold">Examples</h6>
+            <ul class="list-group">
+        `;
+
+					command.examples.forEach((example) => {
+						content += `
+            <li class="list-group-item">
+              <code>${command.type === 'slash' ? '/' : '!'}${command.name} ${example}</code>
+            </li>
+          `;
+					});
+
+					content += `
+            </ul>
+          </div>
+        `;
+				}
+
+				// Add options if it's a slash command with options
+				if (command.options && command.options.length > 0) {
+					content += `
+          <div class="mb-3">
+            <h6 class="fw-bold">Options</h6>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Required</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+					command.options.forEach((option) => {
+						content += `
+            <tr>
+              <td>${option.name}</td>
+              <td>${option.description}</td>
+              <td>${
+					option.required
+						? '<span class="badge bg-danger">Required</span>'
+						: '<span class="badge bg-secondary">Optional</span>'
+				}
+              </td>
+            </tr>
+          `;
+					});
+
+					content += `
+              </tbody>
+            </table>
+          </div>
+        `;
+				}
+
+				// Add permissions if specified
+				if (command.permissions && command.permissions.length > 0) {
+					content += `
+          <div class="mb-3">
+            <h6 class="fw-bold">Required Permissions</h6>
+            <ul class="list-inline">
+        `;
+
+					command.permissions.forEach((perm) => {
+						content += `<li class="list-inline-item"><span class="badge bg-warning text-dark">${perm}</span></li>`;
+					});
+
+					content += `
+            </ul>
+          </div>
+        `;
+				}
+
+				// Add additional information
+				content += `
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title">Command Type</h6>
+                <p class="card-text">
+                  ${
+						command.type === 'slash'
+							? '<span class="badge bg-primary">Slash Command</span>'
+							: '<span class="badge bg-secondary">Text Command</span>'
+					}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h6 class="card-title">Category</h6>
+                <p class="card-text">
+                  <span class="badge bg-info text-dark">${command.category}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+				// Set content and show modal
+				document.getElementById('modal-command-details').innerHTML =
+					content;
+				commandModal.show();
+			}
+
+			// Filter commands based on search input and filters
+			function filterCommands() {
+				const searchTerm = searchInput.value.toLowerCase();
+				const categoryValue = categoryFilter.value;
+				const typeValue = typeFilter.value;
+
+				filteredCommands = allCommands.filter((command) => {
+					// Match search term
+					const matchesSearch =
+						command.name.toLowerCase().includes(searchTerm) ||
+						(command.description &&
+							command.description
+								.toLowerCase()
+								.includes(searchTerm));
+
+					// Match category
+					const matchesCategory =
+						categoryValue === 'all' ||
+						command.category.toLowerCase() === categoryValue;
+
+					// Match type
+					const matchesType =
+						typeValue === 'all' || command.type === typeValue;
+
+					return matchesSearch && matchesCategory && matchesType;
+				});
+
+				displayCommands();
+			}
+
+			// Set up event listeners
+			function setupEventListeners() {
+				searchInput.addEventListener('input', filterCommands);
+				categoryFilter.addEventListener('change', filterCommands);
+				typeFilter.addEventListener('change', filterCommands);
+			}
+
+			// Initialize
+			document.addEventListener('DOMContentLoaded', () => {
+				loadUserProfile();
+				loadCommands();
+				setupEventListeners();
+			});
+		</script>
+	</body>
+</html>
