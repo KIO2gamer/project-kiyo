@@ -312,8 +312,8 @@ class ApiService {
 			return result;
 		} catch (error) {
 			// Enhanced error handling with more specific messages
-			if (error.message.includes('404')) {
-				throw new Error('Server settings not found. The bot might not be in this server yet.');
+			if (error.message.includes('404') || error.message.includes('not found')) {
+				throw new Error('Server settings not found. The bot might not be in this server yet or settings need to be initialized.');
 			} else if (error.message.includes('403')) {
 				throw new Error('You do not have permission to access these settings.');
 			}
@@ -321,6 +321,34 @@ class ApiService {
 			// Re-throw the original error
 			throw error;
 		}
+	}
+
+	/**
+	 * Initializes default settings for a server
+	 * @param {string} guildId - Discord server ID
+	 * @returns {Promise<Object>} Initialized settings
+	 */
+	async initializeServerSettings(guildId) {
+		const defaultSettings = {
+			prefix: '!',
+			premium_enabled: false,
+			log_channel: null,
+			welcome: {
+				enabled: false,
+				channel: null,
+				message: 'Welcome {user} to {server}! You are our {memberCount}th member.',
+				dm: false
+			},
+			moderation: {
+				logging: false,
+				log_channel: null,
+				automod_level: 0,
+				muted_role: null
+			}
+		};
+
+		const result = await this.post(`guilds/${guildId}/settings`, defaultSettings);
+		return result;
 	}
 
 	/**

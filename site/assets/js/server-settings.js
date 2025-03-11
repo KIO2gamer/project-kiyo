@@ -127,6 +127,12 @@ class ServerSettingsManager {
 	 * @param {string} message - Error message to display
 	 */
 	showError(message) {
+		// Special case for "settings not found" error
+		if (message.includes('not found') && message.includes('settings')) {
+			this.showInitializationScreen();
+			return;
+		}
+
 		this.container.innerHTML = `
       <div class="alert alert-danger" role="alert">
         <h4 class="alert-heading">Error</h4>
@@ -186,6 +192,105 @@ class ServerSettingsManager {
 
 		// Store reference to manager in the container for retry action
 		this.container.settingsManager = this;
+	}
+
+	/**
+	 * Shows server initialization screen when settings don't exist yet
+	 */
+	showInitializationScreen() {
+		this.container.innerHTML = `
+      <div class="card">
+        <div class="card-body text-center p-5">
+          <i class="bi bi-robot text-primary" style="font-size: 4rem;"></i>
+          <h2 class="my-4">Welcome to Kiyo Bot!</h2>
+          <p class="mb-4 lead">This server hasn't been configured yet. Initialize settings to start using Kiyo's features.</p>
+          
+          <div class="d-grid gap-2 d-md-block">
+            <button class="btn btn-primary btn-lg" id="initialize-settings">
+              <i class="bi bi-magic me-2"></i>Initialize Default Settings
+            </button>
+            <a href="/dashboard/servers" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-arrow-left me-2"></i>Back to Servers
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+		// Add event listener for initialization button
+		const initBtn = document.getElementById('initialize-settings');
+		if (initBtn) {
+			initBtn.addEventListener('click', () => this.initializeServerSettings());
+		}
+
+		// Store reference to manager
+		this.container.settingsManager = this;
+	}
+
+	/**
+	 * Initializes default server settings
+	 */
+	async initializeServerSettings() {
+		if (!this.guildId) return;
+
+		try {
+			// Show loading state
+			const initBtn = document.getElementById('initialize-settings');
+			if (initBtn) {
+				initBtn.disabled = true;
+				initBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Setting up...';
+			}
+
+			// Default settings to initialize
+			const defaultSettings = {
+				prefix: '!',
+				premium_enabled: false,
+				log_channel: null,
+				welcome: {
+					enabled: false,
+					channel: null,
+					message: 'Welcome {user} to {server}! You are our {memberCount}th member.',
+					dm: false
+				},
+				moderation: {
+					logging: false,
+					log_channel: null,
+					automod_level: 0,
+					muted_role: null
+				}
+			};
+
+			// Save settings via API
+			if (window.apiService) {
+				this.settings = await window.apiService.updateServerSettings(this.guildId, defaultSettings);
+			} else {
+				const response = await fetch(`/.netlify/functions/dashboardApi/guilds/${this.guildId}/settings`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					credentials: 'include',
+					body: JSON.stringify(defaultSettings)
+				});
+
+				if (!response.ok) {
+					throw new Error(`Failed to initialize settings: ${response.status}`);
+				}
+
+				this.settings = await response.json();
+			}
+
+			// Show success message
+			if (window.showToast) {
+				window.showToast('success', 'Settings initialized successfully!');
+			}
+
+			// Render the settings form now that we have settings
+			this.renderSettings();
+		} catch (error) {
+			console.error('Error initializing server settings:', error);
+			this.showError(error.message || 'Failed to initialize server settings');
+		}
 	}
 
 	/**
