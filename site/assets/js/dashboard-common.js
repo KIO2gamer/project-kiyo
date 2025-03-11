@@ -83,14 +83,18 @@ function updateProfileUI(userData) {
 
 /**
  * Loads managed servers for the current user
- * @returns {Promise<Array|null>} Array of servers or null if error
+ * @param {number} page Page number
+ * @param {number} limit Items per page
+ * @returns {Promise<Object|null>} Server data with pagination or null if error
  */
-async function loadManagedServers() {
+async function loadManagedServers(page = 1, limit = 12) {
 	try {
-		// Return cached data if available
-		if (serversCache) return serversCache;
+		// If loading first page and cache exists, return it
+		if (page === 1 && serversCache) {
+			return serversCache;
+		}
 
-		const response = await fetchWithAuth(`${API_BASE}/guilds`);
+		const response = await fetchWithAuth(`${API_BASE}/guilds?page=${page}&limit=${limit}`);
 
 		if (!response.ok) {
 			if (response.status === 401) redirectToLogin();
@@ -98,8 +102,13 @@ async function loadManagedServers() {
 		}
 
 		const data = await response.json();
-		serversCache = data.guilds;
-		return data.guilds;
+
+		// Only cache first page
+		if (page === 1) {
+			serversCache = data;
+		}
+
+		return data;
 	} catch (error) {
 		console.error('Error loading servers:', error);
 		showToast('error', 'Failed to load servers');
@@ -137,7 +146,7 @@ async function fetchWithAuth(url, options = {}) {
  */
 async function postToApi(endpoint, data) {
 	try {
-		const response = await fetchWithAuth(`${API_BASE}${endpoint}`, {
+		const response = await fetchWithAuth(`${API_BASE}/${endpoint}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -204,6 +213,7 @@ function showToast(type, message, duration = 3000) {
 	if (!toastContainer) {
 		toastContainer = document.createElement('div');
 		toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+		toastContainer.style.zIndex = "1050"; // Above most content
 		document.body.appendChild(toastContainer);
 	}
 
@@ -343,7 +353,7 @@ function initMobileNavigation() {
 }
 
 /**
- * Initializes dashboard common features including theme
+ * Initializes dashboard common features
  */
 function initializeDashboard() {
 	// Initialize theme system if available
@@ -361,39 +371,52 @@ function initializeDashboard() {
 		console.warn('Theme system not available, using system default');
 	}
 
-	// Initialize other dashboard common features
-	setupNavigation();
-	initializeToasts();
-	// Other initializations...
+	// Initialize other dashboard components
+	initActiveSidebar();
+	initBootstrapComponents();
+	initMobileNavigation();
+
+	// Initialize toast container
+	const toastContainer = document.createElement('div');
+	toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+	toastContainer.style.zIndex = "1050";
+	document.body.appendChild(toastContainer);
 }
 
-// Initialize theme from saved preference
-function initializeTheme() {
-	const savedTheme = localStorage.getItem('kiyo-theme') || 'system';
-	applyTheme(savedTheme);
-
-	// Update radio buttons if on settings page
-	document.querySelectorAll('input[name="theme"]').forEach(radio => {
-		if (radio.value === savedTheme) {
-			radio.checked = true;
+// Apply theme using theme system if available
+function applyTheme(theme) {
+	if (window.ThemeSystem) {
+		window.ThemeSystem.applyTheme(theme);
+	} else {
+		// Fallback implementation
+		if (theme === 'system') {
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+		} else {
+			document.documentElement.setAttribute('data-bs-theme', theme);
 		}
-	});
+		localStorage.setItem('kiyo-theme', theme);
+	}
+}
 
-	// Listen for system preference changes if using system theme
-	if (savedTheme === 'system') {
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-			applyTheme('system');
-		});
+/**
+ * Initializes theme based on saved preference
+ * Added as convenience method to work alongside theme-system.js
+ */
+function initializeTheme() {
+	if (window.ThemeSystem) {
+		window.ThemeSystem.initialize();
+	} else {
+		// Fallback implementation
+		const savedTheme = localStorage.getItem('kiyo-theme') || 'system';
+		applyTheme(savedTheme);
 	}
 }
 
 // Call when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
-	initActiveSidebar();
-	initBootstrapComponents();
+	initializeDashboard();
 	loadUserProfile();
-	initMobileNavigation();
-	initializeTheme();
 });
 
 // Export functions for use in other scripts

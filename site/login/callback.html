@@ -15,8 +15,6 @@
 		<link rel="stylesheet" href="/assets/css/main.css" />
 		<style>
 			body {
-				background-color: #2c2f33;
-				color: white;
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -27,9 +25,8 @@
 				max-width: 500px;
 				width: 100%;
 				padding: 2rem;
-				background-color: #23272a;
 				border-radius: 10px;
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 				text-align: center;
 			}
 			.logo {
@@ -56,13 +53,58 @@
 			.message {
 				margin-bottom: 1.5rem;
 			}
+			/* Progress bar styles */
+			.progress {
+				height: 8px;
+				margin: 1rem 0;
+				background-color: rgba(128, 128, 128, 0.2);
+			}
+			.progress-bar {
+				background-color: #5865f2;
+				transition: width 1.5s ease;
+			}
+			/* Improve accessibility */
+			.btn:focus {
+				box-shadow: 0 0 0 0.25rem rgba(88, 101, 242, 0.5);
+			}
+			.error-details {
+				background-color: rgba(0, 0, 0, 0.1);
+				border-radius: 4px;
+				padding: 0.5rem;
+				margin-top: 1rem;
+				font-size: 0.9rem;
+				text-align: left;
+				max-height: 100px;
+				overflow-y: auto;
+			}
+
+			/* Dark mode adjustments are handled by theme-system.js */
+			html[data-bs-theme='dark'] .auth-container {
+				background-color: #2c2f33;
+				color: #ffffff;
+			}
+
+			html[data-bs-theme='light'] .auth-container {
+				background-color: #ffffff;
+				color: #23272a;
+			}
 		</style>
 		<script src="/assets/js/theme-system.js"></script>
 	</head>
 	<body>
-		<div class="auth-container">
+		<div class="auth-container" role="main">
 			<img src="/assets/img/logo.png" alt="Kiyo Bot" class="logo" />
 			<h2 id="status-title">Authenticating...</h2>
+
+			<div class="progress" id="progress-container">
+				<div
+					class="progress-bar"
+					role="progressbar"
+					id="progress-bar"
+					style="width: 0%"
+				></div>
+			</div>
+
 			<div
 				id="loading-spinner"
 				class="spinner-border text-primary spinner"
@@ -70,10 +112,14 @@
 			>
 				<span class="visually-hidden">Loading...</span>
 			</div>
+
 			<div id="status-icon" class="status-icon d-none"></div>
 			<p id="status-message" class="message">
 				Please wait while we complete your authentication.
 			</p>
+
+			<div id="error-details" class="error-details d-none"></div>
+
 			<div id="actions" class="d-none">
 				<a
 					href="/dashboard/home"
@@ -91,6 +137,20 @@
 		</div>
 
 		<script>
+			// Initialize theme system
+			if (window.ThemeSystem) {
+				window.ThemeSystem.initialize();
+			} else {
+				// Fallback to system preference
+				const prefersDark = window.matchMedia(
+					'(prefers-color-scheme: dark)',
+				).matches;
+				document.documentElement.setAttribute(
+					'data-bs-theme',
+					prefersDark ? 'dark' : 'light',
+				);
+			}
+
 			// Parse URL query parameters
 			const urlParams = new URLSearchParams(window.location.search);
 			const code = urlParams.get('code');
@@ -107,12 +167,44 @@
 			const dashboardBtn = document.getElementById('dashboard-btn');
 			const homeBtn = document.getElementById('home-btn');
 			const retryBtn = document.getElementById('retry-btn');
+			const progressBar = document.getElementById('progress-bar');
+			const progressContainer =
+				document.getElementById('progress-container');
+			const errorDetails = document.getElementById('error-details');
+
+			// Animation progress
+			let progressValue = 0;
+			let progressInterval;
+
+			// Start progress animation
+			function startProgress() {
+				progressInterval = setInterval(() => {
+					if (progressValue < 90) {
+						// Cap at 90% until complete
+						progressValue += 1;
+						progressBar.style.width = progressValue + '%';
+						progressBar.setAttribute(
+							'aria-valuenow',
+							progressValue,
+						);
+					}
+				}, 100);
+			}
+
+			// Complete progress animation
+			function completeProgress() {
+				clearInterval(progressInterval);
+				progressValue = 100;
+				progressBar.style.width = '100%';
+				progressBar.setAttribute('aria-valuenow', 100);
+			}
 
 			// Handle authentication error from Discord
 			if (error) {
 				showError(
 					`Authentication failed: ${error}`,
 					errorDescription || 'Please try again later.',
+					error + (errorDescription ? `: ${errorDescription}` : ''),
 				);
 				return;
 			}
@@ -122,9 +214,13 @@
 				showError(
 					'Missing required parameters',
 					'The authentication process is missing required parameters.',
+					'Missing code or state parameter in the callback URL.',
 				);
 				return;
 			}
+
+			// Start progress
+			startProgress();
 
 			// Process authentication
 			processAuthentication();
@@ -154,6 +250,7 @@
 					const data = await response.json();
 
 					// Authentication successful
+					completeProgress();
 					showSuccess(
 						'Authentication successful!',
 						'You will be redirected to the dashboard shortly...',
@@ -169,6 +266,7 @@
 						'Authentication failed',
 						error.message ||
 							'An unexpected error occurred. Please try again.',
+						error.stack || error.toString(),
 					);
 				}
 			}
@@ -177,24 +275,35 @@
 				statusTitle.textContent = title;
 				statusMessage.textContent = message;
 
+				completeProgress();
 				loadingSpinner.classList.add('d-none');
 				statusIcon.classList.remove('d-none');
 				statusIcon.classList.add('success-icon');
-				statusIcon.innerHTML = '<i class="bi bi-check-circle"></i>';
+				statusIcon.innerHTML =
+					'<i class="bi bi-check-circle" aria-hidden="true"></i>';
 
 				actions.classList.remove('d-none');
 				dashboardBtn.classList.remove('d-none');
 			}
 
-			function showError(title, message) {
+			function showError(title, message, details) {
 				statusTitle.textContent = title;
 				statusMessage.textContent = message;
+
+				clearInterval(progressInterval);
+				progressContainer.classList.add('d-none');
 
 				loadingSpinner.classList.add('d-none');
 				statusIcon.classList.remove('d-none');
 				statusIcon.classList.add('error-icon');
 				statusIcon.innerHTML =
-					'<i class="bi bi-exclamation-circle"></i>';
+					'<i class="bi bi-exclamation-circle" aria-hidden="true"></i>';
+
+				// Show error details if available
+				if (details) {
+					errorDetails.textContent = details;
+					errorDetails.classList.remove('d-none');
+				}
 
 				actions.classList.remove('d-none');
 				homeBtn.classList.remove('d-none');

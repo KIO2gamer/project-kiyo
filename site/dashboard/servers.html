@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Servers - Kiyo Dashboard</title>
+		<title>My Servers | Kiyo Bot Dashboard</title>
 		<!-- Bootstrap CSS -->
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -17,502 +17,696 @@
 		<!-- Custom CSS -->
 		<link href="/assets/css/dashboard.css" rel="stylesheet" />
 		<script src="/assets/js/theme-system.js"></script>
+		<style>
+			.server-card {
+				transition:
+					transform 0.2s ease,
+					box-shadow 0.2s ease;
+				height: 100%;
+			}
+
+			.server-card:hover {
+				transform: translateY(-5px);
+				box-shadow:
+					0 10px 20px rgba(0, 0, 0, 0.12),
+					0 4px 8px rgba(0, 0, 0, 0.06);
+			}
+
+			.server-icon {
+				width: 80px;
+				height: 80px;
+				border-radius: 50%;
+				object-fit: cover;
+				margin-bottom: 1rem;
+			}
+
+			.server-name {
+				font-weight: 600;
+				margin-bottom: 0.25rem;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+
+			.server-status {
+				padding: 0.25rem 0.5rem;
+				font-size: 0.75rem;
+				border-radius: 0.25rem;
+				display: inline-block;
+				margin-top: 0.5rem;
+			}
+
+			.server-card .card-body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+			}
+
+			.server-actions {
+				margin-top: auto;
+				padding-top: 1rem;
+				width: 100%;
+			}
+
+			.pagination-container {
+				margin-top: 2rem;
+			}
+		</style>
 	</head>
-	<body>
-		<div class="dashboard-container">
-			<!-- Sidebar -->
-			<aside class="sidebar">
-				<div class="sidebar-header">
+	<body class="dashboard">
+		<!-- Navigation sidebar - Will be loaded via dashboard-common.js -->
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<a href="/dashboard/home" class="d-flex align-items-center">
 					<img
 						src="/assets/img/logo.png"
-						alt="Kiyo"
-						class="sidebar-logo"
+						alt="Kiyo Bot"
+						class="sidebar-logo me-2"
 					/>
-					<h1>Kiyo Dashboard</h1>
-				</div>
+					<span class="sidebar-title">Kiyo Bot</span>
+				</a>
+				<button
+					class="btn-close d-lg-none"
+					aria-label="Close sidebar"
+				></button>
+			</div>
+
+			<div class="sidebar-content">
 				<nav class="sidebar-nav">
-					<ul>
-						<li class="nav-item" id="nav-home">
-							<a href="/dashboard/home"
-								><i class="bi bi-house-door"></i> Home</a
-							>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<a href="/dashboard/home" class="nav-link">
+								<i class="bi bi-speedometer2"></i> Dashboard
+							</a>
 						</li>
-						<li class="nav-item" id="nav-servers">
-							<a href="/dashboard/servers"
-								><i class="bi bi-server"></i> Servers</a
-							>
+						<li class="nav-item">
+							<a href="/dashboard/servers" class="nav-link">
+								<i class="bi bi-hdd-network"></i> My Servers
+							</a>
 						</li>
-						<li class="nav-item" id="nav-commands">
-							<a href="/dashboard/commands"
-								><i class="bi bi-command"></i> Commands</a
-							>
+						<li class="nav-item">
+							<a href="/dashboard/settings" class="nav-link">
+								<i class="bi bi-gear"></i> Settings
+							</a>
 						</li>
-						<li class="nav-item" id="nav-settings">
-							<a href="/dashboard/settings"
-								><i class="bi bi-gear"></i> Settings</a
+						<li class="nav-item">
+							<a
+								href="https://discord.gg/support"
+								target="_blank"
+								class="nav-link"
 							>
+								<i class="bi bi-headset"></i> Support
+							</a>
 						</li>
 					</ul>
 				</nav>
-				<div class="sidebar-footer">
-					<a href="/" class="btn btn-outline-light btn-sm">
-						<i class="bi bi-box-arrow-left"></i> Back to Site
-					</a>
-				</div>
-			</aside>
-
-			<!-- Main Content -->
-			<main class="main-content">
-				<!-- Header -->
-				<header class="dashboard-header">
-					<div
-						class="d-flex justify-content-between align-items-center"
-					>
-						<h2><i class="bi bi-server"></i> Manage Servers</h2>
-						<div class="user-profile" id="user-profile">
-							<div
-								class="spinner-border spinner-border-sm text-light"
-								role="status"
-							>
-								<span class="visually-hidden">Loading...</span>
-							</div>
-						</div>
-					</div>
-				</header>
-
-				<div class="content-body">
-					<!-- Servers Overview -->
-					<div class="row mb-4">
-						<div class="col-md-12">
-							<div class="card">
-								<div
-									class="card-header d-flex justify-content-between align-items-center"
-								>
-									<h5>
-										<i class="bi bi-server me-2"></i>Your
-										Servers
-									</h5>
-									<a
-										href="https://discord.com/api/oauth2/authorize"
-										id="add-server-link"
-										class="btn btn-sm btn-primary"
-									>
-										<i class="bi bi-plus-circle"></i> Add to
-										Server
-									</a>
-								</div>
-								<div class="card-body">
-									<div
-										id="servers-container"
-										class="servers-grid"
-									>
-										<div class="text-center py-4">
-											<div
-												class="spinner-border text-primary"
-												role="status"
-											>
-												<span class="visually-hidden"
-													>Loading...</span
-												>
-											</div>
-											<p class="mt-2">
-												Loading your servers...
-											</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Selected Server Details (shown when a server is selected) -->
-					<div
-						class="row mb-4"
-						id="server-details-section"
-						style="display: none"
-					>
-						<div class="col-md-12">
-							<div class="card">
-								<div class="card-header">
-									<h5 id="selected-server-name">
-										Server Details
-									</h5>
-								</div>
-								<div class="card-body">
-									<div class="row">
-										<div class="col-md-4">
-											<div class="server-info-card">
-												<div class="text-center">
-													<img
-														id="selected-server-icon"
-														src="/assets/img/default-server.png"
-														alt="Server Icon"
-														class="server-icon-large mb-3"
-													/>
-													<h4
-														id="selected-server-title"
-													>
-														Server Name
-													</h4>
-												</div>
-												<div class="server-stats mt-4">
-													<div class="stat-item">
-														<i
-															class="bi bi-people"
-														></i>
-														<span
-															id="server-member-count"
-															>-</span
-														>
-														Members
-													</div>
-													<div class="stat-item">
-														<i
-															class="bi bi-chat-left-text"
-														></i>
-														<span
-															id="server-channel-count"
-															>-</span
-														>
-														Channels
-													</div>
-													<div class="stat-item">
-														<i
-															class="bi bi-calendar3"
-														></i>
-														<span
-															id="server-creation-date"
-															>-</span
-														>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="col-md-8">
-											<h5>Server Management</h5>
-											<div class="list-group">
-												<a
-													href="#"
-													class="list-group-item list-group-item-action server-action"
-													data-action="welcome"
-												>
-													<div
-														class="d-flex w-100 justify-content-between"
-													>
-														<h6 class="mb-1">
-															Welcome Messages
-														</h6>
-														<i
-															class="bi bi-chevron-right"
-														></i>
-													</div>
-													<p class="mb-1">
-														Configure welcome
-														messages and auto-roles
-														for new members
-													</p>
-												</a>
-												<a
-													href="#"
-													class="list-group-item list-group-item-action server-action"
-													data-action="moderation"
-												>
-													<div
-														class="d-flex w-100 justify-content-between"
-													>
-														<h6 class="mb-1">
-															Moderation
-														</h6>
-														<i
-															class="bi bi-chevron-right"
-														></i>
-													</div>
-													<p class="mb-1">
-														Setup auto-moderation,
-														word filters, and
-														logging
-													</p>
-												</a>
-												<a
-													href="#"
-													class="list-group-item list-group-item-action server-action"
-													data-action="commands"
-												>
-													<div
-														class="d-flex w-100 justify-content-between"
-													>
-														<h6 class="mb-1">
-															Commands
-														</h6>
-														<i
-															class="bi bi-chevron-right"
-														></i>
-													</div>
-													<p class="mb-1">
-														Enable/disable bot
-														commands for this server
-													</p>
-												</a>
-												<a
-													href="#"
-													class="list-group-item list-group-item-action server-action"
-													data-action="stats"
-												>
-													<div
-														class="d-flex w-100 justify-content-between"
-													>
-														<h6 class="mb-1">
-															Server Statistics
-														</h6>
-														<i
-															class="bi bi-chevron-right"
-														></i>
-													</div>
-													<p class="mb-1">
-														View detailed activity
-														and usage statistics
-													</p>
-												</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</main>
+			</div>
 		</div>
 
-		<!-- Bootstrap JS -->
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-		<!-- Custom Dashboard Scripts -->
-		<script src="/assets/js/dashboard-common.js"></script>
-		<script>
-			document.addEventListener('DOMContentLoaded', async () => {
-				// Load user profile
-				await loadUserProfile();
+		<!-- Main content -->
+		<div class="main-content">
+			<!-- Top navbar -->
+			<nav class="navbar navbar-expand-lg navbar-light">
+				<div class="container-fluid">
+					<button class="navbar-toggle d-lg-none me-3">
+						<i class="bi bi-list"></i>
+					</button>
 
-				// Update add server link with correct OAuth URL
-				const addServerLink =
-					document.getElementById('add-server-link');
-				try {
-					const response = await fetch(
-						'/.netlify/functions/dashboardApi/config',
-					);
-					if (response.ok) {
-						const data = await response.json();
-						if (data.inviteUrl) {
-							addServerLink.href = data.inviteUrl;
-						}
-					}
-				} catch (error) {
-					console.error('Failed to fetch bot invite URL:', error);
-				}
+					<ol class="breadcrumb mb-0">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/home">Dashboard</a>
+						</li>
+						<li class="breadcrumb-item active">My Servers</li>
+					</ol>
 
-				// Check for server ID in URL query params
-				const urlParams = new URLSearchParams(window.location.search);
-				const serverId = urlParams.get('id');
+					<div class="navbar-nav ms-auto">
+						<!-- User profile will be inserted here via dashboard-common.js -->
+						<div id="user-profile"></div>
+					</div>
+				</div>
+			</nav>
 
-				// Load all servers
-				await loadServers();
+			<!-- Page content container -->
+			<div class="container-fluid p-4">
+				<div class="row mb-4">
+					<div class="col-md-6">
+						<h1 class="h3 mb-0">My Discord Servers</h1>
+						<p class="text-muted">
+							Manage your servers where Kiyo is installed
+						</p>
+					</div>
+					<div class="col-md-6 text-md-end">
+						<a
+							href="https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=8&scope=bot%20applications.commands"
+							target="_blank"
+							class="btn btn-primary"
+						>
+							<i class="bi bi-plus-circle me-2"></i> Add to Server
+						</a>
+						<button
+							id="refresh-servers"
+							class="btn btn-outline-secondary ms-2"
+						>
+							<i class="bi bi-arrow-clockwise"></i>
+						</button>
+					</div>
+				</div>
 
-				// If server ID was provided, load that specific server
-				if (serverId) {
-					loadServerDetails(serverId);
-				}
-			});
-
-			// Load user's servers
-			async function loadServers() {
-				const serversContainer =
-					document.getElementById('servers-container');
-
-				try {
-					const response = await fetch(
-						'/.netlify/functions/dashboardApi/guilds',
-					);
-					if (!response.ok) {
-						throw new Error('Failed to fetch servers');
-					}
-
-					const data = await response.json();
-
-					if (data.guilds.length === 0) {
-						serversContainer.innerHTML = `
-							<div class="alert alert-info m-0">
-								No servers found. Add Kiyo to a server where you have management permissions.
-								<a href="${data.inviteUrl}" class="alert-link">Add to a server</a>
-							</div>`;
-						return;
-					}
-
-					serversContainer.innerHTML = '';
-
-					// Create server cards for each server
-					data.guilds.forEach((guild) => {
-						const serverCard = document.createElement('div');
-						serverCard.className = 'server-card';
-
-						const serverIcon = guild.icon
-							? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=128`
-							: '/assets/img/default-server.png';
-
-						serverCard.innerHTML = `
-							<div class="server-icon">
-								<img src="${serverIcon}" alt="${guild.name}" loading="lazy">
+				<!-- Server filter controls -->
+				<div class="card mb-4">
+					<div class="card-body">
+						<div class="row g-2">
+							<div class="col-md-4">
+								<label for="server-filter" class="form-label"
+									>Filter servers</label
+								>
+								<input
+									type="text"
+									class="form-control"
+									id="server-filter"
+									placeholder="Server name..."
+								/>
 							</div>
-							<div class="server-info">
-								<h4>${guild.name}</h4>
-								<a href="/dashboard/servers?id=${guild.id}" class="btn btn-sm btn-primary">Manage</a>
+							<div class="col-md-4">
+								<label for="sort-by" class="form-label"
+									>Sort by</label
+								>
+								<select class="form-select" id="sort-by">
+									<option value="name">Name (A-Z)</option>
+									<option value="name-desc">
+										Name (Z-A)
+									</option>
+									<option value="members">
+										Members (Highest)
+									</option>
+									<option value="members-asc">
+										Members (Lowest)
+									</option>
+								</select>
 							</div>
-						`;
-
-						serversContainer.appendChild(serverCard);
-					});
-				} catch (error) {
-					console.error('Error loading servers:', error);
-					serversContainer.innerHTML =
-						'<div class="alert alert-danger">Failed to load servers. Please try again later.</div>';
-				}
-			}
-
-			// Load user profile
-			async function loadUserProfile() {
-				try {
-					// Add credentials and proper headers for auth
-					const response = await fetch(
-						'/.netlify/functions/dashboardApi/user',
-						{
-							method: 'GET',
-							credentials: 'include', // Include cookies for session-based auth
-							headers: {
-								Accept: 'application/json',
-							},
-						},
-					);
-
-					if (response.status === 401 || response.status === 403) {
-						// Handle authentication issues by redirecting to login
-						console.warn(
-							'Authentication required. Redirecting to login...',
-						);
-						window.location.href =
-							'/.netlify/functions/dashboardAuth';
-						return;
-					}
-
-					if (!response.ok) {
-						throw new Error(
-							`Failed to fetch user profile: ${response.status}`,
-						);
-					}
-
-					const user = await response.json();
-
-					// Check if user data contains required fields
-					if (!user || !user.id || !user.username) {
-						throw new Error('Incomplete user data received');
-					}
-
-					// Avatar might be null for users without custom avatars - handle this case
-					const avatarUrl = user.avatar
-						? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-						: `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || '0') % 5}.png`;
-
-					document.getElementById('user-profile').innerHTML = `
-						<div class="d-flex align-items-center">
-							<span class="me-2">${user.username}</span>
-							<img src="${avatarUrl}" class="avatar rounded-circle" alt="${user.username}">
-							<a href="/logout" class="btn btn-sm btn-outline-light ms-3">
-								<i class="bi bi-box-arrow-right"></i> Logout
-							</a>
+							<div class="col-md-4">
+								<label for="status-filter" class="form-label"
+									>Status</label
+								>
+								<select class="form-select" id="status-filter">
+									<option value="all">All</option>
+									<option value="active">Active</option>
+									<option value="not-configured">
+										Not Configured
+									</option>
+								</select>
+							</div>
 						</div>
-					`;
-				} catch (error) {
-					console.error('Error loading user profile:', error);
-					document.getElementById('user-profile').innerHTML =
-						'<div class="alert alert-danger p-2 m-0">Failed to load profile</div>';
+					</div>
+				</div>
 
-					// Add a retry button to let users attempt to reload
-					const userProfile = document.getElementById('user-profile');
-					const retryButton = document.createElement('button');
-					retryButton.className = 'btn btn-sm btn-outline-light ms-2';
-					retryButton.innerHTML =
-						'<i class="bi bi-arrow-clockwise"></i> Retry';
-					retryButton.addEventListener('click', () =>
-						loadUserProfile(),
-					);
+				<!-- Server container -->
+				<div id="servers-container">
+					<div class="text-center py-5">
+						<div class="spinner-border text-primary" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						<p class="mt-3">Loading your servers...</p>
+					</div>
+				</div>
 
-					userProfile.appendChild(retryButton);
+				<!-- Pagination -->
+				<div
+					id="pagination-container"
+					class="pagination-container d-flex justify-content-center"
+				>
+					<!-- Pagination will be inserted here -->
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-6">
+							<p class="mb-0">
+								© 2023 Kiyo Bot. All rights reserved.
+							</p>
+						</div>
+						<div class="col-md-6 text-md-end">
+							<div class="theme-selector d-inline-block">
+								<div
+									class="btn-group"
+									role="group"
+									aria-label="Theme selector"
+								>
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-light"
+										value="light"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-light"
+										><i class="bi bi-sun"></i
+									></label>
+
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-dark"
+										value="dark"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-dark"
+										><i class="bi bi-moon"></i
+									></label>
+
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-system"
+										value="system"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-system"
+										><i class="bi bi-circle-half"></i
+									></label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+		<!-- Bootstrap JavaScript -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+		<!-- Dashboard common scripts -->
+		<script src="/assets/js/dashboard-common.js"></script>
+
+		<!-- API Service -->
+		<script src="/assets/js/api-service.js"></script>
+
+		<!-- Page-specific script -->
+		<script>
+			// Server list manager
+			class ServerListManager {
+				constructor(containerId, paginationId) {
+					this.containerId = containerId;
+					this.paginationId = paginationId;
+					this.container = document.getElementById(containerId);
+					this.paginationContainer =
+						document.getElementById(paginationId);
+
+					this.currentPage = 1;
+					this.totalPages = 1;
+					this.serversPerPage = 12;
+					this.servers = [];
+					this.filteredServers = [];
+
+					// Filter and sort settings
+					this.filterValue = '';
+					this.sortBy = 'name';
+					this.statusFilter = 'all';
+
+					// Bind methods
+					this.loadServers = this.loadServers.bind(this);
+					this.renderServers = this.renderServers.bind(this);
+					this.renderPagination = this.renderPagination.bind(this);
+					this.handlePageChange = this.handlePageChange.bind(this);
+					this.applyFilters = this.applyFilters.bind(this);
+
+					// Setup filter and sort handlers
+					this.setupEventListeners();
 				}
-			}
 
-			// Load server details
-			async function loadServerDetails(serverId) {
-				try {
-					const response = await fetch(
-						`/.netlify/functions/dashboardApi/guilds/${serverId}`,
-					);
-					if (!response.ok) {
-						throw new Error('Failed to fetch server details');
+				setupEventListeners() {
+					// Filter input handler
+					const filterInput =
+						document.getElementById('server-filter');
+					if (filterInput) {
+						filterInput.addEventListener('input', (e) => {
+							this.filterValue = e.target.value.toLowerCase();
+							this.applyFilters();
+						});
 					}
 
-					const server = await response.json();
-
-					// Show the server details section
-					document.getElementById(
-						'server-details-section',
-					).style.display = 'block';
-
-					// Update server details
-					document.getElementById(
-						'selected-server-name',
-					).textContent = `${server.name} - Server Details`;
-					document.getElementById(
-						'selected-server-title',
-					).textContent = server.name;
-
-					// Set server icon
-					const serverIcon = server.icon
-						? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png?size=256`
-						: '/assets/img/default-server.png';
-					document.getElementById('selected-server-icon').src =
-						serverIcon;
-
-					// Update stats
-					document.getElementById('server-member-count').textContent =
-						server.memberCount || 'N/A';
-					document.getElementById(
-						'server-channel-count',
-					).textContent = server.channels || 'N/A';
-
-					// Format creation date
-					const creationDate = server.createdAt
-						? new Date(server.createdAt).toLocaleDateString()
-						: 'Unknown';
-					document.getElementById(
-						'server-creation-date',
-					).textContent = creationDate;
-
-					// Add event listeners to management links
-					document
-						.querySelectorAll('.server-action')
-						.forEach((link) => {
-							link.addEventListener('click', function (e) {
-								e.preventDefault();
-								const action = this.getAttribute('data-action');
-								window.location.href = `/dashboard/servers/${action}?id=${serverId}`;
-							});
+					// Sort select handler
+					const sortSelect = document.getElementById('sort-by');
+					if (sortSelect) {
+						sortSelect.addEventListener('change', (e) => {
+							this.sortBy = e.target.value;
+							this.applyFilters();
 						});
-				} catch (error) {
-					console.error('Error loading server details:', error);
-					document.getElementById(
-						'server-details-section',
-					).innerHTML =
-						'<div class="alert alert-danger">Failed to load server details. Please try again later.</div>';
+					}
+
+					// Status filter handler
+					const statusSelect =
+						document.getElementById('status-filter');
+					if (statusSelect) {
+						statusSelect.addEventListener('change', (e) => {
+							this.statusFilter = e.target.value;
+							this.applyFilters();
+						});
+					}
+
+					// Refresh button handler
+					const refreshBtn =
+						document.getElementById('refresh-servers');
+					if (refreshBtn) {
+						refreshBtn.addEventListener('click', () => {
+							if (window.apiService) {
+								window.apiService.clearCache('guilds');
+							}
+							this.loadServers();
+						});
+					}
+				}
+
+				async loadServers() {
+					try {
+						// Show loading state
+						this.container.innerHTML = `
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-3">Loading your servers...</p>
+            </div>
+          `;
+
+						// Load servers using API service if available, otherwise fallback to loadManagedServers
+						let serversData;
+						if (window.apiService) {
+							serversData =
+								await window.apiService.getManagedServers(
+									1,
+									100,
+								);
+						} else {
+							serversData = await window.loadManagedServers(
+								1,
+								100,
+							);
+						}
+
+						// Store servers
+						this.servers = serversData.guilds || [];
+						this.totalPages = Math.ceil(
+							this.servers.length / this.serversPerPage,
+						);
+
+						// Apply filters and render
+						this.applyFilters();
+					} catch (error) {
+						console.error('Error loading servers:', error);
+
+						this.container.innerHTML = `
+            <div class="alert alert-danger m-3" role="alert">
+              <h4 class="alert-heading">Error Loading Servers</h4>
+              <p>${
+					error.message ||
+					'An error occurred while loading your servers.'
+				}</p>
+              <hr>
+              <button class="btn btn-danger" onClick="serverListManager.loadServers()">
+                <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+              </button>
+            </div>
+          `;
+					}
+				}
+
+				applyFilters() {
+					// Filter servers based on current filters
+					this.filteredServers = this.servers.filter((server) => {
+						// Apply text filter
+						if (
+							this.filterValue &&
+							!server.name
+								.toLowerCase()
+								.includes(this.filterValue)
+						) {
+							return false;
+						}
+
+						// Apply status filter
+						if (this.statusFilter !== 'all') {
+							const isConfigured = server.configured === true;
+							if (this.statusFilter === 'active' && !isConfigured)
+								return false;
+							if (
+								this.statusFilter === 'not-configured' &&
+								isConfigured
+							)
+								return false;
+						}
+
+						return true;
+					});
+
+					// Apply sorting
+					this.filteredServers.sort((a, b) => {
+						switch (this.sortBy) {
+							case 'name':
+								return a.name.localeCompare(b.name);
+							case 'name-desc':
+								return b.name.localeCompare(a.name);
+							case 'members':
+								return (
+									(b.memberCount || 0) - (a.memberCount || 0)
+								);
+							case 'members-asc':
+								return (
+									(a.memberCount || 0) - (b.memberCount || 0)
+								);
+							default:
+								return 0;
+						}
+					});
+
+					// Update pagination
+					this.totalPages =
+						Math.ceil(
+							this.filteredServers.length / this.serversPerPage,
+						) || 1;
+
+					// Reset to first page if current page is now invalid
+					if (this.currentPage > this.totalPages) {
+						this.currentPage = 1;
+					}
+
+					// Render with updated data
+					this.renderServers();
+					this.renderPagination();
+				}
+
+				renderServers() {
+					if (!this.container) return;
+
+					// Calculate slice indexes
+					const startIndex =
+						(this.currentPage - 1) * this.serversPerPage;
+					const endIndex = startIndex + this.serversPerPage;
+					const serversToShow = this.filteredServers.slice(
+						startIndex,
+						endIndex,
+					);
+
+					// Show no servers message if none match filters
+					if (serversToShow.length === 0) {
+						this.container.innerHTML = `
+            <div class="alert alert-info m-3" role="alert">
+              <h4 class="alert-heading">No Servers Found</h4>
+              <p>No servers match your current filter criteria.</p>
+              ${
+					this.filterValue || this.statusFilter !== 'all'
+						? `
+                <hr>
+                <button class="btn btn-outline-primary" onClick="document.getElementById('server-filter').value=''; document.getElementById('status-filter').value='all'; serverListManager.filterValue=''; serverListManager.statusFilter='all'; serverListManager.applyFilters();">
+                  <i class="bi bi-x-circle me-2"></i>Clear Filters
+                </button>
+              `
+						: ''
+				}
+            </div>
+          `;
+						return;
+					}
+
+					// Create server grid
+					const serverRows = [];
+					for (let i = 0; i < serversToShow.length; i += 3) {
+						const rowServers = serversToShow.slice(i, i + 3);
+						const row = document.createElement('div');
+						row.className = 'row g-3 mb-4';
+
+						rowServers.forEach((server) => {
+							const serverCol = document.createElement('div');
+							serverCol.className = 'col-lg-4 col-md-6';
+
+							const serverIcon = server.icon
+								? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png?size=128`
+								: 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+							const configured = server.configured === true;
+							const statusClass = configured
+								? 'bg-success'
+								: 'bg-warning text-dark';
+							const statusText = configured
+								? 'Active'
+								: 'Setup Required';
+
+							serverCol.innerHTML = `
+              <div class="card server-card">
+                <div class="card-body">
+                  <img src="${serverIcon}" alt="${server.name}" class="server-icon">
+                  <h5 class="server-name">${server.name}</h5>
+                  <small class="text-muted">${
+						server.memberCount || 'N/A'
+					} members</small>
+                  <span class="server-status ${statusClass}">${statusText}</span>
+                  
+                  <div class="server-actions">
+                    <a href="/dashboard/server/settings?id=${
+						server.id
+					}" class="btn btn-primary w-100">
+                      Manage Server
+                    </a>
+                  </div>
+                </div>
+              </div>
+            `;
+
+							row.appendChild(serverCol);
+						});
+
+						serverRows.push(row);
+					}
+
+					// Clear container and add rows
+					this.container.innerHTML = '';
+					serverRows.forEach((row) =>
+						this.container.appendChild(row),
+					);
+				}
+
+				renderPagination() {
+					if (!this.paginationContainer) return;
+
+					// Don't show pagination if only one page
+					if (this.totalPages <= 1) {
+						this.paginationContainer.innerHTML = '';
+						return;
+					}
+
+					// Create pagination
+					const pagination = document.createElement('nav');
+					pagination.setAttribute('aria-label', 'Server pagination');
+
+					let paginationHtml = `
+          <ul class="pagination">
+            <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
+              <a class="page-link" href="#" data-page="${
+					this.currentPage - 1
+				}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+        `;
+
+					// Calculate page numbers to show
+					const maxVisiblePages = 5;
+					let startPage = Math.max(
+						1,
+						this.currentPage - Math.floor(maxVisiblePages / 2),
+					);
+					let endPage = startPage + maxVisiblePages - 1;
+
+					if (endPage > this.totalPages) {
+						endPage = this.totalPages;
+						startPage = Math.max(1, endPage - maxVisiblePages + 1);
+					}
+
+					// Add page numbers
+					for (let i = startPage; i <= endPage; i++) {
+						paginationHtml += `
+            <li class="page-item ${i === this.currentPage ? 'active' : ''}">
+              <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+          `;
+					}
+
+					paginationHtml += `
+            <li class="page-item ${
+				this.currentPage === this.totalPages ? 'disabled' : ''
+			}">
+              <a class="page-link" href="#" data-page="${
+					this.currentPage + 1
+				}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        `;
+
+					pagination.innerHTML = paginationHtml;
+
+					// Add event listeners to pagination links
+					pagination.addEventListener('click', (e) => {
+						e.preventDefault();
+						const pageLink = e.target.closest('[data-page]');
+						if (pageLink) {
+							const page = parseInt(pageLink.dataset.page, 10);
+							this.handlePageChange(page);
+						}
+					});
+
+					// Update container
+					this.paginationContainer.innerHTML = '';
+					this.paginationContainer.appendChild(pagination);
+				}
+
+				handlePageChange(page) {
+					if (
+						page < 1 ||
+						page > this.totalPages ||
+						page === this.currentPage
+					) {
+						return;
+					}
+
+					this.currentPage = page;
+					this.renderServers();
+					this.renderPagination();
+
+					// Scroll to top of server container
+					this.container.scrollIntoView({ behavior: 'smooth' });
 				}
 			}
+
+			// Initialize on DOMContentLoaded
+			let serverListManager;
+			document.addEventListener('DOMContentLoaded', () => {
+				// Create and initialize server list manager
+				serverListManager = new ServerListManager(
+					'servers-container',
+					'pagination-container',
+				);
+
+				// Load servers
+				serverListManager.loadServers();
+
+				// Make it globally available for button handlers
+				window.serverListManager = serverListManager;
+			});
 		</script>
 	</body>
 </html>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Server Settings | Kiyo Bot Dashboard</title>
+
+		<!-- Bootstrap CSS -->
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Bootstrap Icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+		/>
+		<!-- Dashboard styles -->
+		<link rel="stylesheet" href="/assets/css/dashboard.css" />
+
+		<!-- Theme system script -->
+		<script src="/assets/js/theme-system.js"></script>
+	</head>
+	<body class="dashboard">
+		<!-- Navigation sidebar - Will be loaded via dashboard-common.js -->
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<a href="/dashboard/home" class="d-flex align-items-center">
+					<img
+						src="/assets/img/logo.png"
+						alt="Kiyo Bot"
+						class="sidebar-logo me-2"
+					/>
+					<span class="sidebar-title">Kiyo Bot</span>
+				</a>
+				<button
+					class="btn-close d-lg-none"
+					aria-label="Close sidebar"
+				></button>
+			</div>
+
+			<div class="sidebar-content">
+				<nav class="sidebar-nav">
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<a href="/dashboard/home" class="nav-link">
+								<i class="bi bi-speedometer2"></i> Dashboard
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="/dashboard/servers" class="nav-link">
+								<i class="bi bi-hdd-network"></i> My Servers
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="/dashboard/settings" class="nav-link">
+								<i class="bi bi-gear"></i> Settings
+							</a>
+						</li>
+						<li class="nav-item">
+							<a
+								href="https://discord.gg/support"
+								target="_blank"
+								class="nav-link"
+							>
+								<i class="bi bi-headset"></i> Support
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+
+		<!-- Main content -->
+		<div class="main-content">
+			<!-- Top navbar -->
+			<nav class="navbar navbar-expand-lg navbar-light">
+				<div class="container-fluid">
+					<button class="navbar-toggle d-lg-none me-3">
+						<i class="bi bi-list"></i>
+					</button>
+
+					<ol class="breadcrumb mb-0">
+						<li class="breadcrumb-item">
+							<a href="/dashboard/home">Dashboard</a>
+						</li>
+						<li class="breadcrumb-item">
+							<a href="/dashboard/servers">Servers</a>
+						</li>
+						<li class="breadcrumb-item active">Settings</li>
+					</ol>
+
+					<div class="navbar-nav ms-auto">
+						<!-- User profile will be inserted here via dashboard-common.js -->
+						<div id="user-profile"></div>
+					</div>
+				</div>
+			</nav>
+
+			<!-- Page content container -->
+			<div class="container-fluid p-4">
+				<!-- Server settings header -->
+				<div
+					class="d-flex align-items-center justify-content-between mb-4"
+				>
+					<div>
+						<h1 class="h3 mb-0">Server Settings</h1>
+						<p class="text-muted">
+							Configure your Discord server settings
+						</p>
+					</div>
+					<div>
+						<button
+							id="refresh-settings"
+							class="btn btn-outline-secondary"
+						>
+							<i class="bi bi-arrow-clockwise me-1"></i> Refresh
+						</button>
+					</div>
+				</div>
+
+				<!-- Guild ID from URL (for use by the settings manager) -->
+				<input type="hidden" id="guild-id" value="" />
+
+				<!-- Server settings container -->
+				<div id="server-settings-container" class="settings-container">
+					<!-- Settings will be loaded here by the ServerSettingsManager -->
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="footer">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-6">
+							<p class="mb-0">
+								© 2023 Kiyo Bot. All rights reserved.
+							</p>
+						</div>
+						<div class="col-md-6 text-md-end">
+							<div class="theme-selector d-inline-block">
+								<div
+									class="btn-group"
+									role="group"
+									aria-label="Theme selector"
+								>
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-light"
+										value="light"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-light"
+										><i class="bi bi-sun"></i
+									></label>
+
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-dark"
+										value="dark"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-dark"
+										><i class="bi bi-moon"></i
+									></label>
+
+									<input
+										type="radio"
+										class="btn-check"
+										name="theme"
+										id="theme-system"
+										value="system"
+										autocomplete="off"
+									/>
+									<label
+										class="btn btn-sm btn-outline-secondary"
+										for="theme-system"
+										><i class="bi bi-circle-half"></i
+									></label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+		<!-- Bootstrap JavaScript -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+		<!-- Dashboard common scripts -->
+		<script src="/assets/js/dashboard-common.js"></script>
+
+		<!-- API Service -->
+		<script src="/assets/js/api-service.js"></script>
+
+		<!-- Server Settings Manager -->
+		<script src="/assets/js/server-settings.js"></script>
+
+		<!-- Page-specific script -->
+		<script>
+			document.addEventListener('DOMContentLoaded', async () => {
+				// Get guild ID from URL
+				const params = new URLSearchParams(window.location.search);
+				const guildId = params.get('id');
+
+				if (!guildId) {
+					// No guild ID provided, redirect to servers list
+					window.location.href = '/dashboard/servers';
+					return;
+				}
+
+				// Set guild ID in the hidden input for the settings manager
+				document.getElementById('guild-id').value = guildId;
+
+				// Initialize settings manager
+				const settingsManager = new ServerSettingsManager(
+					'server-settings-container',
+					guildId,
+				);
+
+				// Set up refresh button
+				document
+					.getElementById('refresh-settings')
+					.addEventListener('click', () => {
+						// Clear API cache for this guild's settings
+						if (window.apiService) {
+							window.apiService.clearCache(
+								`guilds/${guildId}/settings`,
+							);
+						}
+
+						// Reload settings
+						settingsManager.loadSettings();
+					});
+
+				// Update page title with server name if available
+				try {
+					const serverData =
+						await window.apiService.getServerSettings(guildId);
+					document.title = `${serverData.guild.name} Settings | Kiyo Bot Dashboard`;
+				} catch (error) {
+					console.warn(
+						'Could not update page title with server name:',
+						error,
+					);
+				}
+			});
+		</script>
+	</body>
+</html>
