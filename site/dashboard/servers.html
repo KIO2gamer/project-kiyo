@@ -380,19 +380,50 @@
 			// Load user profile
 			async function loadUserProfile() {
 				try {
+					// Add credentials and proper headers for auth
 					const response = await fetch(
 						'/.netlify/functions/dashboardApi/user',
+						{
+							method: 'GET',
+							credentials: 'include', // Include cookies for session-based auth
+							headers: {
+								Accept: 'application/json',
+							},
+						},
 					);
+
+					if (response.status === 401 || response.status === 403) {
+						// Handle authentication issues by redirecting to login
+						console.warn(
+							'Authentication required. Redirecting to login...',
+						);
+						window.location.href =
+							'/.netlify/functions/dashboardAuth';
+						return;
+					}
+
 					if (!response.ok) {
-						throw new Error('Failed to fetch user profile');
+						throw new Error(
+							`Failed to fetch user profile: ${response.status}`,
+						);
 					}
 
 					const user = await response.json();
 
+					// Check if user data contains required fields
+					if (!user || !user.id || !user.username) {
+						throw new Error('Incomplete user data received');
+					}
+
+					// Avatar might be null for users without custom avatars - handle this case
+					const avatarUrl = user.avatar
+						? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+						: `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || '0') % 5}.png`;
+
 					document.getElementById('user-profile').innerHTML = `
 						<div class="d-flex align-items-center">
 							<span class="me-2">${user.username}</span>
-							<img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" class="avatar rounded-circle" alt="${user.username}">
+							<img src="${avatarUrl}" class="avatar rounded-circle" alt="${user.username}">
 							<a href="/logout" class="btn btn-sm btn-outline-light ms-3">
 								<i class="bi bi-box-arrow-right"></i> Logout
 							</a>
@@ -402,6 +433,18 @@
 					console.error('Error loading user profile:', error);
 					document.getElementById('user-profile').innerHTML =
 						'<div class="alert alert-danger p-2 m-0">Failed to load profile</div>';
+
+					// Add a retry button to let users attempt to reload
+					const userProfile = document.getElementById('user-profile');
+					const retryButton = document.createElement('button');
+					retryButton.className = 'btn btn-sm btn-outline-light ms-2';
+					retryButton.innerHTML =
+						'<i class="bi bi-arrow-clockwise"></i> Retry';
+					retryButton.addEventListener('click', () =>
+						loadUserProfile(),
+					);
+
+					userProfile.appendChild(retryButton);
 				}
 			}
 
