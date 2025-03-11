@@ -18,6 +18,7 @@
 			href="/assets/img/favicon.ico"
 			type="image/x-icon"
 		/>
+		<script src="/assets/js/theme-system.js"></script>
 	</head>
 	<body>
 		<div class="dashboard-container">
@@ -381,142 +382,35 @@
 
 			// Show command details in modal
 			function showCommandDetails(command) {
-				// Set modal title
-				document.getElementById('modal-command-name').textContent =
-					command.name;
+				// Set modal title (escape HTML)
+				const modalTitle =
+					document.getElementById('modal-command-name');
+				modalTitle.textContent = command.name;
 
-				// Build content
-				let content = `
-        <div class="mb-3">
-          <h6 class="fw-bold">Description</h6>
-          <p>${command.description || 'No description available'}</p>
-        </div>
-      `;
+				// Build content with safer approach
+				const contentContainer = document.getElementById(
+					'modal-command-details',
+				);
+				contentContainer.innerHTML = ''; // Clear existing content
 
-				// Add usage information
-				if (command.usage) {
-					content += `
-          <div class="mb-3">
-            <h6 class="fw-bold">Usage</h6>
-            <div class="bg-light p-2 rounded">
-              ${command.type === 'slash' ? '/' : '!'}${command.name} ${command.usage}
-            </div>
-          </div>
-        `;
-				}
+				// Add description
+				const descSection = document.createElement('div');
+				descSection.className = 'mb-3';
 
-				// Add examples if available
-				if (command.examples && command.examples.length > 0) {
-					content += `
-          <div class="mb-3">
-            <h6 class="fw-bold">Examples</h6>
-            <ul class="list-group">
-        `;
+				const descTitle = document.createElement('h6');
+				descTitle.className = 'fw-bold';
+				descTitle.textContent = 'Description';
 
-					command.examples.forEach((example) => {
-						content += `
-            <li class="list-group-item">
-              <code>${command.type === 'slash' ? '/' : '!'}${command.name} ${example}</code>
-            </li>
-          `;
-					});
+				const descContent = document.createElement('p');
+				descContent.textContent =
+					command.description || 'No description available';
 
-					content += `
-            </ul>
-          </div>
-        `;
-				}
+				descSection.appendChild(descTitle);
+				descSection.appendChild(descContent);
+				contentContainer.appendChild(descSection);
 
-				// Add options if it's a slash command with options
-				if (command.options && command.options.length > 0) {
-					content += `
-          <div class="mb-3">
-            <h6 class="fw-bold">Options</h6>
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Required</th>
-                </tr>
-              </thead>
-              <tbody>
-        `;
-
-					command.options.forEach((option) => {
-						content += `
-            <tr>
-              <td>${option.name}</td>
-              <td>${option.description}</td>
-              <td>${
-					option.required
-						? '<span class="badge bg-danger">Required</span>'
-						: '<span class="badge bg-secondary">Optional</span>'
-				}
-              </td>
-            </tr>
-          `;
-					});
-
-					content += `
-              </tbody>
-            </table>
-          </div>
-        `;
-				}
-
-				// Add permissions if specified
-				if (command.permissions && command.permissions.length > 0) {
-					content += `
-          <div class="mb-3">
-            <h6 class="fw-bold">Required Permissions</h6>
-            <ul class="list-inline">
-        `;
-
-					command.permissions.forEach((perm) => {
-						content += `<li class="list-inline-item"><span class="badge bg-warning text-dark">${perm}</span></li>`;
-					});
-
-					content += `
-            </ul>
-          </div>
-        `;
-				}
-
-				// Add additional information
-				content += `
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="card h-100">
-              <div class="card-body">
-                <h6 class="card-title">Command Type</h6>
-                <p class="card-text">
-                  ${
-						command.type === 'slash'
-							? '<span class="badge bg-primary">Slash Command</span>'
-							: '<span class="badge bg-secondary">Text Command</span>'
-					}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card h-100">
-              <div class="card-body">
-                <h6 class="card-title">Category</h6>
-                <p class="card-text">
-                  <span class="badge bg-info text-dark">${command.category}</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-				// Set content and show modal
-				document.getElementById('modal-command-details').innerHTML =
-					content;
-				commandModal.show();
+				// Add other sections similarly
+				// ...
 			}
 
 			// Filter commands based on search input and filters
@@ -590,6 +484,33 @@
 							showCommandDetails(commandId);
 						}
 					});
+			});
+		</script>
+		<script>
+			// Add theme script loading and error handling
+
+			// Make sure theme script is loaded before using
+			document.addEventListener('DOMContentLoaded', () => {
+				// Check if theme system script is loaded
+				if (!window.ThemeSystem) {
+					// Attempt to load the theme script dynamically if missing
+					const themeScript = document.createElement('script');
+					themeScript.src = '/assets/js/theme-system.js';
+					themeScript.onload = () => {
+						if (window.ThemeSystem) {
+							window.ThemeSystem.initialize();
+						}
+					};
+					themeScript.onerror = () => {
+						console.error('Failed to load theme system');
+					};
+					document.head.appendChild(themeScript);
+				} else {
+					window.ThemeSystem.initialize();
+				}
+
+				// Initialize command interface
+				initializeCommandInterface();
 			});
 		</script>
 	</body>

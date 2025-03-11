@@ -18,6 +18,7 @@
 			href="/assets/img/favicon.ico"
 			type="image/x-icon"
 		/>
+		<script src="/assets/js/theme-system.js"></script>
 	</head>
 	<body>
 		<div class="dashboard-container">
@@ -435,7 +436,7 @@
 				);
 
 				// Apply theme immediately
-				applyTheme(preferences.theme);
+				handleThemeChange(preferences.theme);
 
 				// Show success message
 				const alert = document.createElement('div');
@@ -452,17 +453,41 @@
 				}, 3000);
 			}
 
-			function applyTheme(theme) {
-				if (theme === 'system') {
-					theme = window.matchMedia('(prefers-color-scheme: dark)')
-						.matches
-						? 'dark'
-						: 'light';
+			// Use the shared theme system instead of custom implementation
+			function handleThemeChange(themeValue) {
+				if (!window.ThemeSystem) {
+					console.error('Theme system not loaded!');
+					return;
 				}
 
-				document.body.classList.remove('theme-light', 'theme-dark');
-				document.body.classList.add(`theme-${theme}`);
+				// Use the global theme system
+				window.ThemeSystem.applyTheme(themeValue);
+
+				// Update the form to reflect current selection
+				document
+					.querySelectorAll('input[name="theme-option"]')
+					.forEach((radio) => {
+						radio.checked = radio.value === themeValue;
+					});
 			}
+
+			// Initialize theme settings from localStorage
+			document.addEventListener('DOMContentLoaded', () => {
+				try {
+					const savedTheme =
+						localStorage.getItem('kiyo-theme') || 'system';
+
+					// Update radio buttons to match saved theme
+					const radioElement = document.querySelector(
+						`input[name="theme-option"][value="${savedTheme}"]`,
+					);
+					if (radioElement) {
+						radioElement.checked = true;
+					}
+				} catch (error) {
+					console.warn('Failed to restore theme selection:', error);
+				}
+			});
 
 			async function checkYouTubeConnection() {
 				try {

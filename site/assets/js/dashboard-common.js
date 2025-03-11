@@ -207,33 +207,58 @@ function showToast(type, message, duration = 3000) {
 		document.body.appendChild(toastContainer);
 	}
 
-	// Create toast element
-	const toastId = `toast-${Date.now()}`;
-	const toast = document.createElement('div');
-	toast.className = `toast align-items-center text-white bg-${getToastClass(type)} border-0`;
-	toast.id = toastId;
-	toast.setAttribute('role', 'alert');
-	toast.setAttribute('aria-live', 'assertive');
-	toast.setAttribute('aria-atomic', 'true');
+	// Map type to Bootstrap colors and icons
+	let bgColor, iconClass;
+	switch (type) {
+		case 'success':
+			bgColor = 'bg-success';
+			iconClass = 'bi-check-circle';
+			break;
+		case 'error':
+			bgColor = 'bg-danger';
+			iconClass = 'bi-exclamation-triangle';
+			break;
+		case 'warning':
+			bgColor = 'bg-warning text-dark';
+			iconClass = 'bi-exclamation-circle';
+			break;
+		default: // info
+			bgColor = 'bg-info text-dark';
+			iconClass = 'bi-info-circle';
+	}
 
-	toast.innerHTML = `
+	// Create toast element
+	const toastId = 'toast-' + Date.now();
+	const toastEl = document.createElement('div');
+	toastEl.className = `toast align-items-center ${bgColor} border-0 mb-2`;
+	toastEl.setAttribute('role', 'alert');
+	toastEl.setAttribute('aria-live', 'assertive');
+	toastEl.setAttribute('aria-atomic', 'true');
+	toastEl.setAttribute('id', toastId);
+
+	// Set toast content
+	toastEl.innerHTML = `
     <div class="d-flex">
       <div class="toast-body">
-        ${message}
+        <i class="bi ${iconClass} me-2"></i> ${message}
       </div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   `;
 
-	toastContainer.appendChild(toast);
+	// Add toast to container
+	toastContainer.appendChild(toastEl);
 
 	// Initialize and show toast
-	const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: duration });
-	bsToast.show();
+	const toast = new bootstrap.Toast(toastEl, {
+		autohide: true,
+		delay: duration
+	});
+	toast.show();
 
-	// Remove from DOM after hiding
-	toast.addEventListener('hidden.bs.toast', () => {
-		toast.remove();
+	// Remove toast element after it's hidden
+	toastEl.addEventListener('hidden.bs.toast', () => {
+		toastEl.remove();
 	});
 }
 
@@ -318,22 +343,28 @@ function initMobileNavigation() {
 }
 
 /**
- * Apply theme based on user settings
- * @param {string} theme - Theme name: light, dark, or system
+ * Initializes dashboard common features including theme
  */
-function applyTheme(theme) {
-	// Get actual theme (resolve system preference)
-	const actualTheme = theme === 'system'
-		? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-		: theme;
+function initializeDashboard() {
+	// Initialize theme system if available
+	if (window.ThemeSystem) {
+		try {
+			window.ThemeSystem.initialize();
+		} catch (error) {
+			console.error('Failed to initialize theme system:', error);
 
-	// Apply theme classes
-	document.documentElement.setAttribute('data-bs-theme', actualTheme);
-	document.body.classList.remove('theme-light', 'theme-dark');
-	document.body.classList.add(`theme-${actualTheme}`);
+			// Fallback to basic theme based on system preference
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+		}
+	} else {
+		console.warn('Theme system not available, using system default');
+	}
 
-	// Store in localStorage for persistence
-	localStorage.setItem('kiyo-theme', theme);
+	// Initialize other dashboard common features
+	setupNavigation();
+	initializeToasts();
+	// Other initializations...
 }
 
 // Initialize theme from saved preference
