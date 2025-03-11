@@ -58,7 +58,19 @@ exports.handler = async function (event) {
 
 		try {
 			const decryptedState = decrypt(state);
-			// State validation removed - encryption provides sufficient security
+			// Parse the state JSON safely with proper error handling
+			let parsedState;
+			try {
+				parsedState = JSON.parse(decryptedState);
+			} catch (jsonError) {
+				handleError('❌ Error parsing state JSON:', jsonError);
+				return createErrorResponse(
+					400,
+					'Invalid state format',
+					'The state parameter could not be parsed correctly.'
+				);
+			}
+
 			const accessToken = await exchangeCodeForToken(code);
 
 			if (!accessToken) {
@@ -115,12 +127,11 @@ exports.handler = async function (event) {
 };
 
 function getCodeAndState(event) {
+	// Fixed: Netlify's queryStringParameters is already an object, not a string
 	try {
-		const urlParams = new URLSearchParams(event.queryStringParameters);
-		return {
-			code: urlParams.get('code'),
-			state: urlParams.get('state'),
-		};
+		// Access query parameters directly instead of using URLSearchParams
+		const { code, state } = event.queryStringParameters || {};
+		return { code, state };
 	} catch (error) {
 		handleError('❌ Error parsing query parameters:', error);
 		return { code: null, state: null };
@@ -274,8 +285,8 @@ async function exchangeCodeForToken(code) {
 		);
 
 		if (!tokenResponse.ok) {
-			const errorData = await tokenResponse.json();
-			handleError('❌ Discord token exchange error:', errorData);
+			const errorData = await tokenResponse.text();
+			handleError('❌ Discord token exchange error:', tokenResponse.status, errorData);
 			return null;
 		}
 
@@ -324,7 +335,7 @@ async function getYouTubeConnections(accessToken) {
 				connectionsResponse.status,
 				connectionsResponse.statusText,
 			);
-			const errorData = await connectionsResponse.json();
+			const errorData = await connectionsResponse.text();
 			handleError('Discord connections API error details:', errorData);
 			return []; // Return empty array on API error
 		}
@@ -355,7 +366,19 @@ async function getYouTubeConnections(accessToken) {
 
 async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
 	try {
-		const { interactionId, guildId, channelId } = JSON.parse(state);
+		let parsedState;
+		try {
+			parsedState = JSON.parse(state);
+		} catch (error) {
+			handleError('❌ Error parsing state for database save:', error);
+			throw new Error('Invalid state format for database save');
+		}
+
+		const { interactionId, guildId, channelId } = parsedState;
+
+		if (!interactionId || !guildId || !channelId) {
+			throw new Error('Missing required state parameters');
+		}
 
 		const oauthRecord = new OAuthCode({
 			interactionId,
@@ -369,11 +392,11 @@ async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
 			channelId,
 			userInfo: userInfo
 				? {
-						id: userInfo.id,
-						username: userInfo.username,
-						discriminator: userInfo.discriminator,
-						avatar: userInfo.avatar,
-					}
+					id: userInfo.id,
+					username: userInfo.username,
+					discriminator: userInfo.discriminator,
+					avatar: userInfo.avatar,
+				}
 				: null,
 			createdAt: new Date(),
 		});
@@ -388,8 +411,17 @@ async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
 
 async function createSuccessResponse(connectionsLength, state, userInfo) {
 	try {
-		const { guildId, channelId } = JSON.parse(state);
+		let parsedState;
+		try {
+			parsedState = JSON.parse(state);
+		} catch (error) {
+			handleError('❌ Error parsing state for response:', error);
+			throw new Error('Invalid state format for response generation');
+		}
+
+		const { guildId, channelId } = parsedState;
 		const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
+		const browserLink = `https://discord.com/channels/${guildId}/${channelId}`;
 
 		let userInfoHtml = '';
 		if (userInfo) {
@@ -407,7 +439,8 @@ async function createSuccessResponse(connectionsLength, state, userInfo) {
 		const buttonHtml = `
         ${userInfoHtml}
         <p>You can now return to Discord and continue using the bot.</p>
-        <a href="${discordDeepLink}" class="button">Return to Discord</a>`;
+        <a href="${discordDeepLink}" class="button">Return to Discord (App)</a>
+        <a href="${browserLink}" class="button" style="margin-left: 10px; background-color: #7289da;">Open in Browser</a>`;
 
 		const html = generateHtmlResponse(
 			'Success',

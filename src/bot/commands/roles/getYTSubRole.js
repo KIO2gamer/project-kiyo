@@ -36,10 +36,21 @@ module.exports = {
 		try {
 			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
+			// Check if command was used recently
+			const userId = interaction.user.id;
+			const cooldownKey = `ytsubcooldown-${userId}`;
+			const cooldown = await interaction.client.redis?.get(cooldownKey);
+
+			if (cooldown) {
+				const timeLeft = Math.ceil((parseInt(cooldown) - Date.now()) / 1000);
+				throw new Error(`Please wait ${timeLeft} seconds before trying again.`);
+			}
+
 			const state = JSON.stringify({
 				interactionId: interaction.id,
 				guildId: interaction.guild.id,
 				channelId: interaction.channel.id,
+				userId: interaction.user.id // Add user ID for additional security
 			});
 
 			const secretKey = crypto.randomBytes(32);
@@ -55,18 +66,32 @@ module.exports = {
 						[
 							{
 								name: 'Steps',
-								value: '1. Click the link below\n2. Authorize the app\n3. Wait for confirmation',
+								value: '1. Click the link below\n2. Authorize the app\n3. Wait for confirmation (up to 3 minutes)',
+								inline: false,
+							},
+							{
+								name: '⚠️ Important',
+								value: 'Make sure you have connected your YouTube account to Discord in User Settings > Connections first!',
 								inline: false,
 							},
 							{
 								name: '🔗 Authorization Link',
-								value: `[Click here](${discordOAuthUrl})`,
+								value: `[Click here to authorize](${discordOAuthUrl})`,
 								inline: false,
 							},
 						],
-						'Secure verification process.',
+						'Your verification link will expire in 3 minutes',
 					),
 				],
+			});
+
+			// Set a cooldown for this command
+			await interaction.client.redis?.set(cooldownKey, Date.now() + 300000, 'EX', 300); // 5 minute cooldown
+
+			// Wait for the user to complete the OAuth flow
+			await interaction.followUp({
+				content: "Waiting for verification to complete... This will update automatically.",
+				flags: MessageFlags.Ephemeral
 			});
 
 			const oauthData = await getAuthorizationDataFromMongoDB(
@@ -150,43 +175,119 @@ function createEmbed(
 	};
 }
 
+// Replace the getAuthorizationDataFromMongoDB function with this improved version:
+
 async function getAuthorizationDataFromMongoDB(interactionId) {
-	const timeout = 60000;
-	const pollingInterval = 1000;
+	const timeout = 180000; // 3 minutes timeout (increased from 60s)
+	const pollingInterval = 2000; // 2 seconds between checks (reduced polling frequency)
 	let elapsed = 0;
 
-	while (elapsed < timeout) {
-		const oauthRecord = await OAuthCode.findOne({ interactionId });
-		if (oauthRecord) return oauthRecord;
-		await new Promise((res) => setTimeout(res, pollingInterval));
-		elapsed += pollingInterval;
-	}
-	throw new Error('Authorization timeout.');
-}
+	try {
+		// First clear any existing record with this interaction ID to prevent conflicts
+		await OAuthCode.deleteOne({ interactionId });
 
-async function getHighestSubscriberCount(youtubeConnections) {
-	let highest = { youtubeChannelId: null, subscriberCount: 0 };
-	for (const connection of youtubeConnections) {
-		const count = await getYouTubeSubscriberCount(connection.id);
-		if (count > highest.subscriberCount) {
-			highest = {
-				youtubeChannelId: connection.id,
-				subscriberCount: count,
-			};
+		// Start polling for the OAuth response
+		while (elapsed < timeout) {
+			const oauthRecord = await OAuthCode.findOne({ interactionId });
+
+			if (oauthRecord) {
+				// Validate the received data
+				if (!oauthRecord.youtubeConnections || oauthRecord.youtubeConnections.length === 0) {
+					throw new Error('No YouTube connections found in authorization data.');
+				}
+
+				console.log(`✅ OAuth data received for interaction ${interactionId}`);
+				return oauthRecord;
+			}
+
+			// Wait before next poll
+			await new Promise((resolve) => setTimeout(resolve, pollingInterval));
+			elapsed += pollingInterval;
+
+			// Log progress every 30 seconds
+			if (elapsed % 30000 === 0) {
+				console.log(`Waiting for OAuth data: ${elapsed / 1000}s elapsed of ${timeout / 1000}s`);
+			}
+		}
+
+		throw new Error('Authorization timeout. Please try again and complete the authorization within 3 minutes.');
+	} catch (error) {
+		if (error.message.includes('timeout')) {
+			throw error; // Rethrow timeout errors with our custom message
+		} else {
+			console.error('Error while checking for authorization data:', error);
+			throw new Error('Failed to verify your YouTube account. Please try again later.');
 		}
 	}
+}
+
+// Replace getHighestSubscriberCount function:
+
+async function getHighestSubscriberCount(youtubeConnections) {
+	if (!youtubeConnections || youtubeConnections.length === 0) {
+		throw new Error('No YouTube connections found. Please connect your YouTube account to Discord first.');
+	}
+
+	let highest = { youtubeChannelId: null, subscriberCount: 0 };
+	let successfulChecks = 0;
+
+	for (const connection of youtubeConnections) {
+		try {
+			if (!connection.id) {
+				console.warn('YouTube connection missing ID');
+				continue;
+			}
+
+			const count = await getYouTubeSubscriberCount(connection.id);
+			if (count > highest.subscriberCount) {
+				highest = {
+					youtubeChannelId: connection.id,
+					subscriberCount: count,
+				};
+			}
+
+			successfulChecks++;
+		} catch (error) {
+			console.error(`Error checking subscriber count for channel:`, error);
+			// Continue with other channels
+		}
+	}
+
+	if (successfulChecks === 0) {
+		throw new Error('Could not retrieve subscriber counts for any of your YouTube channels.');
+	}
+
 	return highest;
 }
 
+// Replace getYouTubeSubscriberCount function with this improved version:
+
 async function getYouTubeSubscriberCount(channelId) {
-	const response = await youtube.channels.list({
-		part: 'statistics',
-		id: channelId,
-	});
-	return parseInt(
-		response.data.items[0]?.statistics?.subscriberCount || 0,
-		10,
-	);
+	try {
+		const response = await youtube.channels.list({
+			part: 'statistics',
+			id: channelId
+		});
+
+		if (!response.data || !response.data.items || response.data.items.length === 0) {
+			console.warn(`No channel data found for ID: ${channelId}`);
+			return 0;
+		}
+
+		const statistics = response.data.items[0].statistics;
+
+		// YouTube might hide subscriber counts for some channels
+		if (!statistics || statistics.hiddenSubscriberCount || !statistics.subscriberCount) {
+			console.warn(`Hidden subscriber count for channel ID: ${channelId}`);
+			return 0;
+		}
+
+		return parseInt(statistics.subscriberCount, 10);
+	} catch (error) {
+		console.error(`Failed to fetch subscriber count for ${channelId}:`, error);
+		// Continue with other channels instead of failing completely
+		return 0;
+	}
 }
 
 async function assignSubscriberRole(member, subscriberCount) {
