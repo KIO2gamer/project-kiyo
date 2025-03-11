@@ -56,29 +56,53 @@ class ServerSettingsManager {
 			this.isLoading = true;
 			this.showLoading();
 
+			// Set a timeout for the request
+			const timeoutPromise = new Promise((_, reject) => {
+				setTimeout(() => reject(new Error('Request timed out')), 10000); // 10 seconds timeout
+			});
+
 			// Use API service if available, otherwise fallback
+			let settingsPromise;
 			if (window.apiService) {
-				this.settings = await window.apiService.getServerSettings(this.guildId);
+				settingsPromise = window.apiService.getServerSettings(this.guildId);
 			} else {
-				const response = await fetch(`/.netlify/functions/dashboardApi/guilds/${this.guildId}/settings`, {
+				settingsPromise = fetch(`/.netlify/functions/dashboardApi/guilds/${this.guildId}/settings`, {
 					credentials: 'include'
-				});
-
-				if (!response.ok) {
-					if (response.status === 401) {
-						window.location.href = '/.netlify/functions/dashboardAuth';
-						return;
+				}).then(response => {
+					if (!response.ok) {
+						if (response.status === 401) {
+							window.location.href = '/.netlify/functions/dashboardAuth';
+							return;
+						}
+						if (response.status === 404) {
+							throw new Error('Server settings not found. The bot might not be in this server yet.');
+						}
+						if (response.status === 403) {
+							throw new Error('You do not have permission to access these settings.');
+						}
+						throw new Error(`Failed to load settings: ${response.status}`);
 					}
-					throw new Error(`Failed to load settings: ${response.status}`);
-				}
-
-				this.settings = await response.json();
+					return response.json();
+				});
 			}
 
+			// Race the request against the timeout
+			this.settings = await Promise.race([settingsPromise, timeoutPromise]);
 			this.renderSettings();
 		} catch (error) {
 			console.error('Error loading server settings:', error);
-			this.showError('Failed to load server settings');
+
+			// Determine appropriate error message
+			let errorMessage = 'Failed to load server settings';
+			if (error.message.includes('timed out')) {
+				errorMessage = 'The request timed out. Please check your connection and try again.';
+			} else if (error.message.includes('not found')) {
+				errorMessage = error.message;
+			} else if (error.message.includes('permission')) {
+				errorMessage = error.message;
+			}
+
+			this.showError(errorMessage);
 		} finally {
 			this.isLoading = false;
 		}
@@ -108,10 +132,56 @@ class ServerSettingsManager {
         <h4 class="alert-heading">Error</h4>
         <p>${message}</p>
         <hr>
-        <button class="btn btn-outline-danger" onclick="this.closest('.settings-container').settingsManager.loadSettings()">
-          <i class="bi bi-arrow-clockwise me-2"></i>Try Again
-        </button>
+        <div class="d-flex flex-column flex-md-row gap-2">
+          <button class="btn btn-outline-danger" onclick="this.closest('.settings-container').settingsManager.loadSettings()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+          </button>
+          <a href="/dashboard/servers" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Servers
+          </a>
+          <button class="btn btn-link" onclick="showDebugInfo()">
+            Show Debug Info
+          </button>
+        </div>
       </div>
+
+      <script>
+        function showDebugInfo() {
+          const debugInfo = {
+            guildId: '${this.guildId}',
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+          };
+          
+          const debugModal = document.createElement('div');
+          debugModal.className = 'modal fade';
+          debugModal.id = 'debugInfoModal';
+          debugModal.innerHTML = \`
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Debug Information</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>Please share this information with support:</p>
+                  <pre class="bg-light p-3"><code>\${JSON.stringify(debugInfo, null, 2)}</code></pre>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(JSON.stringify(debugInfo, null, 2)).then(() => showToast('success', 'Debug info copied to clipboard'))">
+                    Copy to Clipboard
+                  </button>
+                </div>
+              </div>
+            </div>
+          \`;
+          
+          document.body.appendChild(debugModal);
+          const modal = new bootstrap.Modal(document.getElementById('debugInfoModal'));
+          modal.show();
+        }
+      </script>
     `;
 
 		// Store reference to manager in the container for retry action

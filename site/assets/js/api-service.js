@@ -151,12 +151,29 @@ class ApiService {
 	 */
 	async sendRequest(url, options) {
 		try {
-			const response = await fetch(url, options);
+			// Set a timeout for the fetch request
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
+			const modifiedOptions = {
+				...options,
+				signal: controller.signal
+			};
+
+			const response = await fetch(url, modifiedOptions);
+
+			// Clear the timeout
+			clearTimeout(timeoutId);
 
 			// Handle unauthorized responses
 			if (response.status === 401) {
 				this.redirectToLogin();
 				throw new Error('Unauthorized - Please log in');
+			}
+
+			// Handle not found responses
+			if (response.status === 404) {
+				throw new Error(`Resource not found: ${url.split('/').pop()}`);
 			}
 
 			// Handle other error responses
@@ -178,6 +195,10 @@ class ApiService {
 
 			return response;
 		} catch (error) {
+			if (error.name === 'AbortError') {
+				throw new Error('Request timed out. Please try again later.');
+			}
+
 			if (error.message === 'Unauthorized - Please log in') {
 				throw error; // Already handled
 			}
@@ -286,7 +307,20 @@ class ApiService {
 	 * @returns {Promise<Object>} Server settings
 	 */
 	async getServerSettings(guildId, useCache = true) {
-		return await this.get(`guilds/${guildId}/settings`, {}, useCache);
+		try {
+			const result = await this.get(`guilds/${guildId}/settings`, {}, useCache);
+			return result;
+		} catch (error) {
+			// Enhanced error handling with more specific messages
+			if (error.message.includes('404')) {
+				throw new Error('Server settings not found. The bot might not be in this server yet.');
+			} else if (error.message.includes('403')) {
+				throw new Error('You do not have permission to access these settings.');
+			}
+
+			// Re-throw the original error
+			throw error;
+		}
 	}
 
 	/**
