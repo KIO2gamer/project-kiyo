@@ -5,8 +5,7 @@ const Role = require('../../../database/roleStorage.js');
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Displays a list of roles that have been stored in the database.',
+	description_full: 'Displays a list of roles that have been stored in the database.',
 	usage: '/view_roles_from_data',
 	examples: ['/view_roles_from_data'],
 	category: 'roles',
@@ -19,9 +18,7 @@ module.exports = {
 			const roles = await Role.find();
 
 			if (roles.length === 0) {
-				return interaction.reply(
-					'There are no roles stored in the database.',
-				);
+				return interaction.reply('There are no roles stored in the database.');
 			}
 
 			const embed = new EmbedBuilder()
@@ -31,7 +28,8 @@ module.exports = {
 					roles
 						.map(
 							(role, index) =>
-								`${index + 1}. **${role.roleName}** (ID: \`${role.roleID
+								`${index + 1}. **${role.roleName}** (ID: \`${
+									role.roleID
 								}\`, Color: \`${role.roleColor}\`)`,
 						)
 						.join('\n'),

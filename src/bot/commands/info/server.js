@@ -8,16 +8,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('server')
 		.setDescription('Displays server information and statistics')
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('info')
-				.setDescription('Get basic information about this server'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('info').setDescription('Get basic information about this server'),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('stats')
 				.setDescription('Get detailed server statistics')
-				.addStringOption((option) =>
+				.addStringOption(option =>
 					option
 						.setName('timeframe')
 						.setDescription('The timeframe to calculate stats for')
@@ -69,43 +67,27 @@ async function sendServerInfo(interaction) {
 		// Get feature flags in a readable format
 		const features =
 			guild.features.length > 0
-				? guild.features.map((f) => `• ${formatFeature(f)}`).join('\n')
+				? guild.features.map(f => `• ${formatFeature(f)}`).join('\n')
 				: 'No special features';
 
 		// Get channel counts
-		const textChannels = guild.channels.cache.filter(
-			(c) => c.type === 0,
-		).size;
-		const voiceChannels = guild.channels.cache.filter(
-			(c) => c.type === 2,
-		).size;
-		const categoryChannels = guild.channels.cache.filter(
-			(c) => c.type === 4,
-		).size;
-		const forumChannels = guild.channels.cache.filter(
-			(c) => c.type === 15,
-		).size;
-		const threadChannels = guild.channels.cache.filter((c) =>
-			[11, 12].includes(c.type),
-		).size;
+		const textChannels = guild.channels.cache.filter(c => c.type === 0).size;
+		const voiceChannels = guild.channels.cache.filter(c => c.type === 2).size;
+		const categoryChannels = guild.channels.cache.filter(c => c.type === 4).size;
+		const forumChannels = guild.channels.cache.filter(c => c.type === 15).size;
+		const threadChannels = guild.channels.cache.filter(c => [11, 12].includes(c.type)).size;
 		const totalChannels = guild.channels.cache.size;
 
 		// Get member stats
-		const botCount = guild.members.cache.filter((m) => m.user.bot).size;
+		const botCount = guild.members.cache.filter(m => m.user.bot).size;
 		const humanCount = guild.memberCount - botCount;
 
 		// Status counts
-		const onlineCount = guild.members.cache.filter(
-			(m) => m.presence?.status === 'online',
-		).size;
-		const idleCount = guild.members.cache.filter(
-			(m) => m.presence?.status === 'idle',
-		).size;
-		const dndCount = guild.members.cache.filter(
-			(m) => m.presence?.status === 'dnd',
-		).size;
+		const onlineCount = guild.members.cache.filter(m => m.presence?.status === 'online').size;
+		const idleCount = guild.members.cache.filter(m => m.presence?.status === 'idle').size;
+		const dndCount = guild.members.cache.filter(m => m.presence?.status === 'dnd').size;
 		const offlineCount = guild.members.cache.filter(
-			(m) => !m.presence || m.presence.status === 'offline',
+			m => !m.presence || m.presence.status === 'offline',
 		).size;
 
 		// Create embed
@@ -243,9 +225,7 @@ async function sendServerStats(interaction) {
 		await interaction.editReply({ embeds: [embed] });
 	} catch (error) {
 		handleError('Error fetching server stats:', error);
-		await interaction.editReply(
-			'An error occurred while fetching server statistics.',
-		);
+		await interaction.editReply('An error occurred while fetching server statistics.');
 	}
 }
 
@@ -271,19 +251,18 @@ async function collectServerStats(guild, startDate) {
 	const channels = guild.channels.cache;
 
 	// Calculate member join/leave count
-	const joins = members.filter((member) => member.joinedAt >= startDate).size;
+	const joins = members.filter(member => member.joinedAt >= startDate).size;
 
 	// Get basic counts
 	const stats = {
 		totalMembers: guild.memberCount,
 		newMembers: joins,
-		humanMembers: members.filter((m) => !m.user.bot).size,
-		botMembers: members.filter((m) => m.user.bot).size,
-		textChannels: channels.filter((c) => c.isTextBased() && c.type !== 4)
-			.size,
-		voiceChannels: channels.filter((c) => c.isVoiceBased()).size,
-		categoryChannels: channels.filter((c) => c.type === 4).size,
-		threadChannels: channels.filter((c) => [11, 12].includes(c.type)).size,
+		humanMembers: members.filter(m => !m.user.bot).size,
+		botMembers: members.filter(m => m.user.bot).size,
+		textChannels: channels.filter(c => c.isTextBased() && c.type !== 4).size,
+		voiceChannels: channels.filter(c => c.isVoiceBased()).size,
+		categoryChannels: channels.filter(c => c.type === 4).size,
+		threadChannels: channels.filter(c => [11, 12].includes(c.type)).size,
 		roles: guild.roles.cache.size,
 		emojis: guild.emojis.cache.size,
 		stickers: guild.stickers?.cache.size || 0,
@@ -300,14 +279,11 @@ async function collectServerStats(guild, startDate) {
 
 	// Process text channels
 	const textChannels = channels.filter(
-		(channel) =>
-			channel.isTextBased() && !channel.isThread() && channel.type !== 4,
+		channel => channel.isTextBased() && !channel.isThread() && channel.type !== 4,
 	);
-	const channelPromises = textChannels.map(async (channel) => {
+	const channelPromises = textChannels.map(async channel => {
 		// Check permissions before fetching
-		if (
-			!channel.permissionsFor(guild.members.me).has('ReadMessageHistory')
-		) {
+		if (!channel.permissionsFor(guild.members.me).has('ReadMessageHistory')) {
 			return {
 				messageCount: 0,
 				reactionCount: 0,
@@ -334,13 +310,13 @@ async function collectServerStats(guild, startDate) {
 
 				// Filter and process relevant messages
 				const relevantMessages = Array.from(messages.values()).filter(
-					(msg) => msg.createdAt >= startDate,
+					msg => msg.createdAt >= startDate,
 				);
 
 				messageCount += relevantMessages.length;
 
 				// Process each message for reactions and member activity
-				relevantMessages.forEach((msg) => {
+				relevantMessages.forEach(msg => {
 					// Count reactions
 					reactionCount += msg.reactions.cache.size;
 
@@ -382,10 +358,7 @@ async function collectServerStats(guild, startDate) {
 				channelName: channel.name,
 			};
 		} catch (error) {
-			console.error(
-				`Error fetching messages from ${channel.name}:`,
-				error,
-			);
+			console.error(`Error fetching messages from ${channel.name}:`, error);
 			return {
 				messageCount: 0,
 				reactionCount: 0,
@@ -399,7 +372,7 @@ async function collectServerStats(guild, startDate) {
 	const channelResults = await Promise.all(channelPromises);
 
 	// Calculate totals and find most active channels/members
-	channelResults.forEach((result) => {
+	channelResults.forEach(result => {
 		stats.messagesSent += result.messageCount;
 		stats.reactionsGiven += result.reactionCount;
 
@@ -424,9 +397,7 @@ async function collectServerStats(guild, startDate) {
 function createStatsEmbed(guild, timeframe, stats) {
 	// Format the description based on timeframe
 	const timeframeText =
-		timeframe === 'all'
-			? 'all time'
-			: `the past ${getReadableTimeframe(timeframe)}`;
+		timeframe === 'all' ? 'all time' : `the past ${getReadableTimeframe(timeframe)}`;
 
 	// Calculate message rate
 	let messageRate = 'N/A';
@@ -442,11 +413,8 @@ function createStatsEmbed(guild, timeframe, stats) {
 	const activeMembers =
 		stats.mostActiveMembers.length > 0
 			? stats.mostActiveMembers
-				.map(
-					(m, i) =>
-						`${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`,
-				)
-				.join('\n')
+					.map((m, i) => `${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`)
+					.join('\n')
 			: 'No message activity recorded';
 
 	const embed = new EmbedBuilder()
@@ -580,7 +548,7 @@ function formatCamelCase(str) {
 	return str
 		.replace(/_/g, ' ')
 		.toLowerCase()
-		.replace(/\b\w/g, (char) => char.toUpperCase());
+		.replace(/\b\w/g, char => char.toUpperCase());
 }
 
 function formatAge(timestamp) {

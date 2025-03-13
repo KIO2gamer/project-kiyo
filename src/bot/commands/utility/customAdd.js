@@ -8,26 +8,22 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_add')
 		.setDescription('Adds a custom command')
-		.addStringOption((option) =>
-			option
-				.setName('name')
-				.setDescription('The main name of the command')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('name').setDescription('The main name of the command').setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('message')
 				.setDescription('The response message of the command')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('alias_name')
 				.setDescription('The alternate name of the command')
 				.setRequired(false),
 		),
-	description_full:
-		'Add a custom command to the server.',
+	description_full: 'Add a custom command to the server.',
 	usage: '/custom_add [name] [message] [alias]',
 	examples: [
 		'/custom_add name:hello message:Hello World!',
@@ -54,7 +50,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid command name format'),
 					'VALIDATION',
-					'Command name can only contain letters, numbers, underscores, and hyphens.'
+					'Command name can only contain letters, numbers, underscores, and hyphens.',
 				);
 				return;
 			}
@@ -64,7 +60,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid command name length'),
 					'VALIDATION',
-					'Command name must be between 2 and 32 characters long.'
+					'Command name must be between 2 and 32 characters long.',
 				);
 				return;
 			}
@@ -75,7 +71,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid message length'),
 					'VALIDATION',
-					'Message must be between 1 and 2000 characters long.'
+					'Message must be between 1 and 2000 characters long.',
 				);
 				return;
 			}
@@ -87,7 +83,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid alias format'),
 						'VALIDATION',
-						'Alias can only contain letters, numbers, underscores, and hyphens.'
+						'Alias can only contain letters, numbers, underscores, and hyphens.',
 					);
 					return;
 				}
@@ -97,7 +93,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid alias length'),
 						'VALIDATION',
-						'Alias must be between 2 and 32 characters long.'
+						'Alias must be between 2 and 32 characters long.',
 					);
 					return;
 				}
@@ -105,10 +101,7 @@ module.exports = {
 
 			// Check if command name already exists
 			const existingCommand = await CustomCommand.findOne({
-				$or: [
-					{ name: name.toLowerCase() },
-					{ alias_name: name.toLowerCase() }
-				]
+				$or: [{ name: name.toLowerCase() }, { alias_name: name.toLowerCase() }],
 			});
 
 			if (existingCommand) {
@@ -116,7 +109,7 @@ module.exports = {
 					interaction,
 					new Error('Command already exists'),
 					'VALIDATION',
-					`A command or alias with the name "${name}" already exists.`
+					`A command or alias with the name "${name}" already exists.`,
 				);
 				return;
 			}
@@ -126,8 +119,8 @@ module.exports = {
 				const existingAlias = await CustomCommand.findOne({
 					$or: [
 						{ name: alias_name.toLowerCase() },
-						{ alias_name: alias_name.toLowerCase() }
-					]
+						{ alias_name: alias_name.toLowerCase() },
+					],
 				});
 
 				if (existingAlias) {
@@ -135,7 +128,7 @@ module.exports = {
 						interaction,
 						new Error('Alias already exists'),
 						'VALIDATION',
-						`A command or alias with the name "${alias_name}" already exists.`
+						`A command or alias with the name "${alias_name}" already exists.`,
 					);
 					return;
 				}
@@ -160,21 +153,21 @@ module.exports = {
 					interaction,
 					error,
 					'DATABASE',
-					'A command with this name or alias already exists.'
+					'A command with this name or alias already exists.',
 				);
 			} else if (error.name === 'ValidationError') {
 				await handleError(
 					interaction,
 					error,
 					'VALIDATION',
-					'Invalid command data provided.'
+					'Invalid command data provided.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while creating the custom command.'
+					'An error occurred while creating the custom command.',
 				);
 			}
 		}

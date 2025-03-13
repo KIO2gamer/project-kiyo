@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler');
 const path = require('path');
 const fs = require('fs');
@@ -11,15 +7,12 @@ module.exports = {
 	description_full:
 		'Reloads bot commands without restarting. Can reload a specific command or all commands.',
 	usage: '/reload [command:command_name]',
-	examples: [
-		'/reload command:ping',
-		'/reload',
-	],
+	examples: ['/reload command:ping', '/reload'],
 	category: 'admin',
 	data: new SlashCommandBuilder()
 		.setName('reload')
 		.setDescription('Reloads bot commands')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('command')
 				.setDescription('Specific command to reload')
@@ -38,7 +31,12 @@ module.exports = {
 			});
 
 			if (commandName) {
-				await this.reloadSingleCommand(interaction, commandName, foldersPath, commandFolders);
+				await this.reloadSingleCommand(
+					interaction,
+					commandName,
+					foldersPath,
+					commandFolders,
+				);
 			} else {
 				await this.reloadAllCommands(interaction, foldersPath, commandFolders);
 			}
@@ -47,7 +45,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while reloading commands.'
+				'An error occurred while reloading commands.',
 			);
 		}
 	},
@@ -61,7 +59,7 @@ module.exports = {
 					interaction,
 					new Error(`Command "${commandName}" not found`),
 					'VALIDATION',
-					`There is no command with name \`${commandName}\`!`
+					`There is no command with name \`${commandName}\`!`,
 				);
 				return;
 			}
@@ -92,7 +90,7 @@ module.exports = {
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					`Failed to reload command \`${commandName}\`: ${error.message}`
+					`Failed to reload command \`${commandName}\`: ${error.message}`,
 				);
 			}
 		} catch (error) {
@@ -100,7 +98,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while reloading the command.'
+				'An error occurred while reloading the command.',
 			);
 		}
 	},
@@ -108,8 +106,7 @@ module.exports = {
 	findCommandPath(commandName, foldersPath, commandFolders) {
 		for (const folder of commandFolders) {
 			const folderPath = path.join(foldersPath, folder);
-			const commandFiles = fs.readdirSync(folderPath)
-				.filter(file => file.endsWith('.js'));
+			const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'));
 
 			for (const file of commandFiles) {
 				try {
@@ -135,7 +132,8 @@ module.exports = {
 
 			for (const folder of commandFolders) {
 				const folderPath = path.join(foldersPath, folder);
-				const commandFiles = fs.readdirSync(folderPath)
+				const commandFiles = fs
+					.readdirSync(folderPath)
 					.filter(file => file.endsWith('.js'));
 
 				for (const file of commandFiles) {
@@ -167,7 +165,7 @@ module.exports = {
 			if (errorCount > 0) {
 				statusEmbed.addFields({
 					name: '⚠️ Errors',
-					value: `Failed to reload ${errorCount} commands:\n${errors.map(e => `• ${e}`).join('\n')}`
+					value: `Failed to reload ${errorCount} commands:\n${errors.map(e => `• ${e}`).join('\n')}`,
 				});
 			}
 
@@ -177,7 +175,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while reloading all commands.'
+				'An error occurred while reloading all commands.',
 			);
 		}
 	},

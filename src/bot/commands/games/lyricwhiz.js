@@ -57,7 +57,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('lyricwhiz')
 		.setDescription('Play a lyric fill-in-the-blanks guessing game!') // Updated description
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('rounds')
 				.setDescription(`Number of rounds to play (1-${MAX_ROUNDS})`)
@@ -115,35 +115,26 @@ module.exports = {
 				components: [actionRow],
 			});
 
-			const buttonCollector =
-				interaction.channel.createMessageComponentCollector({
-					filter: (i) =>
-						i.user.id === interaction.user.id &&
-						i.customId === 'skip',
-					time: GUESS_TIME,
-				});
+			const buttonCollector = interaction.channel.createMessageComponentCollector({
+				filter: i => i.user.id === interaction.user.id && i.customId === 'skip',
+				time: GUESS_TIME,
+			});
 
-			const messageCollector = interaction.channel.createMessageCollector(
-				{
-					filter: (m) => m.author.id === interaction.user.id,
-					time: GUESS_TIME,
-				},
-			);
+			const messageCollector = interaction.channel.createMessageCollector({
+				filter: m => m.author.id === interaction.user.id,
+				time: GUESS_TIME,
+			});
 
-			buttonCollector.on('collect', async (i) => {
+			buttonCollector.on('collect', async i => {
 				buttonCollector.stop('skipped');
 				messageCollector.stop('skipped'); // Stop message collector as well
 				await i.deferUpdate(); // Acknowledge button interaction
 			});
 
-			messageCollector.on('collect', async (message) => {
+			messageCollector.on('collect', async message => {
 				const guess = message.content.toLowerCase().trim();
-				const normalizedTitle = title
-					.toLowerCase()
-					.replace(/[^a-z0-9 ]/g, '');
-				const normalizedArtist = artist
-					.toLowerCase()
-					.replace(/[^a-z0-9 ]/g, '');
+				const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+				const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9 ]/g, '');
 
 				// Allow multiple answer formats
 				const matchPatterns = [
@@ -152,7 +143,7 @@ module.exports = {
 					`${normalizedArtist} ${normalizedTitle}`,
 				];
 
-				if (matchPatterns.some((pattern) => guess === pattern)) {
+				if (matchPatterns.some(pattern => guess === pattern)) {
 					score++;
 					messageCollector.stop('correct');
 					buttonCollector.stop('correct');
@@ -217,19 +208,14 @@ async function getRandomSongAndLyricsFromAPI() {
 		);
 
 		const tracks = searchResponse.data.message.body.track_list;
-		if (!tracks?.length)
-			throw new Error(`No tracks found for "${genreKeyword}"`);
+		if (!tracks?.length) throw new Error(`No tracks found for "${genreKeyword}"`);
 
 		// Try up to 3 tracks before failing
 		for (let i = 0; i < Math.min(3, tracks.length); i++) {
 			const randomIndex = Math.floor(Math.random() * tracks.length);
 			const track = tracks[randomIndex].track;
-			const artist = encodeURIComponent(
-				track.artist_name.replace(/\([^)]*\)/g, '').trim(),
-			);
-			const title = encodeURIComponent(
-				track.track_name.replace(/\([^)]*\)/g, '').trim(),
-			);
+			const artist = encodeURIComponent(track.artist_name.replace(/\([^)]*\)/g, '').trim());
+			const title = encodeURIComponent(track.track_name.replace(/\([^)]*\)/g, '').trim());
 
 			try {
 				const lyricsResponse = await axios.get(
@@ -256,9 +242,7 @@ async function getRandomSongAndLyricsFromAPI() {
 		throw new Error(`No lyrics found for 3 random ${genreKeyword} tracks`);
 	} catch (error) {
 		handleError(`Lyric fetch error (${genreKeyword}):`, error.message);
-		throw new Error(
-			`Couldn't find lyrics for ${genreKeyword} tracks. Try another genre!`,
-		);
+		throw new Error(`Couldn't find lyrics for ${genreKeyword} tracks. Try another genre!`);
 	}
 }
 

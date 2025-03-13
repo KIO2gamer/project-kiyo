@@ -7,19 +7,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('reminder')
 		.setDescription('Set a reminder after a specified time')
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('time')
-				.setDescription(
-					'Time in seconds after which you want to be reminded',
-				)
+				.setDescription('Time in seconds after which you want to be reminded')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('message')
-				.setDescription('Message to be reminded of')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('message').setDescription('Message to be reminded of').setRequired(true),
 		),
 
 	description_full:

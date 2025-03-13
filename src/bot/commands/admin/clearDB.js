@@ -35,11 +35,7 @@ module.exports = {
 	 */
 	async execute(interaction) {
 		// Check if user has the highest admin role
-		if (
-			!interaction.member.permissions.has(
-				PermissionFlagsBits.Administrator,
-			)
-		) {
+		if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
 			return interaction.reply({
 				content: '❌ You do not have permission to use this command.',
 				flags: MessageFlags.Ephemeral,
@@ -55,28 +51,25 @@ module.exports = {
 
 		try {
 			// Create message collector for confirmation
-			const filter = (m) => m.author.id === interaction.user.id;
+			const filter = m => m.author.id === interaction.user.id;
 			const collector = interaction.channel.createMessageCollector({
 				filter,
 				time: 30000,
 				max: 1,
 			});
 
-			collector.on('collect', async (message) => {
+			collector.on('collect', async message => {
 				if (message.content === 'CONFIRM') {
 					try {
 						// Get all collections
-						const collections =
-							await mongoose.connection.db.collections();
+						const collections = await mongoose.connection.db.collections();
 
 						// Drop each collection
 						for (const collection of collections) {
 							await collection.drop();
 						}
 
-						await interaction.reply(
-							'✅ Database has been completely wiped.',
-						);
+						await interaction.reply('✅ Database has been completely wiped.');
 					} catch (error) {
 						handleError('Database clear error:', error);
 						await interaction.reply(
@@ -86,18 +79,13 @@ module.exports = {
 				} else {
 					await interaction.reply('❌ Database wipe cancelled.');
 				}
-				message
-					.delete()
-					.catch((error) =>
-						handleError('Failed to delete message:', error),
-					);
+				message.delete().catch(error => handleError('Failed to delete message:', error));
 			});
 
-			collector.on('end', (collected) => {
+			collector.on('end', collected => {
 				if (collected.size === 0) {
 					interaction.followUp({
-						content:
-							'❌ Command timed out. Database wipe cancelled.',
+						content: '❌ Command timed out. Database wipe cancelled.',
 						flags: MessageFlags.Ephemeral,
 					});
 				}

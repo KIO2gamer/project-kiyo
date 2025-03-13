@@ -20,15 +20,12 @@ module.exports = {
 			const pendingReminders = await Reminder.find();
 
 			for (const reminder of pendingReminders) {
-				const timeLeft =
-					new Date(reminder.reminderTime).getTime() - Date.now();
+				const timeLeft = new Date(reminder.reminderTime).getTime() - Date.now();
 
 				// Function to send the reminder
 				const sendReminder = async () => {
 					try {
-						const channel = await client.channels.fetch(
-							reminder.channelId,
-						);
+						const channel = await client.channels.fetch(reminder.channelId);
 						if (!channel) {
 							// If the channel doesn't exist, delete the reminder
 							await Reminder.findByIdAndDelete(reminder._id);

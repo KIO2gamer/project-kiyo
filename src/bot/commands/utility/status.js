@@ -17,11 +17,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('status')
 		.setDescription('Check the status of a server or service')
-		.addStringOption((option) =>
-			option
-				.setName('url')
-				.setDescription('URL to check')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('url').setDescription('URL to check').setRequired(true),
 		),
 
 	async execute(interaction) {

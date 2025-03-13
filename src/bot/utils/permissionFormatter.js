@@ -138,12 +138,10 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	const categorized = {};
 	const uncategorized = [];
 
-	permsArray.forEach((perm) => {
+	permsArray.forEach(perm => {
 		let placed = false;
 
-		for (const [category, categoryPerms] of Object.entries(
-			PERMISSION_CATEGORIES,
-		)) {
+		for (const [category, categoryPerms] of Object.entries(PERMISSION_CATEGORIES)) {
 			if (categoryPerms.includes(perm)) {
 				if (!categorized[category]) categorized[category] = [];
 				categorized[category].push(perm);
@@ -156,7 +154,7 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	});
 
 	// Format permissions within each category
-	const formatPerm = (p) => {
+	const formatPerm = p => {
 		const formattedName = p.replace(/_/g, ' ').toLowerCase();
 		return checkmark ? `✅ ${formattedName}` : `• ${formattedName}`;
 	};
@@ -165,13 +163,7 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	let result = [];
 
 	// Add categorized permissions
-	for (const category of [
-		'advanced',
-		'moderation',
-		'general',
-		'text',
-		'voice',
-	]) {
+	for (const category of ['advanced', 'moderation', 'general', 'text', 'voice']) {
 		if (categorized[category] && categorized[category].length) {
 			const perms = categorized[category].map(formatPerm).join('\n');
 			result.push(
@@ -185,9 +177,7 @@ function formatCategorizedPermissions(permissions, options = {}) {
 	// Add uncategorized permissions
 	if (uncategorized.length) {
 		const perms = uncategorized.map(formatPerm).join('\n');
-		result.push(
-			headers ? `${CATEGORY_ICONS.other} **Other:**\n${perms}` : perms,
-		);
+		result.push(headers ? `${CATEGORY_ICONS.other} **Other:**\n${perms}` : perms);
 	}
 
 	return result.join('\n\n').substring(0, maxLength);
@@ -217,7 +207,7 @@ function formatPermissions(permissions, options = {}) {
 		if (includeAll) {
 			// Generate list of all possible permissions
 			const allPerms = Object.keys(PermissionsBitField.Flags);
-			denied = allPerms.filter((perm) => !allowed.includes(perm));
+			denied = allPerms.filter(perm => !allowed.includes(perm));
 		}
 	} else if (Array.isArray(permissions)) {
 		// Handle permission array
@@ -260,18 +250,14 @@ function formatPermissions(permissions, options = {}) {
 		if (allowed.length > 0) {
 			result.push(
 				'**Allowed:**\n' +
-					allowed
-						.map((p) => `✅ ${p.replace(/_/g, ' ').toLowerCase()}`)
-						.join('\n'),
+					allowed.map(p => `✅ ${p.replace(/_/g, ' ').toLowerCase()}`).join('\n'),
 			);
 		}
 
 		if (denied.length > 0) {
 			result.push(
 				'**Denied:**\n' +
-					denied
-						.map((p) => `❌ ${p.replace(/_/g, ' ').toLowerCase()}`)
-						.join('\n'),
+					denied.map(p => `❌ ${p.replace(/_/g, ' ').toLowerCase()}`).join('\n'),
 			);
 		}
 
@@ -320,16 +306,12 @@ function splitPermissionText(permissionText, maxLength = 1024) {
  */
 function comparePermissions(basePerms, comparePerms) {
 	// Convert inputs to arrays
-	const baseArray = Array.isArray(basePerms)
-		? basePerms
-		: basePerms.toArray();
-	const compareArray = Array.isArray(comparePerms)
-		? comparePerms
-		: comparePerms.toArray();
+	const baseArray = Array.isArray(basePerms) ? basePerms : basePerms.toArray();
+	const compareArray = Array.isArray(comparePerms) ? comparePerms : comparePerms.toArray();
 
 	// Find differences
-	const added = compareArray.filter((perm) => !baseArray.includes(perm));
-	const removed = baseArray.filter((perm) => !compareArray.includes(perm));
+	const added = compareArray.filter(perm => !baseArray.includes(perm));
+	const removed = baseArray.filter(perm => !compareArray.includes(perm));
 
 	return { added, removed };
 }
@@ -348,7 +330,7 @@ function formatPermissionDifferences(differences, options = {}) {
 		return 'No permission differences';
 	}
 
-	const formatPerm = (perm) => {
+	const formatPerm = perm => {
 		const formatted = perm.replace(/_/g, ' ').toLowerCase();
 		return includeDescriptions && PERMISSION_DESCRIPTIONS[perm]
 			? `${formatted} *(${PERMISSION_DESCRIPTIONS[perm]})*`
@@ -359,13 +341,13 @@ function formatPermissionDifferences(differences, options = {}) {
 
 	if (added.length > 0) {
 		sections.push(
-			`**Added Permissions:**\n${added.map((p) => `✅ ${formatPerm(p)}`).join('\n')}`,
+			`**Added Permissions:**\n${added.map(p => `✅ ${formatPerm(p)}`).join('\n')}`,
 		);
 	}
 
 	if (removed.length > 0) {
 		sections.push(
-			`**Removed Permissions:**\n${removed.map((p) => `❌ ${formatPerm(p)}`).join('\n')}`,
+			`**Removed Permissions:**\n${removed.map(p => `❌ ${formatPerm(p)}`).join('\n')}`,
 		);
 	}
 
@@ -427,10 +409,7 @@ function formatChannelPermissions(channel, target, options = {}) {
 
 	// If we're only showing differences
 	if (showOverwritesOnly) {
-		const { added, removed } = comparePermissions(
-			basePermissions,
-			overwritePermissions,
-		);
+		const { added, removed } = comparePermissions(basePermissions, overwritePermissions);
 
 		if (added.length === 0 && removed.length === 0) {
 			return 'No permission overwrites for this channel';

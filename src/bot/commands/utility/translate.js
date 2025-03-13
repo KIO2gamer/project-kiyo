@@ -12,18 +12,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('translate')
 		.setDescription('Translates text into the desired output language.')
-		.addStringOption((option) =>
-			option
-				.setName('input')
-				.setDescription('The text to translate')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('input').setDescription('The text to translate').setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('target_lang')
-				.setDescription(
-					'The target language (e.g., en, es, fr, de, ja)',
-				)
+				.setDescription('The target language (e.g., en, es, fr, de, ja)')
 				.setRequired(true),
 		),
 

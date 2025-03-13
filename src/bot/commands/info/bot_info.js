@@ -41,7 +41,7 @@ module.exports = {
 				const totalGuilds = client.guilds.cache.size;
 				const totalUsers = client.guilds.cache.reduce(
 					(acc, guild) => acc + (guild.memberCount || 0),
-					0
+					0,
 				);
 				const totalChannels = client.channels.cache.size;
 
@@ -49,7 +49,9 @@ module.exports = {
 				const categories = new Set(client.commands.map(cmd => cmd.category));
 				const commandsByCategory = {};
 				categories.forEach(category => {
-					commandsByCategory[category] = client.commands.filter(cmd => cmd.category === category).size;
+					commandsByCategory[category] = client.commands.filter(
+						cmd => cmd.category === category,
+					).size;
 				});
 
 				// Create the embed
@@ -79,8 +81,9 @@ module.exports = {
 								`**Channels:** ${totalChannels.toLocaleString()}`,
 								`**Commands:** ${client.commands.size.toLocaleString()}`,
 								'\n**Commands by Category:**',
-								...Object.entries(commandsByCategory)
-									.map(([category, count]) => `• ${category}: ${count}`)
+								...Object.entries(commandsByCategory).map(
+									([category, count]) => `• ${category}: ${count}`,
+								),
 							].join('\n'),
 							inline: true,
 						},
@@ -102,16 +105,18 @@ module.exports = {
 							name: '🔗 Links',
 							value: [
 								'[Support Server](https://discord.gg/your-support-server)',
-								'[Invite Bot](https://discord.com/api/oauth2/authorize?client_id=' + client.user.id + '&permissions=8&scope=bot%20applications.commands)',
+								'[Invite Bot](https://discord.com/api/oauth2/authorize?client_id=' +
+									client.user.id +
+									'&permissions=8&scope=bot%20applications.commands)',
 								'[Documentation](https://github.com/KIO2gamer/discordbot/wiki)',
-								'[Report Bug](https://github.com/KIO2gamer/discordbot/issues)'
+								'[Report Bug](https://github.com/KIO2gamer/discordbot/issues)',
 							].join(' • '),
 							inline: false,
-						}
+						},
 					)
 					.setFooter({
 						text: `Requested by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 					})
 					.setTimestamp();
 
@@ -121,7 +126,7 @@ module.exports = {
 					interaction,
 					error,
 					'DATA_COLLECTION',
-					'Failed to collect system information. Some statistics may be incomplete.'
+					'Failed to collect system information. Some statistics may be incomplete.',
 				);
 			}
 		} catch (error) {
@@ -129,8 +134,8 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving bot information.'
+				'An error occurred while retrieving bot information.',
 			);
 		}
 	},
-}; 
+};

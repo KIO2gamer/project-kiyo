@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+} = require('discord.js');
 const { handleError } = require('../../utils/errorHandler');
 
 const { MessageFlags } = require('discord.js');
@@ -21,7 +27,11 @@ module.exports = {
 			const contributors = [
 				{ command: 'steel', name: 'steeles.0', contribution: 'Command Development' },
 				{ command: 'koifish', name: 'hallow_spice', contribution: 'Bot Development' },
-				{ command: 'do_not_touch', name: 'umbree_on_toast', contribution: 'Command Development' },
+				{
+					command: 'do_not_touch',
+					name: 'umbree_on_toast',
+					contribution: 'Command Development',
+				},
 				{ command: 'rickroll', name: 'flashxdfx', contribution: 'Command Development' },
 				{ command: 'summon', name: 'eesmal', contribution: 'Command Development' },
 				{ command: 'snipe', name: 'na51f', contribution: 'Command Development' },
@@ -41,12 +51,14 @@ module.exports = {
 				const embed = new EmbedBuilder()
 					.setTitle('✨ Bot Contributors ✨')
 					.setColor('#0099ff')
-					.setDescription([
-						'A big thank you to all the amazing contributors who helped make this bot possible!',
-						'',
-						'Each contributor has helped in various ways, from developing commands to improving the bot\'s functionality.',
-						'Click on the command names to try them out!'
-					].join('\n'))
+					.setDescription(
+						[
+							'A big thank you to all the amazing contributors who helped make this bot possible!',
+							'',
+							"Each contributor has helped in various ways, from developing commands to improving the bot's functionality.",
+							'Click on the command names to try them out!',
+						].join('\n'),
+					)
 					.setTimestamp();
 
 				// Group contributors by contribution type
@@ -57,7 +69,7 @@ module.exports = {
 					} else {
 						acc.push({
 							type: contributor.contribution,
-							members: [contributor]
+							members: [contributor],
 						});
 					}
 					return acc;
@@ -65,57 +77,61 @@ module.exports = {
 
 				// Add fields for each contribution group
 				groupedContributors.forEach(group => {
-					const contributorList = group.members.map(contributor => {
-						const command = guildCommands.find(cmd => cmd.name === contributor.command);
-						const commandLink = command ? `</${contributor.command}:${command.id}>` : contributor.command;
-						return `• **${contributor.name}** - ${commandLink}`;
-					}).join('\n');
+					const contributorList = group.members
+						.map(contributor => {
+							const command = guildCommands.find(
+								cmd => cmd.name === contributor.command,
+							);
+							const commandLink = command
+								? `</${contributor.command}:${command.id}>`
+								: contributor.command;
+							return `• **${contributor.name}** - ${commandLink}`;
+						})
+						.join('\n');
 
 					embed.addFields({
 						name: `${getContributionEmoji(group.type)} ${group.type}`,
 						value: contributorList,
-						inline: false
+						inline: false,
 					});
 				});
 
 				// Add footer with total count
 				embed.setFooter({
 					text: `Total Contributors: ${contributors.length} | Thanks to everyone who helped!`,
-					iconURL: interaction.client.user.displayAvatarURL()
+					iconURL: interaction.client.user.displayAvatarURL(),
 				});
 
 				// Create buttons for additional actions
-				const row = new ActionRowBuilder()
-					.addComponents(
-						new ButtonBuilder()
-							.setLabel('Join Support Server')
-							.setStyle(ButtonStyle.Link)
-							.setURL('https://discord.gg/your-support-server'), // Replace with your support server invite
-						new ButtonBuilder()
-							.setLabel('GitHub Repository')
-							.setStyle(ButtonStyle.Link)
-							.setURL('https://github.com/your-repo') // Replace with your GitHub repo URL
-					);
+				const row = new ActionRowBuilder().addComponents(
+					new ButtonBuilder()
+						.setLabel('Join Support Server')
+						.setStyle(ButtonStyle.Link)
+						.setURL('https://discord.gg/your-support-server'), // Replace with your support server invite
+					new ButtonBuilder()
+						.setLabel('GitHub Repository')
+						.setStyle(ButtonStyle.Link)
+						.setURL('https://github.com/your-repo'), // Replace with your GitHub repo URL
+				);
 
 				await interaction.editReply({
 					embeds: [embed],
-					components: [row]
+					components: [row],
 				});
-
 			} catch (error) {
 				if (error.code === 50001) {
 					await handleError(
 						interaction,
 						error,
 						'PERMISSION',
-						'I do not have permission to view server commands.'
+						'I do not have permission to view server commands.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'DATA_FETCH',
-						'Failed to fetch command information. Some command links may not work.'
+						'Failed to fetch command information. Some command links may not work.',
 					);
 				}
 			}
@@ -124,7 +140,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while displaying credits information.'
+				'An error occurred while displaying credits information.',
 			);
 		}
 	},
@@ -136,8 +152,8 @@ function getContributionEmoji(type) {
 		'Bot Development': '🤖',
 		'Command Development': '⌨️',
 		'UI Design': '🎨',
-		'Testing': '🔍',
-		'Documentation': '📝'
+		Testing: '🔍',
+		Documentation: '📝',
 	};
 	return emojiMap[type] || '✨';
 }

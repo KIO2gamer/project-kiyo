@@ -1,15 +1,10 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
 
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Unbans a member from the server with the specified reason.',
+	description_full: 'Unbans a member from the server with the specified reason.',
 	usage: '/unban user:"user ID or unique username" [reason:"unban reason"]',
 	examples: [
 		'/unban user:"123456789012345678"',
@@ -19,28 +14,25 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('unban')
 		.setDescription('Unban a member from the server.')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('user')
-				.setDescription(
-					'The ID or unique username of the member to unban',
-				)
+				.setDescription('The ID or unique username of the member to unban')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option.setName('reason').setDescription('The reason for unbanning'),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
 
 	async execute(interaction) {
 		const userInput = interaction.options.getString('user');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 
 		try {
 			const bans = await interaction.guild.bans.fetch();
 			const bannedUser = bans.find(
-				(ban) =>
+				ban =>
 					ban.user.id === userInput ||
 					ban.user.tag.toLowerCase() === userInput.toLowerCase(),
 			);
@@ -77,9 +69,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('User Unbanned')
-						.setDescription(
-							`Successfully unbanned ${bannedUser.user.tag}`,
-						)
+						.setDescription(`Successfully unbanned ${bannedUser.user.tag}`)
 						.addFields(
 							{
 								name: 'User ID',
@@ -102,9 +92,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('Error')
-						.setDescription(
-							'An error occurred while trying to unban the user',
-						)
+						.setDescription('An error occurred while trying to unban the user')
 						.setColor('Red')
 						.setTimestamp()
 						.setFooter({

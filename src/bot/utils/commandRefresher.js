@@ -18,7 +18,7 @@ class CommandRefresher {
 
 	/**
 	 * Initialize the command refresher
-	 * 
+	 *
 	 * @param {Client} client - The Discord.js client
 	 * @param {string} commandsDir - Path to the commands directory
 	 * @returns {CommandRefresher} The command refresher instance
@@ -30,7 +30,7 @@ class CommandRefresher {
 
 	/**
 	 * Start watching command files for changes
-	 * 
+	 *
 	 * @param {boolean} recursive - Whether to watch subdirectories recursively
 	 * @returns {CommandRefresher} The command refresher instance for chaining
 	 */
@@ -46,7 +46,7 @@ class CommandRefresher {
 
 	/**
 	 * Watch a directory for file changes
-	 * 
+	 *
 	 * @param {string} dir - Directory to watch
 	 * @param {boolean} recursive - Whether to watch subdirectories
 	 * @private
@@ -90,7 +90,7 @@ class CommandRefresher {
 
 	/**
 	 * Handle file change events
-	 * 
+	 *
 	 * @param {string} filePath - Path to the changed file
 	 * @private
 	 */
@@ -117,13 +117,17 @@ class CommandRefresher {
 			// Reload the command
 			this._reloadCommand(filePath, commandName);
 		} catch (error) {
-			Logger.log('WATCHER', `Error handling file change for ${filePath}: ${error.message}`, 'error');
+			Logger.log(
+				'WATCHER',
+				`Error handling file change for ${filePath}: ${error.message}`,
+				'error',
+			);
 		}
 	}
 
 	/**
 	 * Get the command name from a file path
-	 * 
+	 *
 	 * @param {string} filePath - Path to the command file
 	 * @returns {string|null} The command name or null if not found
 	 * @private
@@ -143,14 +147,18 @@ class CommandRefresher {
 
 			return null;
 		} catch (error) {
-			Logger.log('WATCHER', `Error getting command name from ${filePath}: ${error.message}`, 'warning');
+			Logger.log(
+				'WATCHER',
+				`Error getting command name from ${filePath}: ${error.message}`,
+				'warning',
+			);
 			return null;
 		}
 	}
 
 	/**
 	 * Reload a command from its file
-	 * 
+	 *
 	 * @param {string} filePath - Path to the command file
 	 * @param {string} commandName - Name of the command
 	 * @private
@@ -180,7 +188,11 @@ class CommandRefresher {
 
 			Logger.log('DEVELOPMENT', `Reloaded command: ${commandName}`, 'success');
 		} catch (error) {
-			Logger.log('WATCHER', `Error reloading command ${commandName}: ${error.message}`, 'error');
+			Logger.log(
+				'WATCHER',
+				`Error reloading command ${commandName}: ${error.message}`,
+				'error',
+			);
 		}
 	}
 
@@ -203,7 +215,7 @@ class CommandRefresher {
 
 	/**
 	 * Manually reload a specific command
-	 * 
+	 *
 	 * @param {string} commandName - Name of the command to reload
 	 * @returns {boolean} Whether the reload was successful
 	 */
@@ -227,14 +239,18 @@ class CommandRefresher {
 			this._reloadCommand(commandFile, commandName);
 			return true;
 		} catch (error) {
-			Logger.log('DEVELOPMENT', `Error reloading command ${commandName}: ${error.message}`, 'error');
+			Logger.log(
+				'DEVELOPMENT',
+				`Error reloading command ${commandName}: ${error.message}`,
+				'error',
+			);
 			return false;
 		}
 	}
 
 	/**
 	 * Find a command file by its name
-	 * 
+	 *
 	 * @param {string} dir - Directory to search in
 	 * @param {string} commandName - Name of the command
 	 * @returns {string|null} Path to the command file or null if not found
@@ -277,4 +293,4 @@ class CommandRefresher {
 	}
 }
 
-module.exports = CommandRefresher; 
+module.exports = CommandRefresher;

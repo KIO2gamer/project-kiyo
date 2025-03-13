@@ -18,12 +18,10 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('calculate')
 		.setDescription('Perform a calculation using mathjs.')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('expression')
-				.setDescription(
-					'The mathematical expression to calculate (e.g., 2 + 5 * 3)',
-				)
+				.setDescription('The mathematical expression to calculate (e.g., 2 + 5 * 3)')
 				.setRequired(true),
 		),
 	description_full:
@@ -58,8 +56,7 @@ module.exports = {
 		} catch (error) {
 			handleError('Error calculating expression:', error);
 			await interaction.reply({
-				content:
-					'Invalid mathematical expression. Please check your input.',
+				content: 'Invalid mathematical expression. Please check your input.',
 				flags: MessageFlags.Ephemeral,
 			});
 		}

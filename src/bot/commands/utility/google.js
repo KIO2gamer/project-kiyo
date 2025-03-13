@@ -9,22 +9,15 @@ const MAX_SNIPPET_LENGTH = 200; // Max characters for snippet in embed
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Searches Google for the given query and displays the top results.',
+	description_full: 'Searches Google for the given query and displays the top results.',
 	usage: '/google <query>',
-	examples: [
-		'/google discord bot tutorial',
-		'/google best restaurants near me',
-	],
+	examples: ['/google discord bot tutorial', '/google best restaurants near me'],
 	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('google')
 		.setDescription('Search Google for a query')
-		.addStringOption((option) =>
-			option
-				.setName('query')
-				.setDescription('The search query')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('query').setDescription('The search query').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -33,9 +26,7 @@ module.exports = {
 		const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
 		if (!apiKey || !searchEngineId) {
-			handleError(
-				'Google API key or Search Engine ID not found in environment variables.',
-			);
+			handleError('Google API key or Search Engine ID not found in environment variables.');
 			return interaction.reply({
 				embeds: [
 					new EmbedBuilder()
@@ -50,16 +41,13 @@ module.exports = {
 		}
 
 		try {
-			const response = await axios.get(
-				'https://www.googleapis.com/customsearch/v1',
-				{
-					params: {
-						key: apiKey,
-						cx: searchEngineId,
-						q: query,
-					},
+			const response = await axios.get('https://www.googleapis.com/customsearch/v1', {
+				params: {
+					key: apiKey,
+					cx: searchEngineId,
+					q: query,
 				},
-			);
+			});
 
 			const results = response.data.items?.slice(0, MAX_RESULTS) || []; // Safely access items and limit results
 
@@ -83,9 +71,7 @@ module.exports = {
 				.setDescription(
 					`Here are the top ${results.length} search results for your query:\n\n`, // Introduction in description
 				)
-				.setURL(
-					`https://www.google.com/search?q=${encodeURIComponent(query)}`,
-				) // Link to Google search page
+				.setURL(`https://www.google.com/search?q=${encodeURIComponent(query)}`) // Link to Google search page
 				.setTimestamp()
 				.setFooter({ text: 'Powered by Google Custom Search' }); // Footer for attribution
 

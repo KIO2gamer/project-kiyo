@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const moderationLogs = require('../../../database/moderationLogs');
 const { handleError } = require('../../utils/errorHandler');
 
@@ -46,17 +42,11 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('warn')
 		.setDescription('Issue a warning to a user')
-		.addUserOption((option) =>
-			option
-				.setName('target')
-				.setDescription('The user to warn')
-				.setRequired(true),
+		.addUserOption(option =>
+			option.setName('target').setDescription('The user to warn').setRequired(true),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('reason')
-				.setDescription('The reason for the warning')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for the warning').setRequired(true),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
 
@@ -70,7 +60,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('Could not find the specified user in this server.'),
-					'VALIDATION'
+					'VALIDATION',
 				);
 				return;
 			}
@@ -80,7 +70,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('You cannot warn the owner of the server.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -93,7 +83,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('You cannot warn someone with a higher or equal role than yourself.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -116,7 +106,7 @@ module.exports = {
 					.setColor('Yellow')
 					.setFooter({
 						text: `Warned by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
@@ -138,33 +128,31 @@ module.exports = {
 						dmError,
 						'COMMAND_EXECUTION',
 						'Could not send warning DM to user (they may have DMs disabled).',
-						false // Don't show this error to the user
+						false, // Don't show this error to the user
 					);
 				}
-
 			} catch (dbError) {
 				await handleError(
 					interaction,
 					dbError,
 					'DATABASE',
-					'Failed to save warning in the moderation logs.'
+					'Failed to save warning in the moderation logs.',
 				);
 			}
-
 		} catch (error) {
 			if (error.code === 50013) {
 				await handleError(
 					interaction,
 					error,
 					'PERMISSION',
-					'I do not have the required permissions to warn this user.'
+					'I do not have the required permissions to warn this user.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while trying to warn the user.'
+					'An error occurred while trying to warn the user.',
 				);
 			}
 		}

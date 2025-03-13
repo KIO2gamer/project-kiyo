@@ -7,25 +7,25 @@ module.exports = {
 		.setName('set_cmd_perms')
 		.setDescription('Set permissions for commands')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('command')
 				.setDescription('The command to set permissions for')
 				.setRequired(true),
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option
 				.setName('allowed')
 				.setDescription('Whether to allow or deny the permission')
 				.setRequired(true),
 		)
-		.addRoleOption((option) =>
+		.addRoleOption(option =>
 			option
 				.setName('role')
 				.setDescription('The role to set permissions for')
 				.setRequired(false),
 		)
-		.addUserOption((option) =>
+		.addUserOption(option =>
 			option
 				.setName('user')
 				.setDescription('The user to set permissions for')
@@ -102,9 +102,9 @@ module.exports = {
 		}
 
 		await interaction.reply({
-			content: `Successfully ${allowed ? 'allowed' : 'denied'
-				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
-				} on command ${commandName}`,
+			content: `Successfully ${allowed ? 'allowed' : 'denied'} permissions for ${
+				role ? `role ${role.name}` : `user ${user.tag}`
+			} on command ${commandName}`,
 			flags: MessageFlags.Ephemeral,
 		});
 	},

@@ -8,12 +8,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('set_ai_chat_channel')
 		.setDescription('Set the channel for AI chat interactions')
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('The channel to set for AI chat')
 				.setRequired(true)
-				.addChannelTypes(ChannelType.GuildText)
+				.addChannelTypes(ChannelType.GuildText),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 	description_full:
@@ -37,7 +37,7 @@ module.exports = {
 					interaction,
 					new Error('No channel provided'),
 					'VALIDATION',
-					'Please provide a valid text channel.'
+					'Please provide a valid text channel.',
 				);
 				return;
 			}
@@ -48,7 +48,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel guild'),
 					'VALIDATION',
-					'The channel must be in this server.'
+					'The channel must be in this server.',
 				);
 				return;
 			}
@@ -59,25 +59,26 @@ module.exports = {
 				PermissionFlagsBits.ViewChannel,
 				PermissionFlagsBits.SendMessages,
 				PermissionFlagsBits.EmbedLinks,
-				PermissionFlagsBits.AttachFiles
+				PermissionFlagsBits.AttachFiles,
 			];
 
 			const missingPermissions = requiredPermissions.filter(
-				perm => !channel.permissionsFor(botMember).has(perm)
+				perm => !channel.permissionsFor(botMember).has(perm),
 			);
 
 			if (missingPermissions.length > 0) {
 				const permissionNames = missingPermissions.map(perm =>
-					Object.keys(PermissionFlagsBits).find(key => PermissionFlagsBits[key] === perm)
+					Object.keys(PermissionFlagsBits)
+						.find(key => PermissionFlagsBits[key] === perm)
 						.replace(/_/g, ' ')
-						.toLowerCase()
+						.toLowerCase(),
 				);
 
 				await handleError(
 					interaction,
 					new Error('Missing channel permissions'),
 					'PERMISSION',
-					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`
+					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`,
 				);
 				return;
 			}
@@ -87,28 +88,28 @@ module.exports = {
 				const config = await AIChatChannel.findOneAndUpdate(
 					{ guildId: interaction.guild.id },
 					{ channelId: channel.id },
-					{ upsert: true, new: true }
+					{ upsert: true, new: true },
 				);
 
 				await interaction.editReply({
 					content: `✅ AI chat channel has been set to ${channel}\nUsers can now interact with the AI chatbot in that channel.`,
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
 
 				// Send a test message to the channel
 				await channel.send({
-					content: '🤖 This channel has been set up for AI chat interactions!\n' +
+					content:
+						'🤖 This channel has been set up for AI chat interactions!\n' +
 						'Users can now chat with the AI bot in this channel.\n' +
-						'To start a conversation, simply send a message in this channel.'
+						'To start a conversation, simply send a message in this channel.',
 				});
-
 			} catch (error) {
 				if (error.code === 11000) {
 					await handleError(
 						interaction,
 						error,
 						'DATABASE',
-						'Failed to update the AI chat channel configuration.'
+						'Failed to update the AI chat channel configuration.',
 					);
 				} else {
 					throw error;
@@ -119,7 +120,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while setting up the AI chat channel.'
+				'An error occurred while setting up the AI chat channel.',
 			);
 		}
 	},

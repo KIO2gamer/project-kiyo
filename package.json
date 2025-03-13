@@ -1,40 +1,50 @@
 {
-  "name": "project-kiyo",
-  "version": "1.1.1",
-  "description": "A discord.js bot with MERN stack implemented and various commands to try out.",
-  "main": "src/index.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/KIO2gamer/project-kiyo.git"
-  },
-  "keywords": [
-    "discord.js",
-    "mern",
-    "youtube",
-    "slash commands"
-  ],
-  "author": "KIO2gamer",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/KIO2gamer/project-kiyo/issues"
-  },
-  "homepage": "https://github.com/KIO2gamer/project-kiyo#readme",
-  "dependencies": {
-    "axios": "^1.8.3",
-    "boxen": "^8.0.1",
-    "chalk": "^4.1.2",
-    "discord.js": "^14.18.0",
-    "dotenv": "^16.4.7",
-    "mongoose": "^8.12.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.9"
-  }
+	"name": "project-kiyo",
+	"version": "1.1.1",
+	"description": "A discord.js bot with MERN stack implemented and various commands to try out.",
+	"main": "src/index.js",
+	"directories": {
+		"doc": "docs"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node src/index.js",
+		"format": "prettier --write \"**/*.{js,json,md}\"",
+		"format:check": "prettier --check \"**/*.{js,json,md}\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KIO2gamer/project-kiyo.git"
+	},
+	"keywords": [
+		"discord.js",
+		"mern",
+		"youtube",
+		"slash commands"
+	],
+	"author": "KIO2gamer",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/KIO2gamer/project-kiyo/issues"
+	},
+	"homepage": "https://github.com/KIO2gamer/project-kiyo#readme",
+	"dependencies": {
+		"@google/generative-ai": "^0.24.0",
+		"@iamtraction/google-translate": "^2.0.1",
+		"axios": "^1.8.3",
+		"boxen": "^8.0.1",
+		"chalk": "^4.1.2",
+		"discord.js": "^14.18.0",
+		"dotenv": "^16.4.7",
+		"googleapis": "^146.0.0",
+		"he": "^1.2.0",
+		"mathjs": "^14.3.1",
+		"moment": "^2.30.1",
+		"mongoose": "^8.12.1",
+		"node-cache": "^5.1.2"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.9",
+		"prettier": "^3.5.3"
+	}
 }

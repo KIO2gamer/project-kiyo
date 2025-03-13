@@ -3,23 +3,17 @@ const { SlashCommandBuilder } = require('discord.js');
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Fetches the current answers/votes for a poll from a specific message.',
+	description_full: 'Fetches the current answers/votes for a poll from a specific message.',
 	usage: '/fetch_poll_answers message_id:"message ID" channel:#channel',
-	examples: [
-		'/fetch_poll_answers message_id:"123456789012345678" channel:#polls',
-	],
+	examples: ['/fetch_poll_answers message_id:"123456789012345678" channel:#polls'],
 	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('fetch_poll_answers')
 		.setDescription('Fetches the answers of the poll.')
-		.addStringOption((option) =>
-			option
-				.setName('message_id')
-				.setDescription('Message ID of the poll')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('message_id').setDescription('Message ID of the poll').setRequired(true),
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('Channel where the poll is created')
@@ -34,9 +28,7 @@ module.exports = {
 			// Fetch the message
 			const message = await channel.messages.fetch(messageId);
 			if (!message.poll) {
-				return interaction.reply(
-					'Poll not found or message does not contain a poll.',
-				);
+				return interaction.reply('Poll not found or message does not contain a poll.');
 			}
 
 			// Prepare the header
@@ -56,9 +48,7 @@ module.exports = {
 			await interaction.reply(reply);
 		} catch (error) {
 			handleError(error);
-			await interaction.reply(
-				'An error occurred while fetching the poll answers.',
-			);
+			await interaction.reply('An error occurred while fetching the poll answers.');
 		}
 	},
 };

@@ -17,7 +17,7 @@ module.exports = {
 			option
 				.setName('location')
 				.setDescription('The city to get weather for')
-				.setRequired(true)
+				.setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -29,7 +29,7 @@ module.exports = {
 				interaction,
 				new Error('Weather API key is not configured.'),
 				'API',
-				'The weather service is not properly configured.'
+				'The weather service is not properly configured.',
 			);
 			return;
 		}
@@ -41,13 +41,13 @@ module.exports = {
 					interaction,
 					new Error('Invalid city name format.'),
 					'VALIDATION',
-					'Please provide a valid city name using only letters, spaces, and basic punctuation.'
+					'Please provide a valid city name using only letters, spaces, and basic punctuation.',
 				);
 				return;
 			}
 
 			const response = await axios.get(
-				`http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`
+				`http://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`,
 			);
 
 			const weatherData = response.data;
@@ -58,34 +58,35 @@ module.exports = {
 					{
 						name: '🌡️ Temperature',
 						value: `${Math.round(weatherData.main.temp)}°C (Feels like ${Math.round(weatherData.main.feels_like)}°C)`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '💧 Humidity',
 						value: `${weatherData.main.humidity}%`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '🌪️ Wind',
 						value: `${weatherData.wind.speed} m/s`,
-						inline: true
+						inline: true,
 					},
 					{
 						name: '☁️ Conditions',
-						value: weatherData.weather[0].description.charAt(0).toUpperCase() +
+						value:
+							weatherData.weather[0].description.charAt(0).toUpperCase() +
 							weatherData.weather[0].description.slice(1),
-						inline: true
-					}
+						inline: true,
+					},
 				)
 				.setColor('#0099ff')
 				.setTimestamp()
 				.setFooter({
 					text: 'Powered by OpenWeatherMap',
-					iconURL: 'https://openweathermap.org/img/w/' + weatherData.weather[0].icon + '.png'
+					iconURL:
+						'https://openweathermap.org/img/w/' + weatherData.weather[0].icon + '.png',
 				});
 
 			await interaction.reply({ embeds: [embed] });
-
 		} catch (error) {
 			if (error.response) {
 				switch (error.response.status) {
@@ -94,7 +95,7 @@ module.exports = {
 							interaction,
 							new Error(`Could not find weather data for "${city}"`),
 							'VALIDATION',
-							'Please check the city name and try again.'
+							'Please check the city name and try again.',
 						);
 						break;
 					case 401:
@@ -102,7 +103,7 @@ module.exports = {
 							interaction,
 							error,
 							'API',
-							'Weather API authentication failed.'
+							'Weather API authentication failed.',
 						);
 						break;
 					case 429:
@@ -110,7 +111,7 @@ module.exports = {
 							interaction,
 							error,
 							'RATE_LIMIT',
-							'Weather API rate limit reached. Please try again later.'
+							'Weather API rate limit reached. Please try again later.',
 						);
 						break;
 					default:
@@ -118,7 +119,7 @@ module.exports = {
 							interaction,
 							error,
 							'API',
-							'Weather service is currently unavailable.'
+							'Weather service is currently unavailable.',
 						);
 				}
 			} else if (error.request) {
@@ -126,14 +127,14 @@ module.exports = {
 					interaction,
 					error,
 					'API',
-					'Could not connect to the weather service. Please try again later.'
+					'Could not connect to the weather service. Please try again later.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An unexpected error occurred while fetching weather data.'
+					'An unexpected error occurred while fetching weather data.',
 				);
 			}
 		}

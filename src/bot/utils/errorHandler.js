@@ -3,7 +3,7 @@ const {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
-	MessageFlags
+	MessageFlags,
 } = require('discord.js');
 const Logger = require('../../../logger').default;
 
@@ -12,38 +12,38 @@ const ERROR_CATEGORIES = {
 	COMMAND_EXECUTION: {
 		emoji: '⚙️',
 		color: '#FF6B6B',
-		message: 'Error executing command'
+		message: 'Error executing command',
 	},
 	PERMISSION: {
 		emoji: '🔒',
 		color: '#4ECDC4',
-		message: 'Permission error'
+		message: 'Permission error',
 	},
 	VALIDATION: {
 		emoji: '❌',
 		color: '#FFE66D',
-		message: 'Validation error'
+		message: 'Validation error',
 	},
 	API: {
 		emoji: '🌐',
 		color: '#1A535C',
-		message: 'API error'
+		message: 'API error',
 	},
 	DATABASE: {
 		emoji: '💾',
 		color: '#FF6B6B',
-		message: 'Database error'
+		message: 'Database error',
 	},
 	RATE_LIMIT: {
 		emoji: '⏱️',
 		color: '#F7B267',
-		message: 'Rate limit reached'
+		message: 'Rate limit reached',
 	},
 	UNKNOWN: {
 		emoji: '❓',
 		color: '#5865F2',
-		message: 'Unknown error'
-	}
+		message: 'Unknown error',
+	},
 };
 
 // Common error patterns to identify error types
@@ -51,28 +51,28 @@ const ERROR_PATTERNS = [
 	{
 		pattern: /(Missing Permissions|Forbidden|lacks permission)/i,
 		category: 'PERMISSION',
-		suggestion: 'Check if the bot has the required permissions in the server settings.'
+		suggestion: 'Check if the bot has the required permissions in the server settings.',
 	},
 	{
 		pattern: /(Rate limit|Too many requests)/i,
 		category: 'RATE_LIMIT',
-		suggestion: 'Please wait a moment before trying again.'
+		suggestion: 'Please wait a moment before trying again.',
 	},
 	{
 		pattern: /(Invalid|Expected|ValidationError)/i,
 		category: 'VALIDATION',
-		suggestion: 'Please check the command usage and try again.'
+		suggestion: 'Please check the command usage and try again.',
 	},
 	{
 		pattern: /(API|fetch|request|HTTP)/i,
 		category: 'API',
-		suggestion: 'There might be an issue with external services. Try again later.'
+		suggestion: 'There might be an issue with external services. Try again later.',
 	},
 	{
 		pattern: /(Database|MongoDB|Mongoose|SQL)/i,
 		category: 'DATABASE',
-		suggestion: 'There was an issue with the database. Please try again later.'
-	}
+		suggestion: 'There was an issue with the database. Please try again later.',
+	},
 ];
 
 // Error statistics for monitoring
@@ -80,7 +80,7 @@ const errorStats = {
 	total: 0,
 	categories: {},
 	recent: [],
-	MAX_RECENT: 100
+	MAX_RECENT: 100,
 };
 
 /**
@@ -89,9 +89,8 @@ const errorStats = {
  * @returns {string} The error category
  */
 function identifyErrorCategory(error) {
-	const errorString = error instanceof Error ?
-		`${error.message} ${error.stack || ''}` :
-		String(error);
+	const errorString =
+		error instanceof Error ? `${error.message} ${error.stack || ''}` : String(error);
 
 	for (const { pattern, category } of ERROR_PATTERNS) {
 		if (pattern.test(errorString)) {
@@ -126,7 +125,7 @@ function getErrorSuggestion(category, error) {
 		API: 'The service might be temporarily unavailable. Please try again later.',
 		DATABASE: 'There was a database issue. Please try again later.',
 		RATE_LIMIT: 'Please wait a moment before trying this command again.',
-		UNKNOWN: 'Please try the command again or contact support if the issue persists.'
+		UNKNOWN: 'Please try the command again or contact support if the issue persists.',
 	};
 
 	return defaultSuggestions[category] || defaultSuggestions.UNKNOWN;
@@ -145,7 +144,7 @@ function updateErrorStats(category, error) {
 		timestamp: new Date(),
 		category,
 		message: error instanceof Error ? error.message : String(error),
-		stack: error instanceof Error ? error.stack : null
+		stack: error instanceof Error ? error.stack : null,
 	};
 
 	errorStats.recent.unshift(errorInfo);
@@ -171,10 +170,11 @@ function createErrorEmbed(category, errorMessage, suggestion) {
 			{ name: '💡 Suggestion', value: suggestion },
 			{
 				name: '🔍 Details',
-				value: process.env.NODE_ENV === 'development' ?
-					`\`\`\`js\n${errorMessage.substring(0, 500)}\n\`\`\`` :
-					'Click the button below to see technical details.'
-			}
+				value:
+					process.env.NODE_ENV === 'development'
+						? `\`\`\`js\n${errorMessage.substring(0, 500)}\n\`\`\``
+						: 'Click the button below to see technical details.',
+			},
 		)
 		.setColor(color)
 		.setTimestamp();
@@ -203,7 +203,7 @@ async function handleError(...args) {
 					command: interaction.commandName,
 					options: interaction.options?.data || [],
 					channel: interaction.channel?.name || 'unknown',
-					guild: interaction.guild?.name || 'DM'
+					guild: interaction.guild?.name || 'DM',
 				};
 			}
 		} else if (arg?.edit && !sent) {
@@ -225,12 +225,16 @@ async function handleError(...args) {
 	updateErrorStats(category, errorMessage);
 
 	// Log error with context
-	Logger.log('ERROR', {
-		category,
-		message: errorMessage,
-		context: commandContext,
-		timestamp
-	}, 'error');
+	Logger.log(
+		'ERROR',
+		{
+			category,
+			message: errorMessage,
+			context: commandContext,
+			timestamp,
+		},
+		'error',
+	);
 
 	// If no interaction, we're done after logging
 	if (!interaction) return;
@@ -241,7 +245,7 @@ async function handleError(...args) {
 		new ButtonBuilder()
 			.setCustomId('show_full_error')
 			.setLabel('Show Technical Details')
-			.setStyle(ButtonStyle.Secondary)
+			.setStyle(ButtonStyle.Secondary),
 	);
 
 	try {
@@ -249,24 +253,24 @@ async function handleError(...args) {
 		const response = sent
 			? await sent.edit({ embeds: [errorEmbed], components: [row] })
 			: await (interaction.replied || interaction.deferred
-				? interaction.editReply({
-					embeds: [errorEmbed],
-					components: [row],
-					flags: MessageFlags.Ephemeral
-				})
-				: interaction.reply({
-					embeds: [errorEmbed],
-					components: [row],
-					flags: MessageFlags.Ephemeral
-				}));
+					? interaction.editReply({
+							embeds: [errorEmbed],
+							components: [row],
+							flags: MessageFlags.Ephemeral,
+						})
+					: interaction.reply({
+							embeds: [errorEmbed],
+							components: [row],
+							flags: MessageFlags.Ephemeral,
+						}));
 
 		// Set up button collector
 		const collector = response.createMessageComponentCollector({
 			time: 60000,
-			filter: i => i.user.id === interaction.user.id
+			filter: i => i.user.id === interaction.user.id,
 		});
 
-		collector.on('collect', async (i) => {
+		collector.on('collect', async i => {
 			if (i.customId === 'show_full_error') {
 				const detailsEmbed = new EmbedBuilder()
 					.setTitle('🔍 Technical Details')
@@ -286,14 +290,18 @@ async function handleError(...args) {
 			}
 		});
 	} catch (sendError) {
-		Logger.log('ERROR', {
-			category: 'UNKNOWN',
-			message: 'Failed to send error message',
-			error: sendError,
-			originalError: errorMessage,
-			context: commandContext,
-			timestamp
-		}, 'error');
+		Logger.log(
+			'ERROR',
+			{
+				category: 'UNKNOWN',
+				message: 'Failed to send error message',
+				error: sendError,
+				originalError: errorMessage,
+				context: commandContext,
+				timestamp,
+			},
+			'error',
+		);
 	}
 }
 
@@ -305,12 +313,12 @@ function getErrorStats() {
 	return {
 		total: errorStats.total,
 		categories: { ...errorStats.categories },
-		recent: [...errorStats.recent]
+		recent: [...errorStats.recent],
 	};
 }
 
 module.exports = {
 	handleError,
 	getErrorStats,
-	ERROR_CATEGORIES
+	ERROR_CATEGORIES,
 };

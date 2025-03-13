@@ -10,11 +10,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('delete_role')
 		.setDescription('Deletes an existing role')
-		.addRoleOption((option) =>
-			option
-				.setName('role')
-				.setDescription('The role to delete')
-				.setRequired(true),
+		.addRoleOption(option =>
+			option.setName('role').setDescription('The role to delete').setRequired(true),
 		),
 
 	async execute(interaction) {

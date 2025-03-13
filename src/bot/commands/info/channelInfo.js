@@ -13,13 +13,14 @@ const {
 } = require('./../../utils/permissionFormatter');
 
 module.exports = {
-	description_full: 'Provides detailed information about a specific channel, including its ID, type, creation date, topic, position, permissions, and more specialized details based on channel type.',
+	description_full:
+		'Provides detailed information about a specific channel, including its ID, type, creation date, topic, position, permissions, and more specialized details based on channel type.',
 	usage: '/channel_info <channel>',
 	examples: [
 		'/channel_info #general',
 		'/channel_info #voice-chat',
 		'/channel_info #announcements',
-		'/channel_info 123456789012345678 (channel ID)'
+		'/channel_info 123456789012345678 (channel ID)',
 	],
 	category: 'info',
 	data: new SlashCommandBuilder()
@@ -29,7 +30,7 @@ module.exports = {
 			option
 				.setName('channel')
 				.setDescription('The channel to get information about')
-				.setRequired(true)
+				.setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -44,7 +45,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel'),
 					'VALIDATION',
-					'The specified channel could not be found.'
+					'The specified channel could not be found.',
 				);
 				return;
 			}
@@ -63,7 +64,7 @@ module.exports = {
 				};
 
 				// Get channel activity statistics
-				const getChannelStats = async (channel) => {
+				const getChannelStats = async channel => {
 					if (channel.type === ChannelType.GuildText) {
 						try {
 							const messages = await channel.messages.fetch({ limit: 100 });
@@ -73,7 +74,7 @@ module.exports = {
 							return {
 								messageCount: messages.size,
 								uniqueAuthors,
-								lastMessageAt: lastMessage ? lastMessage.createdTimestamp : null
+								lastMessageAt: lastMessage ? lastMessage.createdTimestamp : null,
 							};
 						} catch {
 							return null;
@@ -93,69 +94,77 @@ module.exports = {
 						{
 							name: '🕒 Created',
 							value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
-							inline: true
-						}
+							inline: true,
+						},
 					);
 
 				// Add fields based on channel type
-				if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement) {
+				if (
+					channel.type === ChannelType.GuildText ||
+					channel.type === ChannelType.GuildAnnouncement
+				) {
 					const stats = await getChannelStats(channel);
 
 					embed.addFields(
 						{
 							name: '📢 Topic',
 							value: channel.topic || 'No topic set',
-							inline: false
+							inline: false,
 						},
 						{
 							name: '🔞 NSFW',
 							value: channel.nsfw ? 'Yes' : 'No',
-							inline: true
+							inline: true,
 						},
 						{
 							name: '⏱️ Rate Limit',
 							value: channel.rateLimitPerUser
 								? `${channel.rateLimitPerUser} seconds`
 								: 'No slow mode',
-							inline: true
-						}
+							inline: true,
+						},
 					);
 
 					if (stats) {
-						embed.addFields(
-							{
-								name: '📊 Recent Activity',
-								value: [
-									`**Messages:** ${stats.messageCount} (last 100)`,
-									`**Unique Authors:** ${stats.uniqueAuthors}`,
-									stats.lastMessageAt
-										? `**Last Message:** <t:${Math.floor(stats.lastMessageAt / 1000)}:R>`
-										: '**Last Message:** No messages'
-								].join('\n'),
-								inline: false
-							}
-						);
+						embed.addFields({
+							name: '📊 Recent Activity',
+							value: [
+								`**Messages:** ${stats.messageCount} (last 100)`,
+								`**Unique Authors:** ${stats.uniqueAuthors}`,
+								stats.lastMessageAt
+									? `**Last Message:** <t:${Math.floor(stats.lastMessageAt / 1000)}:R>`
+									: '**Last Message:** No messages',
+							].join('\n'),
+							inline: false,
+						});
 					}
 
 					// Add thread information if available
 					if (channel.threads?.cache.size) {
-						const activeThreads = channel.threads.cache.filter(thread => !thread.archived);
-						const archivedThreads = channel.threads.cache.filter(thread => thread.archived);
+						const activeThreads = channel.threads.cache.filter(
+							thread => !thread.archived,
+						);
+						const archivedThreads = channel.threads.cache.filter(
+							thread => thread.archived,
+						);
 
 						embed.addFields({
 							name: '🧵 Threads',
 							value: [
 								`**Active:** ${activeThreads.size}`,
 								`**Archived:** ${archivedThreads.size}`,
-								`**Total:** ${channel.threads.cache.size}`
+								`**Total:** ${channel.threads.cache.size}`,
 							].join('\n'),
-							inline: true
+							inline: true,
 						});
 					}
 				}
 
 				// Voice channel specific info
-				if (channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice) {
+				if (
+					channel.type === ChannelType.GuildVoice ||
+					channel.type === ChannelType.GuildStageVoice
+				) {
 					const connectedMembers = channel.members.map(member => member.user.tag);
 
 					embed.addFields(
@@ -164,25 +173,28 @@ module.exports = {
 							value: [
 								`**Bitrate:** ${channel.bitrate / 1000} kbps`,
 								`**Region:** ${channel.rtcRegion || 'Auto'}`,
-								`**Quality Mode:** ${channel.videoQualityMode === 1 ? 'Auto' : 'Full'}`
+								`**Quality Mode:** ${channel.videoQualityMode === 1 ? 'Auto' : 'Full'}`,
 							].join('\n'),
-							inline: true
+							inline: true,
 						},
 						{
 							name: '👥 Capacity',
 							value: [
 								`**Current:** ${channel.members.size} members`,
-								`**Limit:** ${channel.userLimit ? `${channel.userLimit} users` : 'Unlimited'}`
+								`**Limit:** ${channel.userLimit ? `${channel.userLimit} users` : 'Unlimited'}`,
 							].join('\n'),
-							inline: true
-						}
+							inline: true,
+						},
 					);
 
 					if (connectedMembers.length > 0) {
 						embed.addFields({
 							name: '🎧 Connected Members',
-							value: connectedMembers.map(tag => `• ${tag}`).join('\n').substring(0, 1024),
-							inline: false
+							value: connectedMembers
+								.map(tag => `• ${tag}`)
+								.join('\n')
+								.substring(0, 1024),
+							inline: false,
 						});
 					}
 				}
@@ -196,17 +208,17 @@ module.exports = {
 						{
 							name: '📢 Topic',
 							value: channel.topic || 'No topic set',
-							inline: false
+							inline: false,
 						},
 						{
 							name: '📝 Posts',
 							value: [
 								`**Active:** ${activePosts?.size || 0}`,
 								`**Archived:** ${archivedPosts?.size || 0}`,
-								`**Total:** ${channel.threads?.cache.size || 0}`
+								`**Total:** ${channel.threads?.cache.size || 0}`,
 							].join('\n'),
-							inline: true
-						}
+							inline: true,
+						},
 					);
 
 					if (channel.availableTags?.length) {
@@ -215,7 +227,7 @@ module.exports = {
 							value: channel.availableTags
 								.map(tag => `• ${tag.emoji ? tag.emoji + ' ' : ''}${tag.name}`)
 								.join('\n'),
-							inline: false
+							inline: false,
 						});
 					}
 				}
@@ -229,19 +241,19 @@ module.exports = {
 						{
 							name: '📂 Category',
 							value: channel.parent.name,
-							inline: true
+							inline: true,
 						},
 						{
 							name: '📊 Position',
 							value: `${position} of ${siblings.size}`,
-							inline: true
-						}
+							inline: true,
+						},
 					);
 				} else if (channel.type !== ChannelType.GuildCategory) {
 					embed.addFields({
 						name: '📂 Category',
 						value: 'None (Top-level channel)',
-						inline: true
+						inline: true,
 					});
 				}
 
@@ -251,9 +263,12 @@ module.exports = {
 
 				for (let i = 0; i < permissionParts.length; i++) {
 					embed.addFields({
-						name: i === 0 ? '🔐 Default Permissions' : '🔐 Default Permissions (continued)',
+						name:
+							i === 0
+								? '🔐 Default Permissions'
+								: '🔐 Default Permissions (continued)',
 						value: permissionParts[i],
-						inline: false
+						inline: false,
 					});
 				}
 
@@ -263,7 +278,7 @@ module.exports = {
 					interaction,
 					error,
 					'DATA_COLLECTION',
-					'Failed to collect channel information. Some details may be incomplete.'
+					'Failed to collect channel information. Some details may be incomplete.',
 				);
 			}
 		} catch (error) {
@@ -271,7 +286,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving channel information.'
+				'An error occurred while retrieving channel information.',
 			);
 		}
 	},

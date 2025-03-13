@@ -1,36 +1,22 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
 const { handleError } = require('../../utils/errorHandler');
 
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Kicks a member from the server with the specified reason.',
+	description_full: 'Kicks a member from the server with the specified reason.',
 	usage: '/kick target:@user [reason:"kick reason"]',
-	examples: [
-		'/kick target:@user123',
-		'/kick target:@user123 reason:"Violating server rules"',
-	],
+	examples: ['/kick target:@user123', '/kick target:@user123 reason:"Violating server rules"'],
 	category: 'moderation',
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('Kick a user from the server')
-		.addUserOption((option) =>
-			option
-				.setName('target')
-				.setDescription('The user to kick')
-				.setRequired(true),
+		.addUserOption(option =>
+			option.setName('target').setDescription('The user to kick').setRequired(true),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('reason')
-				.setDescription('The reason for kicking')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for kicking').setRequired(true),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
 
@@ -44,7 +30,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('Could not find the specified user in this server.'),
-					'VALIDATION'
+					'VALIDATION',
 				);
 				return;
 			}
@@ -54,7 +40,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('I do not have permission to kick this user.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -64,7 +50,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('You cannot kick the owner of the server.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -78,7 +64,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('You cannot kick someone with a higher or equal role than yourself.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -87,7 +73,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error('I cannot kick someone with a higher or equal role than myself.'),
-					'PERMISSION'
+					'PERMISSION',
 				);
 				return;
 			}
@@ -116,15 +102,12 @@ module.exports = {
 					dmError,
 					'COMMAND_EXECUTION',
 					'Could not send kick notification DM to user (they may have DMs disabled).',
-					false // Don't show this error to the user
+					false, // Don't show this error to the user
 				);
 			}
 
 			// Save log and kick user
-			await Promise.all([
-				logEntry.save(),
-				targetUser.kick(reason)
-			]);
+			await Promise.all([logEntry.save(), targetUser.kick(reason)]);
 
 			// Send success message
 			const successEmbed = new EmbedBuilder()
@@ -133,12 +116,11 @@ module.exports = {
 				.setColor('Orange')
 				.setFooter({
 					text: `Kicked by ${interaction.user.tag}`,
-					iconURL: interaction.user.displayAvatarURL()
+					iconURL: interaction.user.displayAvatarURL(),
 				})
 				.setTimestamp();
 
 			await interaction.reply({ embeds: [successEmbed] });
-
 		} catch (error) {
 			// Handle different types of errors
 			if (error.code === 50013) {
@@ -146,21 +128,16 @@ module.exports = {
 					interaction,
 					error,
 					'PERMISSION',
-					'I do not have the required permissions to kick this user.'
+					'I do not have the required permissions to kick this user.',
 				);
 			} else if (error.code === 'DATABASE_ERROR') {
-				await handleError(
-					interaction,
-					error,
-					'DATABASE',
-					'Failed to save moderation log.'
-				);
+				await handleError(interaction, error, 'DATABASE', 'Failed to save moderation log.');
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while trying to kick the user.'
+					'An error occurred while trying to kick the user.',
 				);
 			}
 		}

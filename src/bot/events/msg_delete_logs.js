@@ -27,9 +27,7 @@ module.exports = {
 					// Attempt to fetch the complete message data
 					message = await message.fetch().catch(() => null);
 					if (!message) {
-						Logger.warn(
-							'Could not fetch deleted partial message, skipping log',
-						);
+						Logger.warn('Could not fetch deleted partial message, skipping log');
 						return;
 					}
 				} catch (error) {
@@ -41,9 +39,7 @@ module.exports = {
 			// Check if message.author exists before checking bot property
 			// This prevents the TypeError when author is null
 			if (!message.author) {
-				Logger.warn(
-					'Message author information unavailable, skipping log',
-				);
+				Logger.warn('Message author information unavailable, skipping log');
 				return;
 			}
 
@@ -59,7 +55,7 @@ module.exports = {
 			}
 
 			// Fetch log channel configuration
-			const config = await MsgLogsConfig.findOne({}).catch((err) => {
+			const config = await MsgLogsConfig.findOne({}).catch(err => {
 				Logger.error('Failed to fetch message log configuration:', err);
 				return null;
 			});
@@ -74,9 +70,7 @@ module.exports = {
 				.fetch(config.channelId)
 				.catch(() => null);
 			if (!logChannel) {
-				Logger.warn(
-					`Invalid log channel ID in configuration: ${config.channelId}`,
-				);
+				Logger.warn(`Invalid log channel ID in configuration: ${config.channelId}`);
 				return;
 			}
 
@@ -93,15 +87,11 @@ module.exports = {
 			];
 
 			try {
-				const botMember = await message.guild.members.fetch(
-					message.client.user.id,
-				);
+				const botMember = await message.guild.members.fetch(message.client.user.id);
 				const permissions = botMember.permissionsIn(logChannel);
 
 				if (!permissions.has(requiredPermissions)) {
-					Logger.warn(
-						`Missing permissions in log channel ${logChannel.name}`,
-					);
+					Logger.warn(`Missing permissions in log channel ${logChannel.name}`);
 					return;
 				}
 			} catch (error) {
@@ -160,18 +150,13 @@ module.exports = {
 					.catch(() => ({ entries: new Map() }));
 
 				// Look for a matching audit log entry
-				const matchingEntry = auditLogs.entries.find((entry) => {
+				const matchingEntry = auditLogs.entries.find(entry => {
 					// Check if this audit log entry matches our deleted message
-					const isRecentDeletion =
-						Date.now() - entry.createdTimestamp < 5000;
-					const matchesChannel =
-						entry.extra?.channel?.id === message.channel.id;
-					const matchesAuthor =
-						entry.target?.id === message.author.id;
+					const isRecentDeletion = Date.now() - entry.createdTimestamp < 5000;
+					const matchesChannel = entry.extra?.channel?.id === message.channel.id;
+					const matchesAuthor = entry.target?.id === message.author.id;
 
-					return (
-						isRecentDeletion && (matchesChannel || matchesAuthor)
-					);
+					return isRecentDeletion && (matchesChannel || matchesAuthor);
 				});
 
 				if (matchingEntry) {
@@ -182,9 +167,7 @@ module.exports = {
 						executor.id === message.client.user.id &&
 						matchingEntry.target.id === message.author.id
 					) {
-						Logger.debug(
-							'Self-deletion detected, skipping logging.',
-						);
+						Logger.debug('Self-deletion detected, skipping logging.');
 						return;
 					}
 
@@ -231,14 +214,9 @@ module.exports = {
 						const response = await fetch(attachment.url, {
 							timeout: 5000,
 						});
-						if (!response.ok)
-							throw new Error(
-								`Failed to fetch: ${response.status}`,
-							);
+						if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
 
-						const buffer = Buffer.from(
-							await response.arrayBuffer(),
-						);
+						const buffer = Buffer.from(await response.arrayBuffer());
 						attachments.push(
 							new AttachmentBuilder(buffer, {
 								name:
@@ -249,9 +227,7 @@ module.exports = {
 						);
 						attachmentCount++;
 					} catch (error) {
-						Logger.warn(
-							`Failed to fetch attachment: ${error.message}`,
-						);
+						Logger.warn(`Failed to fetch attachment: ${error.message}`);
 					}
 				}
 			}

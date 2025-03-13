@@ -8,9 +8,7 @@ module.exports = {
 	usage: '/roll',
 	examples: ['/roll'],
 	category: 'fun',
-	data: new SlashCommandBuilder()
-		.setName('roll')
-		.setDescription('Roll a dice.'),
+	data: new SlashCommandBuilder().setName('roll').setDescription('Roll a dice.'),
 
 	async execute(interaction) {
 		const sides = 6; // You can customize the number of sides

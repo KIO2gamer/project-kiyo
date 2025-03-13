@@ -1,8 +1,4 @@
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 const { getChannelType } = require('./../../utils/channelTypes');
 
@@ -22,11 +18,8 @@ module.exports = {
 		.setName('delete_channel')
 		.setDescription('Deletes a specified channel.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
-		.addChannelOption((option) =>
-			option
-				.setName('channel')
-				.setDescription('The channel to delete')
-				.setRequired(true),
+		.addChannelOption(option =>
+			option.setName('channel').setDescription('The channel to delete').setRequired(true),
 		),
 	async execute(interaction) {
 		const channel = interaction.options.getChannel('channel');
@@ -38,8 +31,7 @@ module.exports = {
 				.setTitle('Channel Deleted!')
 				.setColor('Red')
 				.setDescription(
-					`The ${getChannelType(channel)} ${channel.id
-					} has been successfully deleted.`,
+					`The ${getChannelType(channel)} ${channel.id} has been successfully deleted.`,
 				)
 				.setTimestamp();
 

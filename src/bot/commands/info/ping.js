@@ -2,7 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
 module.exports = {
-	description_full: "Measures the bot's response time (latency) and displays various connection metrics including WebSocket heartbeat, REST API latency, and database connection status.",
+	description_full:
+		"Measures the bot's response time (latency) and displays various connection metrics including WebSocket heartbeat, REST API latency, and database connection status.",
 	usage: '/ping',
 	examples: ['/ping'],
 	category: 'info',
@@ -22,7 +23,7 @@ module.exports = {
 				const uptimeSeconds = Math.floor(interaction.client.uptime / 1000);
 
 				// Create status indicators
-				const getStatusEmoji = (ms) => {
+				const getStatusEmoji = ms => {
 					if (ms < 100) return '🟢'; // Excellent
 					if (ms < 200) return '🟡'; // Good
 					if (ms < 500) return '🟠'; // Fair
@@ -30,7 +31,7 @@ module.exports = {
 				};
 
 				// Format uptime
-				const formatUptime = (seconds) => {
+				const formatUptime = seconds => {
 					const days = Math.floor(seconds / 86400);
 					const hours = Math.floor((seconds % 86400) / 3600);
 					const minutes = Math.floor((seconds % 3600) / 60);
@@ -53,23 +54,23 @@ module.exports = {
 							name: '📊 Latency',
 							value: [
 								`${getStatusEmoji(tripTime)} **Round-trip:** ${tripTime}ms`,
-								`${getStatusEmoji(wsHeartbeat)} **WebSocket:** ${wsHeartbeat}ms`
+								`${getStatusEmoji(wsHeartbeat)} **WebSocket:** ${wsHeartbeat}ms`,
 							].join('\n'),
-							inline: false
+							inline: false,
 						},
 						{
 							name: '⚙️ System Info',
 							value: [
 								`**Uptime:** ${formatUptime(uptimeSeconds)}`,
 								`**Memory Usage:** ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`,
-								`**Node.js:** ${process.version}`
+								`**Node.js:** ${process.version}`,
 							].join('\n'),
-							inline: false
-						}
+							inline: false,
+						},
 					)
 					.setFooter({
 						text: `Shard ${interaction.guild.shardId} | ${interaction.client.ws.status}`,
-						iconURL: interaction.client.user.displayAvatarURL()
+						iconURL: interaction.client.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
@@ -79,7 +80,7 @@ module.exports = {
 					interaction,
 					error,
 					'DATA_COLLECTION',
-					'Failed to collect some metrics. The bot is still operational.'
+					'Failed to collect some metrics. The bot is still operational.',
 				);
 			}
 		} catch (error) {
@@ -87,7 +88,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while checking the bot status.'
+				'An error occurred while checking the bot status.',
 			);
 		}
 	},

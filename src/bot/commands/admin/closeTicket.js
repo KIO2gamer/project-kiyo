@@ -4,11 +4,7 @@
  * @param {import('discord.js').Interaction} interaction - The Discord.js interaction object.
  * @returns {Promise<void>} - A Promise that resolves when the ticket is closed.
  */
-const {
-	SlashCommandBuilder,
-	PermissionFlagsBits,
-	EmbedBuilder,
-} = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 
 const { MessageFlags } = require('discord.js');
 
@@ -22,14 +18,11 @@ module.exports = {
 		.setName('close_ticket')
 		.setDescription('Closes the current ticket channel.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
-		.addStringOption((option) =>
-			option
-				.setName('reason')
-				.setDescription('The reason for closing the ticket'),
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for closing the ticket'),
 		),
 	async execute(interaction) {
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 
 		if (!interaction.channel.name.startsWith('ticket-')) {
 			return interaction.reply({
@@ -41,8 +34,7 @@ module.exports = {
 		const ticketCreatorId = interaction.channel.name.split('-')[1];
 
 		try {
-			const ticketCreator =
-				await interaction.guild.members.fetch(ticketCreatorId);
+			const ticketCreator = await interaction.guild.members.fetch(ticketCreatorId);
 
 			if (ticketCreator) {
 				await ticketCreator.send({
@@ -68,8 +60,7 @@ module.exports = {
 			handleError('Error closing ticket channel:', error.message);
 			if (error.message.includes('Cannot send messages')) {
 				interaction.reply({
-					content:
-						'I cannot send messages to that user as their DMs are turned off.',
+					content: 'I cannot send messages to that user as their DMs are turned off.',
 					flags: MessageFlags.Ephemeral,
 				});
 				return;

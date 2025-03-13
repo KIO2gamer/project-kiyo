@@ -33,9 +33,7 @@ class Command {
 		this.cooldown = options.cooldown || 0;
 
 		// Set up slash command builder
-		this.data = new SlashCommandBuilder()
-			.setName(this.name)
-			.setDescription(this.description);
+		this.data = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
 
 		// Add aliases if provided
 		if (options.aliases && Array.isArray(options.aliases)) {
@@ -50,7 +48,7 @@ class Command {
 
 	/**
 	 * Validate command options
-	 * 
+	 *
 	 * @param {Object} options - Command options to validate
 	 * @private
 	 */
@@ -69,7 +67,9 @@ class Command {
 
 		// Validate name format
 		if (!/^[\w-]{1,32}$/.test(options.name)) {
-			throw new Error('Command name must be 1-32 characters and contain only letters, numbers, hyphens, or underscores');
+			throw new Error(
+				'Command name must be 1-32 characters and contain only letters, numbers, hyphens, or underscores',
+			);
 		}
 
 		// Validate description length
@@ -80,11 +80,11 @@ class Command {
 
 	/**
 	 * Add an option to the command
-	 * 
+	 *
 	 * @param {Function} optionBuilder - Function that takes an option and returns it
 	 * @returns {Command} This command instance for chaining
 	 * @example
-	 * addOption(option => 
+	 * addOption(option =>
 	 *   option.setName('user')
 	 *     .setDescription('The user')
 	 *     .setRequired(true)
@@ -97,7 +97,7 @@ class Command {
 
 	/**
 	 * Add a string option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -106,9 +106,7 @@ class Command {
 	 */
 	addStringOption(name, description, required = false, choices = []) {
 		this.data.addStringOption(option => {
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required);
+			option.setName(name).setDescription(description).setRequired(required);
 
 			if (choices && choices.length > 0) {
 				for (const choice of choices) {
@@ -124,7 +122,7 @@ class Command {
 
 	/**
 	 * Add an integer option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -135,9 +133,7 @@ class Command {
 	 */
 	addIntegerOption(name, description, required = false, min = null, max = null, choices = []) {
 		this.data.addIntegerOption(option => {
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required);
+			option.setName(name).setDescription(description).setRequired(required);
 
 			if (min !== null) {
 				option.setMinValue(min);
@@ -161,7 +157,7 @@ class Command {
 
 	/**
 	 * Add a user option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -169,9 +165,7 @@ class Command {
 	 */
 	addUserOption(name, description, required = false) {
 		this.data.addUserOption(option =>
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required)
+			option.setName(name).setDescription(description).setRequired(required),
 		);
 
 		return this;
@@ -179,7 +173,7 @@ class Command {
 
 	/**
 	 * Add a channel option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -188,9 +182,7 @@ class Command {
 	 */
 	addChannelOption(name, description, required = false, channelTypes = []) {
 		this.data.addChannelOption(option => {
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required);
+			option.setName(name).setDescription(description).setRequired(required);
 
 			if (channelTypes && channelTypes.length > 0) {
 				option.addChannelTypes(...channelTypes);
@@ -204,7 +196,7 @@ class Command {
 
 	/**
 	 * Add a role option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -212,9 +204,7 @@ class Command {
 	 */
 	addRoleOption(name, description, required = false) {
 		this.data.addRoleOption(option =>
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required)
+			option.setName(name).setDescription(description).setRequired(required),
 		);
 
 		return this;
@@ -222,7 +212,7 @@ class Command {
 
 	/**
 	 * Add a boolean option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -230,9 +220,7 @@ class Command {
 	 */
 	addBooleanOption(name, description, required = false) {
 		this.data.addBooleanOption(option =>
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required)
+			option.setName(name).setDescription(description).setRequired(required),
 		);
 
 		return this;
@@ -240,7 +228,7 @@ class Command {
 
 	/**
 	 * Add a mentionable option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -248,9 +236,7 @@ class Command {
 	 */
 	addMentionableOption(name, description, required = false) {
 		this.data.addMentionableOption(option =>
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required)
+			option.setName(name).setDescription(description).setRequired(required),
 		);
 
 		return this;
@@ -258,7 +244,7 @@ class Command {
 
 	/**
 	 * Add a number option to the command
-	 * 
+	 *
 	 * @param {string} name - Option name
 	 * @param {string} description - Option description
 	 * @param {boolean} [required=false] - Whether the option is required
@@ -268,9 +254,7 @@ class Command {
 	 */
 	addNumberOption(name, description, required = false, min = null, max = null) {
 		this.data.addNumberOption(option => {
-			option.setName(name)
-				.setDescription(description)
-				.setRequired(required);
+			option.setName(name).setDescription(description).setRequired(required);
 
 			if (min !== null) {
 				option.setMinValue(min);
@@ -288,7 +272,7 @@ class Command {
 
 	/**
 	 * Add a subcommand to the command
-	 * 
+	 *
 	 * @param {string} name - Subcommand name
 	 * @param {string} description - Subcommand description
 	 * @param {Function} [optionsBuilder] - Function to build subcommand options
@@ -314,7 +298,7 @@ class Command {
 
 	/**
 	 * Add a subcommand group to the command
-	 * 
+	 *
 	 * @param {string} name - Group name
 	 * @param {string} description - Group description
 	 * @param {Function} subcommandsBuilder - Function to build subcommands
@@ -336,7 +320,7 @@ class Command {
 
 	/**
 	 * Set the command to be NSFW
-	 * 
+	 *
 	 * @param {boolean} [nsfw=true] - Whether the command is NSFW
 	 * @returns {Command} This command instance for chaining
 	 */
@@ -347,13 +331,13 @@ class Command {
 
 	/**
 	 * Default implementation - should be overridden in subclasses
-	 * 
+	 *
 	 * @param {Object} interaction - Discord interaction object
 	 */
 	async execute(interaction) {
 		await interaction.reply({
 			content: 'This command has not been implemented yet!',
-			flags: MessageFlags.Ephemeral
+			flags: MessageFlags.Ephemeral,
 		});
 
 		Logger.log('COMMANDS', `Command ${this.name} has no execute method implemented`, 'warning');
@@ -361,7 +345,7 @@ class Command {
 
 	/**
 	 * Optional validation method to be implemented in subclasses
-	 * 
+	 *
 	 * @param {Object} interaction - Discord interaction object
 	 * @returns {boolean|string} true if valid, error message if invalid
 	 */
@@ -371,7 +355,7 @@ class Command {
 
 	/**
 	 * Optional autocomplete handler to be implemented in subclasses
-	 * 
+	 *
 	 * @param {Object} interaction - Discord autocomplete interaction
 	 */
 	async autocomplete(interaction) {
@@ -379,4 +363,4 @@ class Command {
 	}
 }
 
-module.exports = Command; 
+module.exports = Command;

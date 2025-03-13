@@ -1,9 +1,5 @@
 const { Events, AttachmentBuilder } = require('discord.js');
-const {
-	GoogleGenerativeAI,
-	HarmBlockThreshold,
-	HarmCategory,
-} = require('@google/generative-ai');
+const { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } = require('@google/generative-ai');
 const AIChatChannel = require('./../../database/AIChatChannel');
 const ChatHistory = require('./../../database/ChatHistory');
 const { handleError } = require('./../utils/errorHandler');
@@ -16,7 +12,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const RATE_LIMIT = {
 	WINDOW_MS: 60000, // 1 minute window
 	MAX_REQUESTS: 10, // Max 10 requests per minute
-	userTimestamps: new Map()
+	userTimestamps: new Map(),
 };
 
 // Safety configuration with more nuanced thresholds
@@ -42,8 +38,8 @@ const safetySettings = [
 // Improved generation configuration for better responses
 const generationConfig = {
 	temperature: 0.85, // Slightly lower for more coherent responses
-	topK: 40,          // Increased variety in token selection
-	topP: 0.95,        // More diverse responses
+	topK: 40, // Increased variety in token selection
+	topP: 0.95, // More diverse responses
 	maxOutputTokens: 2048, // Increased max token limit
 };
 
@@ -121,7 +117,6 @@ module.exports = {
 			} else if (message.content.trim()) {
 				await this.handleTextMessage(message);
 			}
-
 		} catch (error) {
 			await handleError(message, error);
 			Logger.error('Error in AI chat handler:', error);
@@ -159,7 +154,10 @@ module.exports = {
 			if (aiChannelCache.has(cacheKey)) {
 				const cachedData = aiChannelCache.get(cacheKey);
 				// Return if valid and matching channel
-				if (currentTime < cachedData.expiry && message.channel.id === cachedData.channelId) {
+				if (
+					currentTime < cachedData.expiry &&
+					message.channel.id === cachedData.channelId
+				) {
 					return cachedData.data;
 				}
 			}
@@ -175,7 +173,7 @@ module.exports = {
 			aiChannelCache.set(cacheKey, {
 				data: aiChannelDoc,
 				channelId: aiChannelDoc.channelId,
-				expiry: currentTime + CACHE_TTL
+				expiry: currentTime + CACHE_TTL,
 			});
 
 			return aiChannelDoc;
@@ -191,12 +189,14 @@ module.exports = {
 			const attachments = Array.from(message.attachments.values());
 
 			// Filter for supported image types
-			const imageAttachments = attachments.filter(att =>
-				att.contentType?.startsWith('image/') && att.size < 5000000 // 5MB limit
+			const imageAttachments = attachments.filter(
+				att => att.contentType?.startsWith('image/') && att.size < 5000000, // 5MB limit
 			);
 
 			if (imageAttachments.length === 0) {
-				await message.reply("I can only process images for now. This file type isn't supported.");
+				await message.reply(
+					"I can only process images for now. This file type isn't supported.",
+				);
 				return;
 			}
 
@@ -212,12 +212,17 @@ module.exports = {
 			}
 
 			// Remove thinking reaction
-			await message.reactions.cache.find(r => r.emoji.name === '🤔')?.remove().catch(() => { });
-
+			await message.reactions.cache
+				.find(r => r.emoji.name === '🤔')
+				?.remove()
+				.catch(() => {});
 		} catch (error) {
 			Logger.error('Error handling attachments:', error);
 			await handleError(message, error);
-			await message.reactions.cache.find(r => r.emoji.name === '🤔')?.remove().catch(() => { });
+			await message.reactions.cache
+				.find(r => r.emoji.name === '🤔')
+				?.remove()
+				.catch(() => {});
 		}
 	},
 
@@ -241,10 +246,7 @@ module.exports = {
 				? `${message.content}\n\nDescribe this image based on my question/comment above:`
 				: 'Describe what you see in this image:';
 
-			const result = await model.generateContent([
-				{ text: userPrompt },
-				imagePart,
-			]);
+			const result = await model.generateContent([{ text: userPrompt }, imagePart]);
 
 			const description = result.response.text();
 			await sendLongMessage(message, description);
@@ -302,7 +304,6 @@ Based on these images and the user's message, provide a unified response.`;
 				// Otherwise just send the individual descriptions
 				await sendLongMessage(message, descriptions.join('\n\n'));
 			}
-
 		} catch (error) {
 			Logger.error('Error handling multiple images:', error);
 			await handleError(message, error);
@@ -316,31 +317,35 @@ Based on these images and the user's message, provide a unified response.`;
 
 			// Check for guild context (required for database operations)
 			if (!message.guild) {
-				await message.reply("I can only chat in server channels, not in DMs.");
+				await message.reply('I can only chat in server channels, not in DMs.');
 				return;
 			}
 
 			// Get or initialize chat history, first try with both userId and guildId
 			let chatHistory = await ChatHistory.findOne({
 				userId: message.author.id,
-				guildId: message.guild.id
+				guildId: message.guild.id,
 			});
 
 			// If no history found with guildId, check for legacy records with only userId
 			if (!chatHistory) {
 				const legacyHistory = await ChatHistory.findOne({
-					userId: message.author.id
+					userId: message.author.id,
 				});
 
 				// If found legacy history, migrate it to include guildId
 				if (legacyHistory) {
-					Logger.log('AI', `Migrating chat history for user ${message.author.id} to include guildId`, 'info');
+					Logger.log(
+						'AI',
+						`Migrating chat history for user ${message.author.id} to include guildId`,
+						'info',
+					);
 
 					// Create a new history with both userId and guildId
 					chatHistory = await ChatHistory.create({
 						userId: message.author.id,
 						guildId: message.guild.id,
-						messages: legacyHistory.messages
+						messages: legacyHistory.messages,
 					});
 
 					// Optionally delete the old record without guildId
@@ -354,10 +359,7 @@ Based on these images and the user's message, provide a unified response.`;
 			let conversationHistory = chatHistory ? chatHistory.messages : [];
 
 			// Store user's current message
-			conversationHistory = this.storeUserMessage(
-				conversationHistory,
-				message.content,
-			);
+			conversationHistory = this.storeUserMessage(conversationHistory, message.content);
 
 			// Optimize conversation handling for Gemini
 			let geminiConversation = this.formatConversationForGemini(conversationHistory);
@@ -369,25 +371,23 @@ Based on these images and the user's message, provide a unified response.`;
 
 			while (retries <= MAX_RETRIES && !response) {
 				try {
-					response = await this.getAIResponse(
-						geminiConversation,
-						message.content,
-					);
+					response = await this.getAIResponse(geminiConversation, message.content);
 				} catch (error) {
 					retries++;
 					if (retries > MAX_RETRIES) throw error;
 
 					// If we hit an error, try with truncated history
-					Logger.log('AI', `Retry ${retries}: Truncating conversation history`, 'warning');
+					Logger.log(
+						'AI',
+						`Retry ${retries}: Truncating conversation history`,
+						'warning',
+					);
 					geminiConversation = geminiConversation.slice(-4); // Keep only last 2 exchanges
 				}
 			}
 
 			// Store AI's response in history
-			conversationHistory = this.storeModelResponse(
-				conversationHistory,
-				response,
-			);
+			conversationHistory = this.storeModelResponse(conversationHistory, response);
 
 			// Keep history within limits
 			conversationHistory = this.limitConversationHistory(
@@ -402,7 +402,7 @@ Based on these images and the user's message, provide a unified response.`;
 					userId: message.author.id,
 					guildId: message.guild.id,
 					messages: conversationHistory,
-					lastUpdated: new Date()
+					lastUpdated: new Date(),
 				},
 				{ upsert: true, new: true },
 			);
@@ -426,12 +426,12 @@ Based on these images and the user's message, provide a unified response.`;
 
 			const calculatedDelay = Math.min(
 				maxDelay,
-				Math.max(minDelay, (content.length / typingSpeed) * 60 * 1000)
+				Math.max(minDelay, (content.length / typingSpeed) * 60 * 1000),
 			);
 
 			// Send typing indicator
 			const typingInterval = setInterval(() => {
-				message.channel.sendTyping().catch(() => { });
+				message.channel.sendTyping().catch(() => {});
 			}, 9000); // Discord typing indicator lasts ~10 seconds
 
 			// Wait for calculated delay
@@ -454,7 +454,7 @@ Based on these images and the user's message, provide a unified response.`;
 			conversationHistory.push({
 				role: 'user',
 				content: content,
-				timestamp: Date.now()
+				timestamp: Date.now(),
 			});
 			return conversationHistory;
 		} catch (error) {
@@ -473,10 +473,12 @@ Based on these images and the user's message, provide a unified response.`;
 		} catch (error) {
 			Logger.error('Error formatting conversation for Gemini:', error);
 			// Return a minimal valid conversation to prevent failure
-			return [{
-				role: 'user',
-				parts: [{ text: 'Hello' }]
-			}];
+			return [
+				{
+					role: 'user',
+					parts: [{ text: 'Hello' }],
+				},
+			];
 		}
 	},
 
@@ -485,7 +487,7 @@ Based on these images and the user's message, provide a unified response.`;
 			conversationHistory.push({
 				role: 'model',
 				content: response,
-				timestamp: Date.now()
+				timestamp: Date.now(),
 			});
 			return conversationHistory;
 		} catch (error) {
@@ -550,10 +552,10 @@ Based on these images and the user's message, provide a unified response.`;
 				{
 					$set: {
 						messages: [],
-						lastUpdated: new Date()
-					}
+						lastUpdated: new Date(),
+					},
 				},
-				{ upsert: true, new: true }
+				{ upsert: true, new: true },
 			);
 
 			Logger.log('AI', `Cleared chat history for user ${userId} in guild ${guildId}`, 'info');
@@ -562,7 +564,7 @@ Based on these images and the user's message, provide a unified response.`;
 			Logger.error('Error clearing user history:', error);
 			return false;
 		}
-	}
+	},
 };
 
 // Improved utility function to send long messages with better chunking
@@ -570,7 +572,9 @@ async function sendLongMessage(message, content) {
 	try {
 		// Handle empty responses
 		if (!content || content.trim() === '') {
-			await message.reply("I don't have a good response for that. Can you try asking something else?");
+			await message.reply(
+				"I don't have a good response for that. Can you try asking something else?",
+			);
 			return;
 		}
 
@@ -584,7 +588,7 @@ async function sendLongMessage(message, content) {
 
 		// For longer content, split intelligently at paragraph or sentence boundaries
 		const chunks = [];
-		let currentChunk = "";
+		let currentChunk = '';
 
 		// Split by paragraphs first
 		const paragraphs = content.split(/\n\s*\n/);
@@ -592,14 +596,14 @@ async function sendLongMessage(message, content) {
 		for (const paragraph of paragraphs) {
 			// If paragraph fits in current chunk, add it
 			if (currentChunk.length + paragraph.length + 2 <= maxLength) {
-				currentChunk += (currentChunk ? "\n\n" : "") + paragraph;
+				currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
 			}
 			// If paragraph alone exceeds max length, split by sentences
 			else if (paragraph.length > maxLength) {
 				// If we have content in current chunk, push it
 				if (currentChunk) {
 					chunks.push(currentChunk);
-					currentChunk = "";
+					currentChunk = '';
 				}
 
 				// Split paragraph by sentences
@@ -608,14 +612,14 @@ async function sendLongMessage(message, content) {
 				for (const sentence of sentences) {
 					// If sentence fits in current chunk, add it
 					if (currentChunk.length + sentence.length + 1 <= maxLength) {
-						currentChunk += (currentChunk ? " " : "") + sentence;
+						currentChunk += (currentChunk ? ' ' : '') + sentence;
 					}
 					// If sentence alone exceeds max length, split by words
 					else if (sentence.length > maxLength) {
 						// If we have content in current chunk, push it
 						if (currentChunk) {
 							chunks.push(currentChunk);
-							currentChunk = "";
+							currentChunk = '';
 						}
 
 						// Split sentence by strict character limit
@@ -655,7 +659,9 @@ async function sendLongMessage(message, content) {
 		Logger.error('Error sending long message:', error);
 		// Try simpler approach on failure
 		try {
-			await message.reply("I had a response, but couldn't send it properly. Let me try a simpler version...");
+			await message.reply(
+				"I had a response, but couldn't send it properly. Let me try a simpler version...",
+			);
 			await message.channel.send(content.slice(0, 2000));
 		} catch (fallbackError) {
 			Logger.error('Error in fallback message sending:', fallbackError);

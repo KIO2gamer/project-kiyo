@@ -7,36 +7,36 @@ const path = require('path');
 const activities = [
 	{
 		name: '🎮 Exploring new worlds',
-		type: ActivityType.Playing
+		type: ActivityType.Playing,
 	},
 	{
 		name: '🎲 Rolling the dice',
-		type: ActivityType.Playing
+		type: ActivityType.Playing,
 	},
 	{
 		name: '👾 Conquering challenges',
-		type: ActivityType.Playing
+		type: ActivityType.Playing,
 	},
 	{
 		name: '🎧 music with the team',
-		type: ActivityType.Listening
+		type: ActivityType.Listening,
 	},
 	{
 		name: '🎤 to your requests',
-		type: ActivityType.Listening
+		type: ActivityType.Listening,
 	},
 	{
 		name: '👀 over the server',
-		type: ActivityType.Watching
+		type: ActivityType.Watching,
 	},
 	{
 		name: '🛡️ Guarding your community',
-		type: ActivityType.Custom
+		type: ActivityType.Custom,
 	},
 	{
 		name: '🎬 New features coming soon!',
-		type: ActivityType.Custom
-	}
+		type: ActivityType.Custom,
+	},
 ];
 
 // Define available bot statuses
@@ -48,11 +48,11 @@ let commandRefresher = null;
 
 /**
  * Sets the next activity in the rotation
- * 
+ *
  * @param {Client} client - The Discord.js client
  * @returns {Promise<void>}
  */
-const setNextActivity = async (client) => {
+const setNextActivity = async client => {
 	try {
 		// Get the activity from our enhanced activities array
 		const activity = activities[activityIndex];
@@ -61,42 +61,37 @@ const setNextActivity = async (client) => {
 		const randomStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
 		await client.user.setPresence({
-			activities: [{
-				name: activity.name,
-				type: activity.type,
-				url: activity.url // Optional, only used for certain activity types
-			}],
+			activities: [
+				{
+					name: activity.name,
+					type: activity.type,
+					url: activity.url, // Optional, only used for certain activity types
+				},
+			],
 			status: randomStatus,
 		});
 
 		activityIndex = (activityIndex + 1) % activities.length;
 	} catch (error) {
-		Logger.log(
-			'PRESENCE',
-			`Error updating bot activity: ${error.message}`,
-			'error',
-		);
+		Logger.log('PRESENCE', `Error updating bot activity: ${error.message}`, 'error');
 	}
 };
 
 /**
  * Log bot statistics to the console
- * 
+ *
  * @param {Client} client - The Discord.js client
  */
-const logBotStatistics = (client) => {
+const logBotStatistics = client => {
 	if (typeof Logger.table === 'function') {
 		const stats = {
 			Username: client.user.tag,
 			ID: client.user.id,
 			Guilds: client.guilds.cache.size,
 			Channels: client.channels.cache.size,
-			Users: client.guilds.cache.reduce(
-				(acc, guild) => acc + (guild.memberCount || 0),
-				0,
-			),
+			Users: client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount || 0), 0),
 			Commands: client.commands.size,
-			Uptime: formatUptime(client.uptime)
+			Uptime: formatUptime(client.uptime),
 		};
 		Logger.table(stats, 'Bot Statistics');
 	}
@@ -104,11 +99,11 @@ const logBotStatistics = (client) => {
 
 /**
  * Format uptime in a human-readable format
- * 
+ *
  * @param {number} uptime - Uptime in milliseconds
  * @returns {string} Formatted uptime
  */
-const formatUptime = (uptime) => {
+const formatUptime = uptime => {
 	if (!uptime) return '0s';
 
 	const seconds = Math.floor(uptime / 1000) % 60;
@@ -127,10 +122,10 @@ const formatUptime = (uptime) => {
 
 /**
  * Initialize development mode features
- * 
+ *
  * @param {Client} client - The Discord.js client
  */
-const initDevelopmentMode = (client) => {
+const initDevelopmentMode = client => {
 	const isDevelopment = process.env.NODE_ENV !== 'production';
 	if (!isDevelopment) return;
 
@@ -146,7 +141,7 @@ const initDevelopmentMode = (client) => {
 		client.commands.set('reload', {
 			data: {
 				name: 'reload',
-				description: 'Reload a command (development only)'
+				description: 'Reload a command (development only)',
 			},
 			permissions: ['BOT_OWNER'],
 			async execute(interaction) {
@@ -157,22 +152,26 @@ const initDevelopmentMode = (client) => {
 					content: success
 						? `Command \`${commandName}\` was reloaded successfully!`
 						: `Failed to reload command \`${commandName}\`.`,
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
-			}
+			},
 		});
 	}
 };
 
 /**
  * Optimize the gateway connection
- * 
+ *
  * @param {Client} client - The Discord.js client
  */
-const optimizeGateway = (client) => {
+const optimizeGateway = client => {
 	// Log shard information if using sharding
 	if (client.shard) {
-		Logger.log('SHARDING', `Running on shard ${client.shard.ids.join(', ')} of ${client.shard.count}`, 'info');
+		Logger.log(
+			'SHARDING',
+			`Running on shard ${client.shard.ids.join(', ')} of ${client.shard.count}`,
+			'info',
+		);
 	}
 
 	// Set a larger guild member cache limit for large guilds
@@ -188,7 +187,7 @@ const optimizeGateway = (client) => {
 module.exports = {
 	name: 'ready',
 	once: true,
-	execute: async (client) => {
+	execute: async client => {
 		if (!client.user) {
 			Logger.log('BOT', 'Bot is not ready!', 'error');
 			return;
@@ -212,11 +211,7 @@ module.exports = {
 
 		// Start activity cycling (every 2.5 minutes instead of 10 seconds)
 		activityInterval = setInterval(() => setNextActivity(client), 150000);
-		Logger.log(
-			'PRESENCE',
-			'Activity cycling started (every 2.5 minutes)',
-			'info',
-		);
+		Logger.log('PRESENCE', 'Activity cycling started (every 2.5 minutes)', 'info');
 
 		// Schedule periodic statistics logging (every hour)
 		setInterval(() => {

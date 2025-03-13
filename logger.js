@@ -20,10 +20,7 @@ class Logger {
 
 	// Format the timestamp with more legible format (HH:MM:SS)
 	static #formatTimestamp() {
-		return new Date().toLocaleTimeString(
-			'en-US',
-			Logger.#config.dateFormatOptions,
-		);
+		return new Date().toLocaleTimeString('en-US', Logger.#config.dateFormatOptions);
 	}
 
 	// Generic logging method

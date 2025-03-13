@@ -11,13 +11,13 @@ class CommandHandler {
 		this.cooldowns = new Collection();
 		this.usageStats = {
 			commandsUsed: 0,
-			categoryStats: new Collection()
+			categoryStats: new Collection(),
 		};
 	}
 
 	/**
 	 * Initialize the command handler with the client
-	 * 
+	 *
 	 * @param {Client} client - The Discord.js client
 	 * @returns {CommandHandler} The command handler instance
 	 */
@@ -27,7 +27,7 @@ class CommandHandler {
 
 	/**
 	 * Check if a user is on cooldown for a command
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 * @param {Object} command - The command object
 	 * @returns {boolean|number} False if not on cooldown, or time remaining if on cooldown
@@ -61,7 +61,7 @@ class CommandHandler {
 
 	/**
 	 * Check if the user has the required permissions to use the command
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 * @param {Object} command - The command object
 	 * @returns {boolean} Whether the user has the required permissions
@@ -79,13 +79,16 @@ class CommandHandler {
 		}
 
 		// Check for Discord permissions
-		if (command.permissions.some(perm => Object.keys(PermissionsBitField.Flags).includes(perm))) {
+		if (
+			command.permissions.some(perm => Object.keys(PermissionsBitField.Flags).includes(perm))
+		) {
 			const memberPerms = interaction.memberPermissions;
 			if (!memberPerms) return false;
 
-			const missingPerms = command.permissions.filter(perm =>
-				Object.keys(PermissionsBitField.Flags).includes(perm) &&
-				!memberPerms.has(PermissionsBitField.Flags[perm])
+			const missingPerms = command.permissions.filter(
+				perm =>
+					Object.keys(PermissionsBitField.Flags).includes(perm) &&
+					!memberPerms.has(PermissionsBitField.Flags[perm]),
 			);
 
 			if (missingPerms.length > 0) {
@@ -98,7 +101,7 @@ class CommandHandler {
 
 	/**
 	 * Track command usage statistics
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 * @param {Object} command - The command object
 	 */
@@ -113,7 +116,7 @@ class CommandHandler {
 		}
 		this.usageStats.categoryStats.set(
 			category,
-			this.usageStats.categoryStats.get(category) + 1
+			this.usageStats.categoryStats.get(category) + 1,
 		);
 
 		// Track command history
@@ -130,8 +133,8 @@ class CommandHandler {
 			timestamp: Date.now(),
 			options: Array.from(interaction.options?.data || []).map(opt => ({
 				name: opt.name,
-				value: opt.value
-			}))
+				value: opt.value,
+			})),
 		});
 
 		// Keep only last 1000 commands
@@ -142,7 +145,7 @@ class CommandHandler {
 
 	/**
 	 * Execute a command with all necessary checks and error handling
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 * @returns {Promise<void>}
 	 */
@@ -163,7 +166,7 @@ class CommandHandler {
 		if (cooldownResult !== false) {
 			await interaction.reply({
 				content: `Please wait ${cooldownResult.toFixed(1)} more seconds before reusing the \`${commandName}\` command.`,
-				flags: MessageFlags.Ephemeral
+				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -172,7 +175,7 @@ class CommandHandler {
 		if (!this.checkPermissions(interaction, command)) {
 			await interaction.reply({
 				content: 'You do not have permission to use this command.',
-				flags: MessageFlags.Ephemeral
+				flags: MessageFlags.Ephemeral,
 			});
 			return;
 		}
@@ -187,7 +190,7 @@ class CommandHandler {
 				if (validationResult !== true) {
 					await interaction.reply({
 						content: validationResult || 'Command validation failed.',
-						flags: MessageFlags.Ephemeral
+						flags: MessageFlags.Ephemeral,
 					});
 					return;
 				}
@@ -195,7 +198,6 @@ class CommandHandler {
 
 			// Execute the command
 			await command.execute(interaction);
-
 		} catch (error) {
 			// Handle errors with our specialized error handler
 			handleError(interaction, `Error executing ${commandName}:`, error);
@@ -204,15 +206,15 @@ class CommandHandler {
 
 	/**
 	 * Get command usage statistics
-	 * 
+	 *
 	 * @returns {Object} Command usage statistics
 	 */
 	getUsageStats() {
 		return {
 			total: this.usageStats.commandsUsed,
-			byCategory: Object.fromEntries(this.usageStats.categoryStats)
+			byCategory: Object.fromEntries(this.usageStats.categoryStats),
 		};
 	}
 }
 
-module.exports = CommandHandler; 
+module.exports = CommandHandler;

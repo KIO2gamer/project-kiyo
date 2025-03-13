@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_preview')
 		.setDescription('Preview a custom command')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('name')
 				.setDescription('The name of the command to preview')
@@ -17,10 +17,7 @@ module.exports = {
 	category: 'utility',
 	description_full: "Previews a custom command stored in the bot's database.",
 	usage: '/custom_preview <name_or_alias>',
-	examples: [
-		'/custom_preview hello',
-		'/custom_preview greet',
-	],
+	examples: ['/custom_preview hello', '/custom_preview greet'],
 	/**
 	 * Executes the custom command preview interaction.
 	 *
@@ -40,7 +37,7 @@ module.exports = {
 					interaction,
 					new Error('No command name provided'),
 					'VALIDATION',
-					'Please provide a command name to preview.'
+					'Please provide a command name to preview.',
 				);
 				return;
 			}
@@ -57,15 +54,16 @@ module.exports = {
 					interaction,
 					new Error('Command not found'),
 					'VALIDATION',
-					`Custom command or alias "${commandNameOrAlias}" not found.`
+					`Custom command or alias "${commandNameOrAlias}" not found.`,
 				);
 				return;
 			}
 
 			// Format message preview
-			const messagePreview = customCommand.message.length > 1000
-				? customCommand.message.substring(0, 997) + '...'
-				: customCommand.message;
+			const messagePreview =
+				customCommand.message.length > 1000
+					? customCommand.message.substring(0, 997) + '...'
+					: customCommand.message;
 
 			// Create embed
 			const embed = new EmbedBuilder()
@@ -93,9 +91,7 @@ module.exports = {
 				.setTimestamp();
 
 			// Add usage examples
-			const usageExamples = [
-				`\`/custom_run name:${customCommand.name}\``,
-			];
+			const usageExamples = [`\`/custom_run name:${customCommand.name}\``];
 
 			if (customCommand.alias_name) {
 				usageExamples.push(`\`/custom_run name:${customCommand.alias_name}\``);
@@ -116,14 +112,14 @@ module.exports = {
 					interaction,
 					error,
 					'DATABASE',
-					'Failed to fetch the custom command from the database.'
+					'Failed to fetch the custom command from the database.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while previewing the custom command.'
+					'An error occurred while previewing the custom command.',
 				);
 			}
 		}

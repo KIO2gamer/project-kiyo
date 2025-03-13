@@ -2,7 +2,7 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	PermissionFlagsBits,
-	Collection
+	Collection,
 } = require('discord.js');
 const { handleError } = require('../../utils/errorHandler');
 const {
@@ -14,11 +14,13 @@ const {
 const { MessageFlags } = require('discord.js');
 
 function formatPermissions(permissions) {
-	return Object.entries(PermissionFlagsBits)
-		.filter(([_, flag]) => permissions.has(flag))
-		.map(([name]) => name.replace(/_/g, ' ').toLowerCase())
-		.map(perm => `\`${perm}\``)
-		.join(', ') || 'None';
+	return (
+		Object.entries(PermissionFlagsBits)
+			.filter(([_, flag]) => permissions.has(flag))
+			.map(([name]) => name.replace(/_/g, ' ').toLowerCase())
+			.map(perm => `\`${perm}\``)
+			.join(', ') || 'None'
+	);
 }
 
 function formatTimestamp(timestamp) {
@@ -26,13 +28,10 @@ function formatTimestamp(timestamp) {
 }
 
 module.exports = {
-	description_full: 'Displays detailed information about a role, including its permissions, color, member count, position in hierarchy, and more.',
+	description_full:
+		'Displays detailed information about a role, including its permissions, color, member count, position in hierarchy, and more.',
 	usage: '/roleinfo role:@role',
-	examples: [
-		'/roleinfo role:@Moderator',
-		'/roleinfo role:@Member',
-		'/roleinfo role:@VIP'
-	],
+	examples: ['/roleinfo role:@Moderator', '/roleinfo role:@Member', '/roleinfo role:@VIP'],
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('roleinfo')
@@ -41,7 +40,7 @@ module.exports = {
 			option
 				.setName('role')
 				.setDescription('The role to get information about')
-				.setRequired(true)
+				.setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -55,7 +54,7 @@ module.exports = {
 					interaction,
 					new Error('Role not found'),
 					'VALIDATION',
-					'Could not find the specified role.'
+					'Could not find the specified role.',
 				);
 				return;
 			}
@@ -67,7 +66,7 @@ module.exports = {
 					.map(member => ({
 						tag: member.user.tag,
 						joinedAt: member.joinedTimestamp,
-						isBot: member.user.bot
+						isBot: member.user.bot,
 					}));
 
 				// Calculate member statistics
@@ -78,7 +77,9 @@ module.exports = {
 					online: role.members.filter(m => m.presence?.status === 'online').size,
 					idle: role.members.filter(m => m.presence?.status === 'idle').size,
 					dnd: role.members.filter(m => m.presence?.status === 'dnd').size,
-					offline: role.members.filter(m => !m.presence || m.presence.status === 'offline').size
+					offline: role.members.filter(
+						m => !m.presence || m.presence.status === 'offline',
+					).size,
 				};
 
 				// Get role position info
@@ -105,9 +106,9 @@ module.exports = {
 								`**Mentionable:** ${role.mentionable ? '✅' : '❌'}`,
 								`**Hoisted:** ${role.hoist ? '✅' : '❌'}`,
 								`**Managed:** ${role.managed ? '✅ (Integration)' : '❌'}`,
-								`**Icon:** ${role.icon ? `[View](${role.iconURL()})` : 'None'}`
+								`**Icon:** ${role.icon ? `[View](${role.iconURL()})` : 'None'}`,
 							].join('\n'),
-							inline: false
+							inline: false,
 						},
 						{
 							name: '📈 Position',
@@ -115,9 +116,9 @@ module.exports = {
 								`**Absolute:** ${role.position}/${totalRoles}`,
 								`**From Top:** #${positionFromTop}`,
 								`**Percentile:** Top ${positionPercent}%`,
-								`**Displayed Separately:** ${role.hoist ? 'Yes' : 'No'}`
+								`**Displayed Separately:** ${role.hoist ? 'Yes' : 'No'}`,
 							].join('\n'),
-							inline: true
+							inline: true,
 						},
 						{
 							name: '👥 Member Statistics',
@@ -129,10 +130,10 @@ module.exports = {
 								`Online: ${memberStats.online}`,
 								`Idle: ${memberStats.idle}`,
 								`DND: ${memberStats.dnd}`,
-								`Offline: ${memberStats.offline}`
+								`Offline: ${memberStats.offline}`,
 							].join('\n'),
-							inline: true
-						}
+							inline: true,
+						},
 					);
 
 				// Add permissions
@@ -140,7 +141,7 @@ module.exports = {
 					embed.addFields({
 						name: i === 0 ? '🔒 Permissions' : '🔒 Permissions (continued)',
 						value: permissionParts[i],
-						inline: false
+						inline: false,
 					});
 				}
 
@@ -154,36 +155,42 @@ module.exports = {
 						embed.addFields({
 							name: '📝 Member List',
 							value: memberList,
-							inline: false
+							inline: false,
 						});
 					} else {
 						// Show first 10 and last 5 members
-						const firstMembers = members.slice(0, 10)
+						const firstMembers = members
+							.slice(0, 10)
 							.map(m => `• ${m.tag}${m.isBot ? ' 🤖' : ''}`)
 							.join('\n');
-						const lastMembers = members.slice(-5)
+						const lastMembers = members
+							.slice(-5)
 							.map(m => `• ${m.tag}${m.isBot ? ' 🤖' : ''}`)
 							.join('\n');
 
-						embed.addFields({
-							name: '📝 First 10 Members',
-							value: firstMembers,
-							inline: true
-						}, {
-							name: '📝 Last 5 Members',
-							value: lastMembers,
-							inline: true
-						});
+						embed.addFields(
+							{
+								name: '📝 First 10 Members',
+								value: firstMembers,
+								inline: true,
+							},
+							{
+								name: '📝 Last 5 Members',
+								value: lastMembers,
+								inline: true,
+							},
+						);
 					}
 				}
 
 				// Add integration info if role is managed
 				if (role.managed) {
-					const integration = await interaction.guild.fetchIntegrations()
+					const integration = await interaction.guild
+						.fetchIntegrations()
 						.then(integrations =>
-							integrations.find(i =>
-								i.application && i.role && i.role.id === role.id
-							)
+							integrations.find(
+								i => i.application && i.role && i.role.id === role.id,
+							),
 						)
 						.catch(() => null);
 
@@ -193,42 +200,49 @@ module.exports = {
 							value: [
 								`**Type:** ${integration.type}`,
 								`**Application:** ${integration.application.name}`,
-								integration.account ? `**Account:** ${integration.account.name}` : null,
-								integration.syncedAt ? `**Last Synced:** <t:${Math.floor(integration.syncedAt.getTime() / 1000)}:R>` : null
-							].filter(Boolean).join('\n'),
-							inline: false
+								integration.account
+									? `**Account:** ${integration.account.name}`
+									: null,
+								integration.syncedAt
+									? `**Last Synced:** <t:${Math.floor(integration.syncedAt.getTime() / 1000)}:R>`
+									: null,
+							]
+								.filter(Boolean)
+								.join('\n'),
+							inline: false,
 						});
 					}
 				}
 
-				embed.setFooter({
-					text: `Requested by ${interaction.user.tag}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-				}).setTimestamp();
+				embed
+					.setFooter({
+						text: `Requested by ${interaction.user.tag}`,
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+					})
+					.setTimestamp();
 
 				await interaction.editReply({ embeds: [embed] });
-
 			} catch (error) {
 				if (error.code === 50001) {
 					await handleError(
 						interaction,
 						error,
 						'PERMISSION',
-						'I do not have permission to view role information.'
+						'I do not have permission to view role information.',
 					);
 				} else if (error.code === 50013) {
 					await handleError(
 						interaction,
 						error,
 						'PERMISSION',
-						'I do not have permission to view members of this role.'
+						'I do not have permission to view members of this role.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'DATA_COLLECTION',
-						'Failed to collect some role information. Some details may be incomplete.'
+						'Failed to collect some role information. Some details may be incomplete.',
 					);
 				}
 			}
@@ -237,7 +251,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving role information.'
+				'An error occurred while retrieving role information.',
 			);
 		}
 	},

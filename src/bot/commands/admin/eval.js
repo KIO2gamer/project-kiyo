@@ -51,11 +51,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('eval')
 		.setDescription('Evaluates JavaScript code.')
-		.addStringOption((option) =>
-			option
-				.setName('code')
-				.setDescription('The code to evaluate')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('code').setDescription('The code to evaluate').setRequired(true),
 		),
 	async execute(interaction) {
 		// Check if the user has permission to use this command
@@ -63,9 +60,7 @@ module.exports = {
 			!allowedUsers.includes(interaction.user.id) &&
 			!(
 				interaction.member.roles.cache.size > 0 &&
-				interaction.member.roles.cache.some((role) =>
-					allowedRoles.includes(role.id),
-				)
+				interaction.member.roles.cache.some(role => allowedRoles.includes(role.id))
 			)
 		) {
 			return interaction.reply({

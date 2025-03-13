@@ -19,28 +19,28 @@ function formatUptime(seconds) {
 		{
 			name: 'day',
 			value: Math.floor(seconds / (3600 * 24)),
-			suffix: (v) => (v === 1 ? 'd' : 'd'),
+			suffix: v => (v === 1 ? 'd' : 'd'),
 		},
 		{
 			name: 'hour',
 			value: Math.floor((seconds % (3600 * 24)) / 3600),
-			suffix: (v) => (v === 1 ? 'h' : 'h'),
+			suffix: v => (v === 1 ? 'h' : 'h'),
 		},
 		{
 			name: 'minute',
 			value: Math.floor((seconds % 3600) / 60),
-			suffix: (v) => (v === 1 ? 'm' : 'm'),
+			suffix: v => (v === 1 ? 'm' : 'm'),
 		},
 		{
 			name: 'second',
 			value: Math.floor(seconds % 60),
-			suffix: (v) => (v === 1 ? 's' : 's'),
+			suffix: v => (v === 1 ? 's' : 's'),
 		},
 	];
 
 	const filteredUnits = units
-		.filter((unit) => unit.value > 0)
-		.map((unit) => `${unit.value}${unit.suffix(unit.value)}`);
+		.filter(unit => unit.value > 0)
+		.map(unit => `${unit.value}${unit.suffix(unit.value)}`);
 
 	return filteredUnits.join(' ');
 }

@@ -8,53 +8,50 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('embed')
 		.setDescription('Creates a customizable embed message.')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('title')
 				.setDescription('The title of the embed')
 				.setRequired(true)
 				.setMaxLength(256),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('description')
 				.setDescription('The description of the embed')
 				.setRequired(true)
 				.setMaxLength(4096),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('color')
 				.setDescription('The color of the embed in HEX (e.g., #FF5733)')
 				.setRequired(false),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('footer')
 				.setDescription('The footer text of the embed')
 				.setRequired(false)
 				.setMaxLength(2048),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('thumbnail')
 				.setDescription('The URL of the thumbnail image')
 				.setRequired(false),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('author')
 				.setDescription('The author of the embed')
 				.setRequired(false)
 				.setMaxLength(256),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('image')
-				.setDescription('The URL of the image')
-				.setRequired(false),
+		.addStringOption(option =>
+			option.setName('image').setDescription('The URL of the image').setRequired(false),
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option
 				.setName('timestamp')
 				.setDescription('Whether to include a timestamp')

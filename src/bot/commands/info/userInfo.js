@@ -35,10 +35,16 @@ function formatStatus(status) {
 function getActivityName(activity) {
 	if (!activity) return 'Unknown Activity';
 
-	const timestamps = activity.timestamps ? {
-		start: activity.timestamps.start ? `<t:${Math.floor(activity.timestamps.start / 1000)}:R>` : null,
-		end: activity.timestamps.end ? `<t:${Math.floor(activity.timestamps.end / 1000)}:R>` : null
-	} : null;
+	const timestamps = activity.timestamps
+		? {
+				start: activity.timestamps.start
+					? `<t:${Math.floor(activity.timestamps.start / 1000)}:R>`
+					: null,
+				end: activity.timestamps.end
+					? `<t:${Math.floor(activity.timestamps.end / 1000)}:R>`
+					: null,
+			}
+		: null;
 
 	let details = [];
 	if (activity.details) details.push(activity.details);
@@ -133,11 +139,11 @@ function generateUserFields(user, member, fetchedUser) {
 	// Format client status with emojis
 	const clientStatusText = Object.keys(clientStatus).length
 		? Object.entries(clientStatus)
-			.map(
-				([platform, status]) =>
-					`${getStatusEmoji(platform)} ${platform}: ${formatStatus(status)}`,
-			)
-			.join('\n')
+				.map(
+					([platform, status]) =>
+						`${getStatusEmoji(platform)} ${platform}: ${formatStatus(status)}`,
+				)
+				.join('\n')
 		: 'No devices active';
 
 	const fields = [
@@ -149,10 +155,14 @@ function generateUserFields(user, member, fetchedUser) {
 				`**Display Name:** ${member.displayName}${member.nickname ? ` (${member.nickname})` : ''}`,
 				`**ID:** \`${user.id}\``,
 				`**Type:** ${user.bot ? '🤖 Bot' : '👤 Human'}`,
-				fetchedUser.accentColor ? `**Accent Color:** ${fetchedUser.accentColor.toString(16).toUpperCase()}` : null,
+				fetchedUser.accentColor
+					? `**Accent Color:** ${fetchedUser.accentColor.toString(16).toUpperCase()}`
+					: null,
 				`**Profile URL:** [Link](https://discord.com/users/${user.id})`,
-			].filter(Boolean).join('\n'),
-			inline: false
+			]
+				.filter(Boolean)
+				.join('\n'),
+			inline: false,
 		},
 
 		// Section 2: Badges and Boosts
@@ -160,9 +170,13 @@ function generateUserFields(user, member, fetchedUser) {
 			name: '🏆 Badges & Boosts',
 			value: [
 				`**Badges:**\n${formatUserBadges(user)}`,
-				member.premiumSince ? `**Server Booster:** Level ${member.premiumValue || 1}` : null,
-			].filter(Boolean).join('\n\n'),
-			inline: false
+				member.premiumSince
+					? `**Server Booster:** Level ${member.premiumValue || 1}`
+					: null,
+			]
+				.filter(Boolean)
+				.join('\n\n'),
+			inline: false,
 		},
 
 		// Section 3: Dates
@@ -176,9 +190,11 @@ function generateUserFields(user, member, fetchedUser) {
 					: null,
 				member.communicationDisabledUntil
 					? `**Timeout Until:** <t:${Math.floor(member.communicationDisabledUntil.getTime() / 1000)}:F> (<t:${Math.floor(member.communicationDisabledUntil.getTime() / 1000)}:R>)`
-					: null
-			].filter(Boolean).join('\n'),
-			inline: false
+					: null,
+			]
+				.filter(Boolean)
+				.join('\n'),
+			inline: false,
 		},
 	];
 
@@ -189,23 +205,24 @@ function generateUserFields(user, member, fetchedUser) {
 			value: [
 				`**Status:** ${formatStatus(presence.status || 'offline')}`,
 				`**Devices:**\n${clientStatusText}`,
-				presence.activities?.find((a) => a.type === ActivityType.Custom)?.state
-					? `**Custom Status:** ${presence.activities.find((a) => a.type === ActivityType.Custom).state}`
+				presence.activities?.find(a => a.type === ActivityType.Custom)?.state
+					? `**Custom Status:** ${presence.activities.find(a => a.type === ActivityType.Custom).state}`
 					: null,
-			].filter(Boolean).join('\n'),
-			inline: false
+			]
+				.filter(Boolean)
+				.join('\n'),
+			inline: false,
 		});
 	}
 
 	// Section 5: Activities (if any)
-	const nonCustomActivities = presence.activities?.filter((a) => a.type !== ActivityType.Custom) || [];
+	const nonCustomActivities =
+		presence.activities?.filter(a => a.type !== ActivityType.Custom) || [];
 	if (nonCustomActivities.length > 0) {
 		fields.push({
 			name: '🎯 Activities',
-			value: nonCustomActivities
-				.map(getActivityName)
-				.join('\n\n'),
-			inline: false
+			value: nonCustomActivities.map(getActivityName).join('\n\n'),
+			inline: false,
 		});
 	}
 
@@ -213,7 +230,7 @@ function generateUserFields(user, member, fetchedUser) {
 	fields.push({
 		name: '🛠️ Key Permissions',
 		value: getKeyPermissions(member),
-		inline: false
+		inline: false,
 	});
 
 	// Section 7: Roles
@@ -221,14 +238,14 @@ function generateUserFields(user, member, fetchedUser) {
 	fields.push({
 		name: `📋 Roles [${member.roles.cache.size - 1}]`,
 		value: rolesText.text,
-		inline: false
+		inline: false,
 	});
 
 	if (rolesText.continuation) {
 		fields.push({
 			name: '📋 Roles (continued)',
 			value: rolesText.continuation,
-			inline: false
+			inline: false,
 		});
 	}
 
@@ -240,30 +257,26 @@ function getRolesText(member) {
 	if (member.roles.cache.size <= 1) return { text: 'None' };
 
 	const roles = member.roles.cache
-		.filter((role) => role.id !== member.guild.id)
+		.filter(role => role.id !== member.guild.id)
 		.sort((a, b) => b.position - a.position);
 
-	const formatRole = (role) =>
+	const formatRole = role =>
 		`${role.toString()}${role.color ? ` \`#${role.color.toString(16).toUpperCase()}\`` : ''}`;
 
 	if (roles.size <= 15) {
 		return {
-			text: roles.map(formatRole).join(', ') || 'None'
+			text: roles.map(formatRole).join(', ') || 'None',
 		};
 	}
 
 	// Split roles into two parts if there are too many
 	const firstPart = roles.first(10).map(formatRole).join(', ');
-	const secondPart = Array.from(roles.values())
-		.slice(10, 20)
-		.map(formatRole)
-		.join(', ');
+	const secondPart = Array.from(roles.values()).slice(10, 20).map(formatRole).join(', ');
 
 	return {
 		text: `${firstPart}\n*...and ${roles.size - 10} more roles*`,
-		continuation: roles.size > 20
-			? `${secondPart}\n*...and ${roles.size - 20} more roles*`
-			: secondPart
+		continuation:
+			roles.size > 20 ? `${secondPart}\n*...and ${roles.size - 20} more roles*` : secondPart,
 	};
 }
 
@@ -276,7 +289,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('user_info')
 		.setDescription('Displays detailed information about a user.')
-		.addUserOption((option) =>
+		.addUserOption(option =>
 			option
 				.setName('target')
 				.setDescription('The user to get information about')
@@ -313,10 +326,12 @@ module.exports = {
 				embed.addFields(generateUserFields(user, member, fetchedUser));
 
 				// Add footer
-				embed.setFooter({
-					text: `Requested by ${interaction.user.tag} | ID: ${user.id}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-				}).setTimestamp();
+				embed
+					.setFooter({
+						text: `Requested by ${interaction.user.tag} | ID: ${user.id}`,
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+					})
+					.setTimestamp();
 
 				// Create buttons for additional actions
 				const row = new ActionRowBuilder().addComponents(
@@ -332,35 +347,34 @@ module.exports = {
 					new ButtonBuilder()
 						.setLabel('Profile')
 						.setStyle(ButtonStyle.Link)
-						.setURL(`https://discord.com/users/${user.id}`)
+						.setURL(`https://discord.com/users/${user.id}`),
 				);
 
 				await interaction.editReply({
 					embeds: [embed],
-					components: [row]
+					components: [row],
 				});
-
 			} catch (error) {
 				if (error.code === 10007) {
 					await handleError(
 						interaction,
 						error,
 						'USER_NOT_FOUND',
-						'That user is not a member of this server.'
+						'That user is not a member of this server.',
 					);
 				} else if (error.code === 50001) {
 					await handleError(
 						interaction,
 						error,
 						'PERMISSION',
-						'I do not have permission to view member information.'
+						'I do not have permission to view member information.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'DATA_COLLECTION',
-						'Failed to collect some user information. Some details may be incomplete.'
+						'Failed to collect some user information. Some details may be incomplete.',
 					);
 				}
 			}
@@ -369,7 +383,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving user information.'
+				'An error occurred while retrieving user information.',
 			);
 		}
 	},

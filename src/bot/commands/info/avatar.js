@@ -11,17 +11,14 @@ module.exports = {
 		'/avatar',
 		'/avatar target:@username',
 		'/avatar target:@username size:1024 format:png',
-		'/avatar size:2048 format:webp'
+		'/avatar size:2048 format:webp',
 	],
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('avatar')
 		.setDescription('Get the avatar of a user')
 		.addUserOption(option =>
-			option
-				.setName('target')
-				.setDescription("The user's avatar to show")
-				.setRequired(false)
+			option.setName('target').setDescription("The user's avatar to show").setRequired(false),
 		)
 		.addIntegerOption(option =>
 			option
@@ -37,8 +34,8 @@ module.exports = {
 					{ name: '512', value: 512 },
 					{ name: '1024', value: 1024 },
 					{ name: '2048', value: 2048 },
-					{ name: '4096', value: 4096 }
-				)
+					{ name: '4096', value: 4096 },
+				),
 		)
 		.addStringOption(option =>
 			option
@@ -48,8 +45,8 @@ module.exports = {
 				.addChoices(
 					{ name: 'PNG', value: 'png' },
 					{ name: 'JPEG', value: 'jpg' },
-					{ name: 'WebP', value: 'webp' }
-				)
+					{ name: 'WebP', value: 'webp' },
+				),
 		),
 
 	/**
@@ -81,7 +78,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid user'),
 						'VALIDATION',
-						'The specified user could not be found.'
+						'The specified user could not be found.',
 					);
 					return;
 				}
@@ -102,7 +99,7 @@ module.exports = {
 					avatarURLs[fmt] = userTarget.displayAvatarURL({
 						format: fmt,
 						dynamic: true,
-						size: size
+						size: size,
 					});
 				}
 
@@ -116,32 +113,34 @@ module.exports = {
 							`**Size:** ${size}x${size} pixels`,
 							`**Format:** ${validFormat.toUpperCase()}`,
 							'\n**Available Formats:**',
-							...availableFormats.map(fmt =>
-								`• [${fmt.toUpperCase()}](${avatarURLs[fmt]})`
-							)
-						].join('\n')
+							...availableFormats.map(
+								fmt => `• [${fmt.toUpperCase()}](${avatarURLs[fmt]})`,
+							),
+						].join('\n'),
 					)
 					.setImage(avatarURLs[validFormat])
 					.setColor(userTarget.accentColor || 'Blue')
 					.setFooter({
 						text: `Requested by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 					})
 					.setTimestamp();
 
 				// Add server-specific avatar if available
 				if (interaction.guild) {
-					const member = await interaction.guild.members.fetch(userTarget.id).catch(() => null);
+					const member = await interaction.guild.members
+						.fetch(userTarget.id)
+						.catch(() => null);
 					if (member && member.avatar) {
 						const serverAvatar = member.displayAvatarURL({
 							dynamic: true,
 							size: size,
-							format: validFormat
+							format: validFormat,
 						});
 						embed.addFields({
 							name: 'Server-Specific Avatar',
 							value: `[View Server Avatar](${serverAvatar})`,
-							inline: false
+							inline: false,
 						});
 					}
 				}
@@ -152,7 +151,7 @@ module.exports = {
 					interaction,
 					error,
 					'DATA_COLLECTION',
-					'Failed to fetch avatar information.'
+					'Failed to fetch avatar information.',
 				);
 			}
 		} catch (error) {
@@ -160,7 +159,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving the avatar.'
+				'An error occurred while retrieving the avatar.',
 			);
 		}
 	},

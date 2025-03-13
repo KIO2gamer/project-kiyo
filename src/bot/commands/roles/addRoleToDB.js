@@ -13,11 +13,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('add_role_to_data')
 		.setDescription('Adds a role to the database.')
-		.addRoleOption((option) =>
-			option
-				.setName('role')
-				.setDescription('The role to add')
-				.setRequired(true),
+		.addRoleOption(option =>
+			option.setName('role').setDescription('The role to add').setRequired(true),
 		),
 	async execute(interaction) {
 		const role = interaction.options.getRole('role');
@@ -26,9 +23,7 @@ module.exports = {
 			// Check for Duplicates
 			const existingRole = await Role.findOne({ roleID: role.id });
 			if (existingRole) {
-				return interaction.reply(
-					`The role "${role.name}" is already in the database!`,
-				);
+				return interaction.reply(`The role "${role.name}" is already in the database!`);
 			}
 
 			const roleData = {
@@ -43,9 +38,7 @@ module.exports = {
 			// Save the new role to the database
 			await newRole.save();
 
-			await interaction.reply(
-				'Role data successfully added to the database!',
-			);
+			await interaction.reply('Role data successfully added to the database!');
 		} catch (error) {
 			handleError(interaction, error);
 		}

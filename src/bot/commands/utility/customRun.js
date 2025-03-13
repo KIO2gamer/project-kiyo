@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_run')
 		.setDescription('Run a custom command')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('name')
 				.setDescription('The name or alias of the custom command to run')
@@ -17,10 +17,7 @@ module.exports = {
 	category: 'utility',
 	description_full: "Runs a specified custom command stored in the bot's database.",
 	usage: '/custom_run <name_or_alias>',
-	examples: [
-		'/custom_run greet',
-		'/custom_run hello',
-	],
+	examples: ['/custom_run greet', '/custom_run hello'],
 
 	async execute(interaction) {
 		try {
@@ -31,7 +28,7 @@ module.exports = {
 					interaction,
 					new Error('No command name provided'),
 					'VALIDATION',
-					'Please provide a command name to run.'
+					'Please provide a command name to run.',
 				);
 				return;
 			}
@@ -48,7 +45,7 @@ module.exports = {
 					interaction,
 					new Error('Command not found'),
 					'VALIDATION',
-					`Custom command or alias "${commandNameOrAlias}" not found.`
+					`Custom command or alias "${commandNameOrAlias}" not found.`,
 				);
 				return;
 			}
@@ -59,18 +56,21 @@ module.exports = {
 					interaction,
 					new Error('Invalid command message'),
 					'VALIDATION',
-					'This command has no message content.'
+					'This command has no message content.',
 				);
 				return;
 			}
 
 			// Check if message contains any disallowed content
-			if (customCommand.message.includes('@everyone') || customCommand.message.includes('@here')) {
+			if (
+				customCommand.message.includes('@everyone') ||
+				customCommand.message.includes('@here')
+			) {
 				await handleError(
 					interaction,
 					new Error('Disallowed mentions'),
 					'VALIDATION',
-					'This command contains disallowed mentions.'
+					'This command contains disallowed mentions.',
 				);
 				return;
 			}
@@ -83,28 +83,30 @@ module.exports = {
 				});
 
 				// Log command usage (optional)
-				console.log(`Custom command "${customCommand.name}" executed by ${interaction.user.tag}`);
+				console.log(
+					`Custom command "${customCommand.name}" executed by ${interaction.user.tag}`,
+				);
 			} catch (error) {
 				if (error.code === 50006) {
 					await handleError(
 						interaction,
 						error,
 						'VALIDATION',
-						'Cannot send an empty message.'
+						'Cannot send an empty message.',
 					);
 				} else if (error.code === 50035) {
 					await handleError(
 						interaction,
 						error,
 						'VALIDATION',
-						'Message content is invalid.'
+						'Message content is invalid.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'COMMAND_EXECUTION',
-						'Failed to execute the custom command.'
+						'Failed to execute the custom command.',
 					);
 				}
 			}
@@ -114,14 +116,14 @@ module.exports = {
 					interaction,
 					error,
 					'DATABASE',
-					'Failed to fetch the custom command from the database.'
+					'Failed to fetch the custom command from the database.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while running the custom command.'
+					'An error occurred while running the custom command.',
 				);
 			}
 		}

@@ -8,7 +8,7 @@ module.exports = {
 	name: Events.InteractionCreate,
 	/**
 	 * Handles all interaction types: commands, buttons, select menus, modals, etc.
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 * @returns {Promise<void>} - A promise that resolves when the interaction handling is complete
 	 */
@@ -53,7 +53,11 @@ module.exports = {
 					break;
 
 				default:
-					Logger.log('INTERACTION', `Unknown interaction type: ${interaction.type}`, 'warning');
+					Logger.log(
+						'INTERACTION',
+						`Unknown interaction type: ${interaction.type}`,
+						'warning',
+					);
 					break;
 			}
 		} catch (error) {
@@ -63,7 +67,7 @@ module.exports = {
 				try {
 					await interaction.reply({
 						content: 'There was an error while processing this interaction.',
-						flags: MessageFlags.Ephemeral
+						flags: MessageFlags.Ephemeral,
 					});
 				} catch (replyError) {
 					// Ignore reply errors as the interaction might have expired
@@ -74,25 +78,33 @@ module.exports = {
 
 	/**
 	 * Handles context menu command interactions
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 */
 	async handleContextMenu(interaction) {
 		const command = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {
-			Logger.log('COMMANDS', `No context menu command matching ${interaction.commandName} was found.`, 'warning');
+			Logger.log(
+				'COMMANDS',
+				`No context menu command matching ${interaction.commandName} was found.`,
+				'warning',
+			);
 			return;
 		}
 
 		try {
 			await command.execute(interaction);
 		} catch (error) {
-			Logger.log('COMMANDS', `Error executing context menu ${interaction.commandName}: ${error.message}`, 'error');
+			Logger.log(
+				'COMMANDS',
+				`Error executing context menu ${interaction.commandName}: ${error.message}`,
+				'error',
+			);
 			if (!interaction.replied && !interaction.deferred) {
 				await interaction.reply({
 					content: 'There was an error while executing this command.',
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 		}
@@ -100,7 +112,7 @@ module.exports = {
 
 	/**
 	 * Handles button interactions
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 */
 	async handleButtonInteraction(interaction) {
@@ -142,10 +154,14 @@ module.exports = {
 					}
 				} catch (error) {
 					// No handler found, log the unhandled button
-					Logger.log('BUTTONS', `No handler for button: ${interaction.customId}`, 'warning');
+					Logger.log(
+						'BUTTONS',
+						`No handler for button: ${interaction.customId}`,
+						'warning',
+					);
 					await interaction.reply({
 						content: 'This button is not currently configured.',
-						flags: MessageFlags.Ephemeral
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -154,7 +170,7 @@ module.exports = {
 
 	/**
 	 * Handles select menu interactions
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 */
 	async handleSelectMenuInteraction(interaction) {
@@ -178,10 +194,14 @@ module.exports = {
 						await customHandler.execute(interaction);
 					}
 				} catch (error) {
-					Logger.log('SELECT_MENU', `No handler for select menu: ${interaction.customId}`, 'warning');
+					Logger.log(
+						'SELECT_MENU',
+						`No handler for select menu: ${interaction.customId}`,
+						'warning',
+					);
 					await interaction.reply({
 						content: 'This selection menu is not currently configured.',
-						flags: MessageFlags.Ephemeral
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -190,7 +210,7 @@ module.exports = {
 
 	/**
 	 * Handles modal submission interactions
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 */
 	async handleModalSubmission(interaction) {
@@ -221,7 +241,7 @@ module.exports = {
 					Logger.log('MODAL', `No handler for modal: ${interaction.customId}`, 'warning');
 					await interaction.reply({
 						content: 'This form submission could not be processed.',
-						flags: MessageFlags.Ephemeral
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 				break;
@@ -230,7 +250,7 @@ module.exports = {
 
 	/**
 	 * Handles autocomplete interactions
-	 * 
+	 *
 	 * @param {Object} interaction - The interaction object
 	 */
 	async handleAutocomplete(interaction) {
@@ -244,7 +264,11 @@ module.exports = {
 		try {
 			await command.autocomplete(interaction);
 		} catch (error) {
-			Logger.log('AUTOCOMPLETE', `Error handling autocomplete for ${interaction.commandName}: ${error.message}`, 'error');
+			Logger.log(
+				'AUTOCOMPLETE',
+				`Error handling autocomplete for ${interaction.commandName}: ${error.message}`,
+				'error',
+			);
 			// Try to respond with empty results to prevent the interaction from hanging
 			try {
 				await interaction.respond([]);
@@ -252,5 +276,5 @@ module.exports = {
 				// Ignore respond errors
 			}
 		}
-	}
+	},
 };

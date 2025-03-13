@@ -7,11 +7,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('dictionary')
 		.setDescription('Look up the definition of a word')
-		.addStringOption((option) =>
-			option
-				.setName('word')
-				.setDescription('The word to look up')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('word').setDescription('The word to look up').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -27,7 +24,7 @@ module.exports = {
 				await handleError(
 					interaction,
 					new Error(`No definition found for "${word}"`),
-					'VALIDATION'
+					'VALIDATION',
 				);
 				return;
 			}
@@ -56,23 +53,18 @@ module.exports = {
 					await handleError(
 						interaction,
 						new Error(`Could not find definition for "${word}"`),
-						'VALIDATION'
+						'VALIDATION',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'API',
-						`Error accessing dictionary API: ${error.response.status}`
+						`Error accessing dictionary API: ${error.response.status}`,
 					);
 				}
 			} else if (error.request) {
-				await handleError(
-					interaction,
-					error,
-					'API',
-					'Dictionary API is not responding'
-				);
+				await handleError(interaction, error, 'API', 'Dictionary API is not responding');
 			} else {
 				await handleError(interaction, error);
 			}

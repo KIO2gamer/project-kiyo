@@ -9,9 +9,7 @@ module.exports = {
 	usage: '/meme',
 	examples: ['/meme'],
 	category: 'fun',
-	data: new SlashCommandBuilder()
-		.setName('meme')
-		.setDescription('Send a random meme.'),
+	data: new SlashCommandBuilder().setName('meme').setDescription('Send a random meme.'),
 
 	async execute(interaction) {
 		let attempts = 0;

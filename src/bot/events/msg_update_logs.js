@@ -1,9 +1,4 @@
-const {
-	Events,
-	AuditLogEvent,
-	EmbedBuilder,
-	PermissionsBitField,
-} = require('discord.js');
+const { Events, AuditLogEvent, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 
 async function fetchPartialMessages(oldMessage, newMessage) {
@@ -32,9 +27,7 @@ async function getLogChannel(newMessage) {
 		return null;
 	}
 
-	const botMember = await newMessage.guild.members.fetch(
-		newMessage.client.user.id,
-	);
+	const botMember = await newMessage.guild.members.fetch(newMessage.client.user.id);
 	const permissions = botMember.permissionsIn(logChannel);
 
 	if (
@@ -88,7 +81,7 @@ async function createLogEmbed(oldMessage, newMessage) {
 	if (newMessage.attachments.size > 0) {
 		logEmbed.addFields({
 			name: 'Attachments',
-			value: newMessage.attachments.map((a) => a.url).join('\n'),
+			value: newMessage.attachments.map(a => a.url).join('\n'),
 		});
 	}
 

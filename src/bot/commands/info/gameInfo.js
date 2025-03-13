@@ -11,12 +11,13 @@ require('dotenv').config();
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full: 'Get detailed information about video games, including release date, ratings, platforms, genres, and more. Uses the IGDB database.',
+	description_full:
+		'Get detailed information about video games, including release date, ratings, platforms, genres, and more. Uses the IGDB database.',
 	usage: '/game_info <title>',
 	examples: [
 		'/game_info "The Legend of Zelda"',
 		'/game_info "Red Dead Redemption 2"',
-		'/game_info "Minecraft"'
+		'/game_info "Minecraft"',
 	],
 	category: 'info',
 	data: new SlashCommandBuilder()
@@ -28,7 +29,7 @@ module.exports = {
 				.setDescription('The title of the game to search for')
 				.setRequired(true)
 				.setMinLength(2)
-				.setMaxLength(100)
+				.setMaxLength(100),
 		),
 
 	async execute(interaction) {
@@ -45,7 +46,7 @@ module.exports = {
 					interaction,
 					new Error('API configuration missing'),
 					'CONFIGURATION',
-					'The IGDB API is not properly configured. Please contact the bot administrator.'
+					'The IGDB API is not properly configured. Please contact the bot administrator.',
 				);
 				return;
 			}
@@ -84,14 +85,14 @@ module.exports = {
 						interaction,
 						new Error('No games found'),
 						'NOT_FOUND',
-						`No games found matching "${gameTitle}". Try using a different search term.`
+						`No games found matching "${gameTitle}". Try using a different search term.`,
 					);
 					return;
 				}
 
 				// Check for an exact match first
 				const exactMatch = games.find(
-					game => game.name.toLowerCase() === gameTitle.toLowerCase()
+					game => game.name.toLowerCase() === gameTitle.toLowerCase(),
 				);
 
 				if (exactMatch) {
@@ -114,37 +115,37 @@ module.exports = {
 						? `Released: ${new Date(game.first_release_date * 1000).getFullYear()}`
 						: 'Release date unknown',
 					value: String(index),
-					emoji: '🎮'
+					emoji: '🎮',
 				}));
 
 				const row = new ActionRowBuilder().addComponents(
 					new StringSelectMenuBuilder()
 						.setCustomId('select_game')
 						.setPlaceholder('Select a game')
-						.addOptions(options)
+						.addOptions(options),
 				);
 
 				const listEmbed = new EmbedBuilder()
 					.setTitle('Multiple Games Found')
 					.setDescription(
-						`Found ${games.length} games matching "${gameTitle}"\nPlease select the correct game from the list below:`
+						`Found ${games.length} games matching "${gameTitle}"\nPlease select the correct game from the list below:`,
 					)
 					.setColor('Blue')
 					.setFooter({
 						text: 'Selection will expire in 30 seconds',
-						iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 					});
 
 				const embed_response = await interaction.editReply({
 					embeds: [listEmbed],
-					components: [row]
+					components: [row],
 				});
 
 				// Create collector for selection
 				const collector = embed_response.createMessageComponentCollector({
 					filter: i => i.customId === 'select_game' && i.user.id === interaction.user.id,
 					time: 30000,
-					max: 1
+					max: 1,
 				});
 
 				collector.on('collect', async i => {
@@ -153,7 +154,7 @@ module.exports = {
 					const embed = createGameEmbed(selectedGame);
 					await interaction.editReply({
 						embeds: [embed],
-						components: []
+						components: [],
 					});
 				});
 
@@ -161,30 +162,31 @@ module.exports = {
 					if (collected.size === 0) {
 						const timeoutEmbed = new EmbedBuilder()
 							.setTitle('Selection Timed Out')
-							.setDescription('No selection was made within 30 seconds. Please try the command again.')
+							.setDescription(
+								'No selection was made within 30 seconds. Please try the command again.',
+							)
 							.setColor('Red');
 
 						await interaction.editReply({
 							embeds: [timeoutEmbed],
-							components: []
+							components: [],
 						});
 					}
 				});
-
 			} catch (error) {
 				if (error.response?.status === 429) {
 					await handleError(
 						interaction,
 						error,
 						'RATE_LIMIT',
-						'The API rate limit has been reached. Please try again in a few minutes.'
+						'The API rate limit has been reached. Please try again in a few minutes.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'API_ERROR',
-						'Failed to fetch game data from IGDB. Please try again later.'
+						'Failed to fetch game data from IGDB. Please try again later.',
 					);
 				}
 			}
@@ -193,7 +195,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while processing the game information request.'
+				'An error occurred while processing the game information request.',
 			);
 		}
 	},
@@ -216,9 +218,7 @@ async function getAccessToken(clientId, clientSecret) {
 
 // Helper function to create game embed
 function createGameEmbed(gameData) {
-	const embed = new EmbedBuilder()
-		.setColor('Blue')
-		.setTitle(gameData.name);
+	const embed = new EmbedBuilder().setColor('Blue').setTitle(gameData.name);
 
 	// Set thumbnail if cover exists
 	if (gameData.cover?.url) {
@@ -227,9 +227,10 @@ function createGameEmbed(gameData) {
 
 	// Add description/summary
 	if (gameData.summary) {
-		embed.setDescription(gameData.summary.length > 2048
-			? gameData.summary.substring(0, 2045) + '...'
-			: gameData.summary
+		embed.setDescription(
+			gameData.summary.length > 2048
+				? gameData.summary.substring(0, 2045) + '...'
+				: gameData.summary,
 		);
 	}
 
@@ -238,9 +239,7 @@ function createGameEmbed(gameData) {
 		gameData.first_release_date
 			? `**Released:** <t:${gameData.first_release_date}:D>`
 			: '**Released:** Unknown',
-		gameData.status
-			? `**Status:** ${formatGameStatus(gameData.status)}`
-			: null,
+		gameData.status ? `**Status:** ${formatGameStatus(gameData.status)}` : null,
 		gameData.platforms?.length
 			? `**Platforms:** ${gameData.platforms.map(p => p.name).join(', ')}`
 			: null,
@@ -252,8 +251,10 @@ function createGameEmbed(gameData) {
 			: null,
 		gameData.game_modes?.length
 			? `**Game Modes:** ${gameData.game_modes.map(m => m.name).join(', ')}`
-			: null
-	].filter(Boolean).join('\n');
+			: null,
+	]
+		.filter(Boolean)
+		.join('\n');
 
 	embed.addFields({ name: '📋 Game Information', value: basicInfo, inline: false });
 
@@ -268,8 +269,10 @@ function createGameEmbed(gameData) {
 				: null,
 			gameData.total_rating
 				? `**Overall Rating:** ${(gameData.total_rating / 10).toFixed(1)}/10 (${gameData.total_rating_count} total)`
-				: null
-		].filter(Boolean).join('\n');
+				: null,
+		]
+			.filter(Boolean)
+			.join('\n');
 
 		if (ratings) {
 			embed.addFields({ name: '⭐ Ratings', value: ratings, inline: false });
@@ -287,8 +290,10 @@ function createGameEmbed(gameData) {
 
 		const companies = [
 			developers.length ? `**Developers:** ${developers.join(', ')}` : null,
-			publishers.length ? `**Publishers:** ${publishers.join(', ')}` : null
-		].filter(Boolean).join('\n');
+			publishers.length ? `**Publishers:** ${publishers.join(', ')}` : null,
+		]
+			.filter(Boolean)
+			.join('\n');
 
 		if (companies) {
 			embed.addFields({ name: '🏢 Companies', value: companies, inline: false });
@@ -297,18 +302,22 @@ function createGameEmbed(gameData) {
 
 	// Links field
 	if (gameData.websites?.length) {
-		const links = gameData.websites.map(site => {
-			const type = formatWebsiteType(site.category);
-			return `[${type}](${site.url})`;
-		}).join(' • ');
+		const links = gameData.websites
+			.map(site => {
+				const type = formatWebsiteType(site.category);
+				return `[${type}](${site.url})`;
+			})
+			.join(' • ');
 
 		embed.addFields({ name: '🔗 Links', value: links, inline: false });
 	}
 
-	embed.setFooter({
-		text: 'Data provided by IGDB',
-		iconURL: 'https://www.igdb.com/favicon.ico'
-	}).setTimestamp();
+	embed
+		.setFooter({
+			text: 'Data provided by IGDB',
+			iconURL: 'https://www.igdb.com/favicon.ico',
+		})
+		.setTimestamp();
 
 	return embed;
 }
@@ -330,7 +339,7 @@ function formatWebsiteType(category) {
 		13: 'Subreddit',
 		14: 'Epic Games',
 		15: 'GOG',
-		16: 'Discord'
+		16: 'Discord',
 	};
 	return types[category] || 'Website';
 }
@@ -345,7 +354,7 @@ function formatGameStatus(status) {
 		5: 'Offline',
 		6: 'Cancelled',
 		7: 'Rumored',
-		8: 'Delisted'
+		8: 'Delisted',
 	};
 	return statuses[status] || 'Unknown';
 }

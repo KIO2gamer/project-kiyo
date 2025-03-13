@@ -19,7 +19,7 @@ module.exports = {
 		.setName('set_ticket_category')
 		.setDescription('Sets the category where tickets will be created.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('category')
 				.setDescription('The category to use for new tickets.')
@@ -39,7 +39,7 @@ module.exports = {
 					interaction,
 					new Error('No category provided'),
 					'VALIDATION',
-					'Please provide a valid category channel.'
+					'Please provide a valid category channel.',
 				);
 				return;
 			}
@@ -50,7 +50,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid category guild'),
 					'VALIDATION',
-					'The category must be in this server.'
+					'The category must be in this server.',
 				);
 				return;
 			}
@@ -60,25 +60,26 @@ module.exports = {
 			const requiredPermissions = [
 				PermissionFlagsBits.ViewChannel,
 				PermissionFlagsBits.ManageChannels,
-				PermissionFlagsBits.ManageRoles
+				PermissionFlagsBits.ManageRoles,
 			];
 
 			const missingPermissions = requiredPermissions.filter(
-				perm => !category.permissionsFor(botMember).has(perm)
+				perm => !category.permissionsFor(botMember).has(perm),
 			);
 
 			if (missingPermissions.length > 0) {
 				const permissionNames = missingPermissions.map(perm =>
-					Object.keys(PermissionFlagsBits).find(key => PermissionFlagsBits[key] === perm)
+					Object.keys(PermissionFlagsBits)
+						.find(key => PermissionFlagsBits[key] === perm)
 						.replace(/_/g, ' ')
-						.toLowerCase()
+						.toLowerCase(),
 				);
 
 				await handleError(
 					interaction,
 					new Error('Missing category permissions'),
 					'PERMISSION',
-					`I need the following permissions in ${category}: ${permissionNames.join(', ')}`
+					`I need the following permissions in ${category}: ${permissionNames.join(', ')}`,
 				);
 				return;
 			}
@@ -88,7 +89,7 @@ module.exports = {
 				const config = await TicketConfig.findOneAndUpdate(
 					{ guildId: guildId },
 					{ ticketCategoryId: category.id },
-					{ upsert: true, new: true }
+					{ upsert: true, new: true },
 				);
 
 				const embed = new EmbedBuilder()
@@ -96,40 +97,40 @@ module.exports = {
 					.setDescription(`Ticket category has been set to ${category}`)
 					.addFields(
 						{ name: 'Category', value: category.name, inline: true },
-						{ name: 'Category ID', value: category.id, inline: true }
+						{ name: 'Category ID', value: category.id, inline: true },
 					)
 					.setColor('Green')
 					.setFooter({
 						text: `Set by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
 				await interaction.editReply({
 					embeds: [embed],
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
 
 				// Send test message to verify permissions
 				const testMessage = await category.send({
-					content: '🎫 This category has been set up for ticket channels!\n' +
+					content:
+						'🎫 This category has been set up for ticket channels!\n' +
 						'New tickets will be created in this category.\n' +
 						'This message will be automatically deleted.',
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
 
 				// Delete test message after 5 seconds
 				setTimeout(() => {
-					testMessage.delete().catch(() => { });
+					testMessage.delete().catch(() => {});
 				}, 5000);
-
 			} catch (error) {
 				if (error.code === 11000) {
 					await handleError(
 						interaction,
 						error,
 						'DATABASE',
-						'Failed to update the ticket category configuration.'
+						'Failed to update the ticket category configuration.',
 					);
 				} else {
 					throw error;
@@ -140,7 +141,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while setting up the ticket category.'
+				'An error occurred while setting up the ticket category.',
 			);
 		}
 	},

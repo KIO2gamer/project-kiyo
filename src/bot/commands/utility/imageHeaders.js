@@ -18,7 +18,7 @@ module.exports = {
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('options')
 				.setDescription('Select an image to send')
@@ -31,7 +31,7 @@ module.exports = {
 					{ name: 'Forms', value: 'forms' },
 				),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('caption')
 				.setDescription('Add a caption to the image')

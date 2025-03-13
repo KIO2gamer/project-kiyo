@@ -5,7 +5,7 @@ const {
 	EmbedBuilder,
 	ActionRowBuilder,
 	ButtonBuilder,
-	ButtonStyle
+	ButtonStyle,
 } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 const TicketConfig = require('./../../../database/ticketConfig');
@@ -15,7 +15,7 @@ module.exports = {
 	usage: '/send_ticket_message channel:#channel title:text description:text button_text:text',
 	examples: [
 		'/send_ticket_message channel:#support title:Support Tickets description:Click below to create a ticket button_text:Create Ticket',
-		'/send_ticket_message channel:#help title:Need Help? description:Get assistance from our team button_text:Open Ticket'
+		'/send_ticket_message channel:#help title:Need Help? description:Get assistance from our team button_text:Open Ticket',
 	],
 	category: 'setup',
 	data: new SlashCommandBuilder()
@@ -27,25 +27,25 @@ module.exports = {
 				.setName('channel')
 				.setDescription('The channel to send the ticket message in')
 				.setRequired(true)
-				.addChannelTypes(ChannelType.GuildText)
+				.addChannelTypes(ChannelType.GuildText),
 		)
 		.addStringOption(option =>
 			option
 				.setName('title')
 				.setDescription('The title of the ticket message')
-				.setRequired(true)
+				.setRequired(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName('description')
 				.setDescription('The description of the ticket message')
-				.setRequired(true)
+				.setRequired(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName('button_text')
 				.setDescription('The text to display on the ticket button')
-				.setRequired(true)
+				.setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -63,7 +63,7 @@ module.exports = {
 					interaction,
 					new Error('No channel provided'),
 					'VALIDATION',
-					'Please provide a valid text channel.'
+					'Please provide a valid text channel.',
 				);
 				return;
 			}
@@ -74,7 +74,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel guild'),
 					'VALIDATION',
-					'The channel must be in this server.'
+					'The channel must be in this server.',
 				);
 				return;
 			}
@@ -84,25 +84,26 @@ module.exports = {
 			const requiredPermissions = [
 				PermissionFlagsBits.ViewChannel,
 				PermissionFlagsBits.SendMessages,
-				PermissionFlagsBits.EmbedLinks
+				PermissionFlagsBits.EmbedLinks,
 			];
 
 			const missingPermissions = requiredPermissions.filter(
-				perm => !channel.permissionsFor(botMember).has(perm)
+				perm => !channel.permissionsFor(botMember).has(perm),
 			);
 
 			if (missingPermissions.length > 0) {
 				const permissionNames = missingPermissions.map(perm =>
-					Object.keys(PermissionFlagsBits).find(key => PermissionFlagsBits[key] === perm)
+					Object.keys(PermissionFlagsBits)
+						.find(key => PermissionFlagsBits[key] === perm)
 						.replace(/_/g, ' ')
-						.toLowerCase()
+						.toLowerCase(),
 				);
 
 				await handleError(
 					interaction,
 					new Error('Missing channel permissions'),
 					'PERMISSION',
-					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`
+					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`,
 				);
 				return;
 			}
@@ -113,7 +114,7 @@ module.exports = {
 					interaction,
 					new Error('Title too long'),
 					'VALIDATION',
-					'The title must be 256 characters or less.'
+					'The title must be 256 characters or less.',
 				);
 				return;
 			}
@@ -123,7 +124,7 @@ module.exports = {
 					interaction,
 					new Error('Description too long'),
 					'VALIDATION',
-					'The description must be 4096 characters or less.'
+					'The description must be 4096 characters or less.',
 				);
 				return;
 			}
@@ -133,7 +134,7 @@ module.exports = {
 					interaction,
 					new Error('Button text too long'),
 					'VALIDATION',
-					'The button text must be 80 characters or less.'
+					'The button text must be 80 characters or less.',
 				);
 				return;
 			}
@@ -146,7 +147,7 @@ module.exports = {
 						interaction,
 						new Error('Ticket category not set'),
 						'SETUP',
-						'Please set up the ticket category first using the `/set_ticket_category` command.'
+						'Please set up the ticket category first using the `/set_ticket_category` command.',
 					);
 					return;
 				}
@@ -158,7 +159,7 @@ module.exports = {
 					.setColor('Blue')
 					.setFooter({
 						text: `${interaction.guild.name} • Ticket System`,
-						iconURL: interaction.guild.iconURL()
+						iconURL: interaction.guild.iconURL(),
 					})
 					.setTimestamp();
 
@@ -174,7 +175,7 @@ module.exports = {
 				// Send ticket message
 				const ticketMessage = await channel.send({
 					embeds: [ticketEmbed],
-					components: [row]
+					components: [row],
 				});
 
 				// Send confirmation
@@ -183,23 +184,22 @@ module.exports = {
 					.setDescription(`Successfully sent the ticket message in ${channel}`)
 					.addFields(
 						{ name: 'Message ID', value: ticketMessage.id, inline: true },
-						{ name: 'Channel', value: channel.name, inline: true }
+						{ name: 'Channel', value: channel.name, inline: true },
 					)
 					.setColor('Green')
 					.setFooter({
 						text: `Set by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
 				await interaction.editReply({ embeds: [confirmEmbed] });
-
 			} catch (error) {
 				await handleError(
 					interaction,
 					error,
 					'DATABASE',
-					'Failed to set up the ticket message. Please check the database connection.'
+					'Failed to set up the ticket message. Please check the database connection.',
 				);
 			}
 		} catch (error) {
@@ -207,7 +207,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while setting up the ticket message.'
+				'An error occurred while setting up the ticket message.',
 			);
 		}
 	},

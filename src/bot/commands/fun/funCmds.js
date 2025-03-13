@@ -11,8 +11,7 @@ const axios = require('axios');
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Various fun commands combined into one with subcommands.',
+	description_full: 'Various fun commands combined into one with subcommands.',
 	usage: '/fun <subcommand> [user:@user]',
 	examples: [
 		'/fun boba',
@@ -33,76 +32,54 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('fun')
 		.setDescription('Various fun commands combined into one.')
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('boba')
-				.setDescription('Send a pic of boba because it is the best.'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('boba').setDescription('Send a pic of boba because it is the best.'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('rickroll')
-				.setDescription('Never gonna give you up!'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('rickroll').setDescription('Never gonna give you up!'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('chairhit')
-				.setDescription('Hit someone with a chair!'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('chairhit').setDescription('Hit someone with a chair!'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('skibidi')
-				.setDescription('Send a skibidi meme.'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('skibidi').setDescription('Send a skibidi meme.'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('koifish')
-				.setDescription('Send a koifish meme.'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('koifish').setDescription('Send a koifish meme.'),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('summon')
 				.setDescription('Summon a user')
-				.addUserOption((option) =>
-					option
-						.setName('user')
-						.setDescription('The user to summon')
-						.setRequired(true),
+				.addUserOption(option =>
+					option.setName('user').setDescription('The user to summon').setRequired(true),
 				),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('quokka')
 				.setDescription('Send a pic of a quokka because it is cute.'),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand.setName('steel').setDescription('Send a steel meme.'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('snipe')
-				.setDescription('Snipe a deleted message.'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('snipe').setDescription('Snipe a deleted message.'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand.setName('yeet').setDescription('Yeet someone!'),
-		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand => subcommand.setName('yeet').setDescription('Yeet someone!'))
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('kill')
 				.setDescription('Kill a user (in a fun way)')
-				.addUserOption((option) =>
-					option
-						.setName('user')
-						.setDescription('The user to kill')
-						.setRequired(true),
+				.addUserOption(option =>
+					option.setName('user').setDescription('The user to kill').setRequired(true),
 				),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand.setName('uwu').setDescription('Send an uwu message.'),
 		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName('do_not_touch')
-				.setDescription('DO NOT EVER TOUCH THIS COMMAND.'),
+		.addSubcommand(subcommand =>
+			subcommand.setName('do_not_touch').setDescription('DO NOT EVER TOUCH THIS COMMAND.'),
 		),
 
 	async execute(interaction) {
@@ -131,11 +108,7 @@ module.exports = {
 					);
 					break;
 				case 'koifish':
-					await handleGifCommand(
-						interaction,
-						'koifish meme',
-						'Koifish Meme',
-					);
+					await handleGifCommand(interaction, 'koifish meme', 'Koifish Meme');
 					break;
 				case 'summon':
 					await handleSummon(interaction);
@@ -148,18 +121,10 @@ module.exports = {
 					);
 					break;
 				case 'steel':
-					await handleGifCommand(
-						interaction,
-						'steel metal pipe',
-						'you just got steeled',
-					);
+					await handleGifCommand(interaction, 'steel metal pipe', 'you just got steeled');
 					break;
 				case 'snipe':
-					await handleGifCommand(
-						interaction,
-						'snipe',
-						'sniped 360 no scope',
-					);
+					await handleGifCommand(interaction, 'snipe', 'sniped 360 no scope');
 					break;
 				case 'yeet':
 					await handleGifCommand(interaction, 'yeet', 'Yeet!');
@@ -168,11 +133,7 @@ module.exports = {
 					await handleKill(interaction);
 					break;
 				case 'uwu':
-					await handleGifCommand(
-						interaction,
-						'uwu',
-						'***Notice me, senpai!***',
-					);
+					await handleGifCommand(interaction, 'uwu', '***Notice me, senpai!***');
 					break;
 				case 'do_not_touch':
 					await handleDoNotTouch(interaction);
@@ -182,7 +143,7 @@ module.exports = {
 						interaction,
 						new Error(`Unknown subcommand: ${subcommand}`),
 						'VALIDATION',
-						'This subcommand does not exist.'
+						'This subcommand does not exist.',
 					);
 					break;
 			}
@@ -191,7 +152,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while executing the fun command.'
+				'An error occurred while executing the fun command.',
 			);
 		}
 	},
@@ -203,8 +164,8 @@ async function getRandomGif(searchTerm) {
 			params: {
 				api_key: process.env.GIPHY_API_KEY,
 				tag: searchTerm,
-				rating: 'g'
-			}
+				rating: 'g',
+			},
 		});
 		return response.data.data.images.original.url;
 	} catch (error) {
@@ -224,7 +185,7 @@ async function handleGifCommand(interaction, searchTerm, message) {
 			.setTimestamp()
 			.setFooter({
 				text: `Requested by ${interaction.user.tag}`,
-				iconURL: interaction.user.displayAvatarURL()
+				iconURL: interaction.user.displayAvatarURL(),
 			});
 
 		await interaction.editReply({ embeds: [embed] });
@@ -233,7 +194,7 @@ async function handleGifCommand(interaction, searchTerm, message) {
 			interaction,
 			error,
 			'API',
-			'Failed to fetch a GIF. Please try again later.'
+			'Failed to fetch a GIF. Please try again later.',
 		);
 	}
 }
@@ -246,7 +207,7 @@ async function handleSummon(interaction) {
 				interaction,
 				new Error('No user specified'),
 				'VALIDATION',
-				'You need to specify a user to summon!'
+				'You need to specify a user to summon!',
 			);
 			return;
 		}
@@ -259,12 +220,7 @@ async function handleSummon(interaction) {
 
 		await interaction.reply({ embeds: [embed] });
 	} catch (error) {
-		await handleError(
-			interaction,
-			error,
-			'COMMAND_EXECUTION',
-			'Failed to summon user.'
-		);
+		await handleError(interaction, error, 'COMMAND_EXECUTION', 'Failed to summon user.');
 	}
 }
 
@@ -276,7 +232,7 @@ async function handleKill(interaction) {
 				interaction,
 				new Error('No user specified'),
 				'VALIDATION',
-				'You need to specify a user to kill!'
+				'You need to specify a user to kill!',
 			);
 			return;
 		}
@@ -286,7 +242,7 @@ async function handleKill(interaction) {
 				interaction,
 				new Error('Self-targeting not allowed'),
 				'VALIDATION',
-				'You cannot kill yourself!'
+				'You cannot kill yourself!',
 			);
 			return;
 		}
@@ -303,7 +259,7 @@ async function handleKill(interaction) {
 			interaction,
 			error,
 			'COMMAND_EXECUTION',
-			'Failed to execute kill command.'
+			'Failed to execute kill command.',
 		);
 	}
 }
@@ -332,7 +288,7 @@ async function handleDoNotTouch(interaction) {
 			interaction,
 			error,
 			'COMMAND_EXECUTION',
-			'You should not have touched this command...'
+			'You should not have touched this command...',
 		);
 	}
 }

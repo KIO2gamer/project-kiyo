@@ -1,16 +1,11 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
 const ms = require('ms'); // Use ms library to parse duration strings
 
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Temporarily bans a member for the specified duration and reason.',
+	description_full: 'Temporarily bans a member for the specified duration and reason.',
 	usage: '/temp_ban target:@user duration:"duration" [reason:"ban reason"]',
 	examples: [
 		'/temp_ban target:@user123 duration:"1d"',
@@ -20,19 +15,16 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('temp_ban')
 		.setDescription('Temporarily ban a member for a specified duration.')
-		.addUserOption((option) =>
-			option
-				.setName('target')
-				.setDescription('The member to ban')
-				.setRequired(true),
+		.addUserOption(option =>
+			option.setName('target').setDescription('The member to ban').setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('duration')
 				.setDescription('The duration of the ban (e.g., 1h, 1d)')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option.setName('reason').setDescription('The reason for banning'),
 		)
 		.setDefaultMemberPermissions(
@@ -42,8 +34,7 @@ module.exports = {
 	async execute(interaction) {
 		const targetUser = interaction.options.getMember('target');
 		const duration = interaction.options.getString('duration');
-		const reason =
-			interaction.options.getString('reason') ?? 'No reason provided';
+		const reason = interaction.options.getString('reason') ?? 'No reason provided';
 
 		if (!(await this.checkTargetUser(interaction, targetUser))) return;
 		if (!(await this.checkRolePositions(interaction, targetUser))) return;
@@ -81,9 +72,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'You cannot ban the owner of the server',
-						)
+						.setDescription('You cannot ban the owner of the server')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,
@@ -99,10 +88,8 @@ module.exports = {
 
 	async checkRolePositions(interaction, targetUser) {
 		const targetUserRolePosition = targetUser.roles.highest.position;
-		const requestUserRolePosition =
-			interaction.member.roles.highest.position;
-		const botRolePosition =
-			interaction.guild.members.me.roles.highest.position;
+		const requestUserRolePosition = interaction.member.roles.highest.position;
+		const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
 		if (targetUserRolePosition >= requestUserRolePosition) {
 			await interaction.reply({
@@ -206,9 +193,7 @@ module.exports = {
 				embeds: [
 					new EmbedBuilder()
 						.setTitle('ERROR')
-						.setDescription(
-							'An error occurred while trying to ban the user',
-						)
+						.setDescription('An error occurred while trying to ban the user')
 						.setColor('Red')
 						.setFooter({
 							text: `Done by: ${interaction.user.username}`,

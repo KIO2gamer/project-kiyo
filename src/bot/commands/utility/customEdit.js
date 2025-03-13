@@ -8,23 +8,20 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_edit')
 		.setDescription('Edits a custom command')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('name')
 				.setDescription('The name of the command to edit')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('new_message')
 				.setDescription('The new response message')
 				.setRequired(true),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('new_alias')
-				.setDescription('The new alternate name')
-				.setRequired(false),
+		.addStringOption(option =>
+			option.setName('new_alias').setDescription('The new alternate name').setRequired(false),
 		),
 	category: 'utility',
 	description_full: "Edits an existing custom command in the bot's database.",
@@ -58,7 +55,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid message length'),
 					'VALIDATION',
-					'Message must be between 1 and 2000 characters long.'
+					'Message must be between 1 and 2000 characters long.',
 				);
 				return;
 			}
@@ -69,7 +66,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid alias format'),
 						'VALIDATION',
-						'Alias can only contain letters, numbers, underscores, and hyphens.'
+						'Alias can only contain letters, numbers, underscores, and hyphens.',
 					);
 					return;
 				}
@@ -79,7 +76,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid alias length'),
 						'VALIDATION',
-						'Alias must be between 2 and 32 characters long.'
+						'Alias must be between 2 and 32 characters long.',
 					);
 					return;
 				}
@@ -97,7 +94,7 @@ module.exports = {
 					interaction,
 					new Error('Command not found'),
 					'VALIDATION',
-					`Custom command or alias "${name}" not found!`
+					`Custom command or alias "${name}" not found!`,
 				);
 				return;
 			}
@@ -110,10 +107,10 @@ module.exports = {
 						{
 							$or: [
 								{ name: newAlias.toLowerCase() },
-								{ alias_name: newAlias.toLowerCase() }
-							]
-						}
-					]
+								{ alias_name: newAlias.toLowerCase() },
+							],
+						},
+					],
 				});
 
 				if (existingAlias) {
@@ -121,7 +118,7 @@ module.exports = {
 						interaction,
 						new Error('Alias already exists'),
 						'VALIDATION',
-						`A command or alias with the name "${newAlias}" already exists.`
+						`A command or alias with the name "${newAlias}" already exists.`,
 					);
 					return;
 				}
@@ -140,7 +137,7 @@ module.exports = {
 				new ButtonBuilder()
 					.setCustomId('edit_cancel')
 					.setLabel('No')
-					.setStyle(ButtonStyle.Danger)
+					.setStyle(ButtonStyle.Danger),
 			);
 
 			const confirmationResponse = await interaction.reply({
@@ -151,7 +148,7 @@ module.exports = {
 
 			try {
 				const confirmation = await confirmationResponse.awaitMessageComponent({
-					filter: (i) => i.user.id === interaction.user.id,
+					filter: i => i.user.id === interaction.user.id,
 					time: 15000,
 				});
 
@@ -173,14 +170,14 @@ module.exports = {
 								interaction,
 								error,
 								'DATABASE',
-								'A command with this alias already exists.'
+								'A command with this alias already exists.',
 							);
 						} else {
 							await handleError(
 								interaction,
 								error,
 								'DATABASE',
-								'Failed to save the edited command.'
+								'Failed to save the edited command.',
 							);
 						}
 					}
@@ -201,7 +198,7 @@ module.exports = {
 						interaction,
 						error,
 						'COMMAND_EXECUTION',
-						'An error occurred while processing the confirmation.'
+						'An error occurred while processing the confirmation.',
 					);
 				}
 			}
@@ -210,7 +207,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while editing the custom command.'
+				'An error occurred while editing the custom command.',
 			);
 		}
 	},

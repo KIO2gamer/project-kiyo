@@ -19,11 +19,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('minecraft')
 		.setDescription('Gets general info about a Minecraft player')
-		.addStringOption((option) =>
-			option
-				.setName('username')
-				.setDescription('The Minecraft username')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('username').setDescription('The Minecraft username').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -58,11 +55,7 @@ module.exports = {
 				return;
 			}
 
-			const infoEmbed = createInfoEmbed(
-				playerData,
-				username,
-				interaction,
-			); // Pass username to embed function for potential use
+			const infoEmbed = createInfoEmbed(playerData, username, interaction); // Pass username to embed function for potential use
 			cache.set(username, infoEmbed); // Cache the created embed
 
 			await interaction.reply({
@@ -71,11 +64,7 @@ module.exports = {
 			});
 		} catch (error) {
 			handleError('Error fetching Minecraft player data:', error);
-			await handleError(
-				interaction,
-				error,
-				'Failed to fetch Minecraft player data.',
-			); // More descriptive error message for handleError
+			await handleError(interaction, error, 'Failed to fetch Minecraft player data.'); // More descriptive error message for handleError
 		}
 	},
 };
@@ -89,10 +78,7 @@ async function fetchPlayerData(username) {
 		}
 		return response.data;
 	} catch (error) {
-		handleError(
-			`Error fetching data from Ashcon API for username ${username}:`,
-			error,
-		);
+		handleError(`Error fetching data from Ashcon API for username ${username}:`, error);
 		if (error.response) {
 			// API responded with an error status code
 			if (error.response.status === 404) {
@@ -103,9 +89,7 @@ async function fetchPlayerData(username) {
 			); // More informative API error
 		} else if (error.request) {
 			// Request was made but no response was received
-			throw new Error(
-				'No response received from Ashcon API. The service might be down.',
-			);
+			throw new Error('No response received from Ashcon API. The service might be down.');
 		} else {
 			// Something happened in setting up the request that triggered an Error
 			throw new Error('Error setting up the request to Ashcon API.');
@@ -121,9 +105,7 @@ function createInfoEmbed(playerData, username, interaction) {
 		.setColor(EMBED_COLOR)
 		.setTitle(`Minecraft Player: ${playerData.username}`)
 		.setURL(`https://namemc.com/profile/${uuid}`) // Added NameMC link for easy profile viewing
-		.setDescription(
-			`Information about the Minecraft player **${playerData.username}**`,
-		) // Slightly improved description
+		.setDescription(`Information about the Minecraft player **${playerData.username}**`) // Slightly improved description
 		.addFields(
 			{
 				name: 'Username',
@@ -133,9 +115,7 @@ function createInfoEmbed(playerData, username, interaction) {
 			{ name: 'UUID', value: uuid || 'N/A', inline: true }, // Fallback value if data is missing
 			{
 				name: 'Skin',
-				value: skinUrl
-					? `[View Skin](${skinUrl})`
-					: 'No Skin Available',
+				value: skinUrl ? `[View Skin](${skinUrl})` : 'No Skin Available',
 				inline: true,
 			}, // Handle case where skin URL might be missing
 		)

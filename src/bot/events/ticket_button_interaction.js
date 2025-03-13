@@ -1,9 +1,4 @@
-const {
-	Events,
-	ChannelType,
-	PermissionsBitField,
-	EmbedBuilder,
-} = require('discord.js');
+const { Events, ChannelType, PermissionsBitField, EmbedBuilder } = require('discord.js');
 const TicketConfig = require('./../../database/ticketConfig');
 
 module.exports = {
@@ -35,8 +30,7 @@ module.exports = {
 
 				// Check if the user already has an open ticket
 				const existingChannel = interaction.guild.channels.cache.find(
-					(channel) =>
-						channel.name === `ticket-${interaction.user.id}`,
+					channel => channel.name === `ticket-${interaction.user.id}`,
 				);
 
 				if (existingChannel) {
@@ -93,8 +87,7 @@ module.exports = {
 			} catch (error) {
 				handleError('Error creating ticket channel:', error);
 				await interaction.reply({
-					content:
-						'There was an error creating your ticket. Please try again later.',
+					content: 'There was an error creating your ticket. Please try again later.',
 				});
 			}
 		}

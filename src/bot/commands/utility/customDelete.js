@@ -8,15 +8,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_delete')
 		.setDescription('Deletes a custom command')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('name')
 				.setDescription('The name of the command to delete')
 				.setRequired(true),
 		),
 	category: 'utility',
-	description_full:
-		"Deletes an existing custom command from the bot's database.",
+	description_full: "Deletes an existing custom command from the bot's database.",
 	usage: '/custom_delete <name:command_name_or_alias>',
 	examples: ['/custom_delete name:hello', '/custom_delete name:greet'],
 	/**
@@ -84,7 +83,7 @@ module.exports = {
 
 			const confirmation = await confirmationResponse
 				.awaitMessageComponent({
-					filter: (i) => i.user.id === interaction.user.id,
+					filter: i => i.user.id === interaction.user.id,
 					time: 15000,
 				})
 				.catch(() => null);
@@ -100,8 +99,9 @@ module.exports = {
 			if (confirmation.customId === 'delete_confirm') {
 				await cc.deleteOne({ _id: cc_record._id });
 				await interaction.reply({
-					content: `Custom command "${command_name}"${alias_name ? ` (alias: ${alias_name})` : ''
-						} deleted successfully!`,
+					content: `Custom command "${command_name}"${
+						alias_name ? ` (alias: ${alias_name})` : ''
+					} deleted successfully!`,
 					components: [],
 				});
 			} else {

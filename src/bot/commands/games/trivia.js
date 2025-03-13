@@ -19,8 +19,7 @@ const API_ENDPOINT = 'https://opentdb.com/api.php?amount=1&type=multiple';
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
-	description_full:
-		'Tests your knowledge with a multiple-choice trivia question.',
+	description_full: 'Tests your knowledge with a multiple-choice trivia question.',
 	usage: '/trivia',
 	examples: ['/trivia'],
 	category: 'games',
@@ -34,14 +33,12 @@ module.exports = {
 			const questionData = await fetchTriviaQuestion();
 			if (!questionData) {
 				return interaction.editReply({
-					content:
-						'⚠️ Failed to fetch trivia question. Please try again later.',
+					content: '⚠️ Failed to fetch trivia question. Please try again later.',
 					flags: MessageFlags.Ephemeral,
 				});
 			}
 
-			const { triviaEmbed, correctIndex } =
-				createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
+			const { triviaEmbed, correctIndex } = createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
 			const answerRow = createAnswerRow();
 
 			const reply = await interaction.editReply({
@@ -61,8 +58,7 @@ module.exports = {
 		} catch (error) {
 			handleError('Trivia command error:', error);
 			await interaction.editReply({
-				content:
-					'🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
+				content: '🤖 Uh oh! Something went wrong with the trivia game. Please try again.',
 				flags: MessageFlags.Ephemeral,
 			});
 		}
@@ -96,12 +92,9 @@ function decodeHtmlEntities(text) {
 
 function createTriviaEmbed(questionData) {
 	const decodedQuestion = decodeHtmlEntities(questionData.question);
-	const incorrectAnswers =
-		questionData.incorrect_answers.map(decodeHtmlEntities);
+	const incorrectAnswers = questionData.incorrect_answers.map(decodeHtmlEntities);
 	const correctAnswer = decodeHtmlEntities(questionData.correct_answer);
-	const allAnswers = [...incorrectAnswers, correctAnswer].sort(
-		() => Math.random() - 0.5,
-	);
+	const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
 	const correctIndex = allAnswers.indexOf(correctAnswer);
 
 	console.log(`Correct Answer from API: ${correctAnswer}`); // Debug log
@@ -133,19 +126,15 @@ function createAnswerFields(answers) {
 
 function createAnswerRow() {
 	return new ActionRowBuilder().addComponents(
-		ANSWER_BUTTON_LABELS.map((letter) =>
-			new ButtonBuilder()
-				.setCustomId(letter)
-				.setLabel(letter)
-				.setStyle(ButtonStyle.Primary),
+		ANSWER_BUTTON_LABELS.map(letter =>
+			new ButtonBuilder().setCustomId(letter).setLabel(letter).setStyle(ButtonStyle.Primary),
 		),
 	);
 }
 
 function createButtonCollector(interaction) {
-	const filter = (i) =>
-		ANSWER_BUTTON_LABELS.includes(i.customId) &&
-		i.user.id === interaction.user.id;
+	const filter = i =>
+		ANSWER_BUTTON_LABELS.includes(i.customId) && i.user.id === interaction.user.id;
 	return interaction.channel.createMessageComponentCollector({
 		filter,
 		time: TRIVIA_TIMEOUT,
@@ -163,9 +152,9 @@ function handleCollectorEvents(
 	// Added correctAnswerIndex parameter
 	let answered = false;
 	// Removed: const correctAnswerIndex = reply.embeds[0]?.correctAnswerIndex; // No longer needed from embed
-	const answers = answerFields.map((field) => field.value); // Extract answers from embed fields
+	const answers = answerFields.map(field => field.value); // Extract answers from embed fields
 
-	collector.on('collect', async (i) => {
+	collector.on('collect', async i => {
 		answered = true;
 		collector.stop(); // Stop collector immediately after an answer is collected
 		const userAnswerIndex = ANSWER_BUTTON_LABELS.indexOf(i.customId); // userAnswerIndex from button click
@@ -181,12 +170,9 @@ function handleCollectorEvents(
 		await i.update({ embeds: [resultEmbed], components: [] });
 	});
 
-	collector.on('end', async (collected) => {
+	collector.on('end', async collected => {
 		if (!answered) {
-			const timeoutEmbed = createTimeoutEmbed(
-				answers,
-				correctAnswerIndex,
-			);
+			const timeoutEmbed = createTimeoutEmbed(answers, correctAnswerIndex);
 			await interaction.followUp({
 				embeds: [timeoutEmbed],
 				components: [],
@@ -195,20 +181,10 @@ function handleCollectorEvents(
 	});
 }
 
-function createResultEmbed(
-	isCorrect,
-	answers,
-	correctAnswerIndex,
-	userAnswerIndex,
-	interaction,
-) {
+function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction) {
 	// Correct Answer Index parameter
-	console.log(
-		`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`,
-	); // Debug log
-	console.log(
-		`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`,
-	); // Debug log
+	console.log(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
+	console.log(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
 
 	const resultEmbed = new EmbedBuilder()
 		.setColor(isCorrect ? CORRECT_COLOR : WRONG_COLOR)
@@ -223,16 +199,12 @@ function createResultEmbed(
 		.addFields(
 			{
 				name: 'Your Choice',
-				value:
-					answers?.[userAnswerIndex] ||
-					'*Error: Your Answer Missing*', // Safe access and fallback
+				value: answers?.[userAnswerIndex] || '*Error: Your Answer Missing*', // Safe access and fallback
 				inline: true,
 			},
 			{
 				name: 'Correct Choice',
-				value:
-					answers?.[correctAnswerIndex] ||
-					'*Error: Correct Answer Missing*', // Safe access and fallback
+				value: answers?.[correctAnswerIndex] || '*Error: Correct Answer Missing*', // Safe access and fallback
 				inline: true,
 			},
 		)
@@ -244,12 +216,8 @@ function createResultEmbed(
 
 function createTimeoutEmbed(answers, correctAnswerIndex) {
 	// Correct Answer Index parameter
-	console.log(
-		`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`,
-	); // Debug log
-	console.log(
-		`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`,
-	); // Debug log
+	console.log(`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
+	console.log(`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
 	return new EmbedBuilder()
 		.setColor(TIMEOUT_COLOR)
 		.setTitle("⏰ Time's Up! No answer in time. ⏱️")

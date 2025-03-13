@@ -36,11 +36,11 @@ module.exports = {
 		await interaction.editReply({ embeds: [gameEmbed] });
 
 		const messageCollector = interaction.channel.createMessageCollector({
-			filter: (m) => !m.author.bot && gameActive, // Any non-bot user can guess
+			filter: m => !m.author.bot && gameActive, // Any non-bot user can guess
 			time: GAME_TIMEOUT_MS,
 		});
 
-		messageCollector.on('collect', async (message) => {
+		messageCollector.on('collect', async message => {
 			const guess = message.content.trim().toLowerCase();
 
 			if (guess === wordToUnscramble.toLowerCase()) {
@@ -51,9 +51,7 @@ module.exports = {
 			} else {
 				message
 					.react(INCORRECT_GUESS_EMOJI)
-					.catch((error) =>
-						handleError('Failed to react to message:', error),
-					); // React with wrong emoji
+					.catch(error => handleError('Failed to react to message:', error)); // React with wrong emoji
 			}
 		});
 
@@ -92,8 +90,8 @@ async function loadWords() {
 		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
 		return data
 			.split('\n')
-			.map((word) => word.trim())
-			.filter((word) => word);
+			.map(word => word.trim())
+			.filter(word => word);
 	} catch (error) {
 		handleError('Failed to load words:', error);
 		return null;

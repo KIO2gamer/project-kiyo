@@ -16,7 +16,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_list')
 		.setDescription('Lists all custom commands')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('search')
 				.setDescription('Search for a specific command')
@@ -25,10 +25,7 @@ module.exports = {
 	category: 'utility',
 	description_full: "Lists all custom commands stored in the bot's database.",
 	usage: '/custom_list [search:search_term]',
-	examples: [
-		'/custom_list',
-		'/custom_list search:greet',
-	],
+	examples: ['/custom_list', '/custom_list search:greet'],
 	/**
 	 * Executes the custom command list interaction.
 	 *
@@ -44,12 +41,12 @@ module.exports = {
 			// Build query
 			const query = searchTerm
 				? {
-					$or: [
-						{ name: { $regex: searchTerm, $options: 'i' } },
-						{ alias_name: { $regex: searchTerm, $options: 'i' } },
-						{ message: { $regex: searchTerm, $options: 'i' } },
-					],
-				}
+						$or: [
+							{ name: { $regex: searchTerm, $options: 'i' } },
+							{ alias_name: { $regex: searchTerm, $options: 'i' } },
+							{ message: { $regex: searchTerm, $options: 'i' } },
+						],
+					}
 				: {};
 
 			// Fetch commands
@@ -58,9 +55,11 @@ module.exports = {
 			if (commands.length === 0) {
 				const noResultsEmbed = new EmbedBuilder()
 					.setTitle('Custom Commands')
-					.setDescription(searchTerm
-						? `No commands found matching "${searchTerm}"`
-						: 'No custom commands have been created yet.')
+					.setDescription(
+						searchTerm
+							? `No commands found matching "${searchTerm}"`
+							: 'No custom commands have been created yet.',
+					)
 					.setColor('#FF0000')
 					.setTimestamp();
 
@@ -73,7 +72,7 @@ module.exports = {
 			let currentPage = 0;
 
 			// Function to generate embed for a specific page
-			const generateEmbed = (page) => {
+			const generateEmbed = page => {
 				const start = page * COMMANDS_PER_PAGE;
 				const end = Math.min(start + COMMANDS_PER_PAGE, commands.length);
 				const pageCommands = commands.slice(start, end);
@@ -90,13 +89,16 @@ module.exports = {
 					embed.setDescription(`Search results for "${searchTerm}"`);
 				}
 
-				const commandList = pageCommands.map((cmd) => {
-					const aliasText = cmd.alias_name ? ` (alias: ${cmd.alias_name})` : '';
-					const messagePreview = cmd.message.length > 50
-						? cmd.message.substring(0, 47) + '...'
-						: cmd.message;
-					return `• **${cmd.name}**${aliasText}\n  └ ${messagePreview}`;
-				}).join('\n\n');
+				const commandList = pageCommands
+					.map(cmd => {
+						const aliasText = cmd.alias_name ? ` (alias: ${cmd.alias_name})` : '';
+						const messagePreview =
+							cmd.message.length > 50
+								? cmd.message.substring(0, 47) + '...'
+								: cmd.message;
+						return `• **${cmd.name}**${aliasText}\n  └ ${messagePreview}`;
+					})
+					.join('\n\n');
 
 				embed.addFields({ name: 'Commands', value: commandList || 'No commands found.' });
 
@@ -104,7 +106,7 @@ module.exports = {
 			};
 
 			// Create navigation buttons
-			const getNavigationRow = (currentPage) => {
+			const getNavigationRow = currentPage => {
 				const row = new ActionRowBuilder();
 
 				row.addComponents(
@@ -127,7 +129,7 @@ module.exports = {
 						.setCustomId('last')
 						.setLabel('Last ⏩')
 						.setStyle(ButtonStyle.Primary)
-						.setDisabled(currentPage === totalPages - 1)
+						.setDisabled(currentPage === totalPages - 1),
 				);
 
 				return row;
@@ -142,11 +144,11 @@ module.exports = {
 			if (totalPages > 1) {
 				// Create collector for button interactions
 				const collector = message.createMessageComponentCollector({
-					filter: (i) => i.user.id === interaction.user.id,
+					filter: i => i.user.id === interaction.user.id,
 					time: 300000, // 5 minutes
 				});
 
-				collector.on('collect', async (i) => {
+				collector.on('collect', async i => {
 					try {
 						switch (i.customId) {
 							case 'first':
@@ -172,7 +174,7 @@ module.exports = {
 							interaction,
 							error,
 							'COMMAND_EXECUTION',
-							'Failed to update the command list.'
+							'Failed to update the command list.',
 						);
 					}
 				});
@@ -199,14 +201,14 @@ module.exports = {
 					interaction,
 					error,
 					'DATABASE',
-					'Failed to fetch custom commands from the database.'
+					'Failed to fetch custom commands from the database.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while listing custom commands.'
+					'An error occurred while listing custom commands.',
 				);
 			}
 		}

@@ -14,9 +14,9 @@ module.exports = {
 		guild.client.recentJoins.unshift({
 			guild: {
 				name: guild.name,
-				id: guild.id
+				id: guild.id,
 			},
-			timestamp: Date.now()
+			timestamp: Date.now(),
 		});
 
 		// Keep only last 10 server joins
@@ -24,4 +24,4 @@ module.exports = {
 			guild.client.recentJoins.pop();
 		}
 	},
-}; 
+};

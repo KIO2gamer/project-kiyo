@@ -15,7 +15,7 @@ module.exports = {
 	examples: [
 		'/new_channel name:general type:text',
 		'/new_channel name:voice-chat type:voice category:Voice Channels',
-		'/new_channel name:announcements type:text topic:Server announcements'
+		'/new_channel name:announcements type:text topic:Server announcements',
 	],
 	category: 'setup',
 	data: new SlashCommandBuilder()
@@ -23,31 +23,25 @@ module.exports = {
 		.setDescription('Creates a new channel in the server.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 		.addStringOption(option =>
-			option
-				.setName('name')
-				.setDescription('The name for the new channel')
-				.setRequired(true)
+			option.setName('name').setDescription('The name for the new channel').setRequired(true),
 		)
 		.addStringOption(option =>
 			option
 				.setName('type')
 				.setDescription('The type of channel to create')
 				.setRequired(true)
-				.addChoices(
-					{ name: 'Text', value: 'text' },
-					{ name: 'Voice', value: 'voice' }
-				)
+				.addChoices({ name: 'Text', value: 'text' }, { name: 'Voice', value: 'voice' }),
 		)
 		.addChannelOption(option =>
 			option
 				.setName('category')
 				.setDescription('The category to place the channel in')
-				.addChannelTypes(ChannelType.GuildCategory)
+				.addChannelTypes(ChannelType.GuildCategory),
 		)
 		.addStringOption(option =>
 			option
 				.setName('topic')
-				.setDescription('The topic/description for the channel (text channels only)')
+				.setDescription('The topic/description for the channel (text channels only)'),
 		),
 
 	async execute(interaction) {
@@ -65,21 +59,21 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel name'),
 					'VALIDATION',
-					'Channel name can only contain letters, numbers, hyphens, and underscores.'
+					'Channel name can only contain letters, numbers, hyphens, and underscores.',
 				);
 				return;
 			}
 
 			// Check if channel name already exists
 			const existingChannel = interaction.guild.channels.cache.find(
-				ch => ch.name.toLowerCase() === name.toLowerCase()
+				ch => ch.name.toLowerCase() === name.toLowerCase(),
 			);
 			if (existingChannel) {
 				await handleError(
 					interaction,
 					new Error('Channel already exists'),
 					'VALIDATION',
-					`A channel with the name "${name}" already exists.`
+					`A channel with the name "${name}" already exists.`,
 				);
 				return;
 			}
@@ -91,7 +85,7 @@ module.exports = {
 						interaction,
 						new Error('Invalid category'),
 						'VALIDATION',
-						'The specified category is not valid.'
+						'The specified category is not valid.',
 					);
 					return;
 				}
@@ -100,25 +94,26 @@ module.exports = {
 				const botMember = interaction.guild.members.me;
 				const requiredPermissions = [
 					PermissionFlagsBits.ViewChannel,
-					PermissionFlagsBits.ManageChannels
+					PermissionFlagsBits.ManageChannels,
 				];
 
 				const missingPermissions = requiredPermissions.filter(
-					perm => !category.permissionsFor(botMember).has(perm)
+					perm => !category.permissionsFor(botMember).has(perm),
 				);
 
 				if (missingPermissions.length > 0) {
 					const permissionNames = missingPermissions.map(perm =>
-						Object.keys(PermissionFlagsBits).find(key => PermissionFlagsBits[key] === perm)
+						Object.keys(PermissionFlagsBits)
+							.find(key => PermissionFlagsBits[key] === perm)
 							.replace(/_/g, ' ')
-							.toLowerCase()
+							.toLowerCase(),
 					);
 
 					await handleError(
 						interaction,
 						new Error('Missing category permissions'),
 						'PERMISSION',
-						`I need the following permissions in the category: ${permissionNames.join(', ')}`
+						`I need the following permissions in the category: ${permissionNames.join(', ')}`,
 					);
 					return;
 				}
@@ -128,7 +123,7 @@ module.exports = {
 			const channelOptions = {
 				name,
 				type: type === 'text' ? ChannelType.GuildText : ChannelType.GuildVoice,
-				parent: category ? category.id : null
+				parent: category ? category.id : null,
 			};
 
 			// Add topic for text channels
@@ -144,13 +139,21 @@ module.exports = {
 					.setDescription(`Successfully created ${type} channel ${newChannel}`)
 					.addFields(
 						{ name: 'Name', value: name, inline: true },
-						{ name: 'Type', value: type.charAt(0).toUpperCase() + type.slice(1), inline: true },
-						{ name: 'Category', value: category ? category.name : 'None', inline: true }
+						{
+							name: 'Type',
+							value: type.charAt(0).toUpperCase() + type.slice(1),
+							inline: true,
+						},
+						{
+							name: 'Category',
+							value: category ? category.name : 'None',
+							inline: true,
+						},
 					)
 					.setColor('Green')
 					.setFooter({
 						text: `Created by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
@@ -167,7 +170,7 @@ module.exports = {
 						.setDescription('This channel has been created and is ready for use!')
 						.addFields({
 							name: 'Created By',
-							value: interaction.user.tag
+							value: interaction.user.tag,
 						})
 						.setColor('Blue')
 						.setTimestamp();
@@ -179,7 +182,7 @@ module.exports = {
 					interaction,
 					error,
 					'DISCORD_API',
-					'Failed to create the channel. Please check my permissions and try again.'
+					'Failed to create the channel. Please check my permissions and try again.',
 				);
 			}
 		} catch (error) {
@@ -187,7 +190,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while creating the channel.'
+				'An error occurred while creating the channel.',
 			);
 		}
 	},

@@ -19,7 +19,7 @@ module.exports = {
 		.setName('set_msg_logs_channel')
 		.setDescription('Sets the channel where message logs would be sent into.')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('The channel to show message logs to.')
@@ -38,7 +38,7 @@ module.exports = {
 					interaction,
 					new Error('No channel provided'),
 					'VALIDATION',
-					'Please provide a valid text channel.'
+					'Please provide a valid text channel.',
 				);
 				return;
 			}
@@ -49,7 +49,7 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel guild'),
 					'VALIDATION',
-					'The channel must be in this server.'
+					'The channel must be in this server.',
 				);
 				return;
 			}
@@ -60,25 +60,26 @@ module.exports = {
 				PermissionFlagsBits.ViewChannel,
 				PermissionFlagsBits.SendMessages,
 				PermissionFlagsBits.EmbedLinks,
-				PermissionFlagsBits.ReadMessageHistory
+				PermissionFlagsBits.ReadMessageHistory,
 			];
 
 			const missingPermissions = requiredPermissions.filter(
-				perm => !channel.permissionsFor(botMember).has(perm)
+				perm => !channel.permissionsFor(botMember).has(perm),
 			);
 
 			if (missingPermissions.length > 0) {
 				const permissionNames = missingPermissions.map(perm =>
-					Object.keys(PermissionFlagsBits).find(key => PermissionFlagsBits[key] === perm)
+					Object.keys(PermissionFlagsBits)
+						.find(key => PermissionFlagsBits[key] === perm)
 						.replace(/_/g, ' ')
-						.toLowerCase()
+						.toLowerCase(),
 				);
 
 				await handleError(
 					interaction,
 					new Error('Missing channel permissions'),
 					'PERMISSION',
-					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`
+					`I need the following permissions in ${channel}: ${permissionNames.join(', ')}`,
 				);
 				return;
 			}
@@ -88,7 +89,7 @@ module.exports = {
 				const config = await MsgLogsConfig.findOneAndUpdate(
 					{ guildId: interaction.guild.id },
 					{ channelId: channel.id },
-					{ upsert: true, new: true }
+					{ upsert: true, new: true },
 				);
 
 				const embed = new EmbedBuilder()
@@ -96,41 +97,42 @@ module.exports = {
 					.setDescription(`Message logs will now be sent to ${channel}`)
 					.addFields(
 						{ name: 'Channel', value: channel.name, inline: true },
-						{ name: 'Channel ID', value: channel.id, inline: true }
+						{ name: 'Channel ID', value: channel.id, inline: true },
 					)
 					.setColor('Green')
 					.setFooter({
 						text: `Set by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
 				await interaction.editReply({
 					embeds: [embed],
-					flags: MessageFlags.Ephemeral
+					flags: MessageFlags.Ephemeral,
 				});
 
 				// Send test message to verify permissions
 				const testEmbed = new EmbedBuilder()
 					.setTitle('Message Logs Setup')
-					.setDescription('This channel has been set up for message logs.\n' +
-						'You will see message edit and delete logs here.')
+					.setDescription(
+						'This channel has been set up for message logs.\n' +
+							'You will see message edit and delete logs here.',
+					)
 					.setColor('Blue')
 					.addFields({
 						name: 'Test Log',
-						value: 'This is a test message to verify permissions.'
+						value: 'This is a test message to verify permissions.',
 					})
 					.setTimestamp();
 
 				await channel.send({ embeds: [testEmbed] });
-
 			} catch (error) {
 				if (error.code === 11000) {
 					await handleError(
 						interaction,
 						error,
 						'DATABASE',
-						'Failed to update the message logs channel configuration.'
+						'Failed to update the message logs channel configuration.',
 					);
 				} else {
 					throw error;
@@ -141,7 +143,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while setting up the message logs channel.'
+				'An error occurred while setting up the message logs channel.',
 			);
 		}
 	},

@@ -47,9 +47,7 @@ module.exports = {
 			await interaction.deferReply(); // Defer reply for potential file reading delay
 			const words = await loadWords();
 			if (!words) {
-				return interaction.editReply(
-					'Oops! The word list is as empty as a ghost town!',
-				);
+				return interaction.editReply('Oops! The word list is as empty as a ghost town!');
 			}
 
 			const word = selectWord(words);
@@ -87,8 +85,8 @@ async function loadWords() {
 		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
 		return data
 			.split('\n')
-			.map((word) => word.trim())
-			.filter((word) => word);
+			.map(word => word.trim())
+			.filter(word => word);
 	} catch (error) {
 		handleError('Failed to read the word list file:', error);
 		return null;
@@ -134,14 +132,12 @@ function createGameEmbed(gameState, thumbnail) {
 }
 
 function getGuessedLettersDisplay(guessedLetters) {
-	return guessedLetters.length > 0
-		? guessedLetters.join(', ').toUpperCase()
-		: 'None yet!';
+	return guessedLetters.length > 0 ? guessedLetters.join(', ').toUpperCase() : 'None yet!';
 }
 
 function createCollector(interaction, gameActive) {
 	// Added gameActive parameter
-	const filter = (m) =>
+	const filter = m =>
 		!m.author.bot &&
 		gameActive && // Any non-bot user can guess while game is active
 		m.content.length === 1 &&
@@ -163,7 +159,7 @@ function startGameCollector(
 	winner,
 ) {
 	// Added gameActive and winner parameters
-	collector.on('collect', async (m) => {
+	collector.on('collect', async m => {
 		const letter = m.content.toLowerCase();
 		if (gameState.guessedLetters.includes(letter)) {
 			handleGuess(m);
@@ -203,13 +199,7 @@ function startGameCollector(
 	});
 }
 
-async function handleCorrectGuess(
-	message,
-	letter,
-	gameState,
-	gameEmbed,
-	gameMessage,
-) {
+async function handleCorrectGuess(message, letter, gameState, gameEmbed, gameMessage) {
 	updateWordState(letter, gameState);
 	gameEmbed.setDescription(
 		`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``,
@@ -223,10 +213,7 @@ async function handleCorrectGuess(
 function updateWordState(letter, gameState) {
 	let newWordState = '';
 	for (let i = 0; i < gameState.word.length; i++) {
-		if (
-			gameState.word[i] === letter ||
-			gameState.guessedLetters.includes(gameState.word[i])
-		) {
+		if (gameState.word[i] === letter || gameState.guessedLetters.includes(gameState.word[i])) {
 			newWordState += gameState.word[i] + ' ';
 		} else {
 			newWordState += '_ ';
@@ -235,24 +222,14 @@ function updateWordState(letter, gameState) {
 	gameState.wordState = newWordState.trim();
 }
 
-async function handleIncorrectGuess(
-	message,
-	gameState,
-	gameEmbed,
-	gameMessage,
-) {
+async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) {
 	gameState.remainingGuesses--;
-	const funnyMessage =
-		funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
-	const reply = await message.reply(
-		`😅 ${funnyMessage} - Nice try, ${message.author}!`,
-	); // Mention the user who guessed incorrectly
+	const funnyMessage = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+	const reply = await message.reply(`😅 ${funnyMessage} - Nice try, ${message.author}!`); // Mention the user who guessed incorrectly
 	// setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
 
 	gameEmbed
-		.setDescription(
-			`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``,
-		)
+		.setDescription(`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``)
 		.setThumbnail(hangmanImages[MAX_GUESSES - gameState.remainingGuesses])
 		.setFields([
 			{

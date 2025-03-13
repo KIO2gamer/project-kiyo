@@ -7,7 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ask_gemini')
 		.setDescription('Ask a single question to Gemini AI')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('question')
 				.setDescription('The question you want to ask Gemini AI')
@@ -43,9 +43,7 @@ module.exports = {
 			await interaction.reply(text);
 		} catch (error) {
 			handleError('Error in ask-gemini command:', error);
-			await interaction.reply(
-				'Sorry, there was an error processing your request.',
-			);
+			await interaction.reply('Sorry, there was an error processing your request.');
 		}
 	},
 };

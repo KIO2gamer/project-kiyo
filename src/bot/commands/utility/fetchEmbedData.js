@@ -13,17 +13,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('fetch_embed_data')
 		.setDescription('Fetches the embed data from a message URL.')
-		.addStringOption((option) =>
-			option
-				.setName('url')
-				.setDescription('The message URL')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('url').setDescription('The message URL').setRequired(true),
 		),
 	async execute(interaction) {
 		try {
 			const url = interaction.options.getString('url'); // Get the URL from the message
-			const urlRegex =
-				/https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
+			const urlRegex = /https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
 			const match = url.match(urlRegex);
 
 			if (!match) {
@@ -51,9 +47,7 @@ module.exports = {
 			const data = await response.json();
 
 			if (!data.embeds || data.embeds.length === 0) {
-				return interaction.reply(
-					'The message does not contain any embeds.',
-				);
+				return interaction.reply('The message does not contain any embeds.');
 			}
 
 			// Extract the first embed (you can loop through if there are multiple)
@@ -64,9 +58,7 @@ module.exports = {
 				content: 'Embed Data:',
 				files: [
 					{
-						attachment: Buffer.from(
-							JSON.stringify(embedData, null, 2),
-						),
+						attachment: Buffer.from(JSON.stringify(embedData, null, 2)),
 						name: 'embed.json',
 					},
 				],

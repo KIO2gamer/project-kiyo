@@ -1,4 +1,15 @@
-const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, StringSelectMenuBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ActionRowBuilder,
+	ComponentType,
+	StringSelectMenuBuilder,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
+} = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const { handleError } = require('../../utils/errorHandler');
@@ -9,7 +20,7 @@ const { MessageFlags } = require('discord.js');
 const CACHE_LIFETIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 let commandCache = {
 	commands: [],
-	timestamp: 0
+	timestamp: 0,
 };
 
 // Command usage tracking
@@ -17,15 +28,15 @@ const commandUsage = new Map();
 
 // Category emoji mapping
 const CATEGORY_EMOJIS = {
-	'admin': '⚙️',
-	'fun': '🎲',
-	'games': '🎮',
-	'info': 'ℹ️',
-	'moderation': '🛡️',
-	'roles': '👑',
-	'setup': '🔧',
-	'utility': '🛠️',
-	'media': '🎬'
+	admin: '⚙️',
+	fun: '🎲',
+	games: '🎮',
+	info: 'ℹ️',
+	moderation: '🛡️',
+	roles: '👑',
+	setup: '🔧',
+	utility: '🛠️',
+	media: '🎬',
 };
 
 // Constants
@@ -35,26 +46,26 @@ const MAX_FIELDS_PER_EMBED = 25;
 const PAGINATION_TIMEOUT = 300000; // 5 minutes
 
 module.exports = {
-	description_full: 'Displays comprehensive help information for all bot commands. You can view all commands grouped by category, get detailed information about specific commands, search for commands using keywords, or filter commands by category.',
+	description_full:
+		'Displays comprehensive help information for all bot commands. You can view all commands grouped by category, get detailed information about specific commands, search for commands using keywords, or filter commands by category.',
 	usage: '/help [command:command_name] [search:keyword] [category:category_name]',
-	examples: [
-		'/help',
-		'/help command:ping',
-		'/help search:user',
-		'/help category:moderation'
-	],
+	examples: ['/help', '/help command:ping', '/help search:user', '/help category:moderation'],
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Display help information for bot commands')
 		.addStringOption(option =>
-			option.setName('command')
+			option
+				.setName('command')
 				.setDescription('Get detailed info about a specific command')
-				.setRequired(false))
+				.setRequired(false),
+		)
 		.addStringOption(option =>
-			option.setName('search')
+			option
+				.setName('search')
 				.setDescription('Search for commands by keyword')
-				.setRequired(false))
+				.setRequired(false),
+		)
 		.addStringOption(option =>
 			option
 				.setName('category')
@@ -63,9 +74,9 @@ module.exports = {
 				.addChoices(
 					...Object.entries(CATEGORY_EMOJIS).map(([category, emoji]) => ({
 						name: `${emoji} ${category.charAt(0).toUpperCase() + category.slice(1)}`,
-						value: category
-					}))
-				)
+						value: category,
+					})),
+				),
 		),
 
 	async execute(interaction) {
@@ -102,21 +113,21 @@ module.exports = {
 						interaction,
 						error,
 						'PERMISSION',
-						'I do not have permission to view or manage commands in this server.'
+						'I do not have permission to view or manage commands in this server.',
 					);
 				} else if (error.code === 'ENOENT') {
 					await handleError(
 						interaction,
 						error,
 						'FILE_SYSTEM',
-						'Failed to read command files. Please contact the bot administrator.'
+						'Failed to read command files. Please contact the bot administrator.',
 					);
 				} else {
 					await handleError(
 						interaction,
 						error,
 						'DATA_FETCH',
-						'Failed to fetch command information. Please try again later.'
+						'Failed to fetch command information. Please try again later.',
 					);
 				}
 			}
@@ -125,7 +136,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while processing the help command.'
+				'An error occurred while processing the help command.',
 			);
 		}
 	},
@@ -137,7 +148,7 @@ module.exports = {
 
 	getUsageStats() {
 		return Object.fromEntries(commandUsage);
-	}
+	},
 };
 
 // Get all commands recursively from the commands directory
@@ -146,7 +157,11 @@ async function getAllCommands() {
 		// Check if cache is valid
 		const now = Date.now();
 		if (commandCache.commands.length > 0 && now - commandCache.timestamp < CACHE_LIFETIME) {
-			Logger.log('HELP', `Using cached commands (${commandCache.commands.length} commands)`, 'info');
+			Logger.log(
+				'HELP',
+				`Using cached commands (${commandCache.commands.length} commands)`,
+				'info',
+			);
 			return commandCache.commands;
 		}
 
@@ -155,16 +170,21 @@ async function getAllCommands() {
 		const commandsPath = path.join(__dirname, '..');
 
 		// Read and validate command directories
-		const categories = await fs.promises.readdir(commandsPath)
-			.then(dirs => dirs.filter(async dir => {
+		const categories = await fs.promises.readdir(commandsPath).then(dirs =>
+			dirs.filter(async dir => {
 				try {
 					const stat = await fs.promises.stat(path.join(commandsPath, dir));
 					return stat.isDirectory();
 				} catch (error) {
-					Logger.log('HELP', `Error checking directory ${dir}: ${error.message}`, 'error');
+					Logger.log(
+						'HELP',
+						`Error checking directory ${dir}: ${error.message}`,
+						'error',
+					);
 					return false;
 				}
-			}));
+			}),
+		);
 
 		// Process each category
 		for (const category of categories) {
@@ -190,7 +210,11 @@ async function getAllCommands() {
 						commands.push(command);
 						Logger.log('HELP', `Loaded command: ${command.data.name}`, 'debug');
 					} catch (error) {
-						Logger.log('HELP', `Error loading command ${file}: ${error.message}`, 'error');
+						Logger.log(
+							'HELP',
+							`Error loading command ${file}: ${error.message}`,
+							'error',
+						);
 						// Continue loading other commands
 						continue;
 					}
@@ -221,8 +245,8 @@ async function getAllCommands() {
 async function handleCommandDetails(interaction, commandName, commands) {
 	try {
 		// Find exact command match first
-		const command = commands.find(cmd =>
-			cmd.data.name.toLowerCase() === commandName.toLowerCase()
+		const command = commands.find(
+			cmd => cmd.data.name.toLowerCase() === commandName.toLowerCase(),
 		);
 
 		if (!command) {
@@ -230,7 +254,10 @@ async function handleCommandDetails(interaction, commandName, commands) {
 			const similarCommands = commands
 				.map(cmd => ({
 					command: cmd,
-					similarity: calculateSimilarity(cmd.data.name.toLowerCase(), commandName.toLowerCase())
+					similarity: calculateSimilarity(
+						cmd.data.name.toLowerCase(),
+						commandName.toLowerCase(),
+					),
 				}))
 				.filter(result => result.similarity > 0.4) // Minimum similarity threshold
 				.sort((a, b) => b.similarity - a.similarity)
@@ -238,23 +265,25 @@ async function handleCommandDetails(interaction, commandName, commands) {
 				.map(result => ({
 					name: result.command.data.name,
 					category: result.command.category,
-					similarity: result.similarity
+					similarity: result.similarity,
 				}));
 
-			const suggestionText = similarCommands.length > 0
-				? [
-					'Did you mean:',
-					...similarCommands.map(cmd =>
-						`• \`/${cmd.name}\` (${CATEGORY_EMOJIS[cmd.category.toLowerCase()] || '📁'} ${cmd.category})`
-					)
-				].join('\n')
-				: 'No similar commands found. Try using `/help search:keyword` to find what you\'re looking for.';
+			const suggestionText =
+				similarCommands.length > 0
+					? [
+							'Did you mean:',
+							...similarCommands.map(
+								cmd =>
+									`• \`/${cmd.name}\` (${CATEGORY_EMOJIS[cmd.category.toLowerCase()] || '📁'} ${cmd.category})`,
+							),
+						].join('\n')
+					: "No similar commands found. Try using `/help search:keyword` to find what you're looking for.";
 
 			await handleError(
 				interaction,
 				new Error('Command not found'),
 				'NOT_FOUND',
-				`Command \`${commandName}\` not found.\n\n${suggestionText}`
+				`Command \`${commandName}\` not found.\n\n${suggestionText}`,
 			);
 			return;
 		}
@@ -263,38 +292,42 @@ async function handleCommandDetails(interaction, commandName, commands) {
 		const categoryEmoji = CATEGORY_EMOJIS[command.category?.toLowerCase()] || '📁';
 		const embed = new EmbedBuilder()
 			.setTitle(`Command: /${command.data.name}`)
-			.setDescription(command.description_full || command.data.description || 'No description available')
+			.setDescription(
+				command.description_full || command.data.description || 'No description available',
+			)
 			.setColor(EMBED_COLOR)
 			.setAuthor({
 				name: `${categoryEmoji} ${command.category || 'Uncategorized'} Category`,
-				iconURL: interaction.client.user.displayAvatarURL()
+				iconURL: interaction.client.user.displayAvatarURL(),
 			})
 			.setTimestamp();
 
 		// Add command options with better formatting
 		if (command.data.options?.length > 0) {
-			const optionsText = command.data.options.map(option => {
-				const required = option.required ? '`Required`' : '`Optional`';
-				let text = `• **${option.name}** ${required}\n  ${option.description}`;
+			const optionsText = command.data.options
+				.map(option => {
+					const required = option.required ? '`Required`' : '`Optional`';
+					let text = `• **${option.name}** ${required}\n  ${option.description}`;
 
-				if (option.choices?.length > 0) {
-					text += `\n  Choices: ${option.choices.map(c => `\`${c.name}\``).join(', ')}`;
-				}
-
-				// Add type-specific information
-				if (option.type) {
-					const typeInfo = getOptionTypeInfo(option);
-					if (typeInfo) {
-						text += `\n  ${typeInfo}`;
+					if (option.choices?.length > 0) {
+						text += `\n  Choices: ${option.choices.map(c => `\`${c.name}\``).join(', ')}`;
 					}
-				}
 
-				return text;
-			}).join('\n\n');
+					// Add type-specific information
+					if (option.type) {
+						const typeInfo = getOptionTypeInfo(option);
+						if (typeInfo) {
+							text += `\n  ${typeInfo}`;
+						}
+					}
+
+					return text;
+				})
+				.join('\n\n');
 
 			embed.addFields({
 				name: '🔧 Options',
-				value: optionsText || 'No options available'
+				value: optionsText || 'No options available',
 			});
 		}
 
@@ -302,7 +335,7 @@ async function handleCommandDetails(interaction, commandName, commands) {
 		if (command.usage) {
 			embed.addFields({
 				name: '💻 Usage',
-				value: `\`\`\`\n${command.usage}\n\`\`\``
+				value: `\`\`\`\n${command.usage}\n\`\`\``,
 			});
 		}
 
@@ -310,7 +343,7 @@ async function handleCommandDetails(interaction, commandName, commands) {
 		if (command.examples?.length > 0) {
 			embed.addFields({
 				name: '📝 Examples',
-				value: command.examples.map(ex => `• \`${ex}\``).join('\n')
+				value: command.examples.map(ex => `• \`${ex}\``).join('\n'),
 			});
 		}
 
@@ -320,7 +353,7 @@ async function handleCommandDetails(interaction, commandName, commands) {
 				name: '🔒 Required Permissions',
 				value: command.permissions
 					.map(perm => `• \`${formatPermission(perm)}\``)
-					.join('\n')
+					.join('\n'),
 			});
 		}
 
@@ -329,7 +362,7 @@ async function handleCommandDetails(interaction, commandName, commands) {
 			embed.addFields({
 				name: '⏱️ Cooldown',
 				value: formatCooldown(command.cooldown),
-				inline: true
+				inline: true,
 			});
 		}
 
@@ -340,34 +373,33 @@ async function handleCommandDetails(interaction, commandName, commands) {
 				name: '🔗 Related Commands',
 				value: relatedCommands
 					.map(cmd => `• \`/${cmd.data.name}\` - ${cmd.data.description}`)
-					.join('\n')
+					.join('\n'),
 			});
 		}
 
 		// Add navigation buttons
-		const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('overview')
-					.setLabel('Back to Overview')
-					.setStyle(ButtonStyle.Secondary)
-					.setEmoji('📚'),
-				new ButtonBuilder()
-					.setCustomId('category')
-					.setLabel(`View ${command.category} Commands`)
-					.setStyle(ButtonStyle.Primary)
-					.setEmoji(CATEGORY_EMOJIS[command.category?.toLowerCase()] || '📁')
-			);
+		const row = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('overview')
+				.setLabel('Back to Overview')
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('📚'),
+			new ButtonBuilder()
+				.setCustomId('category')
+				.setLabel(`View ${command.category} Commands`)
+				.setStyle(ButtonStyle.Primary)
+				.setEmoji(CATEGORY_EMOJIS[command.category?.toLowerCase()] || '📁'),
+		);
 
 		await interaction.editReply({
 			embeds: [embed],
-			components: [row]
+			components: [row],
 		});
 
 		// Handle button interactions
 		const collector = interaction.channel.createMessageComponentCollector({
 			filter: i => i.user.id === interaction.user.id,
-			time: PAGINATION_TIMEOUT
+			time: PAGINATION_TIMEOUT,
 		});
 
 		collector.on('collect', async i => {
@@ -382,22 +414,21 @@ async function handleCommandDetails(interaction, commandName, commands) {
 					interaction,
 					error,
 					'NAVIGATION',
-					'Failed to navigate to the selected page.'
+					'Failed to navigate to the selected page.',
 				);
 			}
 		});
 
 		collector.on('end', () => {
 			row.components.forEach(button => button.setDisabled(true));
-			interaction.editReply({ components: [row] }).catch(() => { });
+			interaction.editReply({ components: [row] }).catch(() => {});
 		});
-
 	} catch (error) {
 		await handleError(
 			interaction,
 			error,
 			'COMMAND_DETAILS',
-			'Failed to display command details.'
+			'Failed to display command details.',
 		);
 	}
 }
@@ -435,7 +466,7 @@ function getOptionTypeInfo(option) {
 		8: 'Type: Role',
 		9: 'Type: Mentionable',
 		10: 'Type: Number',
-		11: 'Type: Attachment'
+		11: 'Type: Attachment',
 	};
 
 	let info = typeMap[option.type];
@@ -462,7 +493,7 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 				interaction,
 				new Error('Invalid search query'),
 				'SEARCH',
-				'Please provide a valid search term with at least 2 characters.'
+				'Please provide a valid search term with at least 2 characters.',
 			);
 			return;
 		}
@@ -477,8 +508,10 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 					cmd.description_full || '',
 					...(cmd.examples || []),
 					...(cmd.data.options?.map(opt => `${opt.name} ${opt.description}`) || []),
-					cmd.category || ''
-				].join(' ').toLowerCase();
+					cmd.category || '',
+				]
+					.join(' ')
+					.toLowerCase();
 
 				// Calculate score based on different factors
 				for (const term of searchTerms) {
@@ -496,10 +529,14 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 					if (cmd.examples?.some(ex => ex.toLowerCase().includes(term))) score += 15;
 
 					// Matches in options
-					if (cmd.data.options?.some(opt =>
-						opt.name.toLowerCase().includes(term) ||
-						opt.description.toLowerCase().includes(term)
-					)) score += 10;
+					if (
+						cmd.data.options?.some(
+							opt =>
+								opt.name.toLowerCase().includes(term) ||
+								opt.description.toLowerCase().includes(term),
+						)
+					)
+						score += 10;
 
 					// Matches in category
 					if (cmd.category?.toLowerCase().includes(term)) score += 5;
@@ -525,12 +562,12 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 				new Error('No results found'),
 				'SEARCH',
 				`No commands found matching "${searchQuery}".\n\n` +
-				'Try:\n' +
-				'• Using different keywords\n' +
-				'• Checking for typos\n' +
-				'• Searching by category\n\n' +
-				'Available categories:\n' +
-				categoryList
+					'Try:\n' +
+					'• Using different keywords\n' +
+					'• Checking for typos\n' +
+					'• Searching by category\n\n' +
+					'Available categories:\n' +
+					categoryList,
 			);
 			return;
 		}
@@ -541,9 +578,11 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 			.setColor(EMBED_COLOR)
 			.setAuthor({
 				name: 'Command Search',
-				iconURL: interaction.client.user.displayAvatarURL()
+				iconURL: interaction.client.user.displayAvatarURL(),
 			})
-			.setDescription(`Found ${searchResults.length} command${searchResults.length === 1 ? '' : 's'} matching your search.`)
+			.setDescription(
+				`Found ${searchResults.length} command${searchResults.length === 1 ? '' : 's'} matching your search.`,
+			)
 			.setTimestamp();
 
 		// Group results by category for better organization
@@ -561,39 +600,40 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 			const emoji = CATEGORY_EMOJIS[category.toLowerCase()] || '📁';
 			const commandList = categoryCommands
 				.map(cmd => {
-					const description = cmd.data.description.length > 100
-						? cmd.data.description.substring(0, 97) + '...'
-						: cmd.data.description;
+					const description =
+						cmd.data.description.length > 100
+							? cmd.data.description.substring(0, 97) + '...'
+							: cmd.data.description;
 					return `• \`/${cmd.data.name}\` - ${description}`;
 				})
 				.join('\n');
 
 			embed.addFields({
 				name: `${emoji} ${category}`,
-				value: commandList
+				value: commandList,
 			});
 		}
 
 		// Add navigation buttons
-		const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('overview')
-					.setLabel('Back to Overview')
-					.setStyle(ButtonStyle.Secondary)
-					.setEmoji('📚')
-			);
+		const row = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('overview')
+				.setLabel('Back to Overview')
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('📚'),
+		);
 
 		// Add category filter buttons if there are multiple categories
 		if (Object.keys(groupedResults).length > 1) {
 			Object.keys(groupedResults).forEach((category, index) => {
-				if (index < 4) { // Maximum of 4 category buttons (5 total buttons including overview)
+				if (index < 4) {
+					// Maximum of 4 category buttons (5 total buttons including overview)
 					row.addComponents(
 						new ButtonBuilder()
 							.setCustomId(`category_${category}`)
 							.setLabel(category)
 							.setStyle(ButtonStyle.Primary)
-							.setEmoji(CATEGORY_EMOJIS[category.toLowerCase()] || '📁')
+							.setEmoji(CATEGORY_EMOJIS[category.toLowerCase()] || '📁'),
 					);
 				}
 			});
@@ -601,13 +641,13 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 
 		await interaction.editReply({
 			embeds: [embed],
-			components: [row]
+			components: [row],
 		});
 
 		// Handle button interactions
 		const collector = interaction.channel.createMessageComponentCollector({
 			filter: i => i.user.id === interaction.user.id,
-			time: PAGINATION_TIMEOUT
+			time: PAGINATION_TIMEOUT,
 		});
 
 		collector.on('collect', async i => {
@@ -623,22 +663,21 @@ async function handleSearchQuery(interaction, searchQuery, commands) {
 					interaction,
 					error,
 					'NAVIGATION',
-					'Failed to navigate to the selected page.'
+					'Failed to navigate to the selected page.',
 				);
 			}
 		});
 
 		collector.on('end', () => {
 			row.components.forEach(button => button.setDisabled(true));
-			interaction.editReply({ components: [row] }).catch(() => { });
+			interaction.editReply({ components: [row] }).catch(() => {});
 		});
-
 	} catch (error) {
 		await handleError(
 			interaction,
 			error,
 			'SEARCH',
-			'An error occurred while searching for commands.'
+			'An error occurred while searching for commands.',
 		);
 	}
 }
@@ -647,8 +686,8 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 	try {
 		// Validate and normalize category
 		const normalizedCategory = category.toLowerCase();
-		const categoryCommands = commands.filter(cmd =>
-			cmd.category?.toLowerCase() === normalizedCategory
+		const categoryCommands = commands.filter(
+			cmd => cmd.category?.toLowerCase() === normalizedCategory,
 		);
 
 		if (categoryCommands.length === 0) {
@@ -657,24 +696,29 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 			const similarCategories = categories
 				.map(cat => ({
 					name: cat,
-					similarity: calculateSimilarity(cat.toLowerCase(), normalizedCategory)
+					similarity: calculateSimilarity(cat.toLowerCase(), normalizedCategory),
 				}))
 				.filter(result => result.similarity > 0.3)
 				.sort((a, b) => b.similarity - a.similarity)
 				.slice(0, 3);
 
-			const suggestionText = similarCategories.length > 0
-				? '\nDid you mean:\n' + similarCategories
-					.map(cat => `• ${CATEGORY_EMOJIS[cat.name.toLowerCase()] || '📁'} ${cat.name}`)
-					.join('\n')
-				: '';
+			const suggestionText =
+				similarCategories.length > 0
+					? '\nDid you mean:\n' +
+						similarCategories
+							.map(
+								cat =>
+									`• ${CATEGORY_EMOJIS[cat.name.toLowerCase()] || '📁'} ${cat.name}`,
+							)
+							.join('\n')
+					: '';
 
 			await handleError(
 				interaction,
 				new Error('Category not found'),
 				'CATEGORY',
 				`No commands found in the "${category}" category.${suggestionText}\n\n` +
-				'Use `/help` to see all available categories.'
+					'Use `/help` to see all available categories.',
 			);
 			return;
 		}
@@ -685,16 +729,18 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 			.setColor(EMBED_COLOR)
 			.setAuthor({
 				name: `${categoryCommands.length} commands available`,
-				iconURL: interaction.client.user.displayAvatarURL()
+				iconURL: interaction.client.user.displayAvatarURL(),
 			})
-			.setDescription([
-				`Browse all commands in the ${category} category:`,
-				'',
-				'**Quick Tips:**',
-				'• Click on a command name to view its details',
-				'• Use the dropdown menu to filter by subcategory',
-				'• Use the buttons below to navigate'
-			].join('\n'))
+			.setDescription(
+				[
+					`Browse all commands in the ${category} category:`,
+					'',
+					'**Quick Tips:**',
+					'• Click on a command name to view its details',
+					'• Use the dropdown menu to filter by subcategory',
+					'• Use the buttons below to navigate',
+				].join('\n'),
+			)
 			.setTimestamp();
 
 		// Group commands by subcategory with improved organization
@@ -703,7 +749,7 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 			if (!acc[subcategory]) {
 				acc[subcategory] = {
 					commands: [],
-					description: cmd.subcategory_description || ''
+					description: cmd.subcategory_description || '',
 				};
 			}
 			acc[subcategory].commands.push(cmd);
@@ -711,15 +757,17 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 		}, {});
 
 		// Sort subcategories by priority and name
-		const sortedSubcategories = Object.entries(groupedCommands)
-			.sort(([a], [b]) => {
-				if (a === 'General') return -1;
-				if (b === 'General') return 1;
-				return a.localeCompare(b);
-			});
+		const sortedSubcategories = Object.entries(groupedCommands).sort(([a], [b]) => {
+			if (a === 'General') return -1;
+			if (b === 'General') return 1;
+			return a.localeCompare(b);
+		});
 
 		// Add fields for each subcategory with improved formatting
-		for (const [subcategory, { commands: subcatCommands, description }] of sortedSubcategories) {
+		for (const [
+			subcategory,
+			{ commands: subcatCommands, description },
+		] of sortedSubcategories) {
 			const commandList = subcatCommands
 				.sort((a, b) => a.data.name.localeCompare(b.data.name))
 				.map(cmd => {
@@ -733,7 +781,7 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 
 			embed.addFields({
 				name: `${subcategory}${description ? ` - ${description}` : ''}`,
-				value: commandList
+				value: commandList,
 			});
 		}
 
@@ -750,36 +798,39 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 						label: 'All Subcategories',
 						description: `View all ${categoryCommands.length} commands`,
 						value: 'all',
-						emoji: '📋'
+						emoji: '📋',
 					},
 					...sortedSubcategories.map(([subcat, { commands: subcatCommands }]) => ({
 						label: subcat,
 						description: `View ${subcatCommands.length} command${subcatCommands.length === 1 ? '' : 's'}`,
 						value: subcat,
-						emoji: subcat === 'General' ? '⚡' : '��'
-					}))
+						emoji: subcat === 'General' ? '⚡' : '��',
+					})),
 				]);
 
 			components.push(new ActionRowBuilder().addComponents(selectMenu));
 		}
 
 		// Add navigation buttons
-		const buttonRow = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('overview')
-					.setLabel('Back to Overview')
-					.setStyle(ButtonStyle.Secondary)
-					.setEmoji('📚')
-			);
+		const buttonRow = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('overview')
+				.setLabel('Back to Overview')
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('📚'),
+		);
 
 		// Add category navigation buttons if there are other categories
-		const otherCategories = [...new Set(commands.map(cmd => cmd.category))]
-			.filter(cat => cat.toLowerCase() !== normalizedCategory);
+		const otherCategories = [...new Set(commands.map(cmd => cmd.category))].filter(
+			cat => cat.toLowerCase() !== normalizedCategory,
+		);
 
 		if (otherCategories.length > 0) {
 			const currentIndex = otherCategories.indexOf(category);
-			const prevCategory = otherCategories[(currentIndex - 1 + otherCategories.length) % otherCategories.length];
+			const prevCategory =
+				otherCategories[
+					(currentIndex - 1 + otherCategories.length) % otherCategories.length
+				];
 			const nextCategory = otherCategories[(currentIndex + 1) % otherCategories.length];
 
 			buttonRow.addComponents(
@@ -792,7 +843,7 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 					.setCustomId(`category_${nextCategory}`)
 					.setLabel(nextCategory)
 					.setStyle(ButtonStyle.Primary)
-					.setEmoji(CATEGORY_EMOJIS[nextCategory.toLowerCase()] || '📁')
+					.setEmoji(CATEGORY_EMOJIS[nextCategory.toLowerCase()] || '📁'),
 			);
 		}
 
@@ -800,7 +851,7 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 
 		const replyOptions = {
 			embeds: [embed],
-			components: components
+			components: components,
 		};
 
 		if (isEdit) {
@@ -812,7 +863,7 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 		// Handle component interactions
 		const collector = interaction.channel.createMessageComponentCollector({
 			filter: i => i.user.id === interaction.user.id,
-			time: PAGINATION_TIMEOUT
+			time: PAGINATION_TIMEOUT,
 		});
 
 		collector.on('collect', async i => {
@@ -825,9 +876,10 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 						await handleCategoryFilter(interaction, category, commands, true);
 					} else {
 						// Filter commands by subcategory
-						const filteredCommands = commands.filter(cmd =>
-							cmd.category?.toLowerCase() === normalizedCategory &&
-							(cmd.subcategory || 'General') === selectedSubcategory
+						const filteredCommands = commands.filter(
+							cmd =>
+								cmd.category?.toLowerCase() === normalizedCategory &&
+								(cmd.subcategory || 'General') === selectedSubcategory,
 						);
 						await handleCategoryFilter(interaction, category, filteredCommands, true);
 					}
@@ -840,23 +892,19 @@ async function handleCategoryFilter(interaction, category, commands, isEdit = fa
 					interaction,
 					error,
 					'NAVIGATION',
-					'Failed to navigate to the selected view.'
+					'Failed to navigate to the selected view.',
 				);
 			}
 		});
 
 		collector.on('end', () => {
-			components.forEach(row => row.components.forEach(component => component.setDisabled(true)));
-			interaction.editReply({ components: components }).catch(() => { });
+			components.forEach(row =>
+				row.components.forEach(component => component.setDisabled(true)),
+			);
+			interaction.editReply({ components: components }).catch(() => {});
 		});
-
 	} catch (error) {
-		await handleError(
-			interaction,
-			error,
-			'CATEGORY',
-			'Failed to display category commands.'
-		);
+		await handleError(interaction, error, 'CATEGORY', 'Failed to display category commands.');
 	}
 }
 
@@ -869,7 +917,7 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 				acc[category] = {
 					commands: [],
 					subcategories: new Set(),
-					totalPermissions: 0
+					totalPermissions: 0,
 				};
 			}
 			acc[category].commands.push(cmd);
@@ -881,37 +929,38 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 		}, {});
 
 		// Sort categories by priority and name
-		const sortedCategories = Object.entries(categorizedCommands)
-			.sort(([a], [b]) => {
-				const priorities = {
-					'info': 1,
-					'utility': 2,
-					'admin': 3,
-					'moderation': 4
-				};
-				const priorityA = priorities[a.toLowerCase()] || 99;
-				const priorityB = priorities[b.toLowerCase()] || 99;
-				return priorityA - priorityB || a.localeCompare(b);
-			});
+		const sortedCategories = Object.entries(categorizedCommands).sort(([a], [b]) => {
+			const priorities = {
+				info: 1,
+				utility: 2,
+				admin: 3,
+				moderation: 4,
+			};
+			const priorityA = priorities[a.toLowerCase()] || 99;
+			const priorityB = priorities[b.toLowerCase()] || 99;
+			return priorityA - priorityB || a.localeCompare(b);
+		});
 
 		const embed = new EmbedBuilder()
 			.setTitle('📚 Command Help')
 			.setColor(EMBED_COLOR)
 			.setAuthor({
 				name: `${commands.length} Commands Available`,
-				iconURL: interaction.client.user.displayAvatarURL()
+				iconURL: interaction.client.user.displayAvatarURL(),
 			})
-			.setDescription([
-				'Welcome to the help menu! Here are all available commands grouped by category.',
-				'',
-				'**Quick Navigation:**',
-				'• Use the dropdown menu below to jump to a category',
-				'• Click on a category name to see all its commands',
-				'• Use `/help command:name` for detailed command info',
-				'• Use `/help search:keyword` to search commands',
-				'',
-				'**Categories Overview:**'
-			].join('\n'))
+			.setDescription(
+				[
+					'Welcome to the help menu! Here are all available commands grouped by category.',
+					'',
+					'**Quick Navigation:**',
+					'• Use the dropdown menu below to jump to a category',
+					'• Click on a category name to see all its commands',
+					'• Use `/help command:name` for detailed command info',
+					'• Use `/help search:keyword` to search commands',
+					'',
+					'**Categories Overview:**',
+				].join('\n'),
+			)
 			.setTimestamp();
 
 		// Add category summaries with improved information
@@ -922,9 +971,15 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 
 			const summary = [
 				`${data.commands.length} command${data.commands.length === 1 ? '' : 's'}`,
-				subcategoryCount > 0 ? `${subcategoryCount} subcategor${subcategoryCount === 1 ? 'y' : 'ies'}` : null,
-				permissionCount > 0 ? `${permissionCount} permission${permissionCount === 1 ? '' : 's'} required` : null
-			].filter(Boolean).join(' • ');
+				subcategoryCount > 0
+					? `${subcategoryCount} subcategor${subcategoryCount === 1 ? 'y' : 'ies'}`
+					: null,
+				permissionCount > 0
+					? `${permissionCount} permission${permissionCount === 1 ? '' : 's'} required`
+					: null,
+			]
+				.filter(Boolean)
+				.join(' • ');
 
 			const previewCommands = data.commands
 				.sort((a, b) => {
@@ -948,8 +1003,10 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 					'',
 					'**Popular Commands:**',
 					previewCommands,
-					data.commands.length > 3 ? `\n*...and ${data.commands.length - 3} more commands*` : ''
-				].join('\n')
+					data.commands.length > 3
+						? `\n*...and ${data.commands.length - 3} more commands*`
+						: '',
+				].join('\n'),
 			});
 		}
 
@@ -965,32 +1022,31 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 					label: category,
 					description: `${data.commands.length} command${data.commands.length === 1 ? '' : 's'}`,
 					value: category.toLowerCase(),
-					emoji: CATEGORY_EMOJIS[category.toLowerCase()] || '📁'
-				}))
+					emoji: CATEGORY_EMOJIS[category.toLowerCase()] || '📁',
+				})),
 			);
 
 		components.push(new ActionRowBuilder().addComponents(categorySelect));
 
 		// Quick action buttons
-		const buttonRow = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('refresh')
-					.setLabel('Refresh')
-					.setStyle(ButtonStyle.Secondary)
-					.setEmoji('🔄'),
-				new ButtonBuilder()
-					.setCustomId('search')
-					.setLabel('Search Commands')
-					.setStyle(ButtonStyle.Primary)
-					.setEmoji('🔍')
-			);
+		const buttonRow = new ActionRowBuilder().addComponents(
+			new ButtonBuilder()
+				.setCustomId('refresh')
+				.setLabel('Refresh')
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('🔄'),
+			new ButtonBuilder()
+				.setCustomId('search')
+				.setLabel('Search Commands')
+				.setStyle(ButtonStyle.Primary)
+				.setEmoji('🔍'),
+		);
 
 		components.push(buttonRow);
 
 		const replyOptions = {
 			embeds: [embed],
-			components: components
+			components: components,
 		};
 
 		if (isEdit) {
@@ -1002,7 +1058,7 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 		// Handle component interactions
 		const collector = interaction.channel.createMessageComponentCollector({
 			filter: i => i.user.id === interaction.user.id,
-			time: PAGINATION_TIMEOUT
+			time: PAGINATION_TIMEOUT,
 		});
 
 		collector.on('collect', async i => {
@@ -1026,8 +1082,8 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 									.setLabel('Enter search term')
 									.setStyle(TextInputStyle.Short)
 									.setPlaceholder('e.g., role, user, channel')
-									.setRequired(true)
-							)
+									.setRequired(true),
+							),
 						);
 
 					await i.showModal(modal);
@@ -1037,7 +1093,7 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 					interaction,
 					error,
 					'NAVIGATION',
-					'Failed to navigate to the selected view.'
+					'Failed to navigate to the selected view.',
 				);
 			}
 		});
@@ -1045,7 +1101,7 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 		// Handle modal submit
 		const modalCollector = interaction.channel.createMessageComponentCollector({
 			filter: i => i.customId === 'search_modal' && i.user.id === interaction.user.id,
-			time: PAGINATION_TIMEOUT
+			time: PAGINATION_TIMEOUT,
 		});
 
 		modalCollector.on('collect', async i => {
@@ -1053,34 +1109,26 @@ async function handleGeneralHelp(interaction, commands, isEdit = false) {
 				const query = i.fields.getTextInputValue('search_query');
 				await handleSearchQuery(interaction, query, commands, true);
 			} catch (error) {
-				await handleError(
-					interaction,
-					error,
-					'SEARCH',
-					'Failed to process search query.'
-				);
+				await handleError(interaction, error, 'SEARCH', 'Failed to process search query.');
 			}
 		});
 
 		collector.on('end', () => {
-			components.forEach(row => row.components.forEach(component => component.setDisabled(true)));
-			interaction.editReply({ components: components }).catch(() => { });
+			components.forEach(row =>
+				row.components.forEach(component => component.setDisabled(true)),
+			);
+			interaction.editReply({ components: components }).catch(() => {});
 		});
-
 	} catch (error) {
-		await handleError(
-			interaction,
-			error,
-			'OVERVIEW',
-			'Failed to display help overview.'
-		);
+		await handleError(interaction, error, 'OVERVIEW', 'Failed to display help overview.');
 	}
 }
 
 // Helper function to calculate string similarity (Levenshtein distance)
 function calculateSimilarity(str1, str2) {
-	const track = Array(str2.length + 1).fill(null).map(() =>
-		Array(str1.length + 1).fill(null));
+	const track = Array(str2.length + 1)
+		.fill(null)
+		.map(() => Array(str1.length + 1).fill(null));
 	for (let i = 0; i <= str1.length; i += 1) {
 		track[0][i] = i;
 	}
@@ -1093,19 +1141,16 @@ function calculateSimilarity(str1, str2) {
 			track[j][i] = Math.min(
 				track[j][i - 1] + 1,
 				track[j - 1][i] + 1,
-				track[j - 1][i - 1] + indicator
+				track[j - 1][i - 1] + indicator,
 			);
 		}
 	}
-	return 1 - (track[str2.length][str1.length] / Math.max(str1.length, str2.length));
+	return 1 - track[str2.length][str1.length] / Math.max(str1.length, str2.length);
 }
 
 // Helper function to find related commands
 function findRelatedCommands(command, allCommands) {
 	return allCommands
-		.filter(cmd =>
-			cmd.category === command.category &&
-			cmd.data.name !== command.data.name
-		)
+		.filter(cmd => cmd.category === command.category && cmd.data.name !== command.data.name)
 		.slice(0, 3);
 }

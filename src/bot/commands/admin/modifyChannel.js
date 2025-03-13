@@ -57,8 +57,7 @@ async function handleChannelUpdate(channel, newName, permissionChoice, toggleCho
 }
 
 module.exports = {
-	description_full:
-		'Modify channel settings including name and permissions.',
+	description_full: 'Modify channel settings including name and permissions.',
 	usage: '/modifychannel <subcommand> <channel> [options]',
 	examples: [
 		'/modifychannel text #general new_name:announcements',
@@ -68,24 +67,24 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('modifychannel')
 		.setDescription('Modify channel settings')
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('text')
 				.setDescription('Modify a text channel')
-				.addChannelOption((option) =>
+				.addChannelOption(option =>
 					option
 						.setName('channel')
 						.setDescription('The text channel to modify')
 						.addChannelTypes(ChannelType.GuildText)
 						.setRequired(true),
 				)
-				.addStringOption((option) =>
+				.addStringOption(option =>
 					option
 						.setName('new_name')
 						.setDescription('New name for the channel')
 						.setRequired(false),
 				)
-				.addStringOption((option) =>
+				.addStringOption(option =>
 					option
 						.setName('permission')
 						.setDescription('Permission to modify')
@@ -96,37 +95,37 @@ module.exports = {
 							{ name: 'Manage Messages', value: 'manage' },
 						),
 				)
-				.addBooleanOption((option) =>
+				.addBooleanOption(option =>
 					option
 						.setName('toggle')
 						.setDescription('Enable or disable the permission')
 						.setRequired(false),
 				)
-				.addRoleOption((option) =>
+				.addRoleOption(option =>
 					option
 						.setName('role')
 						.setDescription('Role to modify permissions for')
 						.setRequired(false),
 				),
 		)
-		.addSubcommand((subcommand) =>
+		.addSubcommand(subcommand =>
 			subcommand
 				.setName('voice')
 				.setDescription('Modify a voice channel')
-				.addChannelOption((option) =>
+				.addChannelOption(option =>
 					option
 						.setName('channel')
 						.setDescription('The voice channel to modify')
 						.addChannelTypes(ChannelType.GuildVoice)
 						.setRequired(true),
 				)
-				.addStringOption((option) =>
+				.addStringOption(option =>
 					option
 						.setName('new_name')
 						.setDescription('New name for the channel')
 						.setRequired(false),
 				)
-				.addStringOption((option) =>
+				.addStringOption(option =>
 					option
 						.setName('permission')
 						.setDescription('Permission to modify')
@@ -137,13 +136,13 @@ module.exports = {
 							{ name: 'Speak', value: 'speak' },
 						),
 				)
-				.addBooleanOption((option) =>
+				.addBooleanOption(option =>
 					option
 						.setName('toggle')
 						.setDescription('Enable or disable the permission')
 						.setRequired(false),
 				)
-				.addRoleOption((option) =>
+				.addRoleOption(option =>
 					option
 						.setName('role')
 						.setDescription('Role to modify permissions for')
@@ -169,7 +168,7 @@ module.exports = {
 					interaction,
 					new Error('No modifications specified'),
 					'VALIDATION',
-					'Please specify either a new name or permission changes.'
+					'Please specify either a new name or permission changes.',
 				);
 				return;
 			}
@@ -179,7 +178,7 @@ module.exports = {
 					interaction,
 					new Error('Incomplete permission options'),
 					'VALIDATION',
-					'When modifying permissions, both toggle and role options are required.'
+					'When modifying permissions, both toggle and role options are required.',
 				);
 				return;
 			}
@@ -189,18 +188,22 @@ module.exports = {
 					interaction,
 					new Error('Invalid channel name length'),
 					'VALIDATION',
-					'Channel name must be between 1 and 100 characters.'
+					'Channel name must be between 1 and 100 characters.',
 				);
 				return;
 			}
 
 			// Check bot permissions
-			if (!channel.permissionsFor(interaction.guild.members.me).has(PermissionFlagsBits.ManageChannels)) {
+			if (
+				!channel
+					.permissionsFor(interaction.guild.members.me)
+					.has(PermissionFlagsBits.ManageChannels)
+			) {
 				await handleError(
 					interaction,
 					new Error('Missing permissions'),
 					'PERMISSION',
-					'I do not have permission to modify this channel.'
+					'I do not have permission to modify this channel.',
 				);
 				return;
 			}
@@ -211,7 +214,7 @@ module.exports = {
 				newChannelName,
 				permissionChoice,
 				toggleChoice,
-				role
+				role,
 			);
 
 			if (updated) {
@@ -221,7 +224,7 @@ module.exports = {
 					.setColor('Green')
 					.setFooter({
 						text: `Modified by ${interaction.user.tag}`,
-						iconURL: interaction.user.displayAvatarURL()
+						iconURL: interaction.user.displayAvatarURL(),
 					})
 					.setTimestamp();
 
@@ -231,7 +234,7 @@ module.exports = {
 					interaction,
 					new Error('No changes made'),
 					'VALIDATION',
-					'No changes were made to the channel.'
+					'No changes were made to the channel.',
 				);
 			}
 		} catch (error) {
@@ -240,21 +243,21 @@ module.exports = {
 					interaction,
 					error,
 					'PERMISSION',
-					'I do not have permission to modify this channel.'
+					'I do not have permission to modify this channel.',
 				);
 			} else if (error.code === 50035) {
 				await handleError(
 					interaction,
 					error,
 					'VALIDATION',
-					'Invalid channel settings provided.'
+					'Invalid channel settings provided.',
 				);
 			} else {
 				await handleError(
 					interaction,
 					error,
 					'COMMAND_EXECUTION',
-					'An error occurred while modifying the channel.'
+					'An error occurred while modifying the channel.',
 				);
 			}
 		}

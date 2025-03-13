@@ -23,39 +23,32 @@ module.exports = {
 
 		// Timer message
 		let timeLeft = 30;
-		const timerMessage = await interaction.followUp(
-			`Time Remaining: ${timeLeft} seconds`,
-		);
+		const timerMessage = await interaction.followUp(`Time Remaining: ${timeLeft} seconds`);
 
 		const countdown = setInterval(async () => {
 			if (!gameWon) {
 				timeLeft--;
 				if (timeLeft >= 0) {
-					await timerMessage.edit(
-						`Time Remaining: ${timeLeft} seconds`,
-					);
+					await timerMessage.edit(`Time Remaining: ${timeLeft} seconds`);
 				}
 			}
 
 			if (timeLeft <= 0 && !gameWon) {
 				clearInterval(countdown);
 				await timerMessage.delete().catch(handleError);
-				interaction.followUp(
-					`Time's up! The number was ${randomNumber}.`,
-				);
+				interaction.followUp(`Time's up! The number was ${randomNumber}.`);
 			}
 		}, 1000);
 
 		// Guess collection
-		const filter = (m) =>
-			!isNaN(m.content) && m.author.id === interaction.user.id;
+		const filter = m => !isNaN(m.content) && m.author.id === interaction.user.id;
 		const collector = interaction.channel.createMessageCollector({
 			filter,
 			max: guessesLeft,
 			time: 30000,
 		});
 
-		collector.on('collect', async (msg) => {
+		collector.on('collect', async msg => {
 			const guess = parseInt(msg.content);
 
 			if (guess === randomNumber) {
@@ -67,14 +60,10 @@ module.exports = {
 				);
 			} else if (guess < randomNumber) {
 				guessesLeft--;
-				interaction.followUp(
-					`Too low! You have ${guessesLeft} guesses left.`,
-				);
+				interaction.followUp(`Too low! You have ${guessesLeft} guesses left.`);
 			} else {
 				guessesLeft--;
-				interaction.followUp(
-					`Too high! You have ${guessesLeft} guesses left.`,
-				);
+				interaction.followUp(`Too high! You have ${guessesLeft} guesses left.`);
 			}
 		});
 	},

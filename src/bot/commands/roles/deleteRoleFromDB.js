@@ -12,11 +12,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('delete_role_from_data')
 		.setDescription('Deletes a role from the database.')
-		.addRoleOption((option) =>
-			option
-				.setName('role')
-				.setDescription('The role to delete')
-				.setRequired(true),
+		.addRoleOption(option =>
+			option.setName('role').setDescription('The role to delete').setRequired(true),
 		),
 	async execute(interaction) {
 		const role = interaction.options.getRole('role');
@@ -25,17 +22,13 @@ module.exports = {
 			// Check if role exists in the database
 			const existingRole = await Role.findOne({ roleID: role.id });
 			if (!existingRole) {
-				return interaction.reply(
-					`The role "${role.name}" was not found in the database!`,
-				);
+				return interaction.reply(`The role "${role.name}" was not found in the database!`);
 			}
 
 			// Delete the role from the database
 			await Role.deleteOne({ roleID: role.id });
 
-			await interaction.reply(
-				`Role "${role.name}" has been deleted from the database!`,
-			);
+			await interaction.reply(`Role "${role.name}" has been deleted from the database!`);
 		} catch (error) {
 			handleError(interaction, error);
 		}

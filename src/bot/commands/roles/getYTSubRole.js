@@ -22,7 +22,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('get_yt_sub_role')
 		.setDescription('Assign a role based on your YouTube subscriber count.'),
-	description_full: 'Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.',
+	description_full:
+		'Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.',
 	usage: '/get_yt_sub_role',
 	examples: ['/get_yt_sub_role'],
 	category: 'roles',
@@ -44,7 +45,7 @@ module.exports = {
 				interactionId: interaction.id,
 				guildId: interaction.guild.id,
 				channelId: interaction.channel.id,
-				userId: interaction.user.id
+				userId: interaction.user.id,
 			});
 
 			const secretKey = crypto.randomBytes(32);
@@ -74,7 +75,7 @@ module.exports = {
 								inline: false,
 							},
 						],
-						'Your verification link will expire in 3 minutes'
+						'Your verification link will expire in 3 minutes',
 					),
 				],
 			});
@@ -82,8 +83,8 @@ module.exports = {
 			await interaction.client.redis?.set(cooldownKey, Date.now() + 300000, 'EX', 300);
 
 			await interaction.followUp({
-				content: "Waiting for verification to complete... This will update automatically.",
-				flags: MessageFlags.Ephemeral
+				content: 'Waiting for verification to complete... This will update automatically.',
+				flags: MessageFlags.Ephemeral,
 			});
 
 			const oauthData = await getAuthorizationDataFromMongoDB(interaction.id);
@@ -91,7 +92,9 @@ module.exports = {
 				throw new Error('No YouTube connections found.');
 			}
 
-			const { youtubeChannelId, subscriberCount } = await getHighestSubscriberCount(oauthData.youtubeConnections);
+			const { youtubeChannelId, subscriberCount } = await getHighestSubscriberCount(
+				oauthData.youtubeConnections,
+			);
 			if (subscriberCount === null) {
 				throw new Error('Failed to retrieve subscriber count.');
 			}
@@ -119,7 +122,7 @@ module.exports = {
 								inline: false,
 							},
 						],
-						'Thank you for verifying!'
+						'Thank you for verifying!',
 					),
 				],
 			});
@@ -127,13 +130,7 @@ module.exports = {
 			handleError(error);
 			await interaction.editReply({
 				embeds: [
-					createEmbed(
-						'❌ Error',
-						error.message,
-						[],
-						'Please try again later.',
-						0xff0000
-					),
+					createEmbed('❌ Error', error.message, [], 'Please try again later.', 0xff0000),
 				],
 			});
 		}
@@ -166,22 +163,29 @@ async function getAuthorizationDataFromMongoDB(interactionId) {
 		while (elapsed < timeout) {
 			const oauthRecord = await OAuthCode.findOne({ interactionId });
 			if (oauthRecord) {
-				if (!oauthRecord.youtubeConnections || oauthRecord.youtubeConnections.length === 0) {
+				if (
+					!oauthRecord.youtubeConnections ||
+					oauthRecord.youtubeConnections.length === 0
+				) {
 					throw new Error('No YouTube connections found in authorization data.');
 				}
 				console.log(`OAuth data received for interaction ${interactionId}`);
 				return oauthRecord;
 			}
 
-			await new Promise((resolve) => setTimeout(resolve, pollingInterval));
+			await new Promise(resolve => setTimeout(resolve, pollingInterval));
 			elapsed += pollingInterval;
 
 			if (elapsed % 30000 === 0) {
-				console.log(`Waiting for OAuth data: ${elapsed / 1000}s elapsed of ${timeout / 1000}s`);
+				console.log(
+					`Waiting for OAuth data: ${elapsed / 1000}s elapsed of ${timeout / 1000}s`,
+				);
 			}
 		}
 
-		throw new Error('Authorization timeout. Please try again and complete the authorization within 3 minutes.');
+		throw new Error(
+			'Authorization timeout. Please try again and complete the authorization within 3 minutes.',
+		);
 	} catch (error) {
 		if (error.message.includes('timeout')) {
 			throw error;
@@ -194,7 +198,9 @@ async function getAuthorizationDataFromMongoDB(interactionId) {
 
 async function getHighestSubscriberCount(youtubeConnections) {
 	if (!youtubeConnections || youtubeConnections.length === 0) {
-		throw new Error('No YouTube connections found. Please connect your YouTube account to Discord first.');
+		throw new Error(
+			'No YouTube connections found. Please connect your YouTube account to Discord first.',
+		);
 	}
 
 	let highest = { youtubeChannelId: null, subscriberCount: 0 };
@@ -230,7 +236,7 @@ async function getYouTubeSubscriberCount(channelId) {
 	try {
 		const response = await youtube.channels.list({
 			part: 'statistics',
-			id: channelId
+			id: channelId,
 		});
 
 		if (!response.data || !response.data.items || response.data.items.length === 0) {
@@ -264,7 +270,7 @@ async function assignSubscriberRole(member, subscriberCount) {
 		{ max: 1000000, name: '500K - 999.9K Subs' },
 		{ max: Infinity, name: '1M+ Subs' },
 	];
-	const roleName = ranges.find((range) => subscriberCount < range.max).name;
+	const roleName = ranges.find(range => subscriberCount < range.max).name;
 	const roleData = await RoleSchema.findOne({ roleName });
 	if (!roleData) throw new Error(`Role "${roleName}" not found.`);
 	await member.roles.add(roleData.roleID);

@@ -2,13 +2,14 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
 module.exports = {
-	description_full: "Shows detailed information about emojis in the server, including name, ID, creation date, usage stats, and more. Can display info for a specific emoji or list all server emojis.",
+	description_full:
+		'Shows detailed information about emojis in the server, including name, ID, creation date, usage stats, and more. Can display info for a specific emoji or list all server emojis.',
 	usage: '/emoji_info [emoji]',
 	examples: [
 		'/emoji_info',
 		'/emoji_info MyCustomEmoji',
 		'/emoji_info 🎮',
-		'/emoji_info PartyBlob'
+		'/emoji_info PartyBlob',
 	],
 	category: 'info',
 	data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ module.exports = {
 			option
 				.setName('emoji')
 				.setDescription('The emoji to get information about (name or the emoji itself)')
-				.setRequired(false)
+				.setRequired(false),
 		),
 
 	async execute(interaction) {
@@ -40,7 +41,7 @@ module.exports = {
 							.setColor('Blue')
 							.setFooter({
 								text: `Server ID: ${interaction.guild.id}`,
-								iconURL: interaction.guild.iconURL({ dynamic: true })
+								iconURL: interaction.guild.iconURL({ dynamic: true }),
 							});
 
 						await interaction.editReply({ embeds: [embed] });
@@ -53,34 +54,36 @@ module.exports = {
 					const managedCount = emojis.cache.filter(e => e.managed).size;
 
 					// Group emojis by category (animated/static)
-					const staticEmojis = emojis.cache.filter(e => !e.animated)
-						.map(emoji => `${emoji} \`${emoji.name}\``).join(' ');
-					const animatedEmojis = emojis.cache.filter(e => e.animated)
-						.map(emoji => `${emoji} \`${emoji.name}\``).join(' ');
+					const staticEmojis = emojis.cache
+						.filter(e => !e.animated)
+						.map(emoji => `${emoji} \`${emoji.name}\``)
+						.join(' ');
+					const animatedEmojis = emojis.cache
+						.filter(e => e.animated)
+						.map(emoji => `${emoji} \`${emoji.name}\``)
+						.join(' ');
 
 					const embed = new EmbedBuilder()
 						.setTitle(`Emojis in ${interaction.guild.name}`)
 						.setColor('Blue')
-						.addFields(
-							{
-								name: '📊 Statistics',
-								value: [
-									`**Total Emojis:** ${totalEmojis}`,
-									`**Static:** ${staticCount}`,
-									`**Animated:** ${animatedCount}`,
-									`**Integration Managed:** ${managedCount}`,
-									`**Server Boost Level:** ${interaction.guild.premiumTier}`,
-									`**Max Emoji Slots:** ${getMaxEmojis(interaction.guild.premiumTier)}`
-								].join('\n'),
-								inline: false
-							}
-						);
+						.addFields({
+							name: '📊 Statistics',
+							value: [
+								`**Total Emojis:** ${totalEmojis}`,
+								`**Static:** ${staticCount}`,
+								`**Animated:** ${animatedCount}`,
+								`**Integration Managed:** ${managedCount}`,
+								`**Server Boost Level:** ${interaction.guild.premiumTier}`,
+								`**Max Emoji Slots:** ${getMaxEmojis(interaction.guild.premiumTier)}`,
+							].join('\n'),
+							inline: false,
+						});
 
 					if (staticEmojis) {
 						embed.addFields({
 							name: '🖼️ Static Emojis',
 							value: staticEmojis || 'None',
-							inline: false
+							inline: false,
 						});
 					}
 
@@ -88,13 +91,13 @@ module.exports = {
 						embed.addFields({
 							name: '✨ Animated Emojis',
 							value: animatedEmojis || 'None',
-							inline: false
+							inline: false,
 						});
 					}
 
 					embed.setFooter({
 						text: `Server ID: ${interaction.guild.id} • Use /emoji_info <emoji> for detailed info`,
-						iconURL: interaction.guild.iconURL({ dynamic: true })
+						iconURL: interaction.guild.iconURL({ dynamic: true }),
 					});
 
 					await interaction.editReply({ embeds: [embed] });
@@ -115,8 +118,8 @@ module.exports = {
 				}
 				// Check if input is an emoji name
 				else {
-					emoji = interaction.guild.emojis.cache.find(e =>
-						e.name.toLowerCase() === emojiInput.toLowerCase()
+					emoji = interaction.guild.emojis.cache.find(
+						e => e.name.toLowerCase() === emojiInput.toLowerCase(),
 					);
 				}
 
@@ -125,7 +128,7 @@ module.exports = {
 						interaction,
 						new Error('Emoji not found'),
 						'VALIDATION',
-						'Could not find that emoji in this server. Make sure to use the emoji name or the emoji itself.'
+						'Could not find that emoji in this server. Make sure to use the emoji name or the emoji itself.',
 					);
 					return;
 				}
@@ -153,9 +156,9 @@ module.exports = {
 								`**Animated:** ${emoji.animated ? 'Yes' : 'No'}`,
 								`**Available:** ${emoji.available ? 'Yes' : 'No'}`,
 								`**Managed:** ${emoji.managed ? 'Yes (Integration)' : 'No'}`,
-								`**Requires Colons:** ${emoji.requiresColons ? 'Yes' : 'No'}`
+								`**Requires Colons:** ${emoji.requiresColons ? 'Yes' : 'No'}`,
 							].join('\n'),
-							inline: false
+							inline: false,
 						},
 						{
 							name: '🔗 Usage',
@@ -165,20 +168,17 @@ module.exports = {
 								'**In Reaction:**',
 								`\`${emoji.identifier}\``,
 								'**As URL:**',
-								`[Direct Link](${emoji.url})`
+								`[Direct Link](${emoji.url})`,
 							].join('\n'),
-							inline: false
-						}
+							inline: false,
+						},
 					);
 
 				if (creator) {
 					embed.addFields({
 						name: '👤 Creator',
-						value: [
-							`**Name:** ${creator.tag}`,
-							`**ID:** \`${creator.id}\``
-						].join('\n'),
-						inline: false
+						value: [`**Name:** ${creator.tag}`, `**ID:** \`${creator.id}\``].join('\n'),
+						inline: false,
 					});
 				}
 
@@ -187,14 +187,15 @@ module.exports = {
 					embed.addFields({
 						name: '🔒 Role Restrictions',
 						value: roles,
-						inline: false
+						inline: false,
 					});
 				}
 
-				embed.setFooter({
-					text: `Requested by ${interaction.user.tag}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true })
-				})
+				embed
+					.setFooter({
+						text: `Requested by ${interaction.user.tag}`,
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+					})
 					.setTimestamp();
 
 				await interaction.editReply({ embeds: [embed] });
@@ -203,7 +204,7 @@ module.exports = {
 					interaction,
 					error,
 					'DATA_COLLECTION',
-					'Failed to fetch emoji information. The emoji might have been deleted.'
+					'Failed to fetch emoji information. The emoji might have been deleted.',
 				);
 			}
 		} catch (error) {
@@ -211,7 +212,7 @@ module.exports = {
 				interaction,
 				error,
 				'COMMAND_EXECUTION',
-				'An error occurred while retrieving emoji information.'
+				'An error occurred while retrieving emoji information.',
 			);
 		}
 	},
