@@ -1,19 +1,18 @@
 {
-	"name": "kiyo-discord-bot",
-	"version": "1.1.0",
-	"description": "A versatile Discord bot with moderation, entertainment, and utility features.",
+	"name": "project-kiyo",
+	"version": "1.0.0",
+	"description": "Kiyo Discord Bot with MERN Dashboard",
 	"engines": {
-		"node": ">=16.9.0",
-		"npm": ">=7.0.0"
+		"node": ">=18.0.0"
 	},
-	"main": "src/index.js",
+	"main": "server.js",
 	"scripts": {
-		"start": "node src/index.js",
-		"dev": "nodemon src/index.js",
-		"lint": "eslint .",
-		"lint:fix": "eslint --fix .",
-		"format": "prettier --config .prettierrc.json --write .",
-		"format:check": "prettier --config .prettierrc.json --check ."
+		"start": "node server.js",
+		"server": "nodemon server.js",
+		"client": "npm start --prefix client",
+		"dev": "concurrently \"npm run server\" \"npm run client\"",
+		"build": "npm install && cd client && npm install && npm run build",
+		"heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
 	},
 	"repository": {
 		"type": "git",
@@ -23,74 +22,25 @@
 	"keywords": [
 		"discord",
 		"bot",
-		"moderation",
-		"fun",
-		"games",
-		"utility",
-		"api",
-		"discord.js"
+		"dashboard",
+		"mern"
 	],
-	"author": "KIO2gamer (https://kio2gamer.carrd.co/)",
-	"contributors": [
-		{
-			"name": "Neon",
-			"email": "neon@saahild.com",
-			"url": "https://saahild.com"
-		}
-	],
+	"author": "KIO2gamer",
 	"license": "MIT",
-	"nodemonConfig": {
-		"ignore": [
-			"assets/",
-			"docs/",
-			"coverage/",
-			"dist/"
-		],
-		"ext": "js,json",
-		"watch": [
-			"src/"
-		]
-	},
 	"dependencies": {
-		"@discord/embedded-app-sdk": "^1.8.1",
-		"@google/generative-ai": "^0.21.0",
-		"@iamtraction/google-translate": "^2.0.1",
-		"axios": "^1.7.8",
-		"chalk": "^4.1.2",
-		"common-tags": "^1.8.2",
-		"cookie": "^1.0.2",
-		"discord.js": "^14.17.2",
-		"dotenv": "^16.4.5",
-		"googleapis": "^144.0.0",
+		"axios": "^1.3.4",
+		"concurrently": "^8.0.1",
+		"cors": "^2.8.5",
+		"discord.js": "^14.7.1",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
 		"he": "^1.2.0",
-		"mathjs": "^14.0.0",
-		"moment": "^2.30.1",
-		"mongoose": "^8.12.1",
-		"ms": "^2.1.3",
-		"node-cache": "^5.1.2",
-		"node-fetch": "^2.7.0",
-		"winston": "^3.17.0"
+		"jsonwebtoken": "^9.0.0",
+		"mongoose": "^7.0.3",
+		"node-cache": "^5.1.2"
 	},
 	"devDependencies": {
-		"eslint": "^9.15.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-prettier": "^5.2.1",
-		"globals": "^15.12.0",
-		"husky": "^8.0.3",
-		"jsdoc": "^4.0.2",
-		"lint-staged": "^15.0.2",
-		"nodemon": "^3.1.9",
-		"prettier": "^3.4.1",
-		"rimraf": "^5.0.1"
-	},
-	"lint-staged": {
-		"*.js": [
-			"eslint --fix",
-			"prettier --write"
-		],
-		"*.{json,md}": [
-			"prettier --write"
-		]
+		"nodemon": "^2.0.22"
 	},
 	"bugs": {
 		"url": "https://github.com/KIO2gamer/discordbot/issues"

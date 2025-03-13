@@ -6,74 +6,31 @@ const { handleError } = require('./bot/utils/errorHandler');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-const {
-	Client,
-	Collection,
-	GatewayIntentBits,
-	Partials,
-	REST,
-	Routes,
-} = require('discord.js');
+const { REST, Routes } = require('discord.js');
 const Logger = require('./../logger');
+const client = require('./bot/client');
 
 // Environment Variables
 const {
-	DISCORD_CLIENT_ID,
-	DISCORD_TOKEN,
-	MONGODB_URI,
-	DISCORD_GUILD_IDS = '',
-	NODE_ENV = 'development',
+  DISCORD_CLIENT_ID,
+  DISCORD_TOKEN,
+  MONGODB_URI,
+  DISCORD_GUILD_IDS = '',
+  NODE_ENV = 'development',
 } = process.env;
 
 // Validate critical environment variables
 if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !MONGODB_URI) {
-	handleError('Missing one or more required environment variables.');
-	process.exit(1);
+  handleError('Missing one or more required environment variables.');
+  process.exit(1);
 }
 
 // Constants
 const GUILD_IDS = DISCORD_GUILD_IDS.split(',').filter(Boolean);
 const IS_PRODUCTION = NODE_ENV === 'production';
 
-// Initialize boot process
+// Initialize bot process
 Logger.log('BOT', `Initializing bot in ${NODE_ENV} mode`, 'info');
-
-/**
- * Create Discord client with appropriate intents and partials
- * Intents are carefully selected based on the bot's functionality
- */
-const client = new Client({
-	intents: [
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.GuildMembers,
-		GatewayIntentBits.GuildVoiceStates,
-		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.MessageContent,
-		GatewayIntentBits.DirectMessages,
-		GatewayIntentBits.GuildMessageReactions,
-		GatewayIntentBits.GuildPresences,
-	],
-	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
-	// Improve performance with proper ws settings
-	ws: {
-		large_threshold: 250, // Only receive info for up to 250 members per guild
-	},
-	// Make reconnection more resilient
-	failIfNotExists: false,
-	retryLimit: 5,
-});
-
-// Collections for bot data
-client.commands = new Collection();
-client.cooldowns = new Collection();
-client.aliases = new Collection();
-client.startup = {
-	time: Date.now(),
-	modules: {
-		commands: 0,
-		events: 0,
-	}
-};
 
 /**
  * Recursively loads files from a directory and applies a given action to each file.
@@ -483,3 +440,6 @@ if (IS_PRODUCTION) {
 
 // Start the bot initialization
 initializeBot();
+
+// Export the client so it can be used by the Express API if needed
+module.exports = client;
