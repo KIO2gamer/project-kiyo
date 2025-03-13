@@ -381,6 +381,14 @@ const App = {
 process.on('SIGINT', () => App.shutdown(0));
 process.on('SIGTERM', () => App.shutdown(0));
 
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+	client.events.get('messageReactionAdd').execute(reaction, user);
+});
+
+client.on(Events.MessageReactionRemove, async (reaction, user) => {
+	client.events.get('messageReactionRemove').execute(reaction, user);
+});
+
 process.on('unhandledRejection', reason => {
 	handleError('Unhandled Promise Rejection:', reason);
 });
