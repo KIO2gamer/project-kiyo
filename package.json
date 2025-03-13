@@ -9,16 +9,11 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node src/index.js",
-<<<<<<< HEAD
-		"format": "prettier --write \"**/*.{js,json,md}\"",
-		"format:check": "prettier --check \"**/*.{js,json,md}\""
-=======
 		"dev": "nodemon src/index.js",
 		"lint": "eslint .",
 		"lint:fix": "eslint --fix .",
 		"format": "prettier --config .prettierrc.json --write .",
 		"format:check": "prettier --config .prettierrc.json --check ."
->>>>>>> 16acea6 (Remove unused test scripts and clean up package.json for improved readability)
 	},
 	"repository": {
 		"type": "git",
