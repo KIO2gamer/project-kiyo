@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const moderationLogs = require('../../../database/moderationLogs');
-
+const { parseRange } = require('../../utils/rangeParser');
+const { handleError } = require('../../utils/errorHandler');
 const { MessageFlags } = require('discord.js');
 
 module.exports = {
@@ -54,21 +55,21 @@ module.exports = {
 					);
 				}
 			} else if (logRange) {
-				const [start, end] = logRange
-					.split('-')
-					.map((num) => parseInt(num.trim()));
-
-				if (isNaN(start) || isNaN(end)) {
+				const range = parseRange(logRange);
+				
+				if (!range) {
 					await interaction.reply(
 						'Invalid log range. Please provide a valid range (e.g., 1-5).',
 					);
 					return;
 				}
-
+				
+				const { start, end } = range;
+				
 				const deletedLogs = await moderationLogs.deleteMany({
 					logNumber: { $gte: start, $lte: end },
 				});
-
+				
 				if (deletedLogs.deletedCount > 0) {
 					await interaction.reply(
 						`Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,

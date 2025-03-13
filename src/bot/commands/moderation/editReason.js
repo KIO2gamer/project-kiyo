@@ -1,8 +1,7 @@
-// commands/moderation/editlog.js
-const { SlashCommandBuilder } = require('discord.js');
-const moderationLogs = require('./../../../database/moderationLogs');
-
-const { MessageFlags } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const moderationLogs = require('../../../database/moderationLogs');
+const { parseRange } = require('../../utils/rangeParser');
+const { handleError } = require('../../utils/errorHandler');
 
 module.exports = {
 	description_full:
@@ -67,16 +66,14 @@ module.exports = {
 					);
 				}
 			} else if (logRange) {
-				const [start, end] = logRange
-					.split('-')
-					.map((num) => parseInt(num.trim()));
-
-				if (isNaN(start) || isNaN(end)) {
-					await interaction.reply(
-						'Invalid log range. Please provide a valid range (e.g., 1-5).',
-					);
+				const range = parseRange(logRange);
+        
+				if (!range) {
+					await interaction.reply('Invalid log range. Please provide a valid range (e.g., 1-5).');
 					return;
 				}
+				
+				const { start, end } = range;
 
 				const logs = await moderationLogs.find({
 					logNumber: { $gte: start, $lte: end },

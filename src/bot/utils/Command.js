@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const Logger = require('../../../logger');
+const Logger = require('../../../logger').default;
 
 /**
  * Base Command class that all commands should extend.

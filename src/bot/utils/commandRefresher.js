@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const Logger = require('../../../logger');
+const Logger = require('../../../logger').default;
 
 /**
  * CommandRefresher watches command files for changes and automatically reloads them

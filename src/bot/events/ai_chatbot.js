@@ -7,7 +7,7 @@ const {
 const AIChatChannel = require('./../../database/AIChatChannel');
 const ChatHistory = require('./../../database/ChatHistory');
 const { handleError } = require('./../utils/errorHandler');
-const Logger = require('./../../../logger');
+const Logger = require('./../../../logger').default;
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRow
 const fs = require('fs');
 const path = require('path');
 const { handleError } = require('../../utils/errorHandler');
-const Logger = require('../../../../logger');
+const Logger = require('../../../../logger').default;
 const { MessageFlags } = require('discord.js');
 
 // Command cache with expiration time

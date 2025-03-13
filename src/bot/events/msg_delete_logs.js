@@ -7,7 +7,7 @@ const {
 } = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 const { handleError } = require('./../utils/errorHandler');
-const Logger = require('./../../../logger');
+const Logger = require('./../../../logger').default;
 
 module.exports = {
 	name: Events.MessageDelete,

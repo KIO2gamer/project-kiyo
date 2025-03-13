@@ -1,5 +1,5 @@
 const { ActivityType } = require('discord-api-types/v10');
-const Logger = require('./../../../logger');
+const Logger = require('./../../../logger').default;
 const CommandRefresher = require('../utils/commandRefresher');
 const path = require('path');
 

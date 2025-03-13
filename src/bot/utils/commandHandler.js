@@ -1,5 +1,5 @@
 const { Collection, PermissionsBitField } = require('discord.js');
-const Logger = require('../../../logger');
+const Logger = require('../../../logger').default;
 const { handleError } = require('./errorHandler');
 
 /**

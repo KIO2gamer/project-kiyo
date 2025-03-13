@@ -7,6 +7,8 @@ const {
 	ComponentType,
 } = require('discord.js');
 const moderationLogs = require('./../../../database/moderationLogs');
+const { parseRange } = require('../../utils/rangeParser');
+const { handleError } = require('../../utils/errorHandler');
 
 const ACTION_CHOICES = [
 	{ name: 'Warn', value: 'warn' },
@@ -95,18 +97,21 @@ module.exports = {
 			}
 
 			if (logRange) {
-				const [start, end] = logRange
-					.split('-')
-					.map((num) => parseInt(num.trim()));
-				if (!isNaN(start) && !isNaN(end) && start <= end) {
-					query.logNumber = { $gte: start, $lte: end };
-				} else {
-					return interaction.reply({
-						content:
-							'Invalid log range. Please use the format "start-end" (e.g., 1-5).',
-						flags: MessageFlags.Ephemeral,
-					});
+				const range = parseRange(logRange);
+				
+				if (!range) {
+					await interaction.reply('Invalid log range. Please provide a valid range (e.g., 1-5).');
+					return;
 				}
+				
+				const { start, end } = range;
+				
+				// Continue with fetching logs in the range
+				const logs = await moderationLogs.find({
+					logNumber: { $gte: start, $lte: end }
+				}).sort({ logNumber: 1 });
+				
+				// ...existing code for handling the logs...
 			}
 
 			if (user) {

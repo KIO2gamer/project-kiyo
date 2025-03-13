@@ -5,7 +5,7 @@ const {
 	ButtonStyle,
 	MessageFlags
 } = require('discord.js');
-const Logger = require('../../../logger');
+const Logger = require('../../../logger').default;
 
 // Error categories for better organization and handling
 const ERROR_CATEGORIES = {
