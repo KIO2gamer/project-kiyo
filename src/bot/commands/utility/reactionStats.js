@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const moment = require('moment');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays statistics on reactions used in a specific channel or across the entire server. It shows the top 5 most used reactions and the top 5 users who react the most, within a specified timeframe or for the entire server history.',
@@ -17,20 +19,16 @@ module.exports = {
 		.setDescription(
 			'Displays statistics on reactions given in a specific channel or server-wide.',
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
-				.setDescription(
-					'The channel to get reaction stats from (optional)',
-				)
+				.setDescription('The channel to get reaction stats from (optional)')
 				.setRequired(false),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('timeframe')
-				.setDescription(
-					'The timeframe to get stats for (e.g., "24h", "7d", "1M")',
-				)
+				.setDescription('The timeframe to get stats for (e.g., "24h", "7d", "1M")')
 				.setRequired(false)
 				.addChoices(
 					{ name: 'Last 24 Hours', value: '24h' },
@@ -71,7 +69,7 @@ module.exports = {
 		const endDate = new Date();
 
 		// Function to fetch messages and filter by timeframe:
-		const getMessagesInTimeframe = async (channel) => {
+		const getMessagesInTimeframe = async channel => {
 			let messages = [];
 			let lastMessage = null;
 
@@ -83,15 +81,9 @@ module.exports = {
 				});
 				messages = messages.concat(fetchedMessages);
 				lastMessage = fetchedMessages.last();
-			} while (
-				lastMessage &&
-				lastMessage.createdAt > startDate &&
-				messages.size <= 10000
-			); // Limit to 10,000 messages for performance
+			} while (lastMessage && lastMessage.createdAt > startDate && messages.size <= 10000); // Limit to 10,000 messages for performance
 
-			return messages.filter(
-				(msg) => msg.createdAt >= startDate && msg.createdAt <= endDate,
-			);
+			return messages.filter(msg => msg.createdAt >= startDate && msg.createdAt <= endDate);
 		};
 
 		let messages;
@@ -99,32 +91,25 @@ module.exports = {
 			messages = await getMessagesInTimeframe(channel);
 		} else {
 			// Use a more efficient method to get messages from all channels
-			const allMessages = await interaction.guild.channels.cache.reduce(
-				async (acc, ch) => {
-					if (ch.isTextBased()) {
-						return (await acc).concat(
-							await getMessagesInTimeframe(ch),
-						);
-					}
-					return acc;
-				},
-				Promise.resolve([]),
-			);
+			const allMessages = await interaction.guild.channels.cache.reduce(async (acc, ch) => {
+				if (ch.isTextBased()) {
+					return (await acc).concat(await getMessagesInTimeframe(ch));
+				}
+				return acc;
+			}, Promise.resolve([]));
 			messages = allMessages;
 		}
 
 		const reactionCounts = {};
 		const userReactionCounts = {};
 
-		messages.forEach((msg) => {
-			msg.reactions.cache.forEach((reaction) => {
+		messages.forEach(msg => {
+			msg.reactions.cache.forEach(reaction => {
 				const emoji = reaction.emoji.name;
-				reactionCounts[emoji] =
-					(reactionCounts[emoji] || 0) + reaction.count;
+				reactionCounts[emoji] = (reactionCounts[emoji] || 0) + reaction.count;
 
-				reaction.users.cache.forEach((user) => {
-					userReactionCounts[user.id] =
-						(userReactionCounts[user.id] || 0) + 1;
+				reaction.users.cache.forEach(user => {
+					userReactionCounts[user.id] = (userReactionCounts[user.id] || 0) + 1;
 				});
 			});
 		});
@@ -141,26 +126,22 @@ module.exports = {
 		const embed = new EmbedBuilder()
 			.setTitle('Reaction Stats')
 			.setDescription(
-				`Reaction statistics from ${channel ? `<#${channel.id}>` : 'the server'
-				} for the ${timeframe === 'all'
-					? 'entire server history'
-					: `past ${timeframe}`
+				`Reaction statistics from ${channel ? `<#${channel.id}>` : 'the server'} for the ${
+					timeframe === 'all' ? 'entire server history' : `past ${timeframe}`
 				}`,
 			)
 			.addFields([
 				{
 					name: 'Top 5 Reactions',
 					value:
-						sortedReactions
-							.map(([emoji, count]) => `${emoji}: ${count}`)
-							.join('\n') || 'No reactions found.',
+						sortedReactions.map(([emoji, count]) => `${emoji}: ${count}`).join('\n') ||
+						'No reactions found.',
 				},
 				{
 					name: 'Top 5 Reactors',
 					value:
-						sortedUsers
-							.map(([user, count]) => `<@${user}>: ${count}`)
-							.join('\n') || 'No reactors found.',
+						sortedUsers.map(([user, count]) => `<@${user}>: ${count}`).join('\n') ||
+						'No reactors found.',
 				},
 			])
 			.setTimestamp();

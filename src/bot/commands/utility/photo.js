@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Searches for and displays photos from Pexels based on your query. You can customize the number of photos, orientation, size, and even request a random photo.',
@@ -13,20 +15,17 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('photo')
 		.setDescription('Search for a photo.')
-		.addStringOption((option) =>
-			option
-				.setName('query')
-				.setDescription('The search query')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('query').setDescription('The search query').setRequired(true),
 		)
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('count')
 				.setDescription('Number of photos to fetch (1-5)')
 				.setMinValue(1)
 				.setMaxValue(5),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('orientation')
 				.setDescription('Photo orientation')
@@ -36,7 +35,7 @@ module.exports = {
 					{ name: 'Square', value: 'square' },
 				),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('size')
 				.setDescription('Photo size')
@@ -46,7 +45,7 @@ module.exports = {
 					{ name: 'Large', value: 'large' },
 				),
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option.setName('random').setDescription('Fetch a random photo'),
 		),
 
@@ -76,7 +75,7 @@ module.exports = {
 			const data = await response.json();
 
 			if (data.photos && data.photos.length > 0) {
-				const embeds = data.photos.map((photo) => {
+				const embeds = data.photos.map(photo => {
 					return new EmbedBuilder()
 						.setTitle(`Photo by ${photo.photographer}`)
 						.setImage(photo.src.original)
@@ -85,15 +84,11 @@ module.exports = {
 
 				await interaction.reply({ embeds });
 			} else {
-				await interaction.reply(
-					'Sorry, I could not find any photos for that query.',
-				);
+				await interaction.reply('Sorry, I could not find any photos for that query.');
 			}
 		} catch (error) {
-			console.error('Error fetching photo:', error);
-			await interaction.reply(
-				'There was an error trying to fetch the photo.',
-			);
+			handleError('Error fetching photo:', error);
+			await interaction.reply('There was an error trying to fetch the photo.');
 		}
 	},
 };

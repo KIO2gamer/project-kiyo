@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'The bot virtually flips a coin and reveals the result (Heads or Tails). You can also bet on the outcome!',
@@ -9,15 +11,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('coin_flip')
 		.setDescription('Flip a coin and bet on the outcome!')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('bet')
 				.setDescription('Bet on heads or tails')
 				.setRequired(false)
-				.addChoices(
-					{ name: 'Heads', value: 'heads' },
-					{ name: 'Tails', value: 'tails' },
-				),
+				.addChoices({ name: 'Heads', value: 'heads' }, { name: 'Tails', value: 'tails' }),
 		),
 	async execute(interaction) {
 		const bet = interaction.options.getString('bet')?.toLowerCase();
@@ -29,8 +28,9 @@ module.exports = {
 			imageMedia = 'https://i.imgur.com/u1pmQMV.png';
 		}
 
-		let description = `The coin landed on **${result.charAt(0).toUpperCase() + result.slice(1)
-			}**!`;
+		let description = `The coin landed on **${
+			result.charAt(0).toUpperCase() + result.slice(1)
+		}**!`;
 
 		if (bet) {
 			if (bet === result) {

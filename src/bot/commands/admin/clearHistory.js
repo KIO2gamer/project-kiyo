@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 const ChatHistory = require('./../../../database/ChatHistory');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('clear_history')
@@ -25,9 +27,7 @@ module.exports = {
 			// Delete the user's chat history
 			await ChatHistory.findOneAndDelete({ userId: interaction.user.id });
 
-			await interaction.reply(
-				'Your AI chat history has been cleared.',
-			);
+			await interaction.reply('Your AI chat history has been cleared.');
 		} catch (error) {
 			await handleError(interaction, error);
 		}

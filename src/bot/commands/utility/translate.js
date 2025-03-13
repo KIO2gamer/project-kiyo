@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const translate = require('@iamtraction/google-translate');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Translates the provided text into the specified target language. Use language codes like "en" (English), "es" (Spanish), "fr" (French), etc.',
@@ -10,18 +12,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('translate')
 		.setDescription('Translates text into the desired output language.')
-		.addStringOption((option) =>
-			option
-				.setName('input')
-				.setDescription('The text to translate')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('input').setDescription('The text to translate').setRequired(true),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('target_lang')
-				.setDescription(
-					'The target language (e.g., en, es, fr, de, ja)',
-				)
+				.setDescription('The target language (e.g., en, es, fr, de, ja)')
 				.setRequired(true),
 		),
 
@@ -52,7 +49,7 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error executing translate command:', error);
+			handleError('Error executing translate command:', error);
 			await interaction.reply(
 				'There was an error while executing this command. Please try again later.',
 			);

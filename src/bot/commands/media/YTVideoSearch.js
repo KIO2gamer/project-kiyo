@@ -15,24 +15,26 @@ const youtube = google.youtube({
 
 const pageSize = 3; // Number of results per page
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
-	category: 'youtube',
+	data: new SlashCommandBuilder()
+		.setName('ytvideo')
+		.setDescription('Search for a YouTube video')
+		.addStringOption(option =>
+			option.setName('query').setDescription('The search query').setRequired(true),
+		),
+	category: 'media',
 	data: new SlashCommandBuilder()
 		.setName('youtube_search')
 		.setDescription('Search for YouTube videos')
-		.addStringOption((option) =>
-			option
-				.setName('query')
-				.setDescription('The search query')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('query').setDescription('The search query').setRequired(true),
 		)
-		.addStringOption((option) =>
-			option
-				.setName('channel')
-				.setDescription('Filter by channel name')
-				.setRequired(false),
+		.addStringOption(option =>
+			option.setName('channel').setDescription('Filter by channel name').setRequired(false),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('duration')
 				.setDescription('Filter by video duration')
@@ -44,7 +46,7 @@ module.exports = {
 					{ name: 'Long (> 20 minutes)', value: 'long' },
 				),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('order')
 				.setDescription('Order of search results')
@@ -56,7 +58,7 @@ module.exports = {
 					{ name: 'Rating', value: 'rating' },
 				),
 		)
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('max_results')
 				.setDescription('Maximum number of results per page (1-10)')
@@ -76,12 +78,9 @@ module.exports = {
 	async execute(interaction) {
 		const query = interaction.options.getString('query');
 		const channelFilter = interaction.options.getString('channel');
-		const durationFilter =
-			interaction.options.getString('duration') || 'any';
-		const orderFilter =
-			interaction.options.getString('order') || 'relevance';
-		const maxResults =
-			interaction.options.getInteger('max_results') || pageSize;
+		const durationFilter = interaction.options.getString('duration') || 'any';
+		const orderFilter = interaction.options.getString('order') || 'relevance';
+		const maxResults = interaction.options.getInteger('max_results') || pageSize;
 		let currentPage = 1;
 		let nextPageToken = '';
 		let prevPageToken = '';
@@ -100,8 +99,8 @@ module.exports = {
 			];
 
 			const formattedDuration = timeUnits
-				.filter((timeUnit) => timeUnit.value)
-				.map((timeUnit) => {
+				.filter(timeUnit => timeUnit.value)
+				.map(timeUnit => {
 					const value = parseInt(timeUnit.value);
 					return `${value} ${timeUnit.unit}${value > 1 ? 's' : ''}`;
 				})
@@ -119,8 +118,7 @@ module.exports = {
 				const results = searchResponse.data;
 
 				nextPageToken = results.nextPageToken || '';
-				prevPageToken =
-					currentPage > 1 ? results.prevPageToken || '' : '';
+				prevPageToken = currentPage > 1 ? results.prevPageToken || '' : '';
 
 				// Handle case when there are no results
 				if (results.items.length === 0) {
@@ -138,7 +136,7 @@ module.exports = {
 					components: row ? [row] : [],
 				};
 			} catch (error) {
-				console.error('Error fetching YouTube results:', error);
+				handleError('Error fetching YouTube results:', error);
 				return {
 					content: 'An error occurred while searching YouTube.',
 					embeds: [],
@@ -170,10 +168,8 @@ module.exports = {
 		};
 
 		// Function to fetch video details
-		const fetchVideoDetails = async (searchResponse) => {
-			const videoIds = searchResponse.data.items
-				.map((item) => item.id.videoId)
-				.join(',');
+		const fetchVideoDetails = async searchResponse => {
+			const videoIds = searchResponse.data.items.map(item => item.id.videoId).join(',');
 
 			const videoResponse = await youtube.videos.list({
 				part: 'contentDetails,statistics',
@@ -198,9 +194,7 @@ module.exports = {
 
 			results.items.forEach((item, index) => {
 				const details = videoDetails[item.id.videoId];
-				const duration = details
-					? formatDuration(details.contentDetails.duration)
-					: 'N/A';
+				const duration = details ? formatDuration(details.contentDetails.duration) : 'N/A';
 				const views = details
 					? parseInt(details.statistics.viewCount).toLocaleString()
 					: 'N/A';
@@ -246,12 +240,10 @@ module.exports = {
 				);
 			}
 
-			return buttons.length > 0
-				? new ActionRowBuilder().addComponents(buttons)
-				: null;
+			return buttons.length > 0 ? new ActionRowBuilder().addComponents(buttons) : null;
 		};
 		// Function to get channel ID from channel name
-		const getChannelId = async (channelName) => {
+		const getChannelId = async channelName => {
 			try {
 				const response = await youtube.search.list({
 					part: 'snippet',
@@ -265,7 +257,7 @@ module.exports = {
 				}
 				return null;
 			} catch (error) {
-				console.error('Error fetching channel ID:', error);
+				handleError('Error fetching channel ID:', error);
 				return null;
 			}
 		};
@@ -278,13 +270,12 @@ module.exports = {
 			time: 60000, // Collector lasts for 60 seconds
 		});
 
-		collector.on('collect', async (i) => {
+		collector.on('collect', async i => {
 			// Ensure the user interacting with the buttons is the original one
 			if (i.user.id !== interaction.user.id) {
 				return i.reply({
-					content:
-						'You are not allowed to interact with these buttons.',
-					ephemeral: true,
+					content: 'You are not allowed to interact with these buttons.',
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -300,7 +291,7 @@ module.exports = {
 		});
 
 		collector.on('end', () => {
-			message.edit({ components: [] }).catch(console.error); // Remove buttons after the collector ends
+			message.edit({ components: [] }).catch(handleError); // Remove buttons after the collector ends
 		});
 	},
 };

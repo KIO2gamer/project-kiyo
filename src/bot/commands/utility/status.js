@@ -2,6 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 const { handleError } = require('./../../utils/errorHandler.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Check the status of a server or service by providing a URL. This command will return detailed information such as the status code, content type, server details, response time, and more.',
@@ -15,11 +17,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('status')
 		.setDescription('Check the status of a server or service')
-		.addStringOption((option) =>
-			option
-				.setName('url')
-				.setDescription('URL to check')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('url').setDescription('URL to check').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -70,7 +69,7 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error fetching server status:', error);
+			handleError('Error fetching server status:', error);
 			await handleError(interaction, error);
 		}
 	},

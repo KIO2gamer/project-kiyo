@@ -1,10 +1,10 @@
-// commands/moderation/editlog.js
-const { SlashCommandBuilder } = require('discord.js');
-const moderationLogs = require('./../../../database/moderationLogs');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const moderationLogs = require('../../../database/moderationLogs');
+const { parseRange } = require('../../utils/rangeParser');
+const { handleError } = require('../../utils/errorHandler');
 
 module.exports = {
-	description_full:
-		'Edits the reason for a specific log entry or a range of log entries.',
+	description_full: 'Edits the reason for a specific log entry or a range of log entries.',
 	usage: '/edit_reason reason:"new reason" [lognumber] [logrange]',
 	examples: [
 		'/edit_reason reason:"Spamming" lognumber:5',
@@ -13,22 +13,17 @@ module.exports = {
 	category: 'moderation',
 	data: new SlashCommandBuilder()
 		.setName('edit_reason')
-		.setDescription(
-			'Edit the reason for a specific log entry / a range of log entries.',
-		)
-		.addStringOption((option) =>
+		.setDescription('Edit the reason for a specific log entry / a range of log entries.')
+		.addStringOption(option =>
 			option
 				.setName('reason')
 				.setDescription('The new reason for the log entry or entries')
 				.setRequired(true),
 		)
-		.addIntegerOption((option) =>
-			option
-				.setName('lognumber')
-				.setDescription('The log number to edit')
-				.setRequired(false),
+		.addIntegerOption(option =>
+			option.setName('lognumber').setDescription('The log number to edit').setRequired(false),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('logrange')
 				.setDescription('The range of log numbers to edit (e.g., 1-5)')
@@ -60,21 +55,19 @@ module.exports = {
 						`Successfully updated reason for log #${logNumber} to: ${newReason}`,
 					);
 				} else {
-					await interaction.reply(
-						`No log found with log number ${logNumber}.`,
-					);
+					await interaction.reply(`No log found with log number ${logNumber}.`);
 				}
 			} else if (logRange) {
-				const [start, end] = logRange
-					.split('-')
-					.map((num) => parseInt(num.trim()));
+				const range = parseRange(logRange);
 
-				if (isNaN(start) || isNaN(end)) {
+				if (!range) {
 					await interaction.reply(
 						'Invalid log range. Please provide a valid range (e.g., 1-5).',
 					);
 					return;
 				}
+
+				const { start, end } = range;
 
 				const logs = await moderationLogs.find({
 					logNumber: { $gte: start, $lte: end },
@@ -89,16 +82,12 @@ module.exports = {
 						`Successfully updated reason for ${logs.length} logs in the range #${start}-#${end} to: ${newReason}`,
 					);
 				} else {
-					await interaction.reply(
-						`No logs found in the range #${start}-#${end}.`,
-					);
+					await interaction.reply(`No logs found in the range #${start}-#${end}.`);
 				}
 			}
 		} catch (error) {
-			console.error(error);
-			await interaction.reply(
-				'Failed to update the log(s). Please try again later.',
-			);
+			handleError(error);
+			await interaction.reply('Failed to update the log(s). Please try again later.');
 		}
 	},
 };

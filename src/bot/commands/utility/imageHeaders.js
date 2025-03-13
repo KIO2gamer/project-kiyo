@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Posts a predefined image header to the channel. Useful for sending visual guides or announcements related to specific server sections (like welcome, rules, etc.).',
@@ -16,7 +18,7 @@ module.exports = {
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers,
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('options')
 				.setDescription('Select an image to send')
@@ -29,7 +31,7 @@ module.exports = {
 					{ name: 'Forms', value: 'forms' },
 				),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('caption')
 				.setDescription('Add a caption to the image')
@@ -56,19 +58,19 @@ module.exports = {
 				});
 				await interaction.reply({
 					content: `Image successfully posted: ${options}`,
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			} else {
 				await interaction.reply({
 					content: 'There is no such option available',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 		} catch (error) {
-			console.error('Error posting image:', error);
+			handleError('Error posting image:', error);
 			await interaction.reply({
 				content: `An error occurred: ${error.message}`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

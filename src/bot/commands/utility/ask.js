@@ -1,11 +1,13 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ask_gemini')
 		.setDescription('Ask a single question to Gemini AI')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('question')
 				.setDescription('The question you want to ask Gemini AI')
@@ -40,10 +42,8 @@ module.exports = {
 
 			await interaction.reply(text);
 		} catch (error) {
-			console.error('Error in ask-gemini command:', error);
-			await interaction.reply(
-				'Sorry, there was an error processing your request.',
-			);
+			handleError('Error in ask-gemini command:', error);
+			await interaction.reply('Sorry, there was an error processing your request.');
 		}
 	},
 };

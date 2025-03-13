@@ -1,10 +1,8 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionFlagsBits,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const ms = require('ms');
 const { handleError } = require('./../../utils/errorHandler');
+
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
 	description_full:
@@ -18,15 +16,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('slowmode')
 		.setDescription('Set a slowmode for a channel.')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('duration')
-				.setDescription(
-					'The duration of the slowmode (e.g., 10s, 5m, 1h)',
-				)
+				.setDescription('The duration of the slowmode (e.g., 10s, 5m, 1h)')
 				.setRequired(true),
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('The channel to set slowmode in')
@@ -35,8 +31,7 @@ module.exports = {
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
 	async execute(interaction) {
-		const channel =
-			interaction.options.getChannel('channel') || interaction.channel;
+		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		const durationInput = interaction.options.getString('duration');
 		const duration = ms(durationInput) / 1000;
 

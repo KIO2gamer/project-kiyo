@@ -1,4 +1,13 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const {
+	SlashCommandBuilder,
+	EmbedBuilder,
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+} = require('discord.js');
+const { handleError } = require('../../utils/errorHandler');
+
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
 	description_full:
@@ -11,47 +20,140 @@ module.exports = {
 		.setDescription('Shows an embed of users who helped make this bot.'),
 
 	async execute(interaction) {
-		const contributors = [
-			{ command: 'steel', name: 'steeles.0' },
-			{ command: 'koifish', name: 'hallow_spice' },
-			{ command: 'do_not_touch', name: 'umbree_on_toast' },
-			{ command: 'rickroll', name: 'flashxdfx' },
-			{ command: 'summon', name: 'eesmal' },
-			{ command: 'snipe', name: 'na51f' },
-			{ command: 'photo', name: 'spheroidon' },
-			{ command: 'skibidi', name: 'zenoz231' },
-			{ command: 'quokka', name: 'wickiwacka2' },
-			{ command: 'uwu', name: 'rizzwan.' },
-			{ command: 'boba', name: 'pepsi_pro' },
-			{ command: 'lyricwhiz', name: 'vipraz' },
-		];
+		try {
+			await interaction.deferReply();
 
-		const embed = new EmbedBuilder()
-			.setTitle('✨ Credits ✨')
-			.setColor('#0099ff')
-			.setDescription(
-				'A big thank you to all the amazing contributors who helped make this bot possible!',
-			)
-			.setTimestamp()
-			.setFooter({ text: 'Thanks to all the contributors!' });
+			// Static list of contributors with their contributions
+			const contributors = [
+				{ command: 'steel', name: 'steeles.0', contribution: 'Command Development' },
+				{ command: 'koifish', name: 'hallow_spice', contribution: 'Bot Development' },
+				{
+					command: 'do_not_touch',
+					name: 'umbree_on_toast',
+					contribution: 'Command Development',
+				},
+				{ command: 'rickroll', name: 'flashxdfx', contribution: 'Command Development' },
+				{ command: 'summon', name: 'eesmal', contribution: 'Command Development' },
+				{ command: 'snipe', name: 'na51f', contribution: 'Command Development' },
+				{ command: 'photo', name: 'spheroidon', contribution: 'Command Development' },
+				{ command: 'skibidi', name: 'zenoz231', contribution: 'Command Development' },
+				{ command: 'quokka', name: 'wickiwacka2', contribution: 'Command Development' },
+				{ command: 'uwu', name: 'rizzwan.', contribution: 'Command Development' },
+				{ command: 'boba', name: 'pepsi_pro', contribution: 'Command Development' },
+				{ command: 'lyricwhiz', name: 'vipraz', contribution: 'Command Development' },
+			];
 
-		const guildCommands = await interaction.guild.commands.fetch();
+			try {
+				// Fetch the guild's slash commands
+				const guildCommands = await interaction.guild.commands.fetch();
 
-		contributors.forEach((contributor) => {
-			const command = guildCommands.find(
-				(cmd) => cmd.name === contributor.command,
-			);
-			if (command) {
-				embed.addFields([
-					{
-						name: `**${contributor.name}**`,
-						value: `</${contributor.command}:${command.id}>`,
-						inline: true,
-					},
-				]);
+				// Create the base embed
+				const embed = new EmbedBuilder()
+					.setTitle('✨ Bot Contributors ✨')
+					.setColor('#0099ff')
+					.setDescription(
+						[
+							'A big thank you to all the amazing contributors who helped make this bot possible!',
+							'',
+							"Each contributor has helped in various ways, from developing commands to improving the bot's functionality.",
+							'Click on the command names to try them out!',
+						].join('\n'),
+					)
+					.setTimestamp();
+
+				// Group contributors by contribution type
+				const groupedContributors = contributors.reduce((acc, contributor) => {
+					const group = acc.find(g => g.type === contributor.contribution);
+					if (group) {
+						group.members.push(contributor);
+					} else {
+						acc.push({
+							type: contributor.contribution,
+							members: [contributor],
+						});
+					}
+					return acc;
+				}, []);
+
+				// Add fields for each contribution group
+				groupedContributors.forEach(group => {
+					const contributorList = group.members
+						.map(contributor => {
+							const command = guildCommands.find(
+								cmd => cmd.name === contributor.command,
+							);
+							const commandLink = command
+								? `</${contributor.command}:${command.id}>`
+								: contributor.command;
+							return `• **${contributor.name}** - ${commandLink}`;
+						})
+						.join('\n');
+
+					embed.addFields({
+						name: `${getContributionEmoji(group.type)} ${group.type}`,
+						value: contributorList,
+						inline: false,
+					});
+				});
+
+				// Add footer with total count
+				embed.setFooter({
+					text: `Total Contributors: ${contributors.length} | Thanks to everyone who helped!`,
+					iconURL: interaction.client.user.displayAvatarURL(),
+				});
+
+				// Create buttons for additional actions
+				const row = new ActionRowBuilder().addComponents(
+					new ButtonBuilder()
+						.setLabel('Join Support Server')
+						.setStyle(ButtonStyle.Link)
+						.setURL('https://discord.gg/your-support-server'), // Replace with your support server invite
+					new ButtonBuilder()
+						.setLabel('GitHub Repository')
+						.setStyle(ButtonStyle.Link)
+						.setURL('https://github.com/your-repo'), // Replace with your GitHub repo URL
+				);
+
+				await interaction.editReply({
+					embeds: [embed],
+					components: [row],
+				});
+			} catch (error) {
+				if (error.code === 50001) {
+					await handleError(
+						interaction,
+						error,
+						'PERMISSION',
+						'I do not have permission to view server commands.',
+					);
+				} else {
+					await handleError(
+						interaction,
+						error,
+						'DATA_FETCH',
+						'Failed to fetch command information. Some command links may not work.',
+					);
+				}
 			}
-		});
-
-		await interaction.reply({ embeds: [embed] });
+		} catch (error) {
+			await handleError(
+				interaction,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while displaying credits information.',
+			);
+		}
 	},
 };
+
+// Helper function to get emoji for contribution type
+function getContributionEmoji(type) {
+	const emojiMap = {
+		'Bot Development': '🤖',
+		'Command Development': '⌨️',
+		'UI Design': '🎨',
+		Testing: '🔍',
+		Documentation: '📝',
+	};
+	return emojiMap[type] || '✨';
+}

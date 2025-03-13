@@ -1,21 +1,26 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { handleError } = require('../../utils/errorHandler');
+
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
 	description_full:
-		"Displays the user's avatar (profile picture). You can get the avatar of another user by mentioning them.  Customize the size and format (PNG, JPEG, WebP) of the avatar.",
+		"Displays the user's avatar (profile picture) with various options for size and format. You can get the avatar of another user by mentioning them.",
 	usage: '/avatar [target:user] [size:pixels] [format:png/jpg/webp]',
-	examples: ['/avatar', '/avatar target:@username size:1024 format:png'],
+	examples: [
+		'/avatar',
+		'/avatar target:@username',
+		'/avatar target:@username size:1024 format:png',
+		'/avatar size:2048 format:webp',
+	],
 	category: 'info',
 	data: new SlashCommandBuilder()
 		.setName('avatar')
-		.setDescription('Get the avatar of the user.')
-		.addUserOption((option) =>
-			option
-				.setName('target')
-				.setDescription("The user's avatar to show")
-				.setRequired(false),
+		.setDescription('Get the avatar of a user')
+		.addUserOption(option =>
+			option.setName('target').setDescription("The user's avatar to show").setRequired(false),
 		)
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('size')
 				.setDescription('The size of the avatar (in pixels)')
@@ -32,7 +37,7 @@ module.exports = {
 					{ name: '4096', value: 4096 },
 				),
 		)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('format')
 				.setDescription('The format of the avatar')
@@ -41,7 +46,6 @@ module.exports = {
 					{ name: 'PNG', value: 'png' },
 					{ name: 'JPEG', value: 'jpg' },
 					{ name: 'WebP', value: 'webp' },
-					// Only allow GIF if the user has a GIF avatar
 				),
 		),
 
@@ -59,35 +63,104 @@ module.exports = {
 	 * @returns {Promise<void>} - A promise that resolves when the reply is sent.
 	 */
 	async execute(interaction) {
-		const userTarget =
-			interaction.options.getUser('target') || interaction.user;
-		const size = interaction.options.getInteger('size') || 512;
-		const format = interaction.options.getString('format') || 'webp';
+		try {
+			await interaction.deferReply();
 
-		// Check if the user has a GIF avatar before allowing GIF format
-		const availableFormats = ['png', 'jpg', 'webp'];
-		if (userTarget.avatar?.startsWith('a_')) {
-			availableFormats.push('gif');
+			// Get command options
+			const userTarget = interaction.options.getUser('target') || interaction.user;
+			const size = interaction.options.getInteger('size') || 512;
+			const format = interaction.options.getString('format') || 'webp';
+
+			try {
+				// Validate user
+				if (!userTarget) {
+					await handleError(
+						interaction,
+						new Error('Invalid user'),
+						'VALIDATION',
+						'The specified user could not be found.',
+					);
+					return;
+				}
+
+				// Check available formats
+				const availableFormats = ['png', 'jpg', 'webp'];
+				const isAnimated = userTarget.avatar?.startsWith('a_');
+				if (isAnimated) {
+					availableFormats.push('gif');
+				}
+
+				// Validate format
+				const validFormat = availableFormats.includes(format) ? format : 'webp';
+
+				// Get avatar URLs for different formats
+				const avatarURLs = {};
+				for (const fmt of availableFormats) {
+					avatarURLs[fmt] = userTarget.displayAvatarURL({
+						format: fmt,
+						dynamic: true,
+						size: size,
+					});
+				}
+
+				// Create embed
+				const embed = new EmbedBuilder()
+					.setTitle(`${userTarget.username}'s Avatar`)
+					.setDescription(
+						[
+							`**User ID:** ${userTarget.id}`,
+							`**Animated:** ${isAnimated ? 'Yes' : 'No'}`,
+							`**Size:** ${size}x${size} pixels`,
+							`**Format:** ${validFormat.toUpperCase()}`,
+							'\n**Available Formats:**',
+							...availableFormats.map(
+								fmt => `• [${fmt.toUpperCase()}](${avatarURLs[fmt]})`,
+							),
+						].join('\n'),
+					)
+					.setImage(avatarURLs[validFormat])
+					.setColor(userTarget.accentColor || 'Blue')
+					.setFooter({
+						text: `Requested by ${interaction.user.tag}`,
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+					})
+					.setTimestamp();
+
+				// Add server-specific avatar if available
+				if (interaction.guild) {
+					const member = await interaction.guild.members
+						.fetch(userTarget.id)
+						.catch(() => null);
+					if (member && member.avatar) {
+						const serverAvatar = member.displayAvatarURL({
+							dynamic: true,
+							size: size,
+							format: validFormat,
+						});
+						embed.addFields({
+							name: 'Server-Specific Avatar',
+							value: `[View Server Avatar](${serverAvatar})`,
+							inline: false,
+						});
+					}
+				}
+
+				await interaction.editReply({ embeds: [embed] });
+			} catch (error) {
+				await handleError(
+					interaction,
+					error,
+					'DATA_COLLECTION',
+					'Failed to fetch avatar information.',
+				);
+			}
+		} catch (error) {
+			await handleError(
+				interaction,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while retrieving the avatar.',
+			);
 		}
-
-		// Validate the selected format
-		const validFormat = availableFormats.includes(format) ? format : 'webp';
-
-		const avatarURL = userTarget.displayAvatarURL({
-			format: validFormat,
-			dynamic: true,
-			size: size,
-		});
-
-		const embed = new EmbedBuilder()
-			.setTitle(`${userTarget.username}'s Avatar`)
-			.setImage(avatarURL)
-			.setURL(avatarURL)
-			.setFooter({
-				text: `Requested by ${interaction.user.username}`,
-				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-			});
-
-		await interaction.reply({ embeds: [embed] });
 	},
 };

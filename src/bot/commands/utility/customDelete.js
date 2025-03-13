@@ -2,19 +2,20 @@ const { SlashCommandBuilder } = require('discord.js');
 const cc = require('./../../../database/customCommands');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('custom_delete')
-		.setDescription('Deletes an existing custom command')
-		.addStringOption((option) =>
+		.setDescription('Deletes a custom command')
+		.addStringOption(option =>
 			option
 				.setName('name')
-				.setDescription('The name or alias of the command to delete')
+				.setDescription('The name of the command to delete')
 				.setRequired(true),
 		),
-	category: 'customs',
-	description_full:
-		"Deletes an existing custom command from the bot's database.",
+	category: 'utility',
+	description_full: "Deletes an existing custom command from the bot's database.",
 	usage: '/custom_delete <name:command_name_or_alias>',
 	examples: ['/custom_delete name:hello', '/custom_delete name:greet'],
 	/**
@@ -44,7 +45,7 @@ module.exports = {
 			if (!cc_record) {
 				await interaction.reply({
 					content: `Custom command or alias "${commandNameOrAlias}" not found!`,
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 				return;
 			}
@@ -58,7 +59,7 @@ module.exports = {
 
 			const confirmationResponse = await interaction.reply({
 				content: confirmMessage,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 				components: [
 					{
 						type: 1,
@@ -82,7 +83,7 @@ module.exports = {
 
 			const confirmation = await confirmationResponse
 				.awaitMessageComponent({
-					filter: (i) => i.user.id === interaction.user.id,
+					filter: i => i.user.id === interaction.user.id,
 					time: 15000,
 				})
 				.catch(() => null);
@@ -98,8 +99,9 @@ module.exports = {
 			if (confirmation.customId === 'delete_confirm') {
 				await cc.deleteOne({ _id: cc_record._id });
 				await interaction.reply({
-					content: `Custom command "${command_name}"${alias_name ? ` (alias: ${alias_name})` : ''
-						} deleted successfully!`,
+					content: `Custom command "${command_name}"${
+						alias_name ? ` (alias: ${alias_name})` : ''
+					} deleted successfully!`,
 					components: [],
 				});
 			} else {

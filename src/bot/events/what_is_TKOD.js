@@ -16,9 +16,7 @@ module.exports = {
 	async execute(message) {
 		const msg = message.content.toLowerCase();
 		if (msg.includes('tkod') && !message.author.bot) {
-			await message.channel.send(
-				'**T**he\n**K**IO2gamer\n**O**fficial\n**D**iscord',
-			);
+			await message.channel.send('**T**he\n**K**IO2gamer\n**O**fficial\n**D**iscord');
 		}
 	},
 };

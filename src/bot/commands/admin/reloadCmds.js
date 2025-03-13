@@ -1,142 +1,182 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const fs = require('node:fs');
-const path = require('node:path');
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const { handleError } = require('../../utils/errorHandler');
+const path = require('path');
+const fs = require('fs');
 
 module.exports = {
 	description_full:
-		'Reloads a specific command, or all commands if no command is specified.',
-	usage: '/reload [command name]',
-	examples: ['/reload', '/reload ban'],
+		'Reloads bot commands without restarting. Can reload a specific command or all commands.',
+	usage: '/reload [command:command_name]',
+	examples: ['/reload command:ping', '/reload'],
 	category: 'admin',
 	data: new SlashCommandBuilder()
 		.setName('reload')
-		.setDescription('Reloads a command.')
-		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addStringOption((option) =>
+		.setDescription('Reloads bot commands')
+		.addStringOption(option =>
 			option
 				.setName('command')
-				.setDescription('The command to reload.')
+				.setDescription('Specific command to reload')
 				.setRequired(false),
-		),
-	async execute(interaction) {
-		const commandName = interaction.options.getString('command');
-		const foldersPath = path.join(__dirname, '..');
-		const commandFolders = fs.readdirSync(foldersPath);
+		)
+		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-		if (commandName) {
-			await this.reloadSingleCommand(
+	async execute(interaction) {
+		try {
+			await interaction.deferReply({ ephemeral: true });
+
+			const commandName = interaction.options.getString('command');
+			const foldersPath = path.join(__dirname, '..');
+			const commandFolders = fs.readdirSync(foldersPath).filter(folder => {
+				return fs.statSync(path.join(foldersPath, folder)).isDirectory();
+			});
+
+			if (commandName) {
+				await this.reloadSingleCommand(
+					interaction,
+					commandName,
+					foldersPath,
+					commandFolders,
+				);
+			} else {
+				await this.reloadAllCommands(interaction, foldersPath, commandFolders);
+			}
+		} catch (error) {
+			await handleError(
 				interaction,
-				commandName,
-				foldersPath,
-				commandFolders,
-			);
-		} else {
-			await this.reloadAllCommands(
-				interaction,
-				foldersPath,
-				commandFolders,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while reloading commands.',
 			);
 		}
 	},
 
-	async reloadSingleCommand(
-		interaction,
-		commandName,
-		foldersPath,
-		commandFolders,
-	) {
-		const commandPath = this.findCommandPath(
-			commandName,
-			foldersPath,
-			commandFolders,
-		);
-
-		if (!commandPath) {
-			return interaction.reply({
-				content: `There is no command with name \`${commandName}\`!`,
-				ephemeral: true,
-			});
-		}
-
-		delete require.cache[require.resolve(commandPath)];
-
+	async reloadSingleCommand(interaction, commandName, foldersPath, commandFolders) {
 		try {
-			interaction.client.commands.delete(commandName);
-			const newCommand = require(commandPath);
-			interaction.client.commands.set(newCommand.data.name, newCommand);
-			await interaction.reply({
-				content: `Command \`${commandName}\` was reloaded!`,
-				ephemeral: true,
-			});
+			const commandPath = this.findCommandPath(commandName, foldersPath, commandFolders);
+
+			if (!commandPath) {
+				await handleError(
+					interaction,
+					new Error(`Command "${commandName}" not found`),
+					'VALIDATION',
+					`There is no command with name \`${commandName}\`!`,
+				);
+				return;
+			}
+
+			// Clear require cache and reload command
+			delete require.cache[require.resolve(commandPath)];
+
+			try {
+				interaction.client.commands.delete(commandName);
+				const newCommand = require(commandPath);
+
+				// Validate command structure
+				if (!newCommand.data || !newCommand.execute) {
+					throw new Error('Invalid command structure');
+				}
+
+				interaction.client.commands.set(newCommand.data.name, newCommand);
+
+				const successEmbed = new EmbedBuilder()
+					.setTitle('Command Reloaded')
+					.setDescription(`Successfully reloaded command \`${commandName}\``)
+					.setColor('Green')
+					.setTimestamp();
+
+				await interaction.editReply({ embeds: [successEmbed] });
+			} catch (error) {
+				await handleError(
+					interaction,
+					error,
+					'COMMAND_EXECUTION',
+					`Failed to reload command \`${commandName}\`: ${error.message}`,
+				);
+			}
 		} catch (error) {
-			console.error(error);
-			await interaction.reply({
-				content: `There was an error while reloading a command \`${commandName}\`:\n\`${error.message}\``,
-				ephemeral: true,
-			});
+			await handleError(
+				interaction,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while reloading the command.',
+			);
 		}
 	},
 
 	findCommandPath(commandName, foldersPath, commandFolders) {
-		return commandFolders
-			.map((folder) => {
-				const commandsPath = path.join(foldersPath, folder, 'commands');
-				if (fs.existsSync(commandsPath)) {
-					const commandFiles = fs
-						.readdirSync(commandsPath)
-						.filter((file) => file.endsWith('.js'));
-					const commandFile = commandFiles.find(
-						(file) => file === `${commandName}.js`,
-					);
-					if (commandFile) {
-						return path.join(commandsPath, commandFile);
+		for (const folder of commandFolders) {
+			const folderPath = path.join(foldersPath, folder);
+			const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'));
+
+			for (const file of commandFiles) {
+				try {
+					const filePath = path.join(folderPath, file);
+					const command = require(filePath);
+
+					if (command.data && command.data.name === commandName) {
+						return filePath;
 					}
+				} catch (error) {
+					console.error(`Error loading command file ${file}:`, error);
 				}
-			})
-			.find((path) => path !== undefined);
+			}
+		}
+		return null;
 	},
 
-	/**
-	 * Reloads all commands from the specified command folders.
-	 *
-	 * @param {Object} interaction - The interaction object from Discord.
-	 * @param {string} foldersPath - The path to the folders containing command files.
-	 * @param {Array<string>} commandFolders - An array of folder names containing command files.
-	 * @returns {Promise<void>} - A promise that resolves when all commands have been reloaded and a reply has been sent.
-	 */
 	async reloadAllCommands(interaction, foldersPath, commandFolders) {
-		commandFolders.forEach((folder) => {
-			const commandsPath = path.join(foldersPath, folder, 'commands');
-			if (fs.existsSync(commandsPath)) {
-				const commandFiles = fs
-					.readdirSync(commandsPath)
-					.filter((file) => file.endsWith('.js'));
-				for (const file of commandFiles) {
-					const filePath = path.join(commandsPath, file);
-					delete require.cache[require.resolve(filePath)];
+		try {
+			let reloadedCount = 0;
+			let errorCount = 0;
+			const errors = [];
 
+			for (const folder of commandFolders) {
+				const folderPath = path.join(foldersPath, folder);
+				const commandFiles = fs
+					.readdirSync(folderPath)
+					.filter(file => file.endsWith('.js'));
+
+				for (const file of commandFiles) {
 					try {
+						const filePath = path.join(folderPath, file);
+						delete require.cache[require.resolve(filePath)];
+
 						const command = require(filePath);
-						if ('data' in command && 'execute' in command) {
-							interaction.client.commands.set(
-								command.data.name,
-								command,
-							);
+						if (command.data && command.execute) {
+							interaction.client.commands.set(command.data.name, command);
+							reloadedCount++;
 						} else {
-							console.log(
-								`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`,
-							);
+							errorCount++;
+							errors.push(`${file}: Missing required "data" or "execute" property`);
 						}
 					} catch (error) {
-						console.error(error);
+						errorCount++;
+						errors.push(`${file}: ${error.message}`);
 					}
 				}
 			}
-		});
 
-		await interaction.reply({
-			content: 'All commands reloaded!',
-			ephemeral: true,
-		});
+			const statusEmbed = new EmbedBuilder()
+				.setTitle('Commands Reload Status')
+				.setDescription(`Successfully reloaded ${reloadedCount} commands.`)
+				.setColor(errorCount > 0 ? 'Yellow' : 'Green')
+				.setTimestamp();
+
+			if (errorCount > 0) {
+				statusEmbed.addFields({
+					name: '⚠️ Errors',
+					value: `Failed to reload ${errorCount} commands:\n${errors.map(e => `• ${e}`).join('\n')}`,
+				});
+			}
+
+			await interaction.editReply({ embeds: [statusEmbed] });
+		} catch (error) {
+			await handleError(
+				interaction,
+				error,
+				'COMMAND_EXECUTION',
+				'An error occurred while reloading all commands.',
+			);
+		}
 	},
 };

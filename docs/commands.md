@@ -1,8 +1,22 @@
-# Slash Commands
+# Kiyo Discord Bot Commands
 
-This document provides an overview of 100 slash commands available in this discord bot. Each command is located in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder.
+This document provides an overview of the slash commands available in the Kiyo Discord bot. Each command is organized by category and located in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder.
 
-## Some Common Commands Information
+## Command Categories
+
+Kiyo's commands are organized into the following categories for easy management:
+
+- [Admin Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
+- [Fun Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/fun)
+- [Games Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/games)
+- [Info Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/info)
+- [Media Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/media)
+- [Moderation Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/moderation)
+- [Roles Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/roles)
+- [Setup Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/setup)
+- [Utility Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/utility)
+
+## Popular Commands
 
 ### Moderation Commands
 
@@ -30,6 +44,13 @@ This document provides an overview of 100 slash commands available in this disco
         - `/timeout target:@user123 amount:"1h"`
         - `/timeout target:@user123 amount:"30m" reason:"Being disruptive"`
 
+- **/modify_channel**
+    - **Description:** Modify various aspects of a channel including name, topic, and permissions.
+    - **Usage:** `/modify_channel channel:#channel [name:"new name"] [topic:"new topic"]`
+    - **Examples:**
+        - `/modify_channel channel:#general name:"community-chat"`
+        - `/modify_channel channel:#announcements topic:"Official server announcements"`
+
 ### Utility Commands
 
 - **/photo**
@@ -52,6 +73,13 @@ This document provides an overview of 100 slash commands available in this disco
 
     - **Description:** Displays comprehensive information about the current Discord server, including its name, owner, creation date, member count, channels, roles, emojis, and more.
     - **Usage:** `/server_info`
+
+- **/translate**
+    - **Description:** Translates text into the desired output language.
+    - **Usage:** `/translate input:"text to translate" target_lang:"language code"`
+    - **Examples:**
+        - `/translate input:"Hello, world!" target_lang:es`
+        - `/translate input:"Bonjour" target_lang:en`
 
 ### Fun Commands
 
@@ -76,29 +104,79 @@ This document provides an overview of 100 slash commands available in this disco
         - `/coin_flip bet:heads`
 
 - **/meme**
-
     - **Description:** Fetches and displays a random, SFW meme from the internet.
     - **Usage:** `/meme`
 
-## Command Categories
+### Games Commands
 
-- [Admin Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/admin)
-- [Discord Channels Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/channels)
-- [Custom Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/customs)
-- [Fun Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/fun)
-- [Games Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/games)
-- [Info Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/info)
-- [Moderation Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/moderation)
-- [Music Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/music)
-- [Roles Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/roles)
-- [Setup Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/setup)
-- [Ticket Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/tickets)
-- [Utility Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/utility)
-- [Youtube Commands](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands/youtube)
+- **/hangman**
+
+    - **Description:** Start a game of hangman with a random word.
+    - **Usage:** `/hangman`
+
+- **/lyricwhiz**
+    - **Description:** Test your knowledge of song lyrics in this interactive quiz game.
+    - **Usage:** `/lyricwhiz`
+
+### YouTube Integration
+
+- **/get_yt_sub_role**
+    - **Description:** Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.
+    - **Usage:** `/get_yt_sub_role`
+    - **Process:**
+        1. The command initiates an OAuth2 flow to connect your Discord account with YouTube
+        2. After authorization, your YouTube subscriber count is verified
+        3. You receive a role based on your subscriber milestone
+
+## Admin Commands
+
+- **/reload**
+    - **Description:** Reloads a specific command, or all commands if no command is specified.
+    - **Usage:** `/reload [command name]`
+    - **Examples:**
+        - `/reload` (reloads all commands)
+        - `/reload ban` (reloads just the ban command)
+    - **Permissions Required:** Administrator
 
 ## Adding New Commands
 
-To add a new command, create a new file in the [`src/bot/commands`](https://github.com/KIO2gamer/project-kiyo/tree/main/src/bot/commands) folder and follow the existing command structure.
+To add a new command to Kiyo, follow these steps:
+
+1. Create a new JavaScript file in the appropriate category folder under `src/bot/commands/`
+2. Follow the standard command structure:
+
+    ```javascript
+    const { SlashCommandBuilder } = require('discord.js');
+
+    module.exports = {
+    	description_full: 'Detailed description of what the command does',
+    	usage: '/command_name <required_param> [optional_param]',
+    	examples: ['/command_name example1', '/command_name example2'],
+    	category: 'category_name',
+    	data: new SlashCommandBuilder()
+    		.setName('command_name')
+    		.setDescription('Brief description of the command'),
+
+    	async execute(interaction) {
+    		// Command implementation
+    	},
+    };
+    ```
+
+3. Ensure your command has proper error handling
+4. Add appropriate permission checks if needed
+5. Test your command thoroughly before deployment
+
+## Command Structure
+
+Each command in Kiyo follows a consistent structure:
+
+- data : SlashCommandBuilder object defining the command name, description, and parameters
+- description_full : Detailed description of what the command does
+- usage : How to use the command, including parameters
+- examples : Example usages of the command
+- category : The category the command belongs to
+- execute : The function that runs when the command is invoked
 
 ## Contributing
 
@@ -106,4 +184,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 
-[MIT](https://github.com/KIO2gamer/project-kiyo/blob/main/LICENSE.md)
+**[MIT License](https://github.com/KIO2gamer/project-kiyo/blob/main/LICENSE.md)**

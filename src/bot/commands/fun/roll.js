@@ -1,14 +1,14 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'This command simulates a dice roll. It uses a random number generator to generate a number between 1 and 6 (inclusive) and displays the corresponding dice face in an embedded message.',
 	usage: '/roll',
 	examples: ['/roll'],
 	category: 'fun',
-	data: new SlashCommandBuilder()
-		.setName('roll')
-		.setDescription('Roll a dice.'),
+	data: new SlashCommandBuilder().setName('roll').setDescription('Roll a dice.'),
 
 	async execute(interaction) {
 		const sides = 6; // You can customize the number of sides

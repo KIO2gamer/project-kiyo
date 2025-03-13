@@ -1,9 +1,4 @@
-const {
-	Events,
-	AuditLogEvent,
-	EmbedBuilder,
-	PermissionsBitField,
-} = require('discord.js');
+const { Events, AuditLogEvent, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const MsgLogsConfig = require('./../../database/msgLogsConfig');
 
 async function fetchPartialMessages(oldMessage, newMessage) {
@@ -12,7 +7,7 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 			oldMessage = await oldMessage.fetch();
 			newMessage = await newMessage.fetch();
 		} catch (err) {
-			console.error('Error fetching partial messages:', err);
+			handleError('Error fetching partial messages:', err);
 			return false;
 		}
 	}
@@ -22,19 +17,17 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 async function getLogChannel(newMessage) {
 	const config = await MsgLogsConfig.findOne();
 	if (!config?.channelId) {
-		console.error('Log channel ID is not set.');
+		handleError('Log channel ID is not set.');
 		return null;
 	}
 
 	const logChannel = await newMessage.guild.channels.fetch(config.channelId);
 	if (!logChannel) {
-		console.error(`Log channel with ID ${config.channelId} not found.`);
+		handleError(`Log channel with ID ${config.channelId} not found.`);
 		return null;
 	}
 
-	const botMember = await newMessage.guild.members.fetch(
-		newMessage.client.user.id,
-	);
+	const botMember = await newMessage.guild.members.fetch(newMessage.client.user.id);
 	const permissions = botMember.permissionsIn(logChannel);
 
 	if (
@@ -43,7 +36,7 @@ async function getLogChannel(newMessage) {
 			PermissionsBitField.Flags.EmbedLinks,
 		])
 	) {
-		console.error(
+		handleError(
 			`Bot lacks permission to send messages or embed links in the channel: ${config.channelId}`,
 		);
 		return null;
@@ -88,7 +81,7 @@ async function createLogEmbed(oldMessage, newMessage) {
 	if (newMessage.attachments.size > 0) {
 		logEmbed.addFields({
 			name: 'Attachments',
-			value: newMessage.attachments.map((a) => a.url).join('\n'),
+			value: newMessage.attachments.map(a => a.url).join('\n'),
 		});
 	}
 
@@ -141,7 +134,7 @@ async function execute(oldMessage, newMessage) {
 
 		await logChannel.send({ embeds: [logEmbed] });
 	} catch (error) {
-		console.error('Error in MessageUpdate event handler:', error);
+		handleError('Error in MessageUpdate event handler:', error);
 	}
 }
 

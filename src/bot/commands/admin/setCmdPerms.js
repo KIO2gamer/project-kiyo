@@ -1,29 +1,31 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('set_cmd_perms')
 		.setDescription('Set permissions for commands')
 		.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('command')
 				.setDescription('The command to set permissions for')
 				.setRequired(true),
 		)
-		.addBooleanOption((option) =>
+		.addBooleanOption(option =>
 			option
 				.setName('allowed')
 				.setDescription('Whether to allow or deny the permission')
 				.setRequired(true),
 		)
-		.addRoleOption((option) =>
+		.addRoleOption(option =>
 			option
 				.setName('role')
 				.setDescription('The role to set permissions for')
 				.setRequired(false),
 		)
-		.addUserOption((option) =>
+		.addUserOption(option =>
 			option
 				.setName('user')
 				.setDescription('The user to set permissions for')
@@ -61,7 +63,7 @@ module.exports = {
 		if (interaction.user.id !== process.env.OWNER_ID) {
 			return await interaction.reply({
 				content: 'Only the bot owner can use this command!',
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -73,7 +75,7 @@ module.exports = {
 		if (!role && !user) {
 			return await interaction.reply({
 				content: 'You must specify either a role or user!',
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -82,7 +84,7 @@ module.exports = {
 		if (!command) {
 			return await interaction.reply({
 				content: 'That command does not exist!',
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -100,10 +102,10 @@ module.exports = {
 		}
 
 		await interaction.reply({
-			content: `Successfully ${allowed ? 'allowed' : 'denied'
-				} permissions for ${role ? `role ${role.name}` : `user ${user.tag}`
-				} on command ${commandName}`,
-			ephemeral: true,
+			content: `Successfully ${allowed ? 'allowed' : 'denied'} permissions for ${
+				role ? `role ${role.name}` : `user ${user.tag}`
+			} on command ${commandName}`,
+			flags: MessageFlags.Ephemeral,
 		});
 	},
 };

@@ -1,8 +1,6 @@
-const {
-	SlashCommandBuilder,
-	EmbedBuilder,
-	PermissionsBitField,
-} = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
+
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
 	description_full:
@@ -18,7 +16,7 @@ module.exports = {
 	async execute(interaction) {
 		const roles = interaction.guild.roles.cache
 			.sort((a, b) => b.position - a.position)
-			.map((role) => `${role}: ${role.members.size} members`)
+			.map(role => `${role}: ${role.members.size} members`)
 			.join('\n');
 
 		const embed = new EmbedBuilder()

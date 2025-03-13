@@ -6,6 +6,8 @@ const {
 } = require('discord.js');
 const { handleError } = require('./../../utils/errorHandler');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the "Manage Channels" permission to prevent misuse.',
@@ -18,24 +20,22 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('echo')
 		.setDescription('Replies with your input!')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('input')
 				.setDescription('The input to echo back')
 				.setMaxLength(2000)
 				.setRequired(true),
 		)
-		.addChannelOption((option) =>
+		.addChannelOption(option =>
 			option
 				.setName('channel')
 				.setDescription('The channel to echo into')
 				.addChannelTypes(ChannelType.GuildText)
 				.setRequired(true),
 		)
-		.addBooleanOption((option) =>
-			option
-				.setName('embed')
-				.setDescription('Whether or not the echo should be embedded'),
+		.addBooleanOption(option =>
+			option.setName('embed').setDescription('Whether or not the echo should be embedded'),
 		)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
 
@@ -52,7 +52,7 @@ module.exports = {
 		) {
 			return interaction.reply({
 				content: `I don't have permission to send messages in ${channel}.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
@@ -66,23 +66,20 @@ module.exports = {
 
 				await channel.send({ embeds: [echoEmbed] });
 			} else {
-				await channel.send(
-					`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`,
-				);
+				await channel.send(`**Message:** ${input}\n*Echoed by: ${interaction.user.tag}*`);
 			}
 
 			await interaction.reply({
 				content: `Message echoed successfully in ${channel}.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		} catch (error) {
 			handleError(
 				interaction,
 				error,
 				await interaction.reply({
-					content:
-						'There was an error trying to execute that command.',
-					ephemeral: true,
+					content: 'There was an error trying to execute that command.',
+					flags: MessageFlags.Ephemeral,
 				}),
 			);
 		}

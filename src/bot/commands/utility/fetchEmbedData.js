@@ -1,18 +1,20 @@
 // This command fetches the embed data from a message URL.
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'Fetches the embed data from a message URL.',
 	usage: '/fetch_embed_data <url:message_url>',
-	examples: ['/fetch_embed_data https://discord.com/channels/123456789012345678/123456789012345678/123456789012345678'],
+	examples: [
+		'/fetch_embed_data https://discord.com/channels/123456789012345678/123456789012345678/123456789012345678',
+	],
 	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('fetch_embed_data')
 		.setDescription('Fetches the embed data from a message URL.')
-		.addStringOption((option) =>
-			option.setName('url')
-				.setDescription('The message URL')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('url').setDescription('The message URL').setRequired(true),
 		),
 	async execute(interaction) {
 		try {
@@ -27,14 +29,19 @@ module.exports = {
 			const [, guildId, channelId, messageId] = match;
 
 			// Fetch the message using the provided URL
-			const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`, {
-				headers: {
-					Authorization: `Bot ${process.env.DISCORD_TOKEN}` // Replace with your bot token
-				}
-			});
+			const response = await fetch(
+				`https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`,
+				{
+					headers: {
+						Authorization: `Bot ${process.env.DISCORD_TOKEN}`, // Replace with your bot token
+					},
+				},
+			);
 
 			if (!response.ok) {
-				return interaction.reply('Failed to fetch the message. Is the URL correct and is your bot in the server?');
+				return interaction.reply(
+					'Failed to fetch the message. Is the URL correct and is your bot in the server?',
+				);
 			}
 
 			const data = await response.json();
@@ -47,10 +54,17 @@ module.exports = {
 			const embedData = data.embeds[0];
 
 			// Send the embed data as JSON
-			interaction.reply({ content: 'Embed Data:', files: [{ attachment: Buffer.from(JSON.stringify(embedData, null, 2)), name: 'embed.json' }] });
-
+			interaction.reply({
+				content: 'Embed Data:',
+				files: [
+					{
+						attachment: Buffer.from(JSON.stringify(embedData, null, 2)),
+						name: 'embed.json',
+					},
+				],
+			});
 		} catch (error) {
-			console.error('Error fetching embed:', error);
+			handleError('Error fetching embed:', error);
 			interaction.reply('An error occurred while fetching the embed.');
 		}
 	},

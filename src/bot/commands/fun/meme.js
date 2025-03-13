@@ -1,15 +1,15 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Get ready to laugh! This command fetches and displays a random, SFW meme from the vast expanse of the internet.',
 	usage: '/meme',
 	examples: ['/meme'],
 	category: 'fun',
-	data: new SlashCommandBuilder()
-		.setName('meme')
-		.setDescription('Send a random meme.'),
+	data: new SlashCommandBuilder().setName('meme').setDescription('Send a random meme.'),
 
 	async execute(interaction) {
 		let attempts = 0;
@@ -24,7 +24,7 @@ module.exports = {
 					break;
 				}
 			} catch (error) {
-				console.error('Error fetching meme:', error);
+				handleError('Error fetching meme:', error);
 			}
 			attempts++;
 		}

@@ -11,17 +11,17 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const math = require('mathjs'); // Import mathjs
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('calculate')
 		.setDescription('Perform a calculation using mathjs.')
-		.addStringOption((option) =>
+		.addStringOption(option =>
 			option
 				.setName('expression')
-				.setDescription(
-					'The mathematical expression to calculate (e.g., 2 + 5 * 3)',
-				)
+				.setDescription('The mathematical expression to calculate (e.g., 2 + 5 * 3)')
 				.setRequired(true),
 		),
 	description_full:
@@ -54,11 +54,10 @@ module.exports = {
 
 			await interaction.reply({ embeds: [embed] });
 		} catch (error) {
-			console.error('Error calculating expression:', error);
+			handleError('Error calculating expression:', error);
 			await interaction.reply({
-				content:
-					'Invalid mathematical expression. Please check your input.',
-				ephemeral: true,
+				content: 'Invalid mathematical expression. Please check your input.',
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

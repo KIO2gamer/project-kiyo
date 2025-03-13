@@ -8,14 +8,14 @@ class Logger {
 			success: { color: chalk.green, icon: '✅' },
 			warning: { color: chalk.yellow, icon: '⚠️' },
 			error: { color: chalk.red, icon: '❌' },
-			debug: { color: chalk.magenta, icon: '🐞' }
+			debug: { color: chalk.magenta, icon: '🐞' },
 		},
 		dateFormatOptions: {
 			hour12: false,
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit"
-		}
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+		},
 	};
 
 	// Format the timestamp with more legible format (HH:MM:SS)

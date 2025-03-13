@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'Assigns the specified role to the specified user.',
 	usage: '/give_role <target:user> <role:role>',
@@ -8,17 +10,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('give_role')
 		.setDescription('Gives a role to a user')
-		.addUserOption((option) =>
+		.addUserOption(option =>
 			option
 				.setName('target')
 				.setDescription('The user to assign the role to')
 				.setRequired(true),
 		)
-		.addRoleOption((option) =>
-			option
-				.setName('role')
-				.setDescription('The role to assign')
-				.setRequired(true),
+		.addRoleOption(option =>
+			option.setName('role').setDescription('The role to assign').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -27,14 +26,10 @@ module.exports = {
 		const member = await interaction.guild.members.fetch(target.id);
 
 		if (member.roles.cache.has(role.id)) {
-			return interaction.reply(
-				`${target} already has the ${role} role.`,
-			);
+			return interaction.reply(`${target} already has the ${role} role.`);
 		}
 
 		await member.roles.add(role);
-		return interaction.reply(
-			`${target} has been given the ${role} role.`,
-		);
+		return interaction.reply(`${target} has been given the ${role} role.`);
 	},
 };

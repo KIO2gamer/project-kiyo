@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Displays a specific rule from the server’s rules list. The number of the rule to be displayed is specified as an argument.',
@@ -8,18 +10,14 @@ module.exports = {
 	category: 'moderation',
 	data: new SlashCommandBuilder()
 		.setName('rule')
-		.setDescription(
-			'Shows the rules of the server in snippets (selection).',
-		)
+		.setDescription('Shows the rules of the server in snippets (selection).')
 		.setDefaultMemberPermissions(
 			PermissionFlagsBits.ManageMessages, // Changed permission to ManageMessages for better fit
 		)
-		.addIntegerOption((option) =>
+		.addIntegerOption(option =>
 			option
 				.setName('number')
-				.setDescription(
-					'Input a number which corresponds to that rule.',
-				)
+				.setDescription('Input a number which corresponds to that rule.')
 				.setRequired(true),
 		),
 
@@ -73,7 +71,7 @@ module.exports = {
 			default:
 				return interaction.reply({
 					content: 'Input a valid number from 1 to 11.',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 		}
 	},

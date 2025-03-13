@@ -2,27 +2,22 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 const GOOGLE_BLUE = '#4285F4'; // Google Blue color
-const GOOGLE_RED = '#EA4335';  // Google Red color for errors
-const MAX_RESULTS = 5;         // Number of search results to display
+const GOOGLE_RED = '#EA4335'; // Google Red color for errors
+const MAX_RESULTS = 5; // Number of search results to display
 const MAX_SNIPPET_LENGTH = 200; // Max characters for snippet in embed
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
-	description_full:
-		'Searches Google for the given query and displays the top results.',
+	description_full: 'Searches Google for the given query and displays the top results.',
 	usage: '/google <query>',
-	examples: [
-		'/google discord bot tutorial',
-		'/google best restaurants near me',
-	],
+	examples: ['/google discord bot tutorial', '/google best restaurants near me'],
 	category: 'utility',
 	data: new SlashCommandBuilder()
 		.setName('google')
 		.setDescription('Search Google for a query')
-		.addStringOption((option) =>
-			option
-				.setName('query')
-				.setDescription('The search query')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('query').setDescription('The search query').setRequired(true),
 		),
 
 	async execute(interaction) {
@@ -31,7 +26,7 @@ module.exports = {
 		const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
 		if (!apiKey || !searchEngineId) {
-			console.error('Google API key or Search Engine ID not found in environment variables.');
+			handleError('Google API key or Search Engine ID not found in environment variables.');
 			return interaction.reply({
 				embeds: [
 					new EmbedBuilder()
@@ -41,21 +36,18 @@ module.exports = {
 							'The Google Search command is not properly configured by the server administrator.\n\nPlease inform them to set up the `GOOGLE_API_KEY` and `GOOGLE_SEARCH_ENGINE_ID` environment variables.',
 						),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 
 		try {
-			const response = await axios.get(
-				'https://www.googleapis.com/customsearch/v1',
-				{
-					params: {
-						key: apiKey,
-						cx: searchEngineId,
-						q: query,
-					},
+			const response = await axios.get('https://www.googleapis.com/customsearch/v1', {
+				params: {
+					key: apiKey,
+					cx: searchEngineId,
+					q: query,
 				},
-			);
+			});
 
 			const results = response.data.items?.slice(0, MAX_RESULTS) || []; // Safely access items and limit results
 
@@ -69,7 +61,7 @@ module.exports = {
 								`Unfortunately, Google Custom Search did not return any relevant results for the query: \`${query}\`. \n\nPlease try a different or broader search term.`,
 							),
 					],
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 
@@ -102,17 +94,16 @@ module.exports = {
 
 			embed.setDescription(embed.data.description + resultList); // Append results to description
 
-			await interaction.reply({ embeds: [embed], ephemeral: true });
-
+			await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 		} catch (error) {
-			console.error('Error performing Google search:', error);
+			handleError('Error performing Google search:', error);
 			let errorMessage =
 				'An error occurred while performing the search. Please try again later.';
 
 			if (error.response) {
 				// API error details
 				errorMessage = `Google Search API Error: ${error.response.status} ${error.response.statusText}\n${error.response.data?.error?.message || 'No detailed error message available.'}`;
-				console.error('Google API Error Details:', error.response.data); // Log detailed API error
+				handleError('Google API Error Details:', error.response.data); // Log detailed API error
 			} else if (error.request) {
 				errorMessage =
 					'Error reaching Google Search API. Please check your internet connection or the service might be temporarily unavailable.';
@@ -125,7 +116,7 @@ module.exports = {
 						.setTitle('⚠️ Search Error')
 						.setDescription(errorMessage),
 				],
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 	},

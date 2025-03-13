@@ -40,6 +40,8 @@ const vm = require('vm');
 const allowedRoles = ['938469752882479166'];
 const allowedUsers = ['764513584125444146'];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full:
 		'Evaluates provided JavaScript code. WARNING: This command is extremely dangerous and should only be used for debugging in a controlled environment. Never use it in a production bot.',
@@ -49,11 +51,8 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('eval')
 		.setDescription('Evaluates JavaScript code.')
-		.addStringOption((option) =>
-			option
-				.setName('code')
-				.setDescription('The code to evaluate')
-				.setRequired(true),
+		.addStringOption(option =>
+			option.setName('code').setDescription('The code to evaluate').setRequired(true),
 		),
 	async execute(interaction) {
 		// Check if the user has permission to use this command
@@ -61,14 +60,12 @@ module.exports = {
 			!allowedUsers.includes(interaction.user.id) &&
 			!(
 				interaction.member.roles.cache.size > 0 &&
-				interaction.member.roles.cache.some((role) =>
-					allowedRoles.includes(role.id),
-				)
+				interaction.member.roles.cache.some(role => allowedRoles.includes(role.id))
 			)
 		) {
 			return interaction.reply({
 				content: 'You do not have permission to use this command.',
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 		}
 

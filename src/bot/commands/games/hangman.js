@@ -32,6 +32,8 @@ const funnyMessages = [
 	"Uh-oh! That letter's social distancing from this word!",
 ];
 
+const { MessageFlags } = require('discord.js');
+
 module.exports = {
 	description_full: 'A thrilling multiplayer game of hangman!',
 	usage: '/hangman',
@@ -45,9 +47,7 @@ module.exports = {
 			await interaction.deferReply(); // Defer reply for potential file reading delay
 			const words = await loadWords();
 			if (!words) {
-				return interaction.editReply(
-					'Oops! The word list is as empty as a ghost town!',
-				);
+				return interaction.editReply('Oops! The word list is as empty as a ghost town!');
 			}
 
 			const word = selectWord(words);
@@ -59,10 +59,18 @@ module.exports = {
 			const msg = await interaction.editReply({ embeds: [gameEmbed] });
 
 			const collector = createCollector(interaction, gameActive); // Pass gameActive to collector
-			startGameCollector(collector, interaction, msg, word, gameState, gameEmbed, gameActive, winner); // Pass gameActive and winner
-
+			startGameCollector(
+				collector,
+				interaction,
+				msg,
+				word,
+				gameState,
+				gameEmbed,
+				gameActive,
+				winner,
+			); // Pass gameActive and winner
 		} catch (error) {
-			console.error('Multiplayer Hangman game error:', error);
+			handleError('Multiplayer Hangman game error:', error);
 			await interaction.editReply(
 				'Oops! An error occurred while setting up the multiplayer game. Maybe the hangman is playing with others?',
 			);
@@ -77,10 +85,10 @@ async function loadWords() {
 		const data = await fs.readFile(WORD_LIST_PATH, 'utf-8');
 		return data
 			.split('\n')
-			.map((word) => word.trim())
-			.filter((word) => word);
+			.map(word => word.trim())
+			.filter(word => word);
 	} catch (error) {
-		console.error('Failed to read the word list file:', error);
+		handleError('Failed to read the word list file:', error);
 		return null;
 	}
 }
@@ -118,18 +126,20 @@ function createGameEmbed(gameState, thumbnail) {
 				inline: true,
 			},
 		)
-		.setFooter({ text: 'Type a letter to make a guess - anyone can join!' }); // Multiplayer footer
+		.setFooter({
+			text: 'Type a letter to make a guess - anyone can join!',
+		}); // Multiplayer footer
 }
 
 function getGuessedLettersDisplay(guessedLetters) {
-	return guessedLetters.length > 0
-		? guessedLetters.join(', ').toUpperCase()
-		: 'None yet!';
+	return guessedLetters.length > 0 ? guessedLetters.join(', ').toUpperCase() : 'None yet!';
 }
 
-function createCollector(interaction, gameActive) { // Added gameActive parameter
-	const filter = (m) =>
-		!m.author.bot && gameActive && // Any non-bot user can guess while game is active
+function createCollector(interaction, gameActive) {
+	// Added gameActive parameter
+	const filter = m =>
+		!m.author.bot &&
+		gameActive && // Any non-bot user can guess while game is active
 		m.content.length === 1 &&
 		/[a-z]/i.test(m.content);
 	return interaction.channel.createMessageCollector({
@@ -138,8 +148,18 @@ function createCollector(interaction, gameActive) { // Added gameActive paramete
 	});
 }
 
-function startGameCollector(collector, interaction, msg, word, gameState, gameEmbed, gameActive, winner) { // Added gameActive and winner parameters
-	collector.on('collect', async (m) => {
+function startGameCollector(
+	collector,
+	interaction,
+	msg,
+	word,
+	gameState,
+	gameEmbed,
+	gameActive,
+	winner,
+) {
+	// Added gameActive and winner parameters
+	collector.on('collect', async m => {
 		const letter = m.content.toLowerCase();
 		if (gameState.guessedLetters.includes(letter)) {
 			handleGuess(m);
@@ -202,7 +222,6 @@ function updateWordState(letter, gameState) {
 	gameState.wordState = newWordState.trim();
 }
 
-
 async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) {
 	gameState.remainingGuesses--;
 	const funnyMessage = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
@@ -210,14 +229,15 @@ async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) 
 	// setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
 
 	gameEmbed
-		.setDescription(
-			`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``,
-		)
+		.setDescription(`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``)
 		.setThumbnail(hangmanImages[MAX_GUESSES - gameState.remainingGuesses])
 		.setFields([
 			{
 				name: '💪 Guesses Left (Shared)', // Indicate shared guesses
-				value: gameState.remainingGuesses > 0 ? '❤️'.repeat(gameState.remainingGuesses) : 'None left!',
+				value:
+					gameState.remainingGuesses > 0
+						? '❤️'.repeat(gameState.remainingGuesses)
+						: 'None left!',
 				inline: true,
 			},
 			{
@@ -228,7 +248,6 @@ async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) 
 		]);
 }
 
-
 async function handleGuess(message) {
 	const reply = await message.reply(
 		`${message.author}, you've already guessed that letter! Try another one.`, // Mention the user who repeated guess
@@ -236,7 +255,6 @@ async function handleGuess(message) {
 	// setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
 	// message.delete(); // Keeping messages for multiplayer context - No user message deletion
 }
-
 
 function checkGameOver(gameState) {
 	return gameState.remainingGuesses <= 0;
@@ -254,7 +272,7 @@ async function handleTimeout(msg, gameState) {
 			`Looks like time ran out for all of you! The word was **${gameState.word}**.`, // Multiplayer timeout description
 		)
 		.setFooter({
-			text: "Maybe teamwork makes the dream work... next time!", // Multiplayer timeout footer
+			text: 'Maybe teamwork makes the dream work... next time!', // Multiplayer timeout footer
 		});
 	await msg.edit({ embeds: [gameEmbed] });
 }
@@ -272,8 +290,8 @@ async function handleGameOver(msg, gameState) {
 	await msg.edit({ embeds: [gameEmbed] });
 }
 
-
-async function handleWin(msg, gameState, winner) { // Added winner parameter
+async function handleWin(msg, gameState, winner) {
+	// Added winner parameter
 	const gameEmbed = new EmbedBuilder()
 		.setColor(WIN_COLOR)
 		.setTitle(`🎊 We Have a Winner! 🎊 Congratulations, ${winner}!`) // Multiplayer win title - Announce winner

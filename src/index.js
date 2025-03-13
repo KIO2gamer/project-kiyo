@@ -1,22 +1,8 @@
-// Load environment variables
 require('dotenv').config();
+const { handleError } = require('./bot/utils/errorHandler');
+const Logger = require('./../logger');
 
-// Environment Variables
-const {
-	DISCORD_CLIENT_ID,
-	DISCORD_TOKEN,
-	MONGODB_URI,
-	DISCORD_GUILD_IDS = ''
-} = process.env;
-
-// Validate critical environment variables
-if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID || !MONGODB_URI) {
-	console.error('Missing one or more required environment variables.');
-	process.exit(1);
-}
-
-// Constants
-const GUILD_IDS = DISCORD_GUILD_IDS.split(',').filter(Boolean);
+const startTime = process.hrtime();
 
 const fs = require('fs');
 const path = require('path');
@@ -27,13 +13,53 @@ const {
 	GatewayIntentBits,
 	Partials,
 	REST,
-	Routes
+	Routes,
+	Options,
 } = require('discord.js');
-const Logger = require('./../logger');
+
+const config = {
+	clientId: process.env.DISCORD_CLIENT_ID,
+	token: process.env.DISCORD_TOKEN,
+	mongoUri: process.env.MONGODB_URI,
+	guildIds: process.env.DISCORD_GUILD_IDS?.split(',').filter(Boolean) || [],
+	environment: process.env.NODE_ENV || 'development',
+
+	paths: {
+		commands: path.join(__dirname, 'bot/commands'),
+		events: path.join(__dirname, 'bot/events'),
+		database: path.join(__dirname, 'database'),
+	},
+
+	validate() {
+		const missing = [];
+		if (!this.token) missing.push('DISCORD_TOKEN');
+		if (!this.clientId) missing.push('DISCORD_CLIENT_ID');
+		if (!this.mongoUri) missing.push('MONGODB_URI');
+
+		if (missing.length > 0) {
+			throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+		}
+
+		if (this.guildIds.length === 0) {
+			Logger.warning(
+				'CONFIG',
+				'No guild IDs provided. Commands will not be registered to any servers.',
+			);
+		}
+
+		return this;
+	},
+};
+
+try {
+	config.validate();
+} catch (error) {
+	Logger.error('CONFIG', error.message);
+	process.exit(1);
+}
 
 Logger.log('BOT', 'Initializing...', 'info');
 
-// Create Discord client with required intents and partials
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -45,219 +71,323 @@ const client = new Client({
 		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildPresences,
 	],
-	partials: [
-		Partials.Message,
-		Partials.Channel,
-		Partials.Reaction
-	]
+	partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+
+	sweepers: {
+		messages: {
+			interval: 60,
+			lifetime: 600,
+		},
+		users: {
+			interval: 300,
+			filter: () => user => user.bot && user.id !== client.user.id,
+		},
+	},
+
+	makeCache: Options.cacheWithLimits({
+		MessageManager: 100,
+		GuildMemberManager: 200,
+	}),
+
+	presence: {
+		status: 'online',
+	},
 });
 
 client.commands = new Collection();
-
-/**
- * Recursively loads files from a directory and applies a given action to each file.
- *
- * @param {string} dir - The directory to load files from.
- * @param {function} callback - The action to apply to each file. Receives the file path as an argument.
- */
-const loadFiles = (dir, callback) => {
-	const processFile = (filePath) => {
-		let stat;
-		try {
-			stat = fs.statSync(filePath);
-		} catch (error) {
-			Logger.log('FILES', `Error accessing ${filePath}: ${error.message}`, 'warning');
-			return;
-		}
-		if (stat.isDirectory()) {
-			loadFiles(filePath, callback);
-			return;
-		}
-		if (!filePath.endsWith('.js')) return;
-		callback(filePath);
-	};
-
-	fs.readdirSync(dir)
-		.map(file => path.join(dir, file))
-		.forEach(processFile);
+client.aliases = new Collection();
+client.cooldowns = new Collection();
+client.commandStats = {
+	usageCount: 0,
+	categoryCounts: new Map(),
+	lastUsed: new Map(),
 };
 
-/**
- * Loads command modules from a specified directory and registers them with the Discord client.
- *
- * @param {string} dir - The directory to load commands from.
- */
-const loadCommands = (dir) => {
-	Logger.log('COMMANDS', 'Loading command modules', 'info');
-	const commandCache = new Map();
-	loadFiles(dir, (filePath) => {
-		if (!commandCache.has(filePath)) {
+client.startup = {
+	time: Date.now(),
+	commandsLoaded: 0,
+	eventsLoaded: 0,
+	errors: 0,
+};
+
+const FileLoader = {
+	readDirSync(dir) {
+		try {
+			return fs.readdirSync(dir);
+		} catch (error) {
+			Logger.warning('FILES', `Cannot read directory ${dir}: ${error.message}`);
+			return [];
+		}
+	},
+
+	loadFiles(dir, callback) {
+		if (!fs.existsSync(dir)) {
+			Logger.warning('FILES', `Directory does not exist: ${dir}`);
+			return;
+		}
+
+		const processFile = filePath => {
 			try {
-				commandCache.set(filePath, require(filePath));
+				const stat = fs.statSync(filePath);
+
+				if (stat.isDirectory()) {
+					this.loadFiles(filePath, callback);
+					return;
+				}
+
+				if (filePath.endsWith('.js')) {
+					callback(filePath);
+				}
 			} catch (error) {
-				Logger.log('COMMANDS', `Failed to require ${filePath}: ${error.message}`, 'warning');
-				return;
+				Logger.warning('FILES', `Error processing ${filePath}: ${error.message}`);
 			}
-		}
-		const command = commandCache.get(filePath);
-		if (command?.data?.name && command.execute) {
-			client.commands.set(command.data.name, command);
-			if (command.data.aliases && Array.isArray(command.data.aliases)) {
-				command.data.aliases.forEach(alias => {
-					client.commands.set(alias, command);
-				});
-			}
-		}
-	});
-	Logger.log('COMMANDS', 'Command modules loaded', 'success');
-};
+		};
 
-/**
- * Loads event modules from a specified directory and registers them with the Discord client.
- *
- * @param {string} dir - The directory to load events from.
- */
-const loadEvents = (dir) => {
-	Logger.log('EVENTS', 'Loading event modules', 'info');
-	loadFiles(dir, (filePath) => {
-		let event;
+		this.readDirSync(dir)
+			.map(file => path.join(dir, file))
+			.forEach(processFile);
+	},
+
+	safeRequire(filePath) {
 		try {
-			event = require(filePath);
+			if (config.environment === 'development') {
+				delete require.cache[require.resolve(filePath)];
+			}
+			return require(filePath);
 		} catch (error) {
-			Logger.log('EVENTS', `Failed to require ${filePath}: ${error.message}`, 'warning');
-			return;
+			Logger.warning('FILES', `Failed to load ${filePath}: ${error.message}`);
+			client.startup.errors++;
+			return null;
 		}
-		const execute = (...args) => event.execute(...args);
-		if (event.once) {
-			client.once(event.name, execute);
-		} else {
-			client.on(event.name, execute);
-		}
-	});
-	Logger.log('EVENTS', 'Event modules loaded', 'success');
+	},
 };
 
-// Load commands and events from their respective directories
-loadCommands(path.join(__dirname, 'bot/commands'));
-loadEvents(path.join(__dirname, 'bot/events'));
+const CommandManager = {
+	loadCommands(dir) {
+		Logger.log('COMMANDS', 'Loading command modules', 'info');
 
-/**
- * Connects to MongoDB using Mongoose with improved connection options.
- *
- * @async
- * @returns {Promise<void>}
- */
-const connectToMongoDB = async () => {
-	Logger.log('DATABASE', 'Establishing database connection', 'info');
-	try {
-		mongoose.set('strictQuery', false);
-		await mongoose.connect(MONGODB_URI).catch(err => {
-			console.error('❌ MongoDB Connection Error:', err);
+		FileLoader.loadFiles(dir, filePath => {
+			const command = FileLoader.safeRequire(filePath);
+
+			if (!command) return;
+
+			if (command?.data?.name && command.execute) {
+				client.commands.set(command.data.name, command);
+
+				if (command.data.aliases && Array.isArray(command.data.aliases)) {
+					command.data.aliases.forEach(alias => {
+						client.aliases.set(alias, command.data.name);
+					});
+				}
+
+				const category = command.category || 'uncategorized';
+				if (!client.commandStats.categoryCounts.has(category)) {
+					client.commandStats.categoryCounts.set(category, 0);
+				}
+				client.commandStats.categoryCounts.set(
+					category,
+					client.commandStats.categoryCounts.get(category) + 1,
+				);
+
+				client.startup.commandsLoaded++;
+			} else {
+				Logger.warning('COMMANDS', `Invalid command structure in ${filePath}`);
+			}
 		});
-		Logger.log('DATABASE', 'Database connection established', 'success');
-	} catch (error) {
-		Logger.log('DATABASE', `Database connection failed: ${error.message}`, 'error');
-		process.exit(1);
-	}
-};
 
-/**
- * Deploys command modules to a specific guild.
- *
- * @async
- * @param {REST} rest - The Discord REST client.
- * @param {string} guildId - The guild ID for deployment.
- * @param {Array} commands - Array of command data.
- * @returns {Promise<void>}
- */
-const deployCommandsToGuild = async (rest, guildId, commands) => {
-	try {
-		await rest.put(
-			Routes.applicationGuildCommands(DISCORD_CLIENT_ID, guildId),
-			{ body: commands }
-		);
-		Logger.log('DEPLOY', `Deployed ${commands.length} modules to ${guildId}`, 'success');
-	} catch (error) {
-		Logger.log('DEPLOY', `Deployment failed for ${guildId}: ${error.message}`, 'error');
-	}
-};
+		Logger.success('COMMANDS', `Loaded ${client.startup.commandsLoaded} command modules`);
 
-/**
- * Deploys command modules to the Discord API.
- *
- * @async
- * @returns {Promise<void>}
- */
-const deployCommands = async () => {
-	Logger.log('DEPLOY', 'Deploying command modules', 'info');
-	const commands = [];
-	const commandsPath = path.join(__dirname, 'bot/commands');
+		this.refreshHelpCommand();
+	},
 
-	loadFiles(commandsPath, (filePath) => {
+	refreshHelpCommand() {
+		const helpCommand = client.commands.get('help');
+		if (helpCommand && typeof helpCommand.refreshData === 'function') {
+			try {
+				helpCommand.refreshData(client);
+				Logger.info('COMMANDS', 'Help command categories refreshed');
+			} catch (error) {
+				Logger.warning('COMMANDS', `Failed to refresh help command: ${error.message}`);
+			}
+		}
+	},
+
+	async deployCommands() {
+		Logger.info('DEPLOY', 'Preparing command deployment');
+
+		const commands = [];
+		client.commands.forEach(cmd => {
+			if (cmd.data && typeof cmd.data.toJSON === 'function') {
+				commands.push(cmd.data.toJSON());
+			}
+		});
+
+		Logger.info('DEPLOY', `Deploying ${commands.length} commands`);
+
+		const rest = new REST({ version: '10' }).setToken(config.token);
+
 		try {
-			const command = require(filePath);
-			if (command?.data?.toJSON) {
-				commands.push(command.data.toJSON());
+			await rest.put(Routes.applicationCommands(config.clientId), { body: [] });
+
+			if (config.guildIds.length > 0) {
+				const deploymentPromises = config.guildIds.map(guildId =>
+					this.deployToGuild(rest, guildId, commands),
+				);
+
+				await Promise.all(deploymentPromises);
+				Logger.success('DEPLOY', 'Command deployment complete');
+			} else {
+				Logger.warning('DEPLOY', 'No guild IDs provided for command deployment');
 			}
 		} catch (error) {
-			Logger.log('DEPLOY', `Failed to load command from ${filePath}: ${error.message}`, 'warning');
+			Logger.error('DEPLOY', `Command deployment failed: ${error.message}`);
+			throw error;
 		}
-	});
+	},
 
-	const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
-
-	try {
-		// Clear global commands first
-		await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: [] });
-		// Deploy to each guild concurrently
-		await Promise.all(
-			GUILD_IDS.map(guildId => deployCommandsToGuild(rest, guildId, commands))
-		);
-	} catch (error) {
-		Logger.log('DEPLOY', `Failed to deploy command modules: ${error.message}`, 'error');
-	}
+	async deployToGuild(rest, guildId, commands) {
+		try {
+			await rest.put(Routes.applicationGuildCommands(config.clientId, guildId), {
+				body: commands,
+			});
+			Logger.success('DEPLOY', `Deployed ${commands.length} commands to guild ${guildId}`);
+		} catch (error) {
+			Logger.error('DEPLOY', `Failed to deploy to guild ${guildId}: ${error.message}`);
+		}
+	},
 };
 
-/**
- * Initializes the bot by connecting to MongoDB, deploying commands, and logging in.
- *
- * Parallelizes the MongoDB connection and command deployment to reduce startup time.
- *
- * @async
- * @returns {Promise<void>}
- */
-const initializeBot = async () => {
-	try {
-		// Parallelize DB connection and command deployment
-		await Promise.all([
-			connectToMongoDB(),
-			deployCommands()
-		]);
-		await client.login(DISCORD_TOKEN);
-		Logger.log('BOT', 'Initialization complete', 'success');
-	} catch (error) {
-		Logger.log('BOT', `Initialization failed: ${error.message}`, 'error');
-		process.exit(1);
-	}
+const EventManager = {
+	loadEvents(dir) {
+		Logger.info('EVENTS', 'Loading event handlers');
+
+		FileLoader.loadFiles(dir, filePath => {
+			const event = FileLoader.safeRequire(filePath);
+
+			if (!event || !event.name) return;
+
+			const execute = (...args) => {
+				try {
+					event.execute(...args);
+				} catch (error) {
+					Logger.error('EVENTS', `Error in ${event.name} event: ${error.message}`);
+					handleError(`Error in ${event.name} event handler:`, error);
+				}
+			};
+
+			if (event.once) {
+				client.once(event.name, execute);
+			} else {
+				client.on(event.name, execute);
+			}
+
+			client.startup.eventsLoaded++;
+		});
+
+		Logger.success('EVENTS', `Loaded ${client.startup.eventsLoaded} event handlers`);
+	},
 };
 
-// Graceful shutdown on SIGINT
-process.on('SIGINT', async () => {
-	Logger.log('BOT', 'Initiating shutdown', 'warning');
-	await mongoose.connection.close();
-	client.destroy();
-	Logger.log('BOT', 'Shutdown complete', 'info');
-	process.exit(0);
+const DatabaseManager = {
+	async connect() {
+		Logger.info('DATABASE', 'Establishing connection to MongoDB');
+
+		try {
+			mongoose.set('strictQuery', false);
+
+			await mongoose.connect(config.mongoUri, {
+				serverSelectionTimeoutMS: 5000,
+				maxPoolSize: 10,
+			});
+
+			Logger.success('DATABASE', 'MongoDB connection established');
+
+			mongoose.connection.on('error', error => {
+				Logger.error('DATABASE', `Connection error: ${error.message}`);
+			});
+
+			mongoose.connection.on('disconnected', () => {
+				Logger.warning('DATABASE', 'MongoDB disconnected, attempting to reconnect');
+			});
+
+			mongoose.connection.on('reconnected', () => {
+				Logger.success('DATABASE', 'MongoDB reconnection successful');
+			});
+		} catch (error) {
+			Logger.error('DATABASE', `Failed to connect to MongoDB: ${error.message}`);
+			throw error;
+		}
+	},
+
+	async disconnect() {
+		if (mongoose.connection.readyState !== 0) {
+			await mongoose.connection.close();
+			Logger.info('DATABASE', 'MongoDB connection closed');
+		}
+	},
+};
+
+const App = {
+	async initialize() {
+		try {
+			CommandManager.loadCommands(config.paths.commands);
+			EventManager.loadEvents(config.paths.events);
+
+			await Promise.all([DatabaseManager.connect(), CommandManager.deployCommands()]);
+
+			await client.login(config.token);
+
+			const elapsed = process.hrtime(startTime);
+			const elapsedMs = (elapsed[0] * 1000 + elapsed[1] / 1000000).toFixed(2);
+
+			Logger.success('BOT', `Initialization complete in ${elapsedMs}ms`);
+			Logger.info(
+				'BOT',
+				`Loaded ${client.startup.commandsLoaded} commands, ${client.startup.eventsLoaded} events`,
+			);
+
+			if (client.startup.errors > 0) {
+				Logger.warning(
+					'BOT',
+					`Encountered ${client.startup.errors} non-critical errors during startup`,
+				);
+			}
+		} catch (error) {
+			Logger.error('BOT', `Initialization failed: ${error.message}`);
+			await this.shutdown(1);
+		}
+	},
+
+	async shutdown(exitCode = 0) {
+		Logger.warning('BOT', 'Initiating shutdown sequence');
+
+		try {
+			await DatabaseManager.disconnect();
+
+			if (client) {
+				client.destroy();
+				Logger.info('BOT', 'Discord client connection terminated');
+			}
+
+			Logger.success('BOT', 'Shutdown complete');
+		} catch (error) {
+			Logger.error('BOT', `Error during shutdown: ${error.message}`);
+		} finally {
+			process.exit(exitCode);
+		}
+	},
+};
+
+process.on('SIGINT', () => App.shutdown(0));
+process.on('SIGTERM', () => App.shutdown(0));
+
+process.on('unhandledRejection', reason => {
+	handleError('Unhandled Promise Rejection:', reason);
 });
 
-// Global error handling
-process.on('unhandledRejection', (reason) => {
-	console.error('❌ Unhandled Promise Rejection:', reason);
+process.on('uncaughtException', error => {
+	handleError('Uncaught Exception:', error);
+	App.shutdown(1);
 });
 
-process.on('uncaughtException', (error) => {
-	console.error('❌ Uncaught Exception:', error);
-});
-
-// Start the bot initialization
-initializeBot();
+App.initialize();
