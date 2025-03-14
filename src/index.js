@@ -15,6 +15,7 @@ const {
 	REST,
 	Routes,
 	Options,
+	Events
 } = require('discord.js');
 
 const config = {

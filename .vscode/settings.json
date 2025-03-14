@@ -1,0 +1,50 @@
+{
+  "search.exclude": {
+    "**/node_modules": false
+  },
+  "github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled": true,
+  "github.copilot.chat.experimental.inlineChatHint.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "cSpell.words": [
+    "bitfield",
+    "Blurple",
+    "checkmark",
+    "cmdk",
+    "cooldown",
+    "cooldowns",
+    "eesmal",
+    "embla",
+    "FEATURABLE",
+    "flashxdfx",
+    "giphy",
+    "GIPHY",
+    "igdb",
+    "IGDB",
+    "kbps",
+    "kiyo",
+    "koifish",
+    "lognumber",
+    "logrange",
+    "lyricwhiz",
+    "pexels",
+    "quokka",
+    "redeployments",
+    "rickroll",
+    "rizzwan",
+    "skibidi",
+    "spheroidon",
+    "steeles",
+    "umbree",
+    "uncategorized",
+    "vaul",
+    "vipraz",
+    "wickiwacka",
+    "Witcher",
+    "zenoz"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.requireConfig": true
+}
