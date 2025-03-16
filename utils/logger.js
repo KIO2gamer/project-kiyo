@@ -1,22 +1,58 @@
 /**
  * Universal Logger
  * Provides consistent logging across the application with severity levels and context
+ * Using native ANSI color codes and box drawing characters (no dependencies)
  */
 
 const fs = require('node:fs');
 const path = require('node:path');
 
-// Log levels with corresponding colors
-const LOG_LEVELS = {
-    DEBUG: { priority: 0, color: '\x1b[36m', label: 'DEBUG' }, // Cyan
-    INFO: { priority: 1, color: '\x1b[32m', label: 'INFO' }, // Green
-    WARN: { priority: 2, color: '\x1b[33m', label: 'WARN' }, // Yellow
-    ERROR: { priority: 3, color: '\x1b[31m', label: 'ERROR' }, // Red
-    FATAL: { priority: 4, color: '\x1b[35m', label: 'FATAL' }, // Purple
+// ANSI color codes
+const COLORS = {
+    RESET: '\x1b[0m',
+    CYAN: '\x1b[36m',
+    GREEN: '\x1b[32m',
+    YELLOW: '\x1b[33m',
+    RED: '\x1b[31m',
+    MAGENTA: '\x1b[35m',
+    GRAY: '\x1b[90m',
+    WHITE: '\x1b[37m',
+    BOLD: '\x1b[1m',
 };
 
-// Color reset code
-const RESET = '\x1b[0m';
+// Log levels with corresponding colors
+const LOG_LEVELS = {
+    DEBUG: {
+        priority: 0,
+        color: str => `${COLORS.CYAN}${str}${COLORS.RESET}`,
+        label: 'DEBUG',
+        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+    },
+    INFO: {
+        priority: 1,
+        color: str => `${COLORS.GREEN}${str}${COLORS.RESET}`,
+        label: 'INFO',
+        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+    },
+    WARN: {
+        priority: 2,
+        color: str => `${COLORS.YELLOW}${str}${COLORS.RESET}`,
+        label: 'WARN',
+        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+    },
+    ERROR: {
+        priority: 3,
+        color: str => `${COLORS.RED}${str}${COLORS.RESET}`,
+        label: 'ERROR',
+        boxChars: ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬'],
+    },
+    FATAL: {
+        priority: 4,
+        color: str => `${COLORS.MAGENTA}${str}${COLORS.RESET}`,
+        label: 'FATAL',
+        boxChars: ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬'],
+    },
+};
 
 // Default configuration
 const defaultConfig = {
@@ -24,6 +60,9 @@ const defaultConfig = {
     logToFile: false,
     logFolder: 'logs',
     logFileMaxSize: 5 * 1024 * 1024, // 5MB
+    useBoxes: true,
+    showTimestamp: true,
+    colorize: true,
 };
 
 let config = { ...defaultConfig };
@@ -64,11 +103,59 @@ function formatLog(level, message, context = '') {
     const plainText = `[${timestamp}] [${logLevel.label}] ${context ? `[${context}] ` : ''}${message}`;
 
     // Colored format for console logging
-    const coloredText = `${logLevel.color}[${timestamp}] [${logLevel.label}]${RESET} ${
-        context ? `\x1b[90m[${context}]\x1b[0m ` : ''
-    }${message}`;
+    let timestampStr = config.showTimestamp ? `[${timestamp}]` : '';
+    let coloredHeader = config.colorize
+        ? logLevel.color(`${timestampStr} [${logLevel.label}]`)
+        : `${timestampStr} [${logLevel.label}]`;
+    let contextStr = context ? `${COLORS.GRAY}[${context}]${COLORS.RESET}` : '';
+    let coloredText = `${coloredHeader} ${contextStr} ${message}`;
 
-    return { plainText, coloredText };
+    return { plainText, coloredText, logLevel };
+}
+
+/**
+ * Create a box around text
+ * @param {string} text - Text to put in box
+ * @param {Array} chars - Box drawing characters
+ * @param {Object} options - Box options
+ * @returns {string} Boxed text
+ */
+function createBox(text, chars, options = {}) {
+    const lines = text.split('\n');
+    const width = options.width || 60;
+    const padding = options.padding || 1;
+
+    const [h, v, tl, tr, bl, br, ml, mr, mt, mb, mm] = chars;
+
+    const contentWidth = width - 2;
+    let result = [];
+
+    // Top border
+    result.push(`${tl}${h.repeat(contentWidth)}${tr}`);
+
+    // Padding before content
+    for (let i = 0; i < padding; i++) {
+        result.push(`${v}${' '.repeat(contentWidth)}${v}`);
+    }
+
+    // Content
+    lines.forEach(line => {
+        const paddedLine =
+            line.length > contentWidth
+                ? line.substring(0, contentWidth - 3) + '...'
+                : line.padEnd(contentWidth);
+        result.push(`${v}${paddedLine}${v}`);
+    });
+
+    // Padding after content
+    for (let i = 0; i < padding; i++) {
+        result.push(`${v}${' '.repeat(contentWidth)}${v}`);
+    }
+
+    // Bottom border
+    result.push(`${bl}${h.repeat(contentWidth)}${br}`);
+
+    return result.join('\n');
 }
 
 /**
@@ -84,14 +171,78 @@ function log(level, message, context = '') {
         return;
     }
 
-    const { plainText, coloredText } = formatLog(level, message, context);
+    const { plainText, coloredText, logLevel } = formatLog(level, message, context);
 
     // Output to console
-    console.log(coloredText);
+    if (config.useBoxes && (level === 'ERROR' || level === 'FATAL')) {
+        // Use box drawing for errors and fatal errors
+        const boxed = createBox(coloredText, logLevel.boxChars, {
+            padding: 1,
+            width: 80,
+        });
+        console.log('\n' + boxed);
+    } else {
+        console.log(coloredText);
+    }
 
     // Output to file if enabled
     if (config.logToFile && logStream) {
         logStream.write(plainText + '\n');
+    }
+}
+
+/**
+ * Create a visually distinct section header
+ * @param {string} title - Section title
+ * @param {string} [level='INFO'] - Log level for the section
+ * @returns {void}
+ */
+function section(title, level = 'INFO') {
+    if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
+        return;
+    }
+
+    const logLevel = LOG_LEVELS[level];
+    const chars = logLevel.boxChars;
+    const coloredTitle = logLevel.color(` ${title} `);
+
+    // Calculate padding needed to center the title
+    const width = 60;
+    const titleLength = title.length + 2; // +2 for the spaces
+    const leftPadding = Math.floor((width - titleLength) / 2);
+    const rightPadding = width - titleLength - leftPadding;
+
+    // Create a boxed section header
+    const topLine = `${chars[2]}${chars[0].repeat(width)}${chars[3]}`;
+    const titleLine = `${chars[1]}${' '.repeat(leftPadding)}${coloredTitle}${' '.repeat(rightPadding)}${chars[1]}`;
+    const bottomLine = `${chars[4]}${chars[0].repeat(width)}${chars[5]}`;
+
+    console.log('\n' + topLine);
+    console.log(titleLine);
+    console.log(bottomLine);
+
+    // Write to log file if enabled
+    if (config.logToFile && logStream) {
+        const plainHeader = `\n${'='.repeat(20)} ${title} ${'='.repeat(20)}\n`;
+        logStream.write(plainHeader);
+    }
+}
+
+/**
+ * Create a visual divider in logs
+ * @param {string} [level='INFO'] - Log level for the divider
+ * @returns {void}
+ */
+function divider(level = 'INFO') {
+    if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
+        return;
+    }
+
+    const logLevel = LOG_LEVELS[level];
+    console.log(logLevel.color('─'.repeat(80)));
+
+    if (config.logToFile && logStream) {
+        logStream.write('-'.repeat(80) + '\n');
     }
 }
 
@@ -101,6 +252,27 @@ const info = (message, context) => log('INFO', message, context);
 const warn = (message, context) => log('WARN', message, context);
 const error = (message, context) => log('ERROR', message, context);
 const fatal = (message, context) => log('FATAL', message, context);
+
+/**
+ * Create a table from object data
+ * @param {Array} data - Array of objects to display in table
+ * @param {string} [title='Data Table'] - Table title
+ * @param {string} [level='INFO'] - Log level for the table
+ */
+function table(data, title = 'Data Table', level = 'INFO') {
+    if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
+        return;
+    }
+
+    section(title, level);
+    console.table(data);
+
+    // Basic table representation for log file
+    if (config.logToFile && logStream) {
+        logStream.write(`\n--- ${title} ---\n`);
+        logStream.write(JSON.stringify(data, null, 2) + '\n');
+    }
+}
 
 /**
  * Close the logger and any open files
@@ -123,6 +295,9 @@ module.exports = {
     warn,
     error,
     fatal,
+    section,
+    divider,
+    table,
     close,
     LOG_LEVELS,
 };

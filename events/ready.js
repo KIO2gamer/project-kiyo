@@ -9,6 +9,9 @@ module.exports = {
     async execute(client) {
         await errorHandler.wrap(
             async () => {
+                // Create a visually distinct startup section
+                logger.section('BOT READY', 'INFO');
+
                 // Log successful startup with detailed information
                 logger.info(
                     `Bot is ready! Logged in as ${client.user.tag} (${client.user.id})`,
@@ -23,9 +26,17 @@ module.exports = {
                 );
                 const commandCount = client.commands?.size || 0;
 
-                // Log bot statistics
-                logger.info(`Serving ${guildCount} guilds and ${userCount} users`, 'STATS');
-                logger.info(`Loaded ${commandCount} commands`, 'STATS');
+                // Display statistics in a table
+                logger.table(
+                    [
+                        { metric: 'Guilds', value: guildCount },
+                        { metric: 'Users', value: userCount },
+                        { metric: 'Commands', value: commandCount },
+                        { metric: 'Version', value: version },
+                    ],
+                    'Bot Statistics',
+                    'INFO'
+                );
 
                 // Set custom status
                 try {
@@ -43,13 +54,39 @@ module.exports = {
                     logger.warn('Failed to update bot presence', 'READY');
                 }
 
+                // Visual divider before technical information
+                logger.divider();
+
                 // Print memory usage if in debug mode
                 if (process.env.LOG_LEVEL === 'DEBUG') {
                     const memoryUsage = process.memoryUsage();
-                    logger.debug(
-                        `Memory usage: ${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
-                        'MEMORY'
+                    const heapUsedMB = Math.round(memoryUsage.heapUsed / 1024 / 1024);
+                    const heapTotalMB = Math.round(memoryUsage.heapTotal / 1024 / 1024);
+                    const externalMB = Math.round(memoryUsage.external / 1024 / 1024);
+
+                    logger.table(
+                        [
+                            { type: 'Heap Used', value: `${heapUsedMB} MB` },
+                            { type: 'Heap Total', value: `${heapTotalMB} MB` },
+                            { type: 'External', value: `${externalMB} MB` },
+                            { type: 'Uptime', value: `${Math.round(process.uptime())} seconds` },
+                        ],
+                        'System Information',
+                        'DEBUG'
                     );
+                }
+
+                // Show guild list in debug mode
+                if (process.env.LOG_LEVEL === 'DEBUG') {
+                    const guildList = Array.from(client.guilds.cache).map(([id, guild]) => ({
+                        id: id,
+                        name: guild.name,
+                        members: guild.memberCount,
+                    }));
+
+                    if (guildList.length > 0) {
+                        logger.table(guildList, 'Connected Guilds', 'DEBUG');
+                    }
                 }
             },
             'READY_EVENT',

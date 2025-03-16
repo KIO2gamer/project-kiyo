@@ -11,10 +11,17 @@ logger.configure({
     level: process.env.LOG_LEVEL || 'INFO',
     logToFile: process.env.LOG_TO_FILE === 'true',
     logFolder: process.env.LOG_FOLDER || 'logs',
+    useBoxes: true,
+    showTimestamp: true,
+    colorize: true,
 });
 
 // Set up global error handlers
 errorHandler.setupGlobalHandlers();
+
+// Display startup header
+logger.section('BOT STARTUP', 'INFO');
+logger.info('Initializing bot...', 'STARTUP');
 
 // Bot configuration
 const client = new Client({
@@ -40,6 +47,8 @@ client.commands = new Collection();
 // Set up client error handlers
 errorHandler.setupClientHandlers(client);
 
+logger.section('COMMAND LOADING', 'INFO');
+
 // Load all commands
 const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
@@ -51,6 +60,7 @@ for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
+    let folderLoadCount = 0;
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         let command;
@@ -61,6 +71,7 @@ for (const folder of commandFolders) {
             if ('data' in command && 'execute' in command && 'category' in command) {
                 client.commands.set(command.data.name, command);
                 commands.push(command.data.toJSON());
+                folderLoadCount++;
                 logger.debug(`Loaded command: ${command.data.name}`, 'COMMAND_LOAD');
             } else {
                 logger.warn(
@@ -72,9 +83,12 @@ for (const folder of commandFolders) {
             errorHandler.handle(error, `COMMAND_LOAD:${file}`, false);
         }
     }
+
+    logger.info(`Loaded ${folderLoadCount} commands from ${folder} category`, 'FOLDER_LOAD');
 }
 
-logger.info(`Loaded ${commands.length} commands`, 'SETUP');
+logger.info(`Loaded ${commands.length} commands total`, 'SETUP');
+logger.divider();
 
 // Deploy commands function using universal error handler
 async function deployCommands(guildId = null) {
@@ -112,11 +126,13 @@ async function deployCommands(guildId = null) {
 
 // Main function with universal error handler
 (async () => {
+    logger.section('INITIALIZATION', 'INFO');
     logger.info('Bot initialization starting...', 'STARTUP');
 
     // Connect to MongoDB
     await errorHandler.wrap(
         async () => {
+            logger.info('Connecting to MongoDB...', 'DATABASE');
             mongoose.set('strictQuery', false);
             await mongoose.connect(process.env.MONGODB_URL);
             logger.info('Connected to MongoDB', 'DATABASE');
@@ -128,6 +144,7 @@ async function deployCommands(guildId = null) {
     // Load event handlers
     await errorHandler.wrap(
         async () => {
+            logger.section('EVENTS SETUP', 'INFO');
             const eventsPath = path.join(__dirname, 'events');
             const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -163,6 +180,7 @@ async function deployCommands(guildId = null) {
                     errorHandler.handle(error, `EVENT_LOAD:${file}`, false);
                 }
             }
+            logger.divider();
         },
         'EVENT_SETUP',
         true
@@ -171,6 +189,8 @@ async function deployCommands(guildId = null) {
     // Login to Discord
     await errorHandler.wrap(
         async () => {
+            logger.section('DISCORD LOGIN', 'INFO');
+            logger.info('Logging into Discord...', 'LOGIN');
             await client.login(process.env.DISCORD_TOKEN);
             logger.info(`Logged in as ${client.user.tag}`, 'LOGIN');
         },
@@ -180,6 +200,8 @@ async function deployCommands(guildId = null) {
 
     // Track deployed guilds to avoid duplication
     const deployedGuilds = new Set();
+
+    logger.section('COMMAND DEPLOYMENT', 'INFO');
 
     // Deploy commands to primary guild if specified
     if (process.env.GUILDID) {
@@ -203,6 +225,14 @@ async function deployCommands(guildId = null) {
                         await deployCommands(trimmedId);
                         deployedGuilds.add(trimmedId);
                     }
+
+                    logger.table(
+                        Array.from(deployedGuilds).map(id => ({
+                            guild: id,
+                            status: 'Deployed',
+                        })),
+                        'Guild Deployment Status'
+                    );
                 }
             },
             'MULTI_GUILD_DEPLOY',
@@ -213,6 +243,7 @@ async function deployCommands(guildId = null) {
     // Uncomment this if you want global commands as well
     // await deployCommands();
 
+    logger.section('STARTUP COMPLETE', 'INFO');
     logger.info(`Bot is online! Logged in as ${client.user.tag}`, 'STARTUP');
 })().catch(error => {
     errorHandler.handle(error, 'STARTUP', true);
@@ -221,6 +252,7 @@ async function deployCommands(guildId = null) {
 // Handle graceful shutdown
 ['SIGINT', 'SIGTERM'].forEach(signal => {
     process.on(signal, async () => {
+        logger.section('SHUTDOWN', 'WARN');
         logger.info('Shutting down gracefully...', 'SHUTDOWN');
         await logger.close();
         process.exit(0);
