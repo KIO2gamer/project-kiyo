@@ -3,15 +3,18 @@ require('dotenv').config();
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits, REST, Routes, Partials } = require('discord.js');
 const { default: mongoose } = require('mongoose');
+const errorHandler = require('./utils/errorHandler');
+const logger = require('./utils/logger');
 
-// Set up process-level error handlers
-process.on('uncaughtException', error => {
-    ErrorHandler.handle(error, 'UNCAUGHT_EXCEPTION', true);
+// Configure logger
+logger.configure({
+    level: process.env.LOG_LEVEL || 'INFO',
+    logToFile: process.env.LOG_TO_FILE === 'true',
+    logFolder: process.env.LOG_FOLDER || 'logs',
 });
 
-process.on('unhandledRejection', error => {
-    ErrorHandler.handle(error, 'UNHANDLED_REJECTION', true);
-});
+// Set up global error handlers
+errorHandler.setupGlobalHandlers();
 
 // Bot configuration
 const client = new Client({
@@ -35,18 +38,14 @@ const client = new Client({
 client.commands = new Collection();
 
 // Set up client error handlers
-client.on('error', error => {
-    ErrorHandler.handle(error, 'DISCORD_CLIENT', false);
-});
-
-client.on('shardError', error => {
-    ErrorHandler.handle(error, 'DISCORD_SHARD', false);
-});
+errorHandler.setupClientHandlers(client);
 
 // Load all commands
 const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
+
+logger.info('Loading commands...', 'SETUP');
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
@@ -62,37 +61,47 @@ for (const folder of commandFolders) {
             if ('data' in command && 'execute' in command && 'category' in command) {
                 client.commands.set(command.data.name, command);
                 commands.push(command.data.toJSON());
+                logger.debug(`Loaded command: ${command.data.name}`, 'COMMAND_LOAD');
             } else {
-                console.log(`[WARNING] The command at ${filePath} is missing a required property.`);
+                logger.warn(
+                    `Command at ${filePath} is missing a required property.`,
+                    'COMMAND_LOAD'
+                );
             }
         } catch (error) {
-            ErrorHandler.handle(error, `COMMAND_LOAD:${file}`, false);
+            errorHandler.handle(error, `COMMAND_LOAD:${file}`, false);
         }
     }
 }
+
+logger.info(`Loaded ${commands.length} commands`, 'SETUP');
 
 // Deploy commands function using universal error handler
 async function deployCommands(guildId = null) {
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-    console.log(
-        `Started refreshing application (/) commands${guildId ? ` for guild ${guildId}` : ' globally'}.`
+    logger.info(
+        `Refreshing application (/) commands${guildId ? ` for guild ${guildId}` : ' globally'}`,
+        'DEPLOY'
     );
 
-    return await ErrorHandler.wrap(
+    return await errorHandler.wrap(
         async () => {
             if (guildId) {
                 const data = await rest.put(
                     Routes.applicationGuildCommands(process.env.CLIENTID, guildId),
                     { body: commands }
                 );
-                console.log(`Successfully reloaded ${data.length} commands in guild ${guildId}.`);
+                logger.info(
+                    `Successfully reloaded ${data.length} commands in guild ${guildId}`,
+                    'DEPLOY'
+                );
                 return data;
             } else {
                 const data = await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
                     body: commands,
                 });
-                console.log(`Successfully reloaded ${data.length} global commands.`);
+                logger.info(`Successfully reloaded ${data.length} global commands`, 'DEPLOY');
                 return data;
             }
         },
@@ -103,24 +112,26 @@ async function deployCommands(guildId = null) {
 
 // Main function with universal error handler
 (async () => {
-    console.log('Bot initialization starting...');
+    logger.info('Bot initialization starting...', 'STARTUP');
 
     // Connect to MongoDB
-    await ErrorHandler.wrap(
+    await errorHandler.wrap(
         async () => {
             mongoose.set('strictQuery', false);
             await mongoose.connect(process.env.MONGODB_URL);
-            console.log('Connected to MongoDB');
+            logger.info('Connected to MongoDB', 'DATABASE');
         },
         'MONGODB_CONNECT',
         true
     );
 
     // Load event handlers
-    await ErrorHandler.wrap(
+    await errorHandler.wrap(
         async () => {
             const eventsPath = path.join(__dirname, 'events');
             const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+            logger.info(`Loading ${eventFiles.length} event handlers...`, 'EVENT_SETUP');
 
             for (const file of eventFiles) {
                 const filePath = path.join(eventsPath, file);
@@ -128,7 +139,7 @@ async function deployCommands(guildId = null) {
                     const event = require(filePath);
                     if (event.once) {
                         client.once(event.name, async (...args) => {
-                            await ErrorHandler.wrap(
+                            await errorHandler.wrap(
                                 async () => {
                                     await event.execute(...args);
                                 },
@@ -138,7 +149,7 @@ async function deployCommands(guildId = null) {
                         });
                     } else {
                         client.on(event.name, async (...args) => {
-                            await ErrorHandler.wrap(
+                            await errorHandler.wrap(
                                 async () => {
                                     await event.execute(...args);
                                 },
@@ -147,8 +158,9 @@ async function deployCommands(guildId = null) {
                             );
                         });
                     }
+                    logger.debug(`Registered event: ${event.name}`, 'EVENT_LOAD');
                 } catch (error) {
-                    ErrorHandler.handle(error, `EVENT_LOAD:${file}`, false);
+                    errorHandler.handle(error, `EVENT_LOAD:${file}`, false);
                 }
             }
         },
@@ -157,10 +169,10 @@ async function deployCommands(guildId = null) {
     );
 
     // Login to Discord
-    await ErrorHandler.wrap(
+    await errorHandler.wrap(
         async () => {
             await client.login(process.env.DISCORD_TOKEN);
-            console.log(`Logged in as ${client.user.tag}`);
+            logger.info(`Logged in as ${client.user.tag}`, 'LOGIN');
         },
         'DISCORD_LOGIN',
         true
@@ -177,9 +189,14 @@ async function deployCommands(guildId = null) {
 
     // Deploy to additional guilds if specified
     if (process.env.GUILD_IDS) {
-        await ErrorHandler.wrap(
+        await errorHandler.wrap(
             async () => {
                 const guildIds = process.env.GUILD_IDS.split(',');
+                logger.info(
+                    `Deploying to ${guildIds.length} additional guilds`,
+                    'MULTI_GUILD_DEPLOY'
+                );
+
                 for (const guildId of guildIds) {
                     const trimmedId = guildId.trim();
                     if (trimmedId && !deployedGuilds.has(trimmedId)) {
@@ -196,7 +213,16 @@ async function deployCommands(guildId = null) {
     // Uncomment this if you want global commands as well
     // await deployCommands();
 
-    console.log(`Bot is online! Logged in as ${client.user.tag}`);
+    logger.info(`Bot is online! Logged in as ${client.user.tag}`, 'STARTUP');
 })().catch(error => {
-    ErrorHandler.handle(error, 'STARTUP', true);
+    errorHandler.handle(error, 'STARTUP', true);
+});
+
+// Handle graceful shutdown
+['SIGINT', 'SIGTERM'].forEach(signal => {
+    process.on(signal, async () => {
+        logger.info('Shutting down gracefully...', 'SHUTDOWN');
+        await logger.close();
+        process.exit(0);
+    });
 });
