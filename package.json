@@ -1,27 +1,68 @@
 {
-    "name": "nodejs",
-    "version": "1.0.0",
-    "description": "",
+    "name": "project-kiyo",
+    "version": "1.2.0",
+    "description": "A multipurpose discord.js bot with slash commands and API integrations",
     "main": "index.js",
+    "type": "commonjs",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "start": "node index.js",
+        "dev": "nodemon --ignore 'logs/*' index.js",
+        "lint": "prettier --check .",
+        "format": "prettier --write .",
+        "test": "echo \"No tests specified yet\" && exit 0",
+        "deploy": "node deploy-commands.js",
+        "update": "npm update && npm audit fix",
+        "cleanup": "rm -rf logs/*",
+        "prepare": "husky install"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/project-kiyo.git"
+    },
+    "keywords": [
+        "discord",
+        "discord-bot",
+        "discord.js",
+        "bot",
+        "slash-commands",
+        "api-integration"
+    ],
+    "author": {
+        "name": "Your Name",
+        "email": "your.email@example.com",
+        "url": "https://yourwebsite.com"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
+    },
     "dependencies": {
-        "@google/generative-ai": "^0.1.3",
-        "@types/node": "^18.0.6",
-        "axios": "^1.6.2",
         "discord.js": "^14.12.1",
-        "dotenv": "^16.3.1",
         "mongoose": "^8.0.3",
+        "dotenv": "^16.3.1",
+        "axios": "^1.6.2",
+        "@google/generative-ai": "^0.1.3",
         "ms": "^2.1.3",
-        "node-fetch": "^3.2.6",
-        "nodemon": "^3.1.0",
         "translate": "^3.0.0"
     },
     "devDependencies": {
-        "prettier": "3.2.5"
+        "nodemon": "^3.1.0",
+        "prettier": "3.2.5",
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.0"
+    },
+    "lint-staged": {
+        "*.{js,json,md}": "prettier --write"
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "node_modules/*",
+            "logs/*"
+        ],
+        "delay": "1000",
+        "env": {
+            "NODE_ENV": "development"
+        }
     }
 }
