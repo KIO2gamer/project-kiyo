@@ -8,7 +8,7 @@ const {
     ButtonStyle,
 } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
-const TicketConfig = require("./../../../database/ticketConfig");
+const TicketConfig = require("./../../database/ticketConfig");
 
 module.exports = {
     description_full: "Sends a message with a button that users can click to create a new ticket.",

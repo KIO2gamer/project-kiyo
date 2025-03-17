@@ -4,7 +4,7 @@ const {
     ChannelType,
     EmbedBuilder,
 } = require("discord.js");
-const TicketConfig = require("./../../../database/ticketConfig");
+const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");
 
 const { MessageFlags } = require("discord.js");

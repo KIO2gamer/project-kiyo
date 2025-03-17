@@ -1,5 +1,5 @@
 const { Events, InteractionType, MessageFlags } = require("discord.js");
-const Logger = require("../../../logger").default;
+const Logger = require("./../utils/logger");
 const CommandHandler = require("./commandHandler");
 
 let commandHandler = null;

@@ -5,7 +5,7 @@ const {
     ButtonBuilder,
     ButtonStyle,
 } = require("discord.js");
-const cc = require("../../../database/customCommands");
+const cc = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");
 
 const { MessageFlags } = require("discord.js");

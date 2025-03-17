@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, MessageFlags, PermissionFlagsBits } = require("discord.js");
-const ChatHistory = require("../../../database/ChatHistory");
+const ChatHistory = require("./../../database/ChatHistory");
 const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {

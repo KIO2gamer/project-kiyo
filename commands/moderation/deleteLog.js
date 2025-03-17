@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const moderationLogs = require("../../../database/moderationLogs");
+const moderationLogs = require("./../../database/moderationLogs");
 const { parseRange } = require("../../utils/rangeParser");
 const { handleError } = require("../../utils/errorHandler");
 const { MessageFlags } = require("discord.js");

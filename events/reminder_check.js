@@ -1,4 +1,4 @@
-const Reminder = require("./../../database/reminderStorage");
+const Reminder = require("./../database/reminderStorage");
 const { Events } = require("discord.js");
 
 module.exports = {

@@ -5,9 +5,9 @@ const {
     EmbedBuilder,
     AttachmentBuilder,
 } = require("discord.js");
-const MsgLogsConfig = require("./../../database/msgLogsConfig");
+const MsgLogsConfig = require("./../database/msgLogsConfig");
 const { handleError } = require("./../utils/errorHandler");
-const Logger = require("./../../../logger").default;
+const Logger = require("./../utils/logger");
 
 module.exports = {
     name: Events.MessageDelete,

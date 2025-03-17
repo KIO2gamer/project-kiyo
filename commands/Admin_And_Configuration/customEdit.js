@@ -6,7 +6,7 @@ const {
     ButtonStyle,
     PermissionFlagsBits,
 } = require("discord.js");
-const cc = require("../../../database/customCommands");
+const cc = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {

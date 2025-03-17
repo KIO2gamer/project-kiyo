@@ -4,7 +4,7 @@ const {
     ChannelType,
     EmbedBuilder,
 } = require("discord.js");
-const MsgLogsConfig = require("./../../../database/msgLogsConfig");
+const MsgLogsConfig = require("./../../database/msgLogsConfig");
 const { handleError } = require("../../utils/errorHandler");
 
 const { MessageFlags } = require("discord.js");

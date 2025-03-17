@@ -1,5 +1,5 @@
 const { ActivityType, MessageFlags } = require("discord.js");
-const Logger = require("./../../../logger");
+const Logger = require("./../utils/logger");
 const CommandRefresher = require("./commandRefresher");
 const path = require("path");
 
@@ -83,18 +83,17 @@ const setNextActivity = async (client) => {
  * @param {Client} client - The Discord.js client
  */
 const logBotStatistics = (client) => {
-    if (typeof Logger.table === "function") {
-        const stats = {
-            Username: client.user.tag,
-            ID: client.user.id,
-            Guilds: client.guilds.cache.size,
-            Channels: client.channels.cache.size,
-            Users: client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount || 0), 0),
-            Commands: client.commands.size,
-            Uptime: formatUptime(client.uptime),
-        };
-        Logger.table(stats, "Bot Statistics");
-    }
+    const stats = {
+        Username: client.user.tag,
+        ID: client.user.id,
+        Guilds: client.guilds.cache.size,
+        Channels: client.channels.cache.size,
+        Users: client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount || 0), 0),
+        Commands: client.commands.size,
+        Uptime: formatUptime(client.uptime),
+    };
+
+    Logger.table(stats, "Bot Statistics");
 };
 
 /**
@@ -132,7 +131,7 @@ const initDevelopmentMode = (client) => {
     Logger.log("BOT", "Initializing development mode features", "info");
 
     // Start command refresher in development mode
-    const commandsDir = path.join(__dirname, "../../bot/commands");
+    const commandsDir = path.join(__dirname, "../commands");
     commandRefresher = CommandRefresher.init(client, commandsDir);
     commandRefresher.startWatching(true);
 

@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const Logger = require("../../../logger").default;
+const Logger = require("./../utils/logger");
 
 module.exports = {
     name: Events.GuildCreate,

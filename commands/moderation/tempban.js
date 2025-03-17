@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const moderationLogs = require("../../../database/moderationLogs");
+const moderationLogs = require("./../../database/moderationLogs");
 const ms = require("ms"); // Use ms library to parse duration strings
 
 const { MessageFlags } = require("discord.js");

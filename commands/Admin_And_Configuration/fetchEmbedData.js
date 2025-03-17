@@ -1,6 +1,6 @@
 // This command fetches the embed data from a message URL.
 const { SlashCommandBuilder, MessageFlags, PermissionFlagsBits } = require("discord.js");
-const handleError = require("../../utils/handleError");
+const handleError = require("./../../utils/errorHandler");
 
 module.exports = {
     description_full: "Fetches the embed data from a message URL.",

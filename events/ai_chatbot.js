@@ -1,9 +1,9 @@
 const { Events, AttachmentBuilder } = require("discord.js");
 const { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } = require("@google/generative-ai");
-const AIChatChannel = require("./../../database/AIChatChannel");
-const ChatHistory = require("./../../database/ChatHistory");
+const AIChatChannel = require("./../database/AIChatChannel");
+const ChatHistory = require("./../database/ChatHistory");
 const { handleError } = require("./../utils/errorHandler");
-const Logger = require("./../../../logger").default;
+const Logger = require("./../utils/logger");
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
