@@ -60,7 +60,6 @@ class CommandHandler {
 
         // Execute command
         try {
-            Logger.log("COMMANDS", `Executing command: ${interaction.commandName}`, "debug");
             await command.execute(interaction);
         } catch (error) {
             // Handle command execution error
