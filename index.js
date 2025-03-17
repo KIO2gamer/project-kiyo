@@ -63,21 +63,28 @@ for (const folder of commandFolders) {
     let folderLoadCount = 0;
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
-        let command;
+        let commandsToLoad;
 
         try {
-            command = require(filePath);
+            commandsToLoad = require(filePath);
 
-            if ('data' in command && 'execute' in command && 'category' in command) {
-                client.commands.set(command.data.name, command);
-                commands.push(command.data.toJSON());
-                folderLoadCount++;
-                logger.debug(`Loaded command: ${command.data.name}`, 'COMMAND_LOAD');
-            } else {
-                logger.warn(
-                    `Command at ${filePath} is missing a required property.`,
-                    'COMMAND_LOAD'
-                );
+            // Handle both single commands and arrays of commands
+            if (!Array.isArray(commandsToLoad)) {
+                commandsToLoad = [commandsToLoad];
+            }
+
+            for (const command of commandsToLoad) {
+                if ('data' in command && 'execute' in command && 'category' in command) {
+                    client.commands.set(command.data.name, command);
+                    commands.push(command.data.toJSON());
+                    folderLoadCount++;
+                    logger.debug(`Loaded command: ${command.data.name}`, 'COMMAND_LOAD');
+                } else {
+                    logger.warn(
+                        `Command in ${filePath} is missing a required property.`,
+                        'COMMAND_LOAD'
+                    );
+                }
             }
         } catch (error) {
             errorHandler.handle(error, `COMMAND_LOAD:${file}`, false);
@@ -111,13 +118,12 @@ async function deployCommands(guildId = null) {
                     'DEPLOY'
                 );
                 return data;
-            } else {
-                const data = await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
-                    body: commands,
-                });
-                logger.info(`Successfully reloaded ${data.length} global commands`, 'DEPLOY');
-                return data;
             }
+            const data = await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
+                body: commands,
+            });
+            logger.info(`Successfully reloaded ${data.length} global commands`, 'DEPLOY');
+            return data;
         },
         `DEPLOY_COMMANDS${guildId ? `:${guildId}` : ':GLOBAL'}`,
         false

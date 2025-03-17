@@ -2,8 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName('credits')
-    .setDescription('Shows a embed of users who helped make this bot.'),
+        .setName('credits')
+        .setDescription('Shows a embed of users who helped make this bot.'),
     category: 'fun',
     async execute(interaction) {
         const embed = new EmbedBuilder()
@@ -24,7 +24,7 @@ module.exports = {
                 { name: 'flashxdfx', value: '> </rickroll:1204438699258155049>' },
                 { name: 'eesmal', value: '> </summon:1230217345985941574>' },
                 { name: 'na51f', value: '> </snipe:1230417868013699072>' }
-            )
+            );
         await interaction.reply({ embeds: [embed] });
-    }
-}
+    },
+};

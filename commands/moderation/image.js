@@ -1,63 +1,64 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-       .setName("image")
-       .setDescription("Posts an image.")
-       .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
-       .addStringOption((option) =>
+        .setName('image')
+        .setDescription('Posts an image.')
+        .setDefaultMemberPermissions(
+            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
+        )
+        .addStringOption(option =>
             option
-               .setName("options")
-               .setDescription("Sends a image from the options")
-               .setRequired(true)
-               .addChoices(
+                .setName('options')
+                .setDescription('Sends a image from the options')
+                .setRequired(true)
+                .addChoices(
                     {
-                        name: "Welcome",
-                        value: "welcome",
+                        name: 'Welcome',
+                        value: 'welcome',
                     },
                     {
-                        name: "Self Roles",
-                        value: "self_roles",
+                        name: 'Self Roles',
+                        value: 'self_roles',
                     },
                     {
-                        name: "Rules",
-                        value: "rules",
+                        name: 'Rules',
+                        value: 'rules',
                     },
                     {
-                        name: "Roles",
-                        value: "roles",
+                        name: 'Roles',
+                        value: 'roles',
                     },
                     {
-                        name: "Forms",
-                        value: "forms",
-                    },
+                        name: 'Forms',
+                        value: 'forms',
+                    }
                 )
-            ),
-    category: "Moderation",
+        ),
+    category: 'Moderation',
     async execute(interaction) {
-        const options = interaction.options.getString("options");
+        const options = interaction.options.getString('options');
 
-        const errEmbed = new EmbedBuilder()
-        .setTitle("Error")
+        const errEmbed = new EmbedBuilder().setTitle('Error');
 
         try {
-            if (options === "welcome") {
+            if (options === 'welcome') {
                 await interaction.channel.send({ files: ['./assets/headers/welcome-header.png'] });
-            } else if (options === "self_roles") {
-                await interaction.channel.send({ files: ['./assets/headers/self-roles-header.png'] });
-            } else if (options === "rules") {
+            } else if (options === 'self_roles') {
+                await interaction.channel.send({
+                    files: ['./assets/headers/self-roles-header.png'],
+                });
+            } else if (options === 'rules') {
                 await interaction.channel.send({ files: ['./assets/headers/rule-header.png'] });
-            } else if (options === "roles") {
+            } else if (options === 'roles') {
                 await interaction.channel.send({ files: ['./assets/headers/role-header.png'] });
-            } else if (options === "forms") {
+            } else if (options === 'forms') {
                 await interaction.channel.send({ files: ['./assets/headers/forms-header.png'] });
+            } else {
+                await interaction.reply('There is no such option available');
             }
-            else {
-                await interaction.reply("There is no such option available");
-            }
-            
         } catch (error) {
-            errEmbed.setColor("RED").setDescription(error);
+            errEmbed.setColor('RED').setDescription(error);
         }
-    }
-}
+    },
+};

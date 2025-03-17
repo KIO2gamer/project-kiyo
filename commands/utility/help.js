@@ -4,50 +4,50 @@ const {
     ButtonBuilder,
     ButtonStyle,
     ActionRowBuilder,
-} = require("discord.js");
-const fs = require("fs");
+} = require('discord.js');
+const fs = require('fs');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("help")
-        .setDescription("View the help menu")
-        .addStringOption((option) =>
+        .setName('help')
+        .setDescription('View the help menu')
+        .addStringOption(option =>
             option
-                .setName("category")
+                .setName('category')
                 .setRequired(false)
-                .setDescription("What command category do you want to view?")
+                .setDescription('What command category do you want to view?')
                 // Make sure the value of the choices are exactly equal to the folder names
                 .addChoices(
-                    { name: "Fun", value: "fun" },
-                    { name: "Moderation", value: "moderation" },
-                    { name: "Utility", value: "utility" },
-                ),
+                    { name: 'Fun', value: 'fun' },
+                    { name: 'Moderation', value: 'moderation' },
+                    { name: 'Utility', value: 'utility' }
+                )
         ),
-    category: "Utility",
+    category: 'Utility',
     async execute(interaction) {
-        const category = interaction.options.getString("category");
+        const category = interaction.options.getString('category');
         function getCategoryNameForMainMenu(choice) {
             // Make sure to update command categories
-            if (choice === "fun") {
+            if (choice === 'fun') {
                 return `> **Fun**\n> Commands which can be used for funsies.\n`;
             }
-            if (choice === "moderation") {
+            if (choice === 'moderation') {
                 return `> **Moderation**\n> Commands only for moderators.\n`;
             }
-            if (choice === "utility") {
+            if (choice === 'utility') {
                 return `> **Utility**\n> Commands which can be used for various utilities.`;
             }
         }
 
         function getCategoryTitle(choice) {
             // Make sure to update command categories
-            if (choice === "fun") {
+            if (choice === 'fun') {
                 return `Fun`;
             }
-            if (choice === "moderation") {
+            if (choice === 'moderation') {
                 return `Moderation`;
             }
-            if (choice === "utility") {
+            if (choice === 'utility') {
                 return `Utility`;
             }
         }
@@ -57,10 +57,8 @@ module.exports = {
         const utilFields = [];
 
         // eslint-disable-next-line no-unused-vars
-        for (const [index, folder] of fs.readdirSync("commands").entries()) {
-            const files = fs
-                .readdirSync(`commands/${folder}`)
-                .filter((file) => file.endsWith(".js"));
+        for (const [index, folder] of fs.readdirSync('commands').entries()) {
+            const files = fs.readdirSync(`commands/${folder}`).filter(file => file.endsWith('.js'));
 
             for (const file of files) {
                 const command = require(`./../${folder}/${file}`);
@@ -68,80 +66,71 @@ module.exports = {
                 try {
                     const commandId = await interaction.guild.commands
                         .fetch()
-                        .then(
-                            (commands) =>
-                                commands.find((cmd) => cmd.name === name).id,
-                        );
+                        .then(commands => commands.find(cmd => cmd.name === name).id);
 
                     // Make sure to update command categories
-                    if (folder === "fun") {
+                    if (folder === 'fun') {
                         funFields.push(`</${name}:${commandId}>`);
                     }
-                    if (folder === "moderation") {
+                    if (folder === 'moderation') {
                         modFields.push(`</${name}:${commandId}>`);
                     }
-                    if (folder === "utility") {
+                    if (folder === 'utility') {
                         utilFields.push(`</${name}:${commandId}>`);
                     }
                 } catch (error) {
-                    console.error(
-                        `Error fetching ID for ${name}: ${error.message}`,
-                    );
+                    console.error(`Error fetching ID for ${name}: ${error.message}`);
                     console.log(error);
                 }
             }
         }
 
         const cmdListEmbed = new EmbedBuilder()
-            .setColor("White")
-            .setTitle("Command List")
+            .setColor('White')
+            .setTitle('Command List')
             .setDescription(
-                `\`/help [category] - View specific category\`\n(NOTE: The non-blue command links have subcommands because discord doesnt allow to add blue command links to them.)`,
+                `\`/help [category] - View specific category\`\n(NOTE: The non-blue command links have subcommands because discord doesnt allow to add blue command links to them.)`
             )
             .setAuthor({
-                name: "Kiyo Bot HelpDesk",
+                name: 'Kiyo Bot HelpDesk',
                 iconURL: interaction.client.user.avatarURL(),
             })
             // Make sure to update command categories
             .addFields([
-                { name: `**Fun**`, value: `${funFields.join(", ")}` },
-                { name: `**Moderation**`, value: `${modFields.join(", ")}` },
-                { name: `**Utility**`, value: `${utilFields.join(", ")}` },
+                { name: `**Fun**`, value: `${funFields.join(', ')}` },
+                { name: `**Moderation**`, value: `${modFields.join(', ')}` },
+                { name: `**Utility**`, value: `${utilFields.join(', ')}` },
             ]);
 
         if (category === null) {
             const mainMenuEmbed = new EmbedBuilder()
-                .setColor("White")
-                .setDescription("`/help [category] - View specific category`")
+                .setColor('White')
+                .setDescription('`/help [category] - View specific category`')
                 .setAuthor({
-                    name: "Kiyo Bot HelpDesk",
+                    name: 'Kiyo Bot HelpDesk',
                     iconURL: interaction.client.user.avatarURL(),
                 })
                 .addFields([
                     {
                         name: `Categories`,
                         value: `${fs
-                            .readdirSync("./commands")
+                            .readdirSync('./commands')
                             .map(getCategoryNameForMainMenu)
-                            .join("\n")}`,
+                            .join('\n')}`,
                     },
                 ]);
             const cmdListButton = new ButtonBuilder()
-                .setLabel("Command List")
+                .setLabel('Command List')
                 .setStyle(ButtonStyle.Secondary)
-                .setCustomId("cmdList");
+                .setCustomId('cmdList');
 
             const mainMenuBtn = new ButtonBuilder()
-                .setLabel("Home")
+                .setLabel('Home')
                 .setStyle(ButtonStyle.Secondary)
-                .setCustomId("home");
+                .setCustomId('home');
 
-            const rowWithCmdBtn = new ActionRowBuilder().addComponents(
-                cmdListButton,
-            );
-            const rowWithHomeBtn = new ActionRowBuilder().addComponents(
-                mainMenuBtn,
-            );
+            const rowWithCmdBtn = new ActionRowBuilder().addComponents(cmdListButton);
+            const rowWithHomeBtn = new ActionRowBuilder().addComponents(mainMenuBtn);
             const reply = await interaction.editReply({
                 embeds: [mainMenuEmbed],
                 components: [rowWithCmdBtn],
@@ -150,15 +139,15 @@ module.exports = {
             const collector = reply.createMessageComponentCollector({
                 time: 60_000 * 5,
             });
-            collector.on("collect", async (i) => {
+            collector.on('collect', async i => {
                 if (i.user.id === interaction.user.id) {
-                    if (i.customId === "cmdList") {
+                    if (i.customId === 'cmdList') {
                         await i.update({
                             embeds: [cmdListEmbed],
                             components: [rowWithHomeBtn],
                         });
                     }
-                    if (i.customId === "home") {
+                    if (i.customId === 'home') {
                         await i.update({
                             embeds: [mainMenuEmbed],
                             components: [rowWithCmdBtn],
@@ -166,14 +155,13 @@ module.exports = {
                     }
                 } else {
                     await i.reply({
-                        content:
-                            "You should run the command to use this interaction",
+                        content: 'You should run the command to use this interaction',
                         ephemeral: true,
                     });
                 }
             });
-            collector.on("end", async (collected, reason) => {
-                if (reason === "time") {
+            collector.on('end', async (collected, reason) => {
+                if (reason === 'time') {
                     await reply.edit({ components: [] });
                 }
             });
@@ -184,7 +172,7 @@ module.exports = {
 
         const commandFiles = fs
             .readdirSync(`commands/${category}`)
-            .filter((file) => file.endsWith(".js"));
+            .filter(file => file.endsWith('.js'));
 
         for (const file of commandFiles) {
             const command = require(`./../${category}/${file}`);
@@ -195,28 +183,21 @@ module.exports = {
             try {
                 const commandId = await interaction.guild.commands
                     .fetch()
-                    .then(
-                        (commands) =>
-                            commands.find((cmd) => cmd.name === name).id,
-                    );
+                    .then(commands => commands.find(cmd => cmd.name === name).id);
 
-                embedDescription.push(
-                    `</${name}:${commandId}> \n> ${description}`,
-                );
+                embedDescription.push(`</${name}:${commandId}> \n> ${description}`);
             } catch (error) {
-                console.error(
-                    `Error fetching ID for ${name}: ${error.message}`,
-                );
+                console.error(`Error fetching ID for ${name}: ${error.message}`);
                 console.log(error);
             }
         }
 
         const categoryEmbed = new EmbedBuilder()
-            .setColor("White")
+            .setColor('White')
             .setTitle(`${getCategoryTitle(category)}`)
-            .setDescription(`${embedDescription.join("\n\n")}`);
+            .setDescription(`${embedDescription.join('\n\n')}`);
 
-        if (fs.readdirSync("commands").includes(category)) {
+        if (fs.readdirSync('commands').includes(category)) {
             return await interaction.editReply({ embeds: [categoryEmbed] });
         }
     },

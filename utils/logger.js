@@ -103,12 +103,12 @@ function formatLog(level, message, context = '') {
     const plainText = `[${timestamp}] [${logLevel.label}] ${context ? `[${context}] ` : ''}${message}`;
 
     // Colored format for console logging
-    let timestampStr = config.showTimestamp ? `[${timestamp}]` : '';
-    let coloredHeader = config.colorize
+    const timestampStr = config.showTimestamp ? `[${timestamp}]` : '';
+    const coloredHeader = config.colorize
         ? logLevel.color(`${timestampStr} [${logLevel.label}]`)
         : `${timestampStr} [${logLevel.label}]`;
-    let contextStr = context ? `${COLORS.GRAY}[${context}]${COLORS.RESET}` : '';
-    let coloredText = `${coloredHeader} ${contextStr} ${message}`;
+    const contextStr = context ? `${COLORS.GRAY}[${context}]${COLORS.RESET}` : '';
+    const coloredText = `${coloredHeader} ${contextStr} ${message}`;
 
     return { plainText, coloredText, logLevel };
 }
@@ -125,10 +125,10 @@ function createBox(text, chars, options = {}) {
     const width = options.width || 60;
     const padding = options.padding || 1;
 
-    const [h, v, tl, tr, bl, br, ml, mr, mt, mb, mm] = chars;
+    const [h, v, tl, tr, bl, br] = chars;
 
     const contentWidth = width - 2;
-    let result = [];
+    const result = [];
 
     // Top border
     result.push(`${tl}${h.repeat(contentWidth)}${tr}`);
@@ -142,7 +142,7 @@ function createBox(text, chars, options = {}) {
     lines.forEach(line => {
         const paddedLine =
             line.length > contentWidth
-                ? line.substring(0, contentWidth - 3) + '...'
+                ? `${line.substring(0, contentWidth - 3)}...`
                 : line.padEnd(contentWidth);
         result.push(`${v}${paddedLine}${v}`);
     });
@@ -180,14 +180,14 @@ function log(level, message, context = '') {
             padding: 1,
             width: 80,
         });
-        console.log('\n' + boxed);
+        console.log(`\n${boxed}`);
     } else {
         console.log(coloredText);
     }
 
     // Output to file if enabled
     if (config.logToFile && logStream) {
-        logStream.write(plainText + '\n');
+        logStream.write(`${plainText}\n`);
     }
 }
 
@@ -217,7 +217,7 @@ function section(title, level = 'INFO') {
     const titleLine = `${chars[1]}${' '.repeat(leftPadding)}${coloredTitle}${' '.repeat(rightPadding)}${chars[1]}`;
     const bottomLine = `${chars[4]}${chars[0].repeat(width)}${chars[5]}`;
 
-    console.log('\n' + topLine);
+    console.log(`\n${topLine}`);
     console.log(titleLine);
     console.log(bottomLine);
 
@@ -242,7 +242,7 @@ function divider(level = 'INFO') {
     console.log(logLevel.color('─'.repeat(80)));
 
     if (config.logToFile && logStream) {
-        logStream.write('-'.repeat(80) + '\n');
+        logStream.write(`${'-'.repeat(80)}\n`);
     }
 }
 
@@ -270,7 +270,7 @@ function table(data, title = 'Data Table', level = 'INFO') {
     // Basic table representation for log file
     if (config.logToFile && logStream) {
         logStream.write(`\n--- ${title} ---\n`);
-        logStream.write(JSON.stringify(data, null, 2) + '\n');
+        logStream.write(`${JSON.stringify(data, null, 2)}\n`);
     }
 }
 
