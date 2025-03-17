@@ -1,124 +1,145 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
+const moderationLogs = require('../../../database/moderationLogs');
+const { handleError } = require('../../utils/errorHandler');
+
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('kick')
-        .setDescription('Select a member and kick them.')
-        .addUserOption(option =>
-            option.setName('target').setDescription('The member to kick').setRequired(true)
-        )
-        .addStringOption(option =>
-            option.setName('reason').setDescription('The reason for the kick')
-        )
-        .setDefaultMemberPermissions(
-            PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers
-        ),
-    category: 'moderation',
-    async execute(interaction) {
-        const targetUser = interaction.options.getMember('target');
-        const reason = interaction.options.getString('reason') ?? 'No reason provided';
-        await interaction.deferReply();
+	description_full: 'Kicks a member from the server with the specified reason.',
+	usage: '/kick target:@user [reason:"kick reason"]',
+	examples: ['/kick target:@user123', '/kick target:@user123 reason:"Violating server rules"'],
+	category: 'moderation',
+	data: new SlashCommandBuilder()
+		.setName('kick')
+		.setDescription('Kick a user from the server')
+		.addUserOption(option =>
+			option.setName('target').setDescription('The user to kick').setRequired(true),
+		)
+		.addStringOption(option =>
+			option.setName('reason').setDescription('The reason for kicking').setRequired(true),
+		)
+		.setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
 
-        if (!targetUser) {
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription('User not found')
-                        .setColor('Red')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-            return;
-        }
+	async execute(interaction) {
+		try {
+			const targetUser = interaction.options.getMember('target');
+			const reason = interaction.options.getString('reason');
 
-        if (targetUser.id === interaction.guild.ownerId) {
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription('You cannot kick the owner of the server')
-                        .setColor('Red')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-            return;
-        }
-        const targetUserRolePosition = targetUser.roles.highest.position;
-        const requestUserRolePosition = interaction.member.roles.highest.position;
-        const botRolePosition = interaction.guild.members.me.roles.highest.position;
+			// Validate target user
+			if (!targetUser) {
+				await handleError(
+					interaction,
+					new Error('Could not find the specified user in this server.'),
+					'VALIDATION',
+				);
+				return;
+			}
 
-        if (targetUserRolePosition >= requestUserRolePosition) {
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription(
-                            'You cannot kick someone with a higher or equal role than you'
-                        )
-                        .setColor('Red')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-            return;
-        }
+			// Check if user is kickable
+			if (!targetUser.kickable) {
+				await handleError(
+					interaction,
+					new Error('I do not have permission to kick this user.'),
+					'PERMISSION',
+				);
+				return;
+			}
 
-        if (targetUserRolePosition >= botRolePosition) {
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription(
-                            'I cannot kick someone with a higher or equal role than myself'
-                        )
-                        .setColor('Red')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-            return;
-        }
+			// Check if target is server owner
+			if (targetUser.id === interaction.guild.ownerId) {
+				await handleError(
+					interaction,
+					new Error('You cannot kick the owner of the server.'),
+					'PERMISSION',
+				);
+				return;
+			}
 
-        try {
-            await targetUser.kick(reason);
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('KICKED!!!')
-                        .setDescription(
-                            `<@${targetUser.id}> has been kicked for reason: \`${reason}\``
-                        )
-                        .setColor('Green')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-        } catch (error) {
-            await interaction.editReply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle('ERROR')
-                        .setDescription('An error occurred while trying to kick the user')
-                        .setColor('Red')
-                        .setFooter({
-                            text: `Done by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.avatarURL()}`,
-                        }),
-                ],
-            });
-        }
-    },
+			// Check role hierarchy
+			const targetUserRolePosition = targetUser.roles.highest.position;
+			const botRolePosition = interaction.guild.members.me.roles.highest.position;
+			const moderatorRolePosition = interaction.member.roles.highest.position;
+
+			if (targetUserRolePosition >= moderatorRolePosition) {
+				await handleError(
+					interaction,
+					new Error('You cannot kick someone with a higher or equal role than yourself.'),
+					'PERMISSION',
+				);
+				return;
+			}
+
+			if (targetUserRolePosition >= botRolePosition) {
+				await handleError(
+					interaction,
+					new Error('I cannot kick someone with a higher or equal role than myself.'),
+					'PERMISSION',
+				);
+				return;
+			}
+
+			// Create moderation log entry
+			const logEntry = new moderationLogs({
+				action: 'kick',
+				moderator: interaction.user.id,
+				user: targetUser.id,
+				reason: reason,
+			});
+
+			// Try to DM the user before kicking
+			try {
+				const dmEmbed = new EmbedBuilder()
+					.setTitle(`Kicked from ${interaction.guild.name}`)
+					.setDescription(`You have been kicked for: \`${reason}\``)
+					.setColor('Orange')
+					.setTimestamp();
+
+				await targetUser.send({ embeds: [dmEmbed] });
+			} catch (dmError) {
+				// If DM fails, log it but don't treat it as a command failure
+				await handleError(
+					interaction,
+					dmError,
+					'COMMAND_EXECUTION',
+					'Could not send kick notification DM to user (they may have DMs disabled).',
+					false, // Don't show this error to the user
+				);
+			}
+
+			// Save log and kick user
+			await Promise.all([logEntry.save(), targetUser.kick(reason)]);
+
+			// Send success message
+			const successEmbed = new EmbedBuilder()
+				.setTitle('User Kicked')
+				.setDescription(`Successfully kicked ${targetUser} for reason: \`${reason}\``)
+				.setColor('Orange')
+				.setFooter({
+					text: `Kicked by ${interaction.user.tag}`,
+					iconURL: interaction.user.displayAvatarURL(),
+				})
+				.setTimestamp();
+
+			await interaction.reply({ embeds: [successEmbed] });
+		} catch (error) {
+			// Handle different types of errors
+			if (error.code === 50013) {
+				await handleError(
+					interaction,
+					error,
+					'PERMISSION',
+					'I do not have the required permissions to kick this user.',
+				);
+			} else if (error.code === 'DATABASE_ERROR') {
+				await handleError(interaction, error, 'DATABASE', 'Failed to save moderation log.');
+			} else {
+				await handleError(
+					interaction,
+					error,
+					'COMMAND_EXECUTION',
+					'An error occurred while trying to kick the user.',
+				);
+			}
+		}
+	},
 };

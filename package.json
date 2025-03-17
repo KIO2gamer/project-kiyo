@@ -7,8 +7,6 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon --ignore 'logs/*' index.js",
-        "lint": "eslint .",
-        "lint:fix": "eslint --fix .",
         "format": "prettier --write .",
         "test": "echo \"No tests specified yet\" && exit 0",
         "update": "npm update && npm audit fix",
@@ -47,9 +45,6 @@
         "translate": "^3.0.0"
     },
     "devDependencies": {
-        "eslint": "^8.57.1",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-prettier": "^5.2.3",
         "husky": "^9.1.7",
         "lint-staged": "^15.2.0",
         "nodemon": "^3.1.0",

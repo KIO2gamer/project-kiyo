@@ -1,45 +1,58 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const translate = require("@iamtraction/google-translate");
 
-// Access your API key as an environment variable (see "Set up your API key" above)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// The Gemini 1.5 models are versatile and work with most use cases
-const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-    systemInstruction: 'You can only translate text. Never get out of the role.',
-});
+const { MessageFlags } = require("discord.js");
 
 module.exports = {
+    description_full:
+        'Translates the provided text into the specified target language. Use language codes like "en" (English), "es" (Spanish), "fr" (French), etc.',
+    usage: "/translate <input:text_to_translate> <target_lang:language_code>",
+    examples: ['/translate input:"Hello, world!" target_lang:es'],
+    category: "utility",
     data: new SlashCommandBuilder()
-        .setName('translate')
-        .setDescription('Translates the text into the desired output.')
-        .addStringOption(option =>
-            option.setName('input').setDescription('The text to be translated.').setRequired(true)
+        .setName("translate")
+        .setDescription("Translates text into the desired output language.")
+        .addStringOption((option) =>
+            option.setName("input").setDescription("The text to translate").setRequired(true),
         )
-        .addStringOption(option =>
+        .addStringOption((option) =>
             option
-                .setName('target_lang')
-                .setDescription('The target language to translate to.')
-                .setRequired(true)
+                .setName("target_lang")
+                .setDescription("The target language (e.g., en, es, fr, de, ja)")
+                .setRequired(true),
         ),
-    category: 'Utility',
+
     async execute(interaction) {
-        interaction.deferReply();
-        const input = interaction.options.getString('input');
-        const target = interaction.options.getString('target_lang');
-        const prompt2 = `Identify the language of this input: '${input}' in one word.`;
-        const prompt = `Translate the text: ${input} into ${target} language`;
-        const result2 = await model.generateContent(prompt2);
-        const result = await model.generateContent(prompt);
-        const response2 = await result2.response;
-        const response = await result.response;
-        const text2 = response2.text();
-        const text = response.text();
-        const embed = new EmbedBuilder().addFields(
-            { name: `Input : ${text2}`, value: input },
-            { name: `Output : ${target}`, value: text }
-        );
-        await interaction.editReply({ embeds: [embed] });
+        const input = interaction.options.getString("input");
+        const targetLang = interaction.options.getString("target_lang");
+
+        try {
+            const result = await translate(input, { to: targetLang });
+
+            const embed = new EmbedBuilder()
+                .setTitle("Translation Result")
+                .setColor("#00ff00")
+                .addFields(
+                    { name: "Input Text", value: input },
+                    { name: "Translated Text", value: result.text },
+                    {
+                        name: "Target Language",
+                        value: targetLang,
+                        inline: true,
+                    },
+                )
+                .setFooter({
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL(),
+                })
+                .setTimestamp();
+
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            handleError("Error executing translate command:", error);
+            await interaction.reply(
+                "There was an error while executing this command. Please try again later.",
+            );
+        }
     },
 };
