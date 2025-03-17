@@ -64,7 +64,7 @@ A multipurpose Discord bot built with [discord.js](https://discord.js.org/) feat
 
 ## Project Structure
 
--   **`commands/`**: Contains organized command folders (fun, moderation, utility).
+-   **`commands/`**: Contains organized command folders.
 -   **`events/`**: Event listeners for Discord events.
 -   **`utils/`**: Utility modules for error handling and logging.
 -   **`.github/workflows/`**: GitHub CI/CD configurations.
