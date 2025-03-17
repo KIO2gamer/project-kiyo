@@ -62,16 +62,6 @@ A multipurpose Discord bot built with [discord.js](https://discord.js.org/) feat
     npm run format
     ```
 
-## Deploying Slash Commands
-
-To deploy (or update) slash commands, run:
-
-```bash
-npm run deploy
-```
-
-This will deploy commands either globally or for the specified guilds as configured in `index.js`.
-
 ## Project Structure
 
 -   **`commands/`**: Contains organized command folders (fun, moderation, utility).
