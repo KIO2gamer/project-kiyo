@@ -7,46 +7,46 @@
  * @throws {Error} If seconds is negative.
  */
 function formatUptime(seconds) {
-	if (seconds < 0) {
-		throw new Error('Seconds cannot be negative');
-	}
+    if (seconds < 0) {
+        throw new Error("Seconds cannot be negative");
+    }
 
-	if (seconds === 0) {
-		return '0s';
-	}
+    if (seconds === 0) {
+        return "0s";
+    }
 
-	const units = [
-		{
-			name: 'day',
-			value: Math.floor(seconds / (3600 * 24)),
-			suffix: v => (v === 1 ? 'd' : 'd'),
-		},
-		{
-			name: 'hour',
-			value: Math.floor((seconds % (3600 * 24)) / 3600),
-			suffix: v => (v === 1 ? 'h' : 'h'),
-		},
-		{
-			name: 'minute',
-			value: Math.floor((seconds % 3600) / 60),
-			suffix: v => (v === 1 ? 'm' : 'm'),
-		},
-		{
-			name: 'second',
-			value: Math.floor(seconds % 60),
-			suffix: v => (v === 1 ? 's' : 's'),
-		},
-	];
+    const units = [
+        {
+            name: "day",
+            value: Math.floor(seconds / (3600 * 24)),
+            suffix: (v) => (v === 1 ? "d" : "d"),
+        },
+        {
+            name: "hour",
+            value: Math.floor((seconds % (3600 * 24)) / 3600),
+            suffix: (v) => (v === 1 ? "h" : "h"),
+        },
+        {
+            name: "minute",
+            value: Math.floor((seconds % 3600) / 60),
+            suffix: (v) => (v === 1 ? "m" : "m"),
+        },
+        {
+            name: "second",
+            value: Math.floor(seconds % 60),
+            suffix: (v) => (v === 1 ? "s" : "s"),
+        },
+    ];
 
-	const filteredUnits = units
-		.filter(unit => unit.value > 0)
-		.map(unit => `${unit.value}${unit.suffix(unit.value)}`);
+    const filteredUnits = units
+        .filter((unit) => unit.value > 0)
+        .map((unit) => `${unit.value}${unit.suffix(unit.value)}`);
 
-	return filteredUnits.join(' ');
+    return filteredUnits.join(" ");
 }
 
 module.exports = {
-	formatUptime,
-	// Default export for easier usage
-	default: formatUptime,
+    formatUptime,
+    // Default export for easier usage
+    default: formatUptime,
 };

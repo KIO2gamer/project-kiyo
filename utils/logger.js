@@ -4,61 +4,61 @@
  * Using native ANSI color codes and box drawing characters (no dependencies)
  */
 
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require("node:fs");
+const path = require("node:path");
 
 // ANSI color codes
 const COLORS = {
-    RESET: '\x1b[0m',
-    CYAN: '\x1b[36m',
-    GREEN: '\x1b[32m',
-    YELLOW: '\x1b[33m',
-    RED: '\x1b[31m',
-    MAGENTA: '\x1b[35m',
-    GRAY: '\x1b[90m',
-    WHITE: '\x1b[37m',
-    BOLD: '\x1b[1m',
+    RESET: "\x1b[0m",
+    CYAN: "\x1b[36m",
+    GREEN: "\x1b[32m",
+    YELLOW: "\x1b[33m",
+    RED: "\x1b[31m",
+    MAGENTA: "\x1b[35m",
+    GRAY: "\x1b[90m",
+    WHITE: "\x1b[37m",
+    BOLD: "\x1b[1m",
 };
 
 // Log levels with corresponding colors
 const LOG_LEVELS = {
     DEBUG: {
         priority: 0,
-        color: str => `${COLORS.CYAN}${str}${COLORS.RESET}`,
-        label: 'DEBUG',
-        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+        color: (str) => `${COLORS.CYAN}${str}${COLORS.RESET}`,
+        label: "DEBUG",
+        boxChars: ["─", "│", "┌", "┐", "└", "┘", "├", "┤", "┬", "┴", "┼"],
     },
     INFO: {
         priority: 1,
-        color: str => `${COLORS.GREEN}${str}${COLORS.RESET}`,
-        label: 'INFO',
-        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+        color: (str) => `${COLORS.GREEN}${str}${COLORS.RESET}`,
+        label: "INFO",
+        boxChars: ["─", "│", "┌", "┐", "└", "┘", "├", "┤", "┬", "┴", "┼"],
     },
     WARN: {
         priority: 2,
-        color: str => `${COLORS.YELLOW}${str}${COLORS.RESET}`,
-        label: 'WARN',
-        boxChars: ['─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼'],
+        color: (str) => `${COLORS.YELLOW}${str}${COLORS.RESET}`,
+        label: "WARN",
+        boxChars: ["─", "│", "┌", "┐", "└", "┘", "├", "┤", "┬", "┴", "┼"],
     },
     ERROR: {
         priority: 3,
-        color: str => `${COLORS.RED}${str}${COLORS.RESET}`,
-        label: 'ERROR',
-        boxChars: ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬'],
+        color: (str) => `${COLORS.RED}${str}${COLORS.RESET}`,
+        label: "ERROR",
+        boxChars: ["═", "║", "╔", "╗", "╚", "╝", "╠", "╣", "╦", "╩", "╬"],
     },
     FATAL: {
         priority: 4,
-        color: str => `${COLORS.MAGENTA}${str}${COLORS.RESET}`,
-        label: 'FATAL',
-        boxChars: ['═', '║', '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬'],
+        color: (str) => `${COLORS.MAGENTA}${str}${COLORS.RESET}`,
+        label: "FATAL",
+        boxChars: ["═", "║", "╔", "╗", "╚", "╝", "╠", "╣", "╦", "╩", "╬"],
     },
 };
 
 // Default configuration
 const defaultConfig = {
-    level: 'INFO',
+    level: "INFO",
     logToFile: false,
-    logFolder: 'logs',
+    logFolder: "logs",
     logFileMaxSize: 5 * 1024 * 1024, // 5MB
     useBoxes: true,
     showTimestamp: true,
@@ -83,8 +83,8 @@ function configure(options = {}) {
             fs.mkdirSync(logDir, { recursive: true });
         }
 
-        const logFile = path.join(logDir, `app-${new Date().toISOString().split('T')[0]}.log`);
-        logStream = fs.createWriteStream(logFile, { flags: 'a' });
+        const logFile = path.join(logDir, `app-${new Date().toISOString().split("T")[0]}.log`);
+        logStream = fs.createWriteStream(logFile, { flags: "a" });
     }
 }
 
@@ -95,19 +95,19 @@ function configure(options = {}) {
  * @param {string} [context=''] - Log context
  * @returns {Object} Formatted log entry
  */
-function formatLog(level, message, context = '') {
+function formatLog(level, message, context = "") {
     const timestamp = new Date().toISOString();
     const logLevel = LOG_LEVELS[level];
 
     // Plain text format for file logging
-    const plainText = `[${timestamp}] [${logLevel.label}] ${context ? `[${context}] ` : ''}${message}`;
+    const plainText = `[${timestamp}] [${logLevel.label}] ${context ? `[${context}] ` : ""}${message}`;
 
     // Colored format for console logging
-    const timestampStr = config.showTimestamp ? `[${timestamp}]` : '';
+    const timestampStr = config.showTimestamp ? `[${timestamp}]` : "";
     const coloredHeader = config.colorize
         ? logLevel.color(`${timestampStr} [${logLevel.label}]`)
         : `${timestampStr} [${logLevel.label}]`;
-    const contextStr = context ? `${COLORS.GRAY}[${context}]${COLORS.RESET}` : '';
+    const contextStr = context ? `${COLORS.GRAY}[${context}]${COLORS.RESET}` : "";
     const coloredText = `${coloredHeader} ${contextStr} ${message}`;
 
     return { plainText, coloredText, logLevel };
@@ -121,7 +121,7 @@ function formatLog(level, message, context = '') {
  * @returns {string} Boxed text
  */
 function createBox(text, chars, options = {}) {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const width = options.width || 60;
     const padding = options.padding || 1;
 
@@ -135,11 +135,11 @@ function createBox(text, chars, options = {}) {
 
     // Padding before content
     for (let i = 0; i < padding; i++) {
-        result.push(`${v}${' '.repeat(contentWidth)}${v}`);
+        result.push(`${v}${" ".repeat(contentWidth)}${v}`);
     }
 
     // Content
-    lines.forEach(line => {
+    lines.forEach((line) => {
         const paddedLine =
             line.length > contentWidth
                 ? `${line.substring(0, contentWidth - 3)}...`
@@ -149,13 +149,13 @@ function createBox(text, chars, options = {}) {
 
     // Padding after content
     for (let i = 0; i < padding; i++) {
-        result.push(`${v}${' '.repeat(contentWidth)}${v}`);
+        result.push(`${v}${" ".repeat(contentWidth)}${v}`);
     }
 
     // Bottom border
     result.push(`${bl}${h.repeat(contentWidth)}${br}`);
 
-    return result.join('\n');
+    return result.join("\n");
 }
 
 /**
@@ -165,7 +165,7 @@ function createBox(text, chars, options = {}) {
  * @param {string} [context=''] - Log context
  * @returns {void}
  */
-function log(level, message, context = '') {
+function log(level, message, context = "") {
     // Skip logging if below configured level
     if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
         return;
@@ -174,7 +174,7 @@ function log(level, message, context = '') {
     const { plainText, coloredText, logLevel } = formatLog(level, message, context);
 
     // Output to console
-    if (config.useBoxes && (level === 'ERROR' || level === 'FATAL')) {
+    if (config.useBoxes && (level === "ERROR" || level === "FATAL")) {
         // Use box drawing for errors and fatal errors
         const boxed = createBox(coloredText, logLevel.boxChars, {
             padding: 1,
@@ -197,7 +197,7 @@ function log(level, message, context = '') {
  * @param {string} [level='INFO'] - Log level for the section
  * @returns {void}
  */
-function section(title, level = 'INFO') {
+function section(title, level = "INFO") {
     if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
         return;
     }
@@ -214,7 +214,7 @@ function section(title, level = 'INFO') {
 
     // Create a boxed section header
     const topLine = `${chars[2]}${chars[0].repeat(width)}${chars[3]}`;
-    const titleLine = `${chars[1]}${' '.repeat(leftPadding)}${coloredTitle}${' '.repeat(rightPadding)}${chars[1]}`;
+    const titleLine = `${chars[1]}${" ".repeat(leftPadding)}${coloredTitle}${" ".repeat(rightPadding)}${chars[1]}`;
     const bottomLine = `${chars[4]}${chars[0].repeat(width)}${chars[5]}`;
 
     console.log(`\n${topLine}`);
@@ -223,7 +223,7 @@ function section(title, level = 'INFO') {
 
     // Write to log file if enabled
     if (config.logToFile && logStream) {
-        const plainHeader = `\n${'='.repeat(20)} ${title} ${'='.repeat(20)}\n`;
+        const plainHeader = `\n${"=".repeat(20)} ${title} ${"=".repeat(20)}\n`;
         logStream.write(plainHeader);
     }
 }
@@ -233,25 +233,25 @@ function section(title, level = 'INFO') {
  * @param {string} [level='INFO'] - Log level for the divider
  * @returns {void}
  */
-function divider(level = 'INFO') {
+function divider(level = "INFO") {
     if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
         return;
     }
 
     const logLevel = LOG_LEVELS[level];
-    console.log(logLevel.color('─'.repeat(80)));
+    console.log(logLevel.color("─".repeat(80)));
 
     if (config.logToFile && logStream) {
-        logStream.write(`${'-'.repeat(80)}\n`);
+        logStream.write(`${"-".repeat(80)}\n`);
     }
 }
 
 // Individual level methods
-const debug = (message, context) => log('DEBUG', message, context);
-const info = (message, context) => log('INFO', message, context);
-const warn = (message, context) => log('WARN', message, context);
-const error = (message, context) => log('ERROR', message, context);
-const fatal = (message, context) => log('FATAL', message, context);
+const debug = (message, context) => log("DEBUG", message, context);
+const info = (message, context) => log("INFO", message, context);
+const warn = (message, context) => log("WARN", message, context);
+const error = (message, context) => log("ERROR", message, context);
+const fatal = (message, context) => log("FATAL", message, context);
 
 /**
  * Create a table from object data
@@ -259,7 +259,7 @@ const fatal = (message, context) => log('FATAL', message, context);
  * @param {string} [title='Data Table'] - Table title
  * @param {string} [level='INFO'] - Log level for the table
  */
-function table(data, title = 'Data Table', level = 'INFO') {
+function table(data, title = "Data Table", level = "INFO") {
     if (LOG_LEVELS[level].priority < LOG_LEVELS[config.level].priority) {
         return;
     }
@@ -279,7 +279,7 @@ function table(data, title = 'Data Table', level = 'INFO') {
  * @returns {Promise<void>}
  */
 async function close() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         if (logStream) {
             logStream.end(() => resolve());
         } else {

@@ -5,23 +5,23 @@
  * @returns {Object} Object with start and end numbers, or null if invalid
  */
 function parseRange(rangeString) {
-	if (!rangeString || typeof rangeString !== 'string') {
-		return null;
-	}
+    if (!rangeString || typeof rangeString !== "string") {
+        return null;
+    }
 
-	const parts = rangeString.split('-');
-	if (parts.length !== 2) {
-		return null;
-	}
+    const parts = rangeString.split("-");
+    if (parts.length !== 2) {
+        return null;
+    }
 
-	const start = parseInt(parts[0].trim());
-	const end = parseInt(parts[1].trim());
+    const start = parseInt(parts[0].trim());
+    const end = parseInt(parts[1].trim());
 
-	if (isNaN(start) || isNaN(end) || start > end) {
-		return null;
-	}
+    if (isNaN(start) || isNaN(end) || start > end) {
+        return null;
+    }
 
-	return { start, end };
+    return { start, end };
 }
 
 module.exports = { parseRange };
