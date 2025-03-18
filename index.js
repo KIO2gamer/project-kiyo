@@ -35,6 +35,25 @@ const client = new Client({
 
 client.commands = new Collection();
 
+// Import the Player from discord-player
+const { Player } = require("discord-player");
+const { DefaultExtractors } = require("@discord-player/extractor");
+
+// Initialize the player
+const player = new Player(client);
+
+// Load default extractors (required for v5+)
+(async () => {
+    await player.extractors.loadMulti(DefaultExtractors);
+})();
+
+// Make player available throughout your bot
+client.player = player;
+
+client.player.on("trackStart", (queue, track) => {
+    queue.metadata.channel.send(`🎵 | Now playing: **${track.title}**`);
+});
+
 // Function to recursively load files in sub-categories as well
 const loadFiles = (dir, fileAction) => {
     fs.readdirSync(dir).forEach((file) => {

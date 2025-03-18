@@ -40,7 +40,7 @@ const generationConfig = {
     temperature: 0.85, // Slightly lower for more coherent responses
     topK: 40, // Increased variety in token selection
     topP: 0.95, // More diverse responses
-    maxOutputTokens: 2048, // Increased max token limit
+    maxOutputTokens: 128, // Increased max token limit
 };
 
 // Improved AI prompt instruction with more nuanced guidance

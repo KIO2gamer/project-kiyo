@@ -185,6 +185,16 @@ module.exports = {
      * @param {Object} interaction - The interaction object
      */
     async handleSelectMenuInteraction(interaction) {
+        // Special case for song-select which doesn't follow the underscore pattern
+        if (interaction.customId === "song-select") {
+            const playCommand = interaction.client.commands.get("play");
+            if (playCommand && playCommand.handleSelectMenu) {
+                await playCommand.handleSelectMenu(interaction);
+                return;
+            }
+        }
+
+        // Continue with the normal type_action pattern for other menus
         const [type, ...args] = interaction.customId.split("_");
 
         // Generic select menu handler - routes to specific handlers
