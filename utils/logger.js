@@ -13,6 +13,19 @@ const defaultSymbols = {
     bullet: "•",
 };
 
+function formatLogObject(obj) {
+    if (obj instanceof Error) {
+        return obj.stack || obj.message;
+    } else if (typeof obj === "object" && obj !== null) {
+        try {
+            return JSON.stringify(obj, null, 2);
+        } catch (e) {
+            return String(obj);
+        }
+    }
+    return obj;
+}
+
 class Logger {
     static COLORS = {
         BOT: chalk.cyan,
@@ -54,7 +67,9 @@ class Logger {
 
         const symbolStr = chalk[levelColor](symbol);
 
-        console.log(`${timestamp} ${symbolStr} ${moduleStr} ${message}`);
+        const formattedMessage = typeof message === "object" ? formatLogObject(message) : message;
+
+        console.log(`${timestamp} ${symbolStr} ${moduleStr} ${formattedMessage}`);
     }
 
     static error(message) {
