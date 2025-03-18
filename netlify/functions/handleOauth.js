@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const OAuthCode = require("./../../src/database/OauthCode");
+const OAuthCode = require("../../database/OauthCode.js");
 const crypto = require("crypto");
 
 // MongoDB connection URI from environment variables
