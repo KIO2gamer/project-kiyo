@@ -38,7 +38,7 @@ module.exports = {
         '/warn target:@user123 reason:"First warning for spamming"',
         '/warn target:@user123 reason:"Second warning for inappropriate behavior"',
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("warn")
         .setDescription("Issue a warning to a user")

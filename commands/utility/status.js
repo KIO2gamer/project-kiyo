@@ -13,7 +13,7 @@ module.exports = {
         "/status https://api.github.com",
         "/status https://discord.com",
     ],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("status")
         .setDescription("Check the status of a server or service")

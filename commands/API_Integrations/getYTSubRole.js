@@ -26,7 +26,6 @@ module.exports = {
         "Verify your YouTube channel using Discord OAuth2 and assign a role based on your subscriber count.",
     usage: "/get_yt_sub_role",
     examples: ["/get_yt_sub_role"],
-    category: "roles",
 
     async execute(interaction) {
         try {

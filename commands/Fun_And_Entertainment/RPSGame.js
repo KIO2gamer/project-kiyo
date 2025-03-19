@@ -6,7 +6,7 @@ module.exports = {
     description_full: "An exciting game of Rock, Paper, Scissors, Lizard, Spock against the bot!",
     usage: "/rpsls <choice>",
     examples: ["/rpsls rock", "/rpsls paper", "/rpsls scissors", "/rpsls lizard", "/rpsls spock"],
-    category: "games",
+    
     data: new SlashCommandBuilder()
         .setName("rpsls")
         .setDescription("Play Rock, Paper, Scissors, Lizard, Spock!")

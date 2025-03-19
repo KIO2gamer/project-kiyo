@@ -15,7 +15,6 @@ module.exports = {
         "/new_channel name:voice-chat type:voice category:Voice Channels",
         "/new_channel name:announcements type:text topic:Server announcements",
     ],
-    category: "setup",
     data: new SlashCommandBuilder()
         .setName("new_channel")
         .setDescription("Creates a new channel in the server.")

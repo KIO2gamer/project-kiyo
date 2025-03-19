@@ -39,7 +39,6 @@ module.exports = {
         "/set_cmd_perms command:kick allowed:false user:@JohnDoe",
         "/set_cmd_perms command:ban allowed:true role:@Admin",
     ],
-    category: "admin",
 
     /**
      * Executes the setCmdPerms command to set permissions for a specific command.

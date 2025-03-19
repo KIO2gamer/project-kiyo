@@ -28,7 +28,7 @@ module.exports = {
         "/fun uwu",
         "/fun do_not_touch",
     ],
-    category: "fun",
+
     data: new SlashCommandBuilder()
         .setName("fun")
         .setDescription("Various fun commands combined into one.")

@@ -22,7 +22,7 @@ module.exports = {
     description_full: "Tests your knowledge with a multiple-choice trivia question.",
     usage: "/trivia",
     examples: ["/trivia"],
-    category: "games",
+    
     data: new SlashCommandBuilder()
         .setName("trivia")
         .setDescription("Start a trivia game and answer a question!"),

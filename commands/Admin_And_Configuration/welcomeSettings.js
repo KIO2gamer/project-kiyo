@@ -75,7 +75,7 @@ module.exports = {
 
     description_full:
         "Configure welcome messages for new members joining your server. Set a custom welcome channel, message format, and optional direct message settings.",
-    category: "admin",
+
     usage: '/welcomesettings toggle enabled:true|false\n/welcomesettings channel channel:#welcome\n/welcomesettings message content:"Welcome {user} to {server}!"\n/welcomesettings dm enabled:true message:"Thanks for joining!"',
     examples: [
         "/welcomesettings toggle enabled:true",

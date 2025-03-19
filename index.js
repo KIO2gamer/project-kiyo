@@ -72,6 +72,7 @@ const loadCommands = (dir) => {
     Logger.log("COMMANDS", "Loading commands...");
     loadFiles(dir, (filePath) => {
         const command = require(filePath);
+        command.filePath = filePath; // Add the file path to the command object
         if (command?.data && command?.execute) {
             client.commands.set(command.data.name, command);
             if (command.data.aliases) {

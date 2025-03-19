@@ -6,7 +6,7 @@ module.exports = {
     description_full: "Ends a poll from a specific message, preventing further voting.",
     usage: '/end_poll message_id:"message ID" channel:#channel',
     examples: ['/end_poll message_id:"123456789012345678" channel:#general'],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("end_poll")
         .setDescription("Ends a poll")

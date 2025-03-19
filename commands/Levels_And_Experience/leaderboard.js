@@ -16,7 +16,7 @@ module.exports = {
 
     description_full:
         "Shows the server's XP leaderboard with the top members ranked by experience points. View different pages to see more users.",
-    category: "levels",
+
     usage: "/leaderboard [page]",
     examples: ["/leaderboard", "/leaderboard page:2"],
 

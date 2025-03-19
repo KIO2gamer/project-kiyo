@@ -16,7 +16,7 @@ module.exports = {
 
     description_full:
         "Ask any question to Google's Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.",
-    category: "utility",
+    
     usage: "/ask_gemini <question>",
     examples: [
         "/ask_gemini What is quantum computing?",

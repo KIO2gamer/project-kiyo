@@ -74,7 +74,7 @@ module.exports = {
 
     description_full:
         "Configure all aspects of the leveling system including enabling/disabling, XP rate, notifications, and role rewards.",
-    category: "levels",
+
     usage: "/levelsettings toggle enabled:true|false\n/levelsettings xprate multiplier:1.5\n/levelsettings levelupmessage type:public|dm|disabled [channel:#channel]\n/levelsettings rolerewards level:10 [role:@role]",
     examples: [
         "/levelsettings toggle enabled:true",

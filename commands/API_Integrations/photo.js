@@ -11,7 +11,7 @@ module.exports = {
         "/photo query:mountains orientation:landscape",
         "/photo query:flowers random:true",
     ],
-    category: "utility",
+    
     data: new SlashCommandBuilder()
         .setName("photo")
         .setDescription("Search for a photo.")

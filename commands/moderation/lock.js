@@ -17,7 +17,7 @@ module.exports = {
         "/lock channel:announcement_channel", // Locks the "announcement_channel" channel
         "/lock", // Locks the current channel where the command is used
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("lock")
         .setDescription("Lock a channel")

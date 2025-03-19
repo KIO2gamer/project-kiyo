@@ -17,7 +17,6 @@ module.exports = {
         "/send_ticket_message channel:#support title:Support Tickets description:Click below to create a ticket button_text:Create Ticket",
         "/send_ticket_message channel:#help title:Need Help? description:Get assistance from our team button_text:Open Ticket",
     ],
-    category: "setup",
     data: new SlashCommandBuilder()
         .setName("send_ticket_message")
         .setDescription("Sends a message with a button to create tickets.")

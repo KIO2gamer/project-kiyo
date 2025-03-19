@@ -14,7 +14,7 @@ module.exports = {
         "Shows an embed acknowledging and listing the contributors who helped create the bot, linking their Discord usernames to their IDs.",
     usage: "/credits",
     examples: ["/credits"],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("credits")
         .setDescription("Shows an embed of users who helped make this bot."),

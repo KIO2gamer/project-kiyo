@@ -14,7 +14,6 @@ module.exports = {
         'Sets the channel where message logs will be sent. Requires the "Administrator" permission.',
     usage: "/set_msg_logs_channel <channel:channel>",
     examples: ["/set_msg_logs_channel channel:#message-logs"],
-    category: "setup",
     data: new SlashCommandBuilder()
         .setName("set_msg_logs_channel")
         .setDescription("Sets the channel where message logs would be sent into.")

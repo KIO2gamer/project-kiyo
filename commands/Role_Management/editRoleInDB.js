@@ -12,7 +12,7 @@ module.exports = {
         '/edit_role_in_data role:Moderators name:"Senior Moderators"',
         "/edit_role_in_data role:VIP color:#FFD700",
     ],
-    category: "roles",
+
     data: new SlashCommandBuilder()
         .setName("edit_role_in_data")
         .setDescription("Edits a role in the database.")

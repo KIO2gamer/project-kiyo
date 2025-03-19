@@ -11,7 +11,7 @@ module.exports = {
         "Displays detailed information about the bot, including version, uptime, system statistics, and more.",
     usage: "/bot_info",
     examples: ["/bot_info"],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("bot_info")
         .setDescription("Displays information about the bot"),

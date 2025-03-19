@@ -19,7 +19,7 @@ module.exports = {
         '/game_info "Red Dead Redemption 2"',
         '/game_info "Minecraft"',
     ],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("game_info")
         .setDescription("Get detailed information about a video game")

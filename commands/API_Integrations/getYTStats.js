@@ -20,7 +20,7 @@ module.exports = {
         "/ytstats https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         "/ytstats UC_x5XG1OV2P6uZZ5FSM9Ttw",
     ],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("ytstats")
         .setDescription("Get YouTube channel statistics")

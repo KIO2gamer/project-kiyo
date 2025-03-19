@@ -10,7 +10,7 @@ module.exports = {
         '/unban user:"123456789012345678"',
         '/unban user:"yoo_12345" reason:"Ban was a mistake"',
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("unban")
         .setDescription("Unban a member from the server.")

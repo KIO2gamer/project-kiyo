@@ -16,7 +16,7 @@ module.exports = {
         '/echo input:"Hello there!" channel:#general',
         '/echo input:"Important announcement!" channel:#announcements embed:true',
     ],
-    category: "utility",
+    
     data: new SlashCommandBuilder()
         .setName("echo")
         .setDescription("Replies with your input!")

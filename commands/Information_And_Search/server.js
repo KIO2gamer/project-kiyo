@@ -31,7 +31,6 @@ module.exports = {
         ),
     description_full:
         'Provides comprehensive information and statistics about the server. Use "/server info" for general server details, or "/server stats" with an optional timeframe to view activity statistics.',
-    category: "info",
     usage: "/server info\n/server stats [timeframe]",
     examples: [
         "/server info",

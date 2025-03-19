@@ -15,7 +15,7 @@ module.exports = {
         "Retrieves general information about a Minecraft player from the Ashcon API, including their username, UUID, and skin.",
     usage: "/minecraft <username>",
     examples: ["/minecraft Notch", "/minecraft Dinnerbone"],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("minecraft")
         .setDescription("Gets general info about a Minecraft player")

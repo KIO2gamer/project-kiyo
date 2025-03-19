@@ -11,7 +11,7 @@ module.exports = {
         '/temp_ban target:@user123 duration:"1d"',
         '/temp_ban target:@user123 duration:"2h" reason:"Spamming"',
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("temp_ban")
         .setDescription("Temporarily ban a member for a specified duration.")

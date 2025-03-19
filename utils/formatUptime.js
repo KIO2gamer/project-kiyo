@@ -45,8 +45,28 @@ function formatUptime(seconds) {
     return filteredUnits.join(" ");
 }
 
+/**
+ * Formats a cooldown duration in seconds into a simple human-readable string.
+ * Only shows the largest time unit.
+ *
+ * @param {number} seconds - The cooldown duration in seconds
+ * @returns {string} A human-readable string (e.g., "5 seconds" or "2 minutes")
+ */
+function formatCooldown(seconds) {
+    if (seconds < 60) {
+        return `${seconds} second${seconds === 1 ? "" : "s"}`;
+    } else if (seconds < 3600) {
+        const minutes = Math.floor(seconds / 60);
+        return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+    } else {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours} hour${hours === 1 ? "" : "s"}`;
+    }
+}
+
 module.exports = {
     formatUptime,
+    formatCooldown,
     // Default export for easier usage
     default: formatUptime,
 };

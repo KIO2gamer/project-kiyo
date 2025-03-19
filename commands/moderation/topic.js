@@ -7,7 +7,7 @@ module.exports = {
         "Sends a message to the specified users, requesting them to change the current topic.",
     usage: "/topic [user1:@user] [user2:@user] [user3:@user]",
     examples: ["/topic user1:@user123", "/topic user1:@user123 user2:@user456 user3:@user789"],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("topic")
         .setDescription("Sends a message about changing the topic.")

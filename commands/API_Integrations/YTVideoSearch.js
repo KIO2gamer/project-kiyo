@@ -24,7 +24,7 @@ module.exports = {
         .addStringOption((option) =>
             option.setName("query").setDescription("The search query").setRequired(true),
         ),
-    category: "media",
+
     data: new SlashCommandBuilder()
         .setName("youtube_search")
         .setDescription("Search for YouTube videos")

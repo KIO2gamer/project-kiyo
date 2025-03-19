@@ -13,7 +13,7 @@ module.exports = {
                 .setRequired(true),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-    category: "utility",
+
     description_full: "Deletes an existing custom command from the bot's database.",
     usage: "/custom_delete <name:command_name_or_alias>",
     examples: ["/custom_delete name:hello", "/custom_delete name:greet"],

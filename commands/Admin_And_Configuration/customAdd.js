@@ -28,7 +28,7 @@ module.exports = {
         "/custom_add name:hello message:Hello World!",
         "/custom_add name:greet message:Hi there! alias:hi",
     ],
-    category: "utility",
+
     /**
      * Executes the custom command addition process.
      *

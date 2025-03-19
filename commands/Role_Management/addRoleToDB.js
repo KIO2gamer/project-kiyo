@@ -9,7 +9,7 @@ module.exports = {
         "Adds a role to the database. Useful for managing roles that your bot might need to reference.",
     usage: "/add_role_to_data <role:role>",
     examples: ["/add_role_to_data role:Moderators"],
-    category: "roles",
+
     data: new SlashCommandBuilder()
         .setName("add_role_to_data")
         .setDescription("Adds a role to the database.")

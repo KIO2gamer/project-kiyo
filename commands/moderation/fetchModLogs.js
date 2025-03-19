@@ -33,7 +33,7 @@ module.exports = {
         "/mod_logs action:ban",
         "/mod_logs moderator:@mod456",
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("mod_logs")
         .setDescription("Show the moderation logs.")

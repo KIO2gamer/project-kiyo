@@ -8,7 +8,7 @@ module.exports = {
     examples: [
         "/fetch_embed_data https://discord.com/channels/123456789012345678/123456789012345678/123456789012345678",
     ],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("fetch_embed_data")
         .setDescription("Fetches the embed data from a message URL.")

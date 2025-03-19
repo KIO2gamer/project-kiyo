@@ -18,7 +18,6 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
     description_full:
         "Sets a specific channel where users can interact with the AI chatbot. This helps keep AI conversations organized in a dedicated channel.",
-    category: "setup",
     usage: "/set_ai_chat_channel #channel",
     examples: [
         "/set_ai_chat_channel #ai-chat",

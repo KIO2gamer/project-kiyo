@@ -45,7 +45,7 @@ module.exports = {
         "Evaluates provided JavaScript code. WARNING: This command is extremely dangerous and should only be used for debugging in a controlled environment. Never use it in a production bot.",
     usage: "/eval <code>",
     examples: ["/eval 2 + 2", "/eval interaction.guild.name"],
-    category: "admin",
+
     data: new SlashCommandBuilder()
         .setName("eval")
         .setDescription("Evaluates JavaScript code.")

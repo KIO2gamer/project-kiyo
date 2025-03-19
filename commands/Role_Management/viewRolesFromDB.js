@@ -8,7 +8,7 @@ module.exports = {
     description_full: "Displays a list of roles that have been stored in the database.",
     usage: "/view_roles_from_data",
     examples: ["/view_roles_from_data"],
-    category: "roles",
+
     data: new SlashCommandBuilder()
         .setName("view_roles_from_data")
         .setDescription("View the roles stored in the database."),

@@ -7,7 +7,7 @@ module.exports = {
         "Deletes a specified number of messages from the channel. Messages must be less than 14 days old.",
     usage: "/purge amount:number [user:@user]",
     examples: ["/purge amount:10", "/purge amount:50 user:@user123"],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("purge")
         .setDescription("Delete multiple messages from the channel")

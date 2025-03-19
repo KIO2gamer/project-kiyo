@@ -285,7 +285,7 @@ module.exports = {
         "Shows detailed information about a user, including their profile, status, activities, roles, permissions and more.",
     usage: "/user_info [target]",
     examples: ["/user_info", "/user_info @user"],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("user_info")
         .setDescription("Displays detailed information about a user.")

@@ -13,7 +13,7 @@ module.exports = {
         "/reaction_stats #general 7d",
         "/reaction_stats 1M",
     ],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("reaction_stats")
         .setDescription(

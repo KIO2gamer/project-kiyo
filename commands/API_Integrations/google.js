@@ -12,7 +12,7 @@ module.exports = {
     description_full: "Searches Google for the given query and displays the top results.",
     usage: "/google <query>",
     examples: ["/google discord bot tutorial", "/google best restaurants near me"],
-    category: "utility",
+
     data: new SlashCommandBuilder()
         .setName("google")
         .setDescription("Search Google for a query")

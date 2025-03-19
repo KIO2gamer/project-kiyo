@@ -11,7 +11,7 @@ module.exports = {
         "/emoji_info 🎮",
         "/emoji_info PartyBlob",
     ],
-    category: "info",
+    
     data: new SlashCommandBuilder()
         .setName("emoji_info")
         .setDescription("Provides information about emojis")

@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("unscramble")
         .setDescription("Start a multiplayer word unscramble game!"),
-    category: "games",
+
     async execute(interaction) {
         await interaction.deferReply();
 

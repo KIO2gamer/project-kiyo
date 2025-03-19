@@ -9,7 +9,7 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
     description_full:
         "Deletes all your previous chat interactions with the AI assistant, giving you a fresh start. This action cannot be undone.",
-    category: "admin",
+
     usage: "/clear_history",
     examples: ["/clear_history"],
 

@@ -14,7 +14,7 @@ module.exports = {
         'Sets the category where new ticket channels will be created. Requires the "Administrator" permission.',
     usage: "/set_ticket_category <category:category>",
     examples: ["/set_ticket_category category:Tickets"],
-    category: "setup",
+
     data: new SlashCommandBuilder()
         .setName("set_ticket_category")
         .setDescription("Sets the category where tickets will be created.")

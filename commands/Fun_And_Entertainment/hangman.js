@@ -38,7 +38,7 @@ module.exports = {
     description_full: "A thrilling multiplayer game of hangman!",
     usage: "/hangman",
     examples: ["/hangman"],
-    category: "games",
+    
     data: new SlashCommandBuilder()
         .setName("hangman")
         .setDescription("Start a multiplayer exciting game of hangman!"),

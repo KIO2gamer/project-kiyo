@@ -432,6 +432,19 @@ function formatChannelPermissions(channel, target, options = {}) {
     });
 }
 
+/**
+ * Formats a permission string to be more human-readable
+ * @param {string} permission - The permission string to format
+ * @returns {string} Formatted permission string with proper spacing and capitalization
+ */
+function formatPermission(permission) {
+    return permission
+        .replace(/([A-Z])/g, " $1")
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
 module.exports = {
     // Constants
     PERMISSION_CATEGORIES,
@@ -450,4 +463,5 @@ module.exports = {
     formatPermissionWithDescription,
     getPermissionCategory,
     formatChannelPermissions,
+    formatPermission,
 };

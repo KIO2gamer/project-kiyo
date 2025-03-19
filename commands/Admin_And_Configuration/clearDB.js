@@ -11,7 +11,6 @@ module.exports = {
         "Completely wipes all collections and data from the connected MongoDB database. This action is irreversible and should be used with extreme caution. Only server administrators can use this command.",
     usage: "/clear_db",
     examples: ["/clear_db"],
-    category: "admin",
 
     /**
      * Executes the clear database command.

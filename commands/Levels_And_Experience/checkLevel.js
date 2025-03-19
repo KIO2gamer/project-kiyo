@@ -15,7 +15,7 @@ module.exports = {
 
     description_full:
         "Shows detailed information about your XP progress or another user's. Displays current level, XP, progress to next level, and rank on the server.",
-    category: "levels",
+
     usage: "/level [user]",
     examples: ["/level", "/level user:@Username"],
 

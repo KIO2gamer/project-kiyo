@@ -8,7 +8,7 @@ module.exports = {
     description_full: "Bans a member from the server with the specified reason.",
     usage: '/ban target:@user [reason:"ban reason"]',
     examples: ["/ban target:@user123", '/ban target:@user123 reason:"Severe rule violation"'],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("ban")
         .setDescription("Ban a user from the server")

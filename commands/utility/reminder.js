@@ -25,7 +25,6 @@ module.exports = {
         "/reminder 300 Check on the laundry",
         "/reminder 86400 Happy birthday to me!",
     ],
-    category: "utility",
 
     async execute(interaction) {
         const time = interaction.options.getInteger("time"); // Time in seconds

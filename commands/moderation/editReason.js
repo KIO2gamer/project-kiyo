@@ -10,7 +10,7 @@ module.exports = {
         '/edit_reason reason:"Spamming" lognumber:5',
         '/edit_reason reason:"Inappropriate behavior" logrange:10-15',
     ],
-    category: "moderation",
+
     data: new SlashCommandBuilder()
         .setName("edit_reason")
         .setDescription("Edit the reason for a specific log entry / a range of log entries.")

@@ -109,7 +109,7 @@ module.exports = {
         "/role list",
         "/role create name:NewRole color:#00FF00",
     ],
-    category: "roles",
+
     data: command,
 
     async execute(interaction) {

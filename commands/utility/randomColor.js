@@ -16,7 +16,7 @@ module.exports = {
     description_full: "Generates a random color and displays it along with its hexadecimal code.",
     usage: "/random_color",
     examples: ["/random_color"],
-    category: "utility",
+
     data: new SlashCommandBuilder().setName("random_color").setDescription("Get a random color"),
     async execute(interaction) {
         const randomHex = Math.floor(Math.random() * 16777215)

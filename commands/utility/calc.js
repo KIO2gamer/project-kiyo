@@ -14,7 +14,6 @@ const math = require("mathjs"); // Import mathjs
 const { MessageFlags } = require("discord.js");
 
 module.exports = {
-    category: "utility",
     data: new SlashCommandBuilder()
         .setName("calculate")
         .setDescription("Perform a calculation using mathjs.")

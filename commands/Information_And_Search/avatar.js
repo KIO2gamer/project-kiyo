@@ -13,7 +13,7 @@ module.exports = {
         "/avatar target:@username size:1024 format:png",
         "/avatar size:2048 format:webp",
     ],
-    category: "info",
+    
     data: new SlashCommandBuilder()
         .setName("avatar")
         .setDescription("Get the avatar of a user")

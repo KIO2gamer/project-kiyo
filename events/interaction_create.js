@@ -1,301 +1,264 @@
-const { Events, InteractionType, MessageFlags } = require("discord.js");
-const Logger = require("./../utils/logger");
-const CommandHandler = require("./commandHandler");
-
-let commandHandler = null;
+const { Events, InteractionType } = require("discord.js");
+const Logger = require("../utils/logger");
+const { handleError } = require("../utils/errorHandler");
 
 module.exports = {
     name: Events.InteractionCreate,
+
     /**
-     * Handles all interaction types: commands, buttons, select menus, modals, etc.
-     *
-     * @param {Object} interaction - The interaction object
-     * @returns {Promise<void>} - A promise that resolves when the interaction handling is complete
+     * Handles all Discord interactions
+     * @param {import('discord.js').Interaction} interaction - The interaction object
+     * @returns {Promise<void>}
      */
     async execute(interaction) {
-        // Initialize the command handler if not already initialized
-        if (!commandHandler && interaction.client) {
-            commandHandler = CommandHandler.init(interaction.client);
-            Logger.log("HANDLERS", "Command handler initialized", "info");
-        }
-
         try {
+            // Early return if the bot doesn't have access to the guild
+            if (interaction.guild && !interaction.guild.available) return;
+
             // Handle different interaction types
-            switch (interaction.type) {
-                case InteractionType.ApplicationCommand:
-                    if (interaction.isChatInputCommand()) {
-                        // Handle slash commands using our command handler
-                        await commandHandler.executeCommand(interaction);
-                    } else if (interaction.isContextMenuCommand()) {
-                        // Handle context menu commands
-                        await this.handleContextMenu(interaction);
+            if (interaction.isChatInputCommand()) {
+                // Handle slash commands via CommandHandler
+                await handleCommandInteraction(interaction);
+            } else if (interaction.isButton()) {
+                // Handle button interactions
+                await handleButtonInteraction(interaction);
+            } else if (interaction.isStringSelectMenu()) {
+                // Handle select menu interactions
+                await handleSelectMenuInteraction(interaction);
+            } else if (interaction.isAutocomplete()) {
+                // Handle autocomplete interactions
+                await handleAutocompleteInteraction(interaction);
+            } else if (interaction.isModalSubmit()) {
+                // Handle modal submit interactions
+                await handleModalInteraction(interaction);
+
+                // Add this to your interactionCreate.js event handler
+                if (interaction.isModalSubmit() && interaction.customId === "help_search_modal") {
+                    const helpCommand = interaction.client.commands.get("help");
+                    if (helpCommand && typeof helpCommand.handleSearchModal === "function") {
+                        await helpCommand.handleSearchModal(interaction);
                     }
-                    break;
-
-                case InteractionType.MessageComponent:
-                    if (interaction.isButton()) {
-                        // Handle button interactions
-                        await this.handleButtonInteraction(interaction);
-                    } else if (interaction.isStringSelectMenu()) {
-                        // Handle select menu interactions
-                        await this.handleSelectMenuInteraction(interaction);
-                    }
-                    break;
-
-                case InteractionType.ModalSubmit:
-                    // Handle modal submissions
-                    await this.handleModalSubmission(interaction);
-                    break;
-
-                case InteractionType.ApplicationCommandAutocomplete:
-                    // Handle autocomplete interactions
-                    await this.handleAutocomplete(interaction);
-                    break;
-
-                default:
-                    Logger.log(
-                        "INTERACTION",
-                        `Unknown interaction type: ${interaction.type}`,
-                        "warning",
-                    );
-                    break;
+                }
             }
         } catch (error) {
             Logger.log("INTERACTION", `Error handling interaction: ${error.message}`, "error");
-            // Only reply if we haven't already
+
+            // Attempt to respond to the interaction if it hasn't been responded to already
             if (!interaction.replied && !interaction.deferred) {
-                try {
-                    await interaction.reply({
-                        content: "There was an error while processing this interaction.",
-                        flags: MessageFlags.Ephemeral,
-                    });
-                } catch (replyError) {
-                    // Ignore reply errors as the interaction might have expired
-                }
+                await handleError(
+                    interaction,
+                    error,
+                    "INTERACTION",
+                    "An error occurred while processing this interaction.",
+                );
             }
         }
     },
+};
 
-    /**
-     * Handles context menu command interactions
-     *
-     * @param {Object} interaction - The interaction object
-     */
-    async handleContextMenu(interaction) {
-        const command = interaction.client.commands.get(interaction.commandName);
+/**
+ * Handles command interactions
+ * @param {import('discord.js').CommandInteraction} interaction - The command interaction
+ */
+async function handleCommandInteraction(interaction) {
+    const { client } = interaction;
+
+    // Log command usage
+    Logger.log(
+        "COMMANDS",
+        `${interaction.user.tag} (${interaction.user.id}) used command ` +
+            `"${interaction.commandName}" in ${interaction.guild ? `${interaction.guild.name} (${interaction.guild.id})` : "DMs"}`,
+        "info",
+    );
+
+    // Use the CommandHandler class if it exists
+    if (client.commandHandler && typeof client.commandHandler.executeCommand === "function") {
+        await client.commandHandler.executeCommand(interaction);
+    } else {
+        // Fallback to direct command execution
+        const command = client.commands.get(interaction.commandName);
 
         if (!command) {
-            Logger.log(
-                "COMMANDS",
-                `No context menu command matching ${interaction.commandName} was found.`,
-                "warning",
-            );
+            await interaction.reply({
+                content: "This command is no longer available or has been disabled.",
+                ephemeral: true,
+            });
             return;
         }
 
         try {
             await command.execute(interaction);
         } catch (error) {
-            Logger.log(
-                "COMMANDS",
-                `Error executing context menu ${interaction.commandName}: ${error.message}`,
-                "error",
+            await handleError(
+                interaction,
+                error,
+                "COMMAND_EXECUTION",
+                "An error occurred while executing this command.",
             );
-            if (!interaction.replied && !interaction.deferred) {
-                await interaction.reply({
-                    content: "There was an error while executing this command.",
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
         }
-    },
+    }
+}
 
-    /**
-     * Handles button interactions
-     *
-     * @param {Object} interaction - The interaction object
-     */
-    async handleButtonInteraction(interaction) {
-        const [type, ...args] = interaction.customId.split("_");
+/**
+ * Handles button interactions
+ * @param {import('discord.js').ButtonInteraction} interaction - The button interaction
+ */
+async function handleButtonInteraction(interaction) {
+    const { client, customId } = interaction;
 
-        // Generic button handler - routes buttons to their handlers based on type prefix
-        switch (type) {
-            case "help":
-                // Example: Route to help system buttons
-                const helpCommand = interaction.client.commands.get("help");
-                if (helpCommand && helpCommand.handleButton) {
-                    await helpCommand.handleButton(interaction, args);
-                }
-                break;
+    // Log button interaction
+    Logger.log(
+        "BUTTONS",
+        `${interaction.user.tag} clicked button "${customId}" in ${interaction.guild ? interaction.guild.name : "DMs"}`,
+        "info",
+    );
 
-            case "ticket":
-                // Router for ticket system buttons
-                try {
-                    const ticketEvent = require("./ticket_button_interaction");
-                    if (ticketEvent && ticketEvent.execute) {
-                        await ticketEvent.execute(interaction);
-                    }
-                } catch (error) {
-                    Logger.log(
-                        "BUTTONS",
-                        `Ticket button handler not found: ${error.message}`,
-                        "warning",
-                    );
-                    await interaction.reply({
-                        content: "The ticket system is currently unavailable.",
-                        flags: MessageFlags.Ephemeral,
-                    });
-                }
-                break;
-
-            case "error":
-                // Handle error buttons (like "Show Full Error")
-                if (args[0] === "show" && args[1] === "full") {
-                    // This would be handled by the error handler directly
-                }
-                break;
-
-            default:
-                // For custom buttons that don't follow the type_action pattern
-                // Check if we have an event file specifically for this button
-                try {
-                    const customHandler = require(`./buttons/${interaction.customId}`);
-                    if (customHandler && customHandler.execute) {
-                        await customHandler.execute(interaction);
-                    }
-                } catch (error) {
-                    // No handler found, log the unhandled button
-                    Logger.log(
-                        "BUTTONS",
-                        `No handler for button: ${interaction.customId}`,
-                        "warning",
-                    );
-                    await interaction.reply({
-                        content: "This button is not currently configured.",
-                        flags: MessageFlags.Ephemeral,
-                    });
-                }
-                break;
+    // Help command button handling
+    if (customId.startsWith("help_")) {
+        const helpCommand = client.commands.get("help");
+        if (helpCommand && typeof helpCommand.handleButton === "function") {
+            await helpCommand.handleButton(interaction);
+            return;
         }
-    },
+    }
 
-    /**
-     * Handles select menu interactions
-     *
-     * @param {Object} interaction - The interaction object
-     */
-    async handleSelectMenuInteraction(interaction) {
-        // Special case for song-select which doesn't follow the underscore pattern
-        if (interaction.customId === "song-select") {
-            const playCommand = interaction.client.commands.get("play");
-            if (playCommand && playCommand.handleSelectMenu) {
-                await playCommand.handleSelectMenu(interaction);
-                return;
-            }
+    // Ticket button handling (special case based on the project structure)
+    if (customId === "create_ticket" || customId === "open-ticket") {
+        // This will be handled by the dedicated ticket_button_interaction.js event
+        return;
+    }
+
+    // General button handling - look for handlers
+    const buttonHandlers =
+        client.buttonHandlers?.get(customId) ||
+        client.buttonHandlers?.find((handler) => customId.startsWith(handler.prefix));
+
+    if (buttonHandlers) {
+        try {
+            await buttonHandlers.execute(interaction);
+            return;
+        } catch (error) {
+            await handleError(
+                interaction,
+                error,
+                "BUTTON_HANDLER",
+                "An error occurred while processing this button.",
+            );
+            return;
         }
+    }
 
-        // Continue with the normal type_action pattern for other menus
-        const [type, ...args] = interaction.customId.split("_");
+    // If we reach here, no handler was found
+    Logger.log("BUTTONS", `No handler found for button: ${customId}`, "warning");
+}
 
-        // Generic select menu handler - routes to specific handlers
-        switch (type) {
-            case "help":
-                // Example: Route to help system select menus
-                const helpCommand = interaction.client.commands.get("help");
-                if (helpCommand && helpCommand.handleSelectMenu) {
-                    await helpCommand.handleSelectMenu(interaction, args);
-                }
-                break;
+/**
+ * Handles select menu interactions
+ * @param {import('discord.js').StringSelectMenuInteraction} interaction - The select menu interaction
+ */
+async function handleSelectMenuInteraction(interaction) {
+    const { client, customId } = interaction;
 
-            default:
-                // Check for custom select menu handlers
-                try {
-                    const customHandler = require(`./select_menus/${interaction.customId}`);
-                    if (customHandler && customHandler.execute) {
-                        await customHandler.execute(interaction);
-                    }
-                } catch (error) {
-                    Logger.log(
-                        "SELECT_MENU",
-                        `No handler for select menu: ${interaction.customId}`,
-                        "warning",
-                    );
-                    await interaction.reply({
-                        content: "This selection menu is not currently configured.",
-                        flags: MessageFlags.Ephemeral,
-                    });
-                }
-                break;
+    // Log select menu interaction
+    Logger.log(
+        "SELECT_MENUS",
+        `${interaction.user.tag} used select menu "${customId}" with values: ${interaction.values.join(", ")}`,
+        "info",
+    );
+
+    // Help command select menu handling
+    if (customId.startsWith("help_")) {
+        const helpCommand = client.commands.get("help");
+        if (helpCommand && typeof helpCommand.handleSelectMenu === "function") {
+            await helpCommand.handleSelectMenu(interaction);
+            return;
         }
-    },
+    }
 
-    /**
-     * Handles modal submission interactions
-     *
-     * @param {Object} interaction - The interaction object
-     */
-    async handleModalSubmission(interaction) {
-        const [type, ...args] = interaction.customId.split("_");
+    // General select menu handling
+    const selectMenuHandlers =
+        client.selectMenuHandlers?.get(customId) ||
+        client.selectMenuHandlers?.find((handler) => customId.startsWith(handler.prefix));
 
-        // Generic modal submission handler
-        switch (type) {
-            case "ticket":
-                // Example: Handle ticket creation/update modals
-                try {
-                    const ticketModal = require("./modals/ticket_modal");
-                    if (ticketModal && ticketModal.execute) {
-                        await ticketModal.execute(interaction, args);
-                    }
-                } catch (error) {
-                    Logger.log("MODAL", `Error handling ticket modal: ${error.message}`, "error");
-                }
-                break;
-
-            default:
-                // Check for custom modal handlers
-                try {
-                    const customHandler = require(`./modals/${interaction.customId}`);
-                    if (customHandler && customHandler.execute) {
-                        await customHandler.execute(interaction);
-                    }
-                } catch (error) {
-                    Logger.log("MODAL", `No handler for modal: ${interaction.customId}`, "warning");
-                    await interaction.reply({
-                        content: "This form submission could not be processed.",
-                        flags: MessageFlags.Ephemeral,
-                    });
-                }
-                break;
+    if (selectMenuHandlers) {
+        try {
+            await selectMenuHandlers.execute(interaction);
+            return;
+        } catch (error) {
+            await handleError(
+                interaction,
+                error,
+                "SELECT_MENU_HANDLER",
+                "An error occurred while processing this select menu.",
+            );
+            return;
         }
-    },
+    }
 
-    /**
-     * Handles autocomplete interactions
-     *
-     * @param {Object} interaction - The interaction object
-     */
-    async handleAutocomplete(interaction) {
-        const command = interaction.client.commands.get(interaction.commandName);
+    // If we reach here, no handler was found
+    Logger.log("SELECT_MENUS", `No handler found for select menu: ${customId}`, "warning");
+}
 
-        if (!command || !command.autocomplete) {
-            // If no autocomplete handler, just return empty results
-            return await interaction.respond([]);
-        }
+/**
+ * Handles autocomplete interactions
+ * @param {import('discord.js').AutocompleteInteraction} interaction - The autocomplete interaction
+ */
+async function handleAutocompleteInteraction(interaction) {
+    const { client, commandName } = interaction;
 
+    // Get the command
+    const command = client.commands.get(commandName);
+
+    // Check if the command exists and has an autocomplete function
+    if (command && typeof command.autocomplete === "function") {
         try {
             await command.autocomplete(interaction);
         } catch (error) {
             Logger.log(
                 "AUTOCOMPLETE",
-                `Error handling autocomplete for ${interaction.commandName}: ${error.message}`,
+                `Error handling autocomplete for ${commandName}: ${error.message}`,
                 "error",
             );
-            // Try to respond with empty results to prevent the interaction from hanging
-            try {
-                await interaction.respond([]);
-            } catch (respondError) {
-                // Ignore respond errors
-            }
+
+            // Respond with an empty result to prevent the interaction from failing
+            await interaction.respond([]);
         }
-    },
-};
+    } else {
+        // If no autocomplete function exists, respond with an empty result
+        await interaction.respond([]);
+    }
+}
+
+/**
+ * Handles modal submit interactions
+ * @param {import('discord.js').ModalSubmitInteraction} interaction - The modal submit interaction
+ */
+async function handleModalInteraction(interaction) {
+    const { client, customId } = interaction;
+
+    // Log modal submission
+    Logger.log("MODALS", `${interaction.user.tag} submitted modal "${customId}"`, "info");
+
+    // Find handlers for this modal
+    const modalHandlers =
+        client.modalHandlers?.get(customId) ||
+        client.modalHandlers?.find((handler) => customId.startsWith(handler.prefix));
+
+    if (modalHandlers) {
+        try {
+            await modalHandlers.execute(interaction);
+            return;
+        } catch (error) {
+            await handleError(
+                interaction,
+                error,
+                "MODAL_HANDLER",
+                "An error occurred while processing this modal submission.",
+            );
+            return;
+        }
+    }
+
+    // If we reach here, no handler was found
+    Logger.log("MODALS", `No handler found for modal: ${customId}`, "warning");
+}

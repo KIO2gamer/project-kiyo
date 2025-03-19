@@ -63,7 +63,7 @@ module.exports = {
         "/modifychannel text #general new_name:announcements",
         '/modifychannel voice "Voice Chat" permission:view toggle:true role:@Member',
     ],
-    category: "admin",
+
     data: new SlashCommandBuilder()
         .setName("modifychannel")
         .setDescription("Modify channel settings")

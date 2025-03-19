@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("Search for a specific command")
                 .setRequired(false),
         ),
-    category: "utility",
+
     description_full: "Lists all custom commands stored in the bot's database.",
     usage: "/custom_list [search:search_term]",
     examples: ["/custom_list", "/custom_list search:greet"],

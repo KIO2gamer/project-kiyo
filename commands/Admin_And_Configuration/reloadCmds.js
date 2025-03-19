@@ -8,7 +8,7 @@ module.exports = {
         "Reloads bot commands without restarting. Can reload a specific command or all commands.",
     usage: "/reload [command:command_name]",
     examples: ["/reload command:ping", "/reload"],
-    category: "admin",
+
     data: new SlashCommandBuilder()
         .setName("reload")
         .setDescription("Reloads bot commands")

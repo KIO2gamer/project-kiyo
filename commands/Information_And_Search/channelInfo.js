@@ -22,7 +22,7 @@ module.exports = {
         "/channel_info #announcements",
         "/channel_info 123456789012345678 (channel ID)",
     ],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("channel_info")
         .setDescription("Provides detailed information about a specific channel")

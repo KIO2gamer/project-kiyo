@@ -6,7 +6,7 @@ module.exports = {
         "Measures the bot's response time (latency) and displays various connection metrics including WebSocket heartbeat, REST API latency, and database connection status.",
     usage: "/ping",
     examples: ["/ping"],
-    category: "info",
+
     data: new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Check the bot's response time and connection status"),

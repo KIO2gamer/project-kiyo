@@ -29,7 +29,7 @@ module.exports = {
             option.setName("new_alias").setDescription("The new alternate name").setRequired(false),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-    category: "utility",
+
     description_full: "Edits an existing custom command in the bot's database.",
     usage: "/custom_edit <name:command_name_or_alias> <new_message:updated_response> [new_alias:new_alternate_name]",
     examples: [
