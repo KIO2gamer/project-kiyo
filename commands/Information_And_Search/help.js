@@ -5,14 +5,11 @@ const {
     ButtonBuilder,
     ButtonStyle,
     StringSelectMenuBuilder,
-    ComponentType,
+    MessageFlags,
     ModalBuilder,
     TextInputBuilder,
     TextInputStyle,
 } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
-const Logger = require("../../utils/logger");
 const { handleError } = require("../../utils/errorHandler");
 
 // Component IDs for routing
@@ -26,6 +23,7 @@ const COMPONENT_IDS = {
     SEARCH_BUTTON: "help_search",
     REFRESH_BUTTON: "help_refresh",
     SEARCH_MODAL: "help_search_modal",
+    QUIT_BUTTON: "help_quit",
 };
 
 module.exports = {
@@ -134,13 +132,27 @@ module.exports = {
                 .setLabel("Refresh")
                 .setEmoji("🔄")
                 .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId(COMPONENT_IDS.QUIT_BUTTON)
+                .setLabel("Close")
+                .setEmoji("❌")
+                .setStyle(ButtonStyle.Danger),
         );
 
-        await interaction.reply({
-            embeds: [embed],
-            components: [selectRow, buttonRow],
-            ephemeral: true,
-        });
+        // Check if this is the initial command or an update to an existing message
+        if (interaction.isCommand()) {
+            await interaction.reply({
+                embeds: [embed],
+                components: [selectRow, buttonRow],
+                flags: MessageFlags.Ephemeral,
+            });
+        } else {
+            await interaction.update({
+                content: null, // Remove any previous content
+                embeds: [embed],
+                components: [selectRow, buttonRow],
+            });
+        }
     },
 
     /**
@@ -200,12 +212,12 @@ module.exports = {
             if (interaction.replied || interaction.deferred) {
                 return interaction.followUp({
                     content: `Command \`${commandName}\` not found. Try using /help to see all available commands.`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             } else {
                 return interaction.reply({
                     content: `Command \`${commandName}\` not found. Try using /help to see all available commands.`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
         }
@@ -256,6 +268,11 @@ module.exports = {
                 .setCustomId(COMPONENT_IDS.REFRESH_BUTTON)
                 .setLabel("Refresh")
                 .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId(COMPONENT_IDS.QUIT_BUTTON)
+                .setLabel("Close")
+                .setEmoji("❌")
+                .setStyle(ButtonStyle.Danger),
         );
 
         // Check if this is a new interaction or an update to an existing one
@@ -263,7 +280,7 @@ module.exports = {
             await interaction.reply({
                 embeds: [embed],
                 components: [row],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         } else {
             await interaction.update({
@@ -344,6 +361,11 @@ module.exports = {
                 .setCustomId(COMPONENT_IDS.REFRESH_BUTTON)
                 .setLabel("Refresh")
                 .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId(COMPONENT_IDS.QUIT_BUTTON)
+                .setLabel("Close")
+                .setEmoji("❌")
+                .setStyle(ButtonStyle.Danger),
         );
 
         await interaction.update({
@@ -490,6 +512,14 @@ module.exports = {
                     await this.displayOverview(interaction);
                 }
                 break;
+
+            case COMPONENT_IDS.QUIT_BUTTON:
+                await interaction.update({
+                    content: "Help menu closed.",
+                    embeds: [],
+                    components: [],
+                });
+                break;
         }
     },
 
@@ -498,97 +528,61 @@ module.exports = {
      * @param {Object} interaction - The interaction object
      */
     async handleSearchButton(interaction) {
-        // Create a search results embed
-        const embed = new EmbedBuilder()
-            .setTitle("🔍 Command Search")
-            .setDescription("Enter a search term to find commands:")
-            .setColor("#3498db")
-            .setFooter({
-                text: "Type keywords to search by name or description",
-                iconURL: interaction.client.user.displayAvatarURL(),
-            })
-            .setTimestamp();
-
-        // Create a search input component
-        const searchRow = new ActionRowBuilder().addComponents(
-            new TextInputBuilder()
-                .setCustomId("help_search_input")
-                .setLabel("Search Commands")
-                .setPlaceholder("Enter keywords (e.g., music, role, server)")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true)
-                .setMinLength(1)
-                .setMaxLength(50),
-        );
-
-        // Create a modal to contain our input component
+        // Create a modal with a search input field
         const modal = new ModalBuilder()
-            .setCustomId("help_search_modal")
-            .setTitle("Search Commands")
-            .addComponents(searchRow);
+            .setCustomId(COMPONENT_IDS.SEARCH_MODAL)
+            .setTitle("Search Commands");
 
-        // Show the modal
+        const searchInput = new TextInputBuilder()
+            .setCustomId("search_term")
+            .setLabel("Search Term")
+            .setPlaceholder("Enter command name or keywords")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMinLength(1)
+            .setMaxLength(100);
+
+        const actionRow = new ActionRowBuilder().addComponents(searchInput);
+        modal.addComponents(actionRow);
+
         await interaction.showModal(modal);
     },
 
     /**
      * Handle search modal submission
-     * @param {Object} interaction - The modal submission interaction
+     * @param {Object} interaction - The interaction object
      */
     async handleSearchModal(interaction) {
-        const searchTerm = interaction.fields.getTextInputValue("help_search_input").toLowerCase();
+        const searchTerm = interaction.fields.getTextInputValue("search_term").toLowerCase();
         const commands = interaction.client.commands;
-        const results = [];
 
-        // Search through commands
+        // Find matching commands
+        const results = [];
         for (const command of commands.values()) {
             const name = command.data.name.toLowerCase();
             const description = command.data.description.toLowerCase();
-            const fullDesc = (command.description_full || "").toLowerCase();
 
-            // Check if search term appears in name or description
-            if (
-                name.includes(searchTerm) ||
-                description.includes(searchTerm) ||
-                fullDesc.includes(searchTerm)
-            ) {
+            if (name.includes(searchTerm) || description.includes(searchTerm)) {
                 results.push(command);
             }
         }
 
-        // Sort results by relevance (exact name matches first)
-        results.sort((a, b) => {
-            const aName = a.data.name.toLowerCase();
-            const bName = b.data.name.toLowerCase();
-
-            // Exact name matches come first
-            if (aName === searchTerm && bName !== searchTerm) return -1;
-            if (bName === searchTerm && aName !== searchTerm) return 1;
-
-            // Then name contains
-            if (aName.includes(searchTerm) && !bName.includes(searchTerm)) return -1;
-            if (bName.includes(searchTerm) && !aName.includes(searchTerm)) return 1;
-
-            // Alphabetical order for equal relevance
-            return aName.localeCompare(bName);
-        });
-
-        // Create embed for search results
+        // Create embed with results
         const embed = new EmbedBuilder()
             .setTitle(`🔍 Search Results: "${searchTerm}"`)
             .setColor("#3498db")
+            .setTimestamp()
             .setFooter({
-                text: `Found ${results.length} commands matching your search`,
+                text: `Found ${results.length} matching commands`,
                 iconURL: interaction.client.user.displayAvatarURL(),
-            })
-            .setTimestamp();
+            });
 
         if (results.length === 0) {
             embed.setDescription("No commands found matching your search term.");
         } else {
             embed.setDescription(`Here are the commands that match your search:`);
 
-            // Add results (up to 15)
+            // Add results to the embed (up to 15 to avoid hitting embed limits)
             results.slice(0, 15).forEach((cmd) => {
                 embed.addFields({
                     name: cmd.data.name,
@@ -598,7 +592,7 @@ module.exports = {
 
             if (results.length > 15) {
                 embed.addFields({
-                    name: `... and ${results.length - 15} more results`,
+                    name: `... and ${results.length - 15} more matches`,
                     value: "Try refining your search for more specific results.",
                 });
             }
@@ -636,14 +630,19 @@ module.exports = {
                 .setLabel("New Search")
                 .setEmoji("🔍")
                 .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(COMPONENT_IDS.QUIT_BUTTON)
+                .setLabel("Close")
+                .setEmoji("❌")
+                .setStyle(ButtonStyle.Danger),
         );
         components.push(buttonRow);
 
-        // Reply with search results
-        await interaction.reply({
+        // Use update instead of reply
+        await interaction.update({
+            content: null, // Remove any previous content
             embeds: [embed],
             components: components,
-            ephemeral: true,
         });
     },
 };

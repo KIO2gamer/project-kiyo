@@ -28,7 +28,7 @@ module.exports = {
         if (!member) {
             return interaction.followUp({
                 content: "That user is not in this server.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -86,7 +86,7 @@ module.exports = {
             Logger.log("COMMANDS", `Error executing level command: ${error.message}`, "error");
             await interaction.followUp({
                 content: "There was an error fetching level information.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },

@@ -87,7 +87,7 @@ module.exports = {
         if (!interaction.memberPermissions.has(PermissionFlagsBits.ManageGuild)) {
             return interaction.reply({
                 content: "You need the **Manage Server** permission to use this command.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -190,7 +190,7 @@ module.exports = {
                             return interaction.reply({
                                 content:
                                     "I cannot assign this role as it's positioned higher than my highest role.",
-                                ephemeral: true,
+                                flags: MessageFlags.Ephemeral,
                             });
                         }
 
@@ -221,7 +221,7 @@ module.exports = {
             );
             return interaction.reply({
                 content: "There was an error saving the level settings.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },

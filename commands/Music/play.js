@@ -166,7 +166,7 @@ module.exports = {
         if (!selectionData) {
             return interaction.reply({
                 content: "Your song selection has expired. Please run the play command again.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -197,7 +197,7 @@ module.exports = {
             queue.delete();
             return interaction.reply({
                 content: "Could not join your voice channel!",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -244,7 +244,7 @@ module.exports = {
             if (!searchResult.tracks.length) {
                 return interaction.reply({
                     content: "No results found! Please try the search again.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -256,7 +256,7 @@ module.exports = {
             if (!voiceChannel) {
                 return interaction.reply({
                     content: "You need to be in a voice channel to play music!",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -279,7 +279,7 @@ module.exports = {
                 queue.delete();
                 return interaction.reply({
                     content: "Could not join your voice channel!",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -304,7 +304,7 @@ module.exports = {
             console.error("Error in song selection handler:", error);
             return interaction.reply({
                 content: "There was an error while processing your selection.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },

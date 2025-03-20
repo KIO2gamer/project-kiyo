@@ -27,7 +27,7 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
             const channel = interaction.options.getChannel("channel");
 
             // Validate channel

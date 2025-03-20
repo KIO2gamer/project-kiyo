@@ -33,7 +33,7 @@ module.exports = {
             if (page > totalPages) {
                 return interaction.followUp({
                     content: `Invalid page. There are only ${totalPages} pages available.`,
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -82,7 +82,7 @@ module.exports = {
             );
             await interaction.followUp({
                 content: "There was an error fetching the leaderboard.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },

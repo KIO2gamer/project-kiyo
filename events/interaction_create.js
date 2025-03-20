@@ -1,4 +1,4 @@
-const { Events, InteractionType } = require("discord.js");
+const { Events, InteractionType, MessageFlags } = require("discord.js");
 const Logger = require("../utils/logger");
 const { handleError } = require("../utils/errorHandler");
 
@@ -31,14 +31,6 @@ module.exports = {
             } else if (interaction.isModalSubmit()) {
                 // Handle modal submit interactions
                 await handleModalInteraction(interaction);
-
-                // Add this to your interactionCreate.js event handler
-                if (interaction.isModalSubmit() && interaction.customId === "help_search_modal") {
-                    const helpCommand = interaction.client.commands.get("help");
-                    if (helpCommand && typeof helpCommand.handleSearchModal === "function") {
-                        await helpCommand.handleSearchModal(interaction);
-                    }
-                }
             }
         } catch (error) {
             Logger.log("INTERACTION", `Error handling interaction: ${error.message}`, "error");
@@ -63,14 +55,6 @@ module.exports = {
 async function handleCommandInteraction(interaction) {
     const { client } = interaction;
 
-    // Log command usage
-    Logger.log(
-        "COMMANDS",
-        `${interaction.user.tag} (${interaction.user.id}) used command ` +
-            `"${interaction.commandName}" in ${interaction.guild ? `${interaction.guild.name} (${interaction.guild.id})` : "DMs"}`,
-        "info",
-    );
-
     // Use the CommandHandler class if it exists
     if (client.commandHandler && typeof client.commandHandler.executeCommand === "function") {
         await client.commandHandler.executeCommand(interaction);
@@ -81,7 +65,7 @@ async function handleCommandInteraction(interaction) {
         if (!command) {
             await interaction.reply({
                 content: "This command is no longer available or has been disabled.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -105,13 +89,6 @@ async function handleCommandInteraction(interaction) {
  */
 async function handleButtonInteraction(interaction) {
     const { client, customId } = interaction;
-
-    // Log button interaction
-    Logger.log(
-        "BUTTONS",
-        `${interaction.user.tag} clicked button "${customId}" in ${interaction.guild ? interaction.guild.name : "DMs"}`,
-        "info",
-    );
 
     // Help command button handling
     if (customId.startsWith("help_")) {
@@ -158,13 +135,6 @@ async function handleButtonInteraction(interaction) {
  */
 async function handleSelectMenuInteraction(interaction) {
     const { client, customId } = interaction;
-
-    // Log select menu interaction
-    Logger.log(
-        "SELECT_MENUS",
-        `${interaction.user.tag} used select menu "${customId}" with values: ${interaction.values.join(", ")}`,
-        "info",
-    );
 
     // Help command select menu handling
     if (customId.startsWith("help_")) {
@@ -236,8 +206,33 @@ async function handleAutocompleteInteraction(interaction) {
 async function handleModalInteraction(interaction) {
     const { client, customId } = interaction;
 
-    // Log modal submission
-    Logger.log("MODALS", `${interaction.user.tag} submitted modal "${customId}"`, "info");
+    // Special case for help command search modal
+    if (customId === "help_search_modal") {
+        const helpCommand = client.commands.get("help");
+        if (helpCommand && typeof helpCommand.handleSearchModal === "function") {
+            try {
+                await helpCommand.handleSearchModal(interaction);
+                return;
+            } catch (error) {
+                console.error("Error handling search modal:", error);
+                // Don't create a new message, update the existing one if possible
+                await interaction
+                    .update({
+                        content: "Something went wrong with the search. Please try again.",
+                        embeds: [],
+                        components: [],
+                    })
+                    .catch(() => {
+                        // If update fails, then reply
+                        interaction.reply({
+                            content: "Something went wrong with the search. Please try again.",
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    });
+                return;
+            }
+        }
+    }
 
     // Find handlers for this modal
     const modalHandlers =

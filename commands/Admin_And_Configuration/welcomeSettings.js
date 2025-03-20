@@ -89,7 +89,7 @@ module.exports = {
         if (!interaction.memberPermissions.has(PermissionFlagsBits.ManageGuild)) {
             return interaction.reply({
                 content: "You need the **Manage Server** permission to use this command.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
@@ -130,7 +130,7 @@ module.exports = {
                     await settings.save();
                     return interaction.reply({
                         content: `✅ Welcome messages have been ${enabled ? "enabled" : "disabled"} for this server.`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -142,7 +142,7 @@ module.exports = {
                     if (!permissions.has("SendMessages") || !permissions.has("ViewChannel")) {
                         return interaction.reply({
                             content: "I don't have permission to send messages in that channel.",
-                            ephemeral: true,
+                            flags: MessageFlags.Ephemeral,
                         });
                     }
 
@@ -151,7 +151,7 @@ module.exports = {
                     await settings.save();
                     return interaction.reply({
                         content: `✅ Welcome messages will be sent to ${channel}.`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -162,7 +162,7 @@ module.exports = {
                     await settings.save();
                     return interaction.reply({
                         content: `✅ Welcome message has been set to:\n> ${content}`,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -184,7 +184,7 @@ module.exports = {
 
                     return interaction.reply({
                         content: response,
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -241,7 +241,7 @@ module.exports = {
 
                     return interaction.reply({
                         embeds: [embed],
-                        ephemeral: true,
+                        flags: MessageFlags.Ephemeral,
                     });
                 }
             }
@@ -253,7 +253,7 @@ module.exports = {
             );
             return interaction.reply({
                 content: "There was an error saving the welcome settings.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
     },
