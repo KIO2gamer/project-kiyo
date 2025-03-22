@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require("disc
 const { formatUptime } = require("../../utils/formatUptime");
 const { handleError } = require("../../utils/errorHandler");
 const os = require("os");
-const { version } = require("../../package.json");
+const { version } = require("./../../../package.json");
 
 const { MessageFlags } = require("discord.js");
 
