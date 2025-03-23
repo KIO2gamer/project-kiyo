@@ -73,7 +73,6 @@ module.exports = {
                 .setTimestamp();
 
             await interaction.followUp({ embeds: [embed] });
-            Logger.log("COMMANDS", `Leaderboard command used by ${interaction.user.tag}`, "info");
         } catch (error) {
             Logger.log(
                 "COMMANDS",

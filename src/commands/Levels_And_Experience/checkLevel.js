@@ -81,7 +81,6 @@ module.exports = {
                 .setTimestamp();
 
             await interaction.followUp({ embeds: [embed] });
-            Logger.log("COMMANDS", `Level command used by ${interaction.user.tag}`, "info");
         } catch (error) {
             Logger.log("COMMANDS", `Error executing level command: ${error.message}`, "error");
             await interaction.followUp({
