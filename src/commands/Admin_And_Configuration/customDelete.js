@@ -88,7 +88,7 @@ module.exports = {
                 .catch(() => null);
 
             if (!confirmation) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: "Command deletion timed out.",
                     components: [],
                 });
@@ -97,14 +97,14 @@ module.exports = {
 
             if (confirmation.customId === "delete_confirm") {
                 await cc.deleteOne({ _id: cc_record._id });
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Custom command "${command_name}"${
                         alias_name ? ` (alias: ${alias_name})` : ""
                     } deleted successfully!`,
                     components: [],
                 });
             } else {
-                await interaction.reply({
+                await interaction.editReply({
                     content: "Command deletion cancelled.",
                     components: [],
                 });

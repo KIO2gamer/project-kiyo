@@ -7,7 +7,12 @@ module.exports = {
         .setName("custom_add")
         .setDescription("Adds a custom command")
         .addStringOption((option) =>
-            option.setName("name").setDescription("The main name of the command").setRequired(true),
+            option
+                .setName("name")
+                .setDescription("The main name of the command")
+                .setMinLength(3)
+                .setMaxLength(20)
+                .setRequired(true),
         )
         .addStringOption((option) =>
             option

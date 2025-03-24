@@ -10,6 +10,7 @@
  */
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const math = require("mathjs"); // Import mathjs
+const { handleError } = require("../../utils/errorHandler");
 
 const { MessageFlags } = require("discord.js");
 

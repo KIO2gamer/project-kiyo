@@ -67,22 +67,22 @@ module.exports = {
                             await collection.drop();
                         }
 
-                        await interaction.reply("✅ Database has been completely wiped.");
+                        await interaction.editReply("✅ Database has been completely wiped.");
                     } catch (error) {
                         handleError("Database clear error:", error);
-                        await interaction.reply(
+                        await interaction.editReply(
                             "❌ An error occurred while clearing the database.",
                         );
                     }
                 } else {
-                    await interaction.reply("❌ Database wipe cancelled.");
+                    await interaction.editReply("❌ Database wipe cancelled.");
                 }
                 message.delete().catch((error) => handleError("Failed to delete message:", error));
             });
 
             collector.on("end", (collected) => {
                 if (collected.size === 0) {
-                    interaction.followUp({
+                    interaction.editReply({
                         content: "❌ Command timed out. Database wipe cancelled.",
                         flags: MessageFlags.Ephemeral,
                     });
@@ -90,7 +90,7 @@ module.exports = {
             });
         } catch (error) {
             handleError("Command error:", error);
-            await interaction.followUp({
+            await interaction.editReply({
                 content: "❌ An error occurred while executing the command.",
                 flags: MessageFlags.Ephemeral,
             });

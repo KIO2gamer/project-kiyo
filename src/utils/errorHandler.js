@@ -224,17 +224,20 @@ async function handleError(...args) {
     // Update error statistics
     updateErrorStats(category, errorMessage);
 
-    // Log error with context
-    Logger.log(
-        "ERROR",
-        {
-            category,
-            message: errorMessage,
-            context: commandContext,
-            timestamp,
-        },
-        "error",
-    );
+    // Format error output for the console terminal
+    const formattedLog = `
+===========================================
+[${timestamp}] [${category}] ${ERROR_CATEGORIES[category].emoji} ${ERROR_CATEGORIES[category].message}
+
+Context:
+${JSON.stringify(commandContext, null, 2)}
+
+Error Message:
+${errorMessage}
+===========================================
+`;
+    // Output to the terminal with formatting
+    console.error(formattedLog);
 
     // If no interaction, we're done after logging
     if (!interaction) return;
@@ -264,7 +267,7 @@ async function handleError(...args) {
                         flags: MessageFlags.Ephemeral,
                     }));
 
-        // Set up button collector
+        // Set up button collector for showing technical details
         const collector = response.createMessageComponentCollector({
             time: 60000,
             filter: (i) => i.user.id === interaction.user.id,
@@ -277,7 +280,6 @@ async function handleError(...args) {
                     .setDescription(`\`\`\`js\n${errorMessage.substring(0, 1900)}\n\`\`\``)
                     .setColor(ERROR_CATEGORIES[category].color)
                     .setTimestamp();
-
                 await i.update({ embeds: [detailsEmbed], components: [] });
             }
         });

@@ -1,4 +1,9 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require("discord.js");
+const {
+    SlashCommandBuilder,
+    PermissionFlagsBits,
+    EmbedBuilder,
+    MessageFlags,
+} = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 const path = require("path");
 const fs = require("fs");
@@ -31,6 +36,7 @@ module.exports = {
             });
 
             if (commandName) {
+                // Command name is provided, reload specific command
                 await this.reloadSingleCommand(
                     interaction,
                     commandName,
@@ -38,6 +44,7 @@ module.exports = {
                     commandFolders,
                 );
             } else {
+                // No command name provided, reload all commands
                 await this.reloadAllCommands(interaction, foldersPath, commandFolders);
             }
         } catch (error) {
@@ -64,11 +71,9 @@ module.exports = {
                 return;
             }
 
-            // Clear require cache and reload command
-            delete require.cache[require.resolve(commandPath)];
-
             try {
-                interaction.client.commands.delete(commandName);
+                // Load the new command first before removing the old one
+                delete require.cache[require.resolve(commandPath)];
                 const newCommand = require(commandPath);
 
                 // Validate command structure
@@ -76,6 +81,8 @@ module.exports = {
                     throw new Error("Invalid command structure");
                 }
 
+                // Only after validation, remove old command and add new one
+                interaction.client.commands.delete(commandName);
                 interaction.client.commands.set(newCommand.data.name, newCommand);
 
                 const successEmbed = new EmbedBuilder()
@@ -129,6 +136,8 @@ module.exports = {
             let reloadedCount = 0;
             let errorCount = 0;
             const errors = [];
+            // Store old commands in case of errors
+            const oldCommands = new Map(interaction.client.commands);
 
             for (const folder of commandFolders) {
                 const folderPath = path.join(foldersPath, folder);

@@ -81,11 +81,6 @@ module.exports = {
                     content: customCommand.message,
                     allowedMentions: { parse: ["users", "roles"] },
                 });
-
-                // Log command usage (optional)
-                console.log(
-                    `Custom command "${customCommand.name}" executed by ${interaction.user.tag}`,
-                );
             } catch (error) {
                 if (error.code === 50006) {
                     await handleError(

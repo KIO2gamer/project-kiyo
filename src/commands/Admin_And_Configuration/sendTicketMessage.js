@@ -6,207 +6,186 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    Colors,
 } = require("discord.js");
-const { handleError } = require("../../utils/errorHandler");
 const TicketConfig = require("./../../database/ticketConfig");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
-    description_full: "Sends a message with a button that users can click to create a new ticket.",
+    description_full: "Creates a message with a button for users to open tickets",
     usage: "/send_ticket_message channel:#channel title:text description:text button_text:text",
     examples: [
-        "/send_ticket_message channel:#support title:Support Tickets description:Click below to create a ticket button_text:Create Ticket",
-        "/send_ticket_message channel:#help title:Need Help? description:Get assistance from our team button_text:Open Ticket",
+        "/send_ticket_message channel:#support title:Get Help description:Click below to contact our team button_text:Open Ticket",
     ],
+
     data: new SlashCommandBuilder()
         .setName("send_ticket_message")
-        .setDescription("Sends a message with a button to create tickets.")
+        .setDescription("Create a ticket panel with button")
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .addChannelOption((option) =>
             option
                 .setName("channel")
-                .setDescription("The channel to send the ticket message in")
+                .setDescription("Where to send the ticket panel")
                 .setRequired(true)
                 .addChannelTypes(ChannelType.GuildText),
         )
         .addStringOption((option) =>
-            option
-                .setName("title")
-                .setDescription("The title of the ticket message")
-                .setRequired(true),
+            option.setName("title").setDescription("Panel title").setRequired(true),
         )
         .addStringOption((option) =>
-            option
-                .setName("description")
-                .setDescription("The description of the ticket message")
-                .setRequired(true),
+            option.setName("description").setDescription("Panel description").setRequired(true),
         )
         .addStringOption((option) =>
             option
                 .setName("button_text")
-                .setDescription("The text to display on the ticket button")
+                .setDescription("Text for the ticket button")
                 .setRequired(true),
         ),
 
     async execute(interaction) {
-        try {
-            await interaction.deferReply();
+        await interaction.deferReply();
 
+        try {
+            // Get command options
             const channel = interaction.options.getChannel("channel");
             const title = interaction.options.getString("title");
             const description = interaction.options.getString("description");
             const buttonText = interaction.options.getString("button_text");
 
-            // Validate channel
-            if (!channel) {
-                await handleError(
-                    interaction,
-                    new Error("No channel provided"),
-                    "VALIDATION",
-                    "Please provide a valid text channel.",
-                );
-                return;
+            // Validate inputs
+            if (!channel || channel.type !== ChannelType.GuildText) {
+                return await interaction.editReply("⚠️ Please select a valid text channel.");
             }
 
-            // Check if channel is in the same guild
-            if (channel.guildId !== interaction.guildId) {
-                await handleError(
-                    interaction,
-                    new Error("Invalid channel guild"),
-                    "VALIDATION",
-                    "The channel must be in this server.",
+            if (channel.guild.id !== interaction.guild.id) {
+                return await interaction.editReply("⚠️ The channel must be in this server.");
+            }
+
+            if (!title || title.length > 256) {
+                return await interaction.editReply(
+                    "⚠️ Title is required and must be 256 characters or less.",
                 );
-                return;
+            }
+
+            if (!description || description.length > 4000) {
+                return await interaction.editReply(
+                    "⚠️ Description is required and must be 4000 characters or less.",
+                );
+            }
+
+            if (!buttonText || buttonText.length > 80) {
+                return await interaction.editReply(
+                    "⚠️ Button text is required and must be 80 characters or less.",
+                );
             }
 
             // Check bot permissions in the channel
             const botMember = interaction.guild.members.me;
             const requiredPermissions = [
-                PermissionFlagsBits.ViewChannel,
-                PermissionFlagsBits.SendMessages,
-                PermissionFlagsBits.EmbedLinks,
+                { flag: PermissionFlagsBits.ViewChannel, name: "View Channel" },
+                { flag: PermissionFlagsBits.SendMessages, name: "Send Messages" },
+                { flag: PermissionFlagsBits.EmbedLinks, name: "Embed Links" },
             ];
 
-            const missingPermissions = requiredPermissions.filter(
-                (perm) => !channel.permissionsFor(botMember).has(perm),
-            );
+            const missingPermissions = requiredPermissions
+                .filter((perm) => !channel.permissionsFor(botMember).has(perm.flag))
+                .map((perm) => perm.name);
 
             if (missingPermissions.length > 0) {
-                const permissionNames = missingPermissions.map((perm) =>
-                    Object.keys(PermissionFlagsBits)
-                        .find((key) => PermissionFlagsBits[key] === perm)
-                        .replace(/_/g, " ")
-                        .toLowerCase(),
+                return await interaction.editReply(
+                    `⚠️ I'm missing these permissions in ${channel}:\n• ${missingPermissions.join("\n• ")}`,
                 );
-
-                await handleError(
-                    interaction,
-                    new Error("Missing channel permissions"),
-                    "PERMISSION",
-                    `I need the following permissions in ${channel}: ${permissionNames.join(", ")}`,
-                );
-                return;
             }
 
-            // Validate input lengths
-            if (title.length > 256) {
-                await handleError(
-                    interaction,
-                    new Error("Title too long"),
-                    "VALIDATION",
-                    "The title must be 256 characters or less.",
-                );
-                return;
+            // Get ticket configuration
+            const ticketConfig = await TicketConfig.findOne({ guildId: interaction.guild.id });
+
+            if (!ticketConfig || !ticketConfig.ticketCategoryId) {
+                return await interaction.editReply({
+                    content:
+                        "⚠️ Ticket system not configured. Please use `/set_ticket_category` first.",
+                    ephemeral: true,
+                });
             }
 
-            if (description.length > 4096) {
-                await handleError(
-                    interaction,
-                    new Error("Description too long"),
-                    "VALIDATION",
-                    "The description must be 4096 characters or less.",
+            // Verify the category still exists
+            const category = interaction.guild.channels.cache.get(ticketConfig.ticketCategoryId);
+            if (!category || category.type !== ChannelType.GuildCategory) {
+                return await interaction.editReply(
+                    "⚠️ The configured ticket category no longer exists. Please use `/set_ticket_category` again.",
                 );
-                return;
             }
 
-            if (buttonText.length > 80) {
-                await handleError(
-                    interaction,
-                    new Error("Button text too long"),
-                    "VALIDATION",
-                    "The button text must be 80 characters or less.",
-                );
-                return;
-            }
+            // Create ticket panel embed
+            const ticketEmbed = new EmbedBuilder()
+                .setTitle(title)
+                .setDescription(description)
+                .setColor(Colors.Blue)
+                .addFields({
+                    name: "How to Use",
+                    value: "Click the button below to create a private support ticket.",
+                })
+                .setFooter({
+                    text: `${interaction.guild.name} • Ticket System`,
+                    iconURL: interaction.guild.iconURL(),
+                })
+                .setTimestamp();
 
+            // Create button
+            const button = new ButtonBuilder()
+                .setCustomId("create_ticket")
+                .setLabel(buttonText)
+                .setStyle(ButtonStyle.Primary)
+                .setEmoji("🎫");
+
+            const row = new ActionRowBuilder().addComponents(button);
+
+            // Send the ticket panel
+            let ticketMessage;
             try {
-                // Check if ticket config exists
-                const ticketConfig = await TicketConfig.findOne({ guildId: interaction.guild.id });
-                if (!ticketConfig || !ticketConfig.categoryId) {
-                    await handleError(
-                        interaction,
-                        new Error("Ticket category not set"),
-                        "SETUP",
-                        "Please set up the ticket category first using the `/set_ticket_category` command.",
-                    );
-                    return;
-                }
-
-                // Create ticket message embed
-                const ticketEmbed = new EmbedBuilder()
-                    .setTitle(title)
-                    .setDescription(description)
-                    .setColor("Blue")
-                    .setFooter({
-                        text: `${interaction.guild.name} • Ticket System`,
-                        iconURL: interaction.guild.iconURL(),
-                    })
-                    .setTimestamp();
-
-                // Create ticket button
-                const button = new ButtonBuilder()
-                    .setCustomId("create_ticket")
-                    .setLabel(buttonText)
-                    .setStyle(ButtonStyle.Primary)
-                    .setEmoji("🎫");
-
-                const row = new ActionRowBuilder().addComponents(button);
-
-                // Send ticket message
-                const ticketMessage = await channel.send({
+                ticketMessage = await channel.send({
                     embeds: [ticketEmbed],
                     components: [row],
                 });
-
-                // Send confirmation
-                const confirmEmbed = new EmbedBuilder()
-                    .setTitle("Ticket Message Sent")
-                    .setDescription(`Successfully sent the ticket message in ${channel}`)
-                    .addFields(
-                        { name: "Message ID", value: ticketMessage.id, inline: true },
-                        { name: "Channel", value: channel.name, inline: true },
-                    )
-                    .setColor("Green")
-                    .setFooter({
-                        text: `Set by ${interaction.user.tag}`,
-                        iconURL: interaction.user.displayAvatarURL(),
-                    })
-                    .setTimestamp();
-
-                await interaction.editReply({ embeds: [confirmEmbed] });
             } catch (error) {
-                await handleError(
-                    interaction,
-                    error,
-                    "DATABASE",
-                    "Failed to set up the ticket message. Please check the database connection.",
+                console.error("Failed to send ticket panel:", error);
+                return await interaction.editReply(
+                    "❌ Failed to send the ticket panel message. Please check my permissions.",
                 );
             }
+
+            // Send confirmation
+            const confirmEmbed = new EmbedBuilder()
+                .setTitle("✅ Ticket Panel Created")
+                .setDescription(`Successfully created a ticket panel in ${channel}`)
+                .setColor(Colors.Green)
+                .addFields([
+                    {
+                        name: "Message Link",
+                        value: `[Click to View](${ticketMessage.url})`,
+                        inline: true,
+                    },
+                    {
+                        name: "Category",
+                        value: category.name,
+                        inline: true,
+                    },
+                ])
+                .setFooter({
+                    text: `Created by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL(),
+                })
+                .setTimestamp();
+
+            await interaction.editReply({ embeds: [confirmEmbed] });
         } catch (error) {
+            console.error("Error in send_ticket_message command:", error);
+
             await handleError(
                 interaction,
                 error,
-                "COMMAND_EXECUTION",
-                "An error occurred while setting up the ticket message.",
+                error.name === "MongooseError" ? "DATABASE" : "COMMAND_EXECUTION",
+                "An error occurred while creating the ticket panel. Please try again.",
             );
         }
     },
