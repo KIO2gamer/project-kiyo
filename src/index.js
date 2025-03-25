@@ -259,6 +259,37 @@ const setupGracefulShutdown = (client) => {
     });
 };
 
+// Add to your bot initialization code
+async function loadCommandPermissions(client) {
+    try {
+        const CommandPermissions = mongoose.model("CommandPermissions");
+        const permissions = await CommandPermissions.find({});
+
+        for (const permDoc of permissions) {
+            const command = client.commands.get(permDoc.commandName);
+            if (command) {
+                // Initialize permissions object if it doesn't exist
+                if (!command.permissions) command.permissions = {};
+
+                // Set role permissions
+                if (!command.permissions.roles) command.permissions.roles = {};
+                for (const [roleId, allowed] of permDoc.permissions.roles.entries()) {
+                    command.permissions.roles[roleId] = allowed;
+                }
+
+                // Set user permissions
+                if (!command.permissions.users) command.permissions.users = {};
+                for (const [userId, allowed] of permDoc.permissions.users.entries()) {
+                    command.permissions.users[userId] = allowed;
+                }
+            }
+        }
+        console.log(`Loaded permissions for ${permissions.length} commands`);
+    } catch (error) {
+        console.error("Error loading command permissions:", error);
+    }
+}
+
 // Initialize the bot
 const initializeBot = async () => {
     try {
@@ -273,6 +304,9 @@ const initializeBot = async () => {
         // Load commands and events
         loadCommands(client, path.join(__dirname, "./commands"));
         loadEvents(client, path.join(__dirname, "./events"));
+
+        // Load command permissions
+        await loadCommandPermissions(client);
 
         // Deploy commands
         await deployCommands(client);

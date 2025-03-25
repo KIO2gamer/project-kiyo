@@ -1,123 +1,147 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 const axios = require("axios");
 
-const GOOGLE_BLUE = "#4285F4"; // Google Blue color
-const GOOGLE_RED = "#EA4335"; // Google Red color for errors
-const MAX_RESULTS = 5; // Number of search results to display
-const MAX_SNIPPET_LENGTH = 200; // Max characters for snippet in embed
-
-const { MessageFlags } = require("discord.js");
+// Constants for styling
+const GOOGLE_COLORS = {
+    blue: "#4285F4",
+    red: "#EA4335",
+    yellow: "#FBBC05",
+    green: "#34A853",
+};
+const MAX_RESULTS = 3; // Reduced for cleaner output
 
 module.exports = {
-    description_full: "Searches Google for the given query and displays the top results.",
+    description_full: "Searches Google and shows the top results in a clean format",
     usage: "/google <query>",
-    examples: ["/google discord bot tutorial", "/google best restaurants near me"],
+    examples: ["/google discord.js guide", "/google how to make pasta"],
 
     data: new SlashCommandBuilder()
         .setName("google")
-        .setDescription("Search Google for a query")
+        .setDescription("Search Google for information")
         .addStringOption((option) =>
-            option.setName("query").setDescription("The search query").setRequired(true),
+            option
+                .setName("query")
+                .setDescription("What do you want to search for?")
+                .setRequired(true),
+        )
+        .addBooleanOption((option) =>
+            option
+                .setName("private")
+                .setDescription("Keep results visible only to you (default: true)")
+                .setRequired(false),
         ),
 
     async execute(interaction) {
         const query = interaction.options.getString("query");
+        const isPrivate = interaction.options.getBoolean("private") ?? true;
+
+        await interaction.deferReply({ ephemeral: isPrivate });
+
+        // Check API configuration
         const apiKey = process.env.GOOGLE_API_KEY;
         const searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
         if (!apiKey || !searchEngineId) {
-            handleError("Google API key or Search Engine ID not found in environment variables.");
-            return interaction.reply({
+            return await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
-                        .setColor(GOOGLE_RED)
-                        .setTitle("⚙️ Command Configuration Error")
+                        .setColor(GOOGLE_COLORS.red)
+                        .setTitle("⚙️ Google Search Not Configured")
                         .setDescription(
-                            "The Google Search command is not properly configured by the server administrator.\n\nPlease inform them to set up the `GOOGLE_API_KEY` and `GOOGLE_SEARCH_ENGINE_ID` environment variables.",
+                            "This command needs to be set up by the server admin first.",
                         ),
                 ],
-                flags: MessageFlags.Ephemeral,
             });
         }
 
         try {
+            // Perform search
             const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
                 params: {
                     key: apiKey,
                     cx: searchEngineId,
                     q: query,
+                    num: MAX_RESULTS + 2, // Request extra results in case some are filtered
                 },
             });
 
-            const results = response.data.items?.slice(0, MAX_RESULTS) || []; // Safely access items and limit results
+            const results = response.data.items || [];
 
+            // Handle no results
             if (results.length === 0) {
-                return interaction.reply({
+                return await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
-                            .setColor(GOOGLE_BLUE)
-                            .setTitle(`🔍 No Results for "${query}"`)
+                            .setColor(GOOGLE_COLORS.blue)
+                            .setTitle(`🔍 No results found`)
                             .setDescription(
-                                `Unfortunately, Google Custom Search did not return any relevant results for the query: \`${query}\`. \n\nPlease try a different or broader search term.`,
+                                `Nothing found for: "${query}"\nTry different keywords or check your spelling.`,
+                            )
+                            .setThumbnail(
+                                "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
                             ),
                     ],
-                    flags: MessageFlags.Ephemeral,
                 });
             }
 
+            // Create the search results embed
             const embed = new EmbedBuilder()
-                .setColor(GOOGLE_BLUE)
-                .setTitle(`🔍 Google Search Results for: "${query}"`) // More descriptive title
-                .setDescription(
-                    `Here are the top ${results.length} search results for your query:\n\n`, // Introduction in description
+                .setColor(GOOGLE_COLORS.blue)
+                .setTitle(`🔍 Google Search Results`)
+                .setDescription(`Search query: **${query}**`)
+                .setThumbnail(
+                    "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
                 )
-                .setURL(`https://www.google.com/search?q=${encodeURIComponent(query)}`) // Link to Google search page
-                .setTimestamp()
-                .setFooter({ text: "Powered by Google Custom Search" }); // Footer for attribution
+                .setURL(`https://www.google.com/search?q=${encodeURIComponent(query)}`)
+                .setFooter({
+                    text: `Click the title to see all results • Powered by Google`,
+                    iconURL: "https://www.google.com/favicon.ico",
+                })
+                .setTimestamp();
 
-            let resultList = ""; // Build the result list string for the description
+            // Add top results as fields (cleaner than description)
+            results.slice(0, MAX_RESULTS).forEach((item, index) => {
+                // Clean up snippets, removing HTML and excess whitespace
+                let snippet = item.snippet || "No description available";
+                snippet = snippet.replace(/(\r\n|\n|\r)/gm, " ").trim();
 
-            results.forEach((item, index) => {
-                const title = item.title;
-                const link = item.link;
-                let snippet = item.snippet || "No description available."; // Fallback for missing snippet
-
-                // Clean up snippet and truncate if necessary
-                snippet = snippet.replace(/(\r\n|\n|\r)/gm, " ").trim(); // Replace line breaks with spaces and trim
-                if (snippet.length > MAX_SNIPPET_LENGTH) {
-                    snippet = snippet.substring(0, MAX_SNIPPET_LENGTH) + "..."; // Truncate and add ellipsis
+                // Truncate snippet if needed
+                if (snippet.length > 120) {
+                    snippet = snippet.substring(0, 120) + "...";
                 }
 
-                resultList += `${index + 1}. **[${title}](${link})**\n`; // Markdown title and link
-                resultList += `${snippet}\n\n`; // Snippet with spacing
+                // Add result as a field
+                embed.addFields({
+                    name: `${index + 1}. ${item.title}`,
+                    value: `${snippet}\n[View page](${item.link})`,
+                });
             });
 
-            embed.setDescription(embed.data.description + resultList); // Append results to description
+            // Add a view all results button link
+            embed.addFields({
+                name: `Want more results?`,
+                value: `[View all results on Google](https://www.google.com/search?q=${encodeURIComponent(query)})`,
+            });
 
-            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            handleError("Error performing Google search:", error);
-            let errorMessage =
-                "An error occurred while performing the search. Please try again later.";
+            console.error("Google search error:", error);
 
-            if (error.response) {
-                // API error details
-                errorMessage = `Google Search API Error: ${error.response.status} ${error.response.statusText}\n${error.response.data?.error?.message || "No detailed error message available."}`;
-                handleError("Google API Error Details:", error.response.data); // Log detailed API error
-            } else if (error.request) {
-                errorMessage =
-                    "Error reaching Google Search API. Please check your internet connection or the service might be temporarily unavailable.";
-            }
+            // Create a simple, clean error message
+            const errorEmbed = new EmbedBuilder()
+                .setColor(GOOGLE_COLORS.red)
+                .setTitle("⚠️ Search Failed")
+                .setDescription("Something went wrong with your search request.")
+                .addFields({
+                    name: "What happened?",
+                    value:
+                        error.response?.data?.error?.message ||
+                        "Could not connect to Google Search. Please try again later.",
+                })
+                .setFooter({ text: "This is most likely a temporary issue" });
 
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(GOOGLE_RED)
-                        .setTitle("⚠️ Search Error")
-                        .setDescription(errorMessage),
-                ],
-                flags: MessageFlags.Ephemeral,
-            });
+            await interaction.editReply({ embeds: [errorEmbed] });
         }
     },
 };
