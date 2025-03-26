@@ -1,3 +1,5 @@
+# ⚠️⚠️⚠️ THIS PROJECT IS NOW ARCHIVED. I AM REBUILDING THE WHOLE PROJECT IN A NEW REPOSITORY
+
 # Project Kiyo
 
 A multipurpose Discord bot built with [discord.js](https://discord.js.org/) featuring slash commands and various API integrations.
