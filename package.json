@@ -2,7 +2,7 @@
   "name": "project-kiyo",
   "version": "2.0.0",
   "description": "A multi-purpose discord.js bot with 100 slash commands and various other features to try out!",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/KIO2gamer/project-kiyo#readme",
   "dependencies": {
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.4.7",
     "prettier": "^3.5.3"
   }
 }
