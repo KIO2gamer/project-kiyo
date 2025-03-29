@@ -13,9 +13,10 @@ This github repository is a Discord bot made with mainly discord.js. Here you ca
 
     ```
     git clone https://github.com/KIO2gamer/project-kiyo.git
-    
+
     cd project-kiyo
     ```
+
 2. Use `cp .env.example .env` to copy the example .env file unto the .env file.
 
 3. Fill out the neccessary API keys/tokens into the .env file.
