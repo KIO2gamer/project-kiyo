@@ -4,27 +4,28 @@
 	"description": "A multi-purpose discord.js bot with 100 slash commands and various other features to try out!",
 	"main": "src/index.js",
 	"scripts": {
-		"start": "node src/index.js"
+	  "start": "node src/index.js"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/KIO2gamer/project-kiyo.git"
+	  "type": "git",
+	  "url": "git+https://github.com/KIO2gamer/project-kiyo.git"
 	},
 	"keywords": [
-		"discord.js",
-		"api_integrations",
-		"slash_commands",
-		"bot"
+	  "discord.js",
+	  "api_integrations",
+	  "slash_commands",
+	  "bot"
 	],
 	"author": "KIO2gamer",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/KIO2gamer/project-kiyo/issues"
+	  "url": "https://github.com/KIO2gamer/project-kiyo/issues"
 	},
 	"homepage": "https://github.com/KIO2gamer/project-kiyo#readme",
 	"dependencies": {
-		"discord.js": "^14.18.0",
-		"dotenv": "^16.4.7",
-		"prettier": "^3.5.3"
+	  "discord.js": "^14.18.0",
+	  "dotenv": "^16.4.7",
+	  "prettier": "^3.5.3"
 	}
 }
+  
