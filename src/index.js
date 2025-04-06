@@ -1,5 +1,13 @@
-require("dotenv").config();
-const { Client, GatewayIntentBits, Partials, Collection, Events, REST, Routes } = require("discord.js");
+require('dotenv').config();
+const {
+	Client,
+	GatewayIntentBits,
+	Partials,
+	Collection,
+	Events,
+	REST,
+	Routes,
+} = require('discord.js');
 const path = require('path');
 const fs = require('fs');
 
@@ -11,12 +19,7 @@ const client = new Client({
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.DirectMessages,
 	],
-	partials: [
-		Partials.Channel,
-		Partials.Message,
-		Partials.User,
-		Partials.GuildMember,
-	],
+	partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember],
 });
 
 // Handle commands files
@@ -26,21 +29,23 @@ const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
 	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
 		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			console.log(
+				`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+			);
 		}
 	}
 }
 
 // Handle events files
 const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.js'));
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
@@ -57,7 +62,7 @@ const commands = [];
 for (const folder of commandFolders) {
 	// Grab all the command files from the commands directory you created earlier
 	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 	// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
@@ -65,7 +70,9 @@ for (const folder of commandFolders) {
 		if ('data' in command && 'execute' in command) {
 			commands.push(command.data.toJSON());
 		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			console.log(
+				`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+			);
 		}
 	}
 }
@@ -79,7 +86,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 		const data = await rest.put(
 			Routes.applicationGuildCommands(process.env.CLIENTID, process.env.GUILDID),
-			{ body: commands },
+			{ body: commands }
 		);
 
 		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
@@ -91,7 +98,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 client.cooldowns = new Collection();
 
 // Handle cooldowns on commands
-client.on(Events.InteractionCreate, async interaction => {
+client.on(Events.InteractionCreate, async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 	const command = client.commands.get(interaction.commandName);
 
@@ -116,7 +123,10 @@ client.on(Events.InteractionCreate, async interaction => {
 
 		if (now < expirationTime) {
 			const expiredTimestamp = Math.round(expirationTime / 1000);
-			return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, flags: MessageFlags.Ephemeral });
+			return interaction.reply({
+				content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
+				flags: MessageFlags.Ephemeral,
+			});
 		}
 	}
 
