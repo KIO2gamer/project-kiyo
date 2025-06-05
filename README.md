@@ -1,53 +1,66 @@
-# Introduction
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/KIO2gamer/project-kiyo)
 
-This github repository is a Discord bot made with mainly discord.js. Here you can find upto 100 multipurpose slash commands and other integrated features such as an AI Chatbot, welcome system, ticket system and even its dedicated dashboard website and much more!
+# Project Kiyo
 
-### Built using
+## Description
 
-- JavaScript (For most of the bot's functions + the dashboard website)
-- HTML, CSS (For the dashboard website)
+A multi-purpose discord.js bot with 100 slash commands and various other features to try out!
 
-# How to deploy the bot
+## Table of Contents
 
-1. Fetch the github repository by using the following command in your terminal and enter the main folder.
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-    ```
+## Features
+
+- Moderation commands (e.g., ban)
+- Utility commands (e.g., ping, reload)
+
+## Installation
+
+1. Clone the repository:
+    ```bash
     git clone https://github.com/KIO2gamer/project-kiyo.git
-
-    cd project-kiyo
+    ```
+2. Install dependencies:
+    ```bash
+    npm install
     ```
 
-2. Use `cp .env.example .env` to copy the example .env file onto the .env file.
+## Configuration
 
-3. Fill out the neccessary API keys/tokens into the .env file.
+1. Create a `.env` file in the root directory of the project.
+2. Add the following environment variables to the `.env` file:
+    ```env
+    DISCORD_TOKEN=your_discord_bot_token
+    CLIENTID=your_client_id
+    GUILDID=your_guild_id
     ```
-    DISCORD_TOKEN=YOUR_DISCORD_BOT_TOKEN
-    ```
-4. Start the bot by typing either of the two commands.
-    ```
-    nodemon
-    # or
-    npm start
-    ```
+    Replace `your_discord_bot_token`, `your_client_id`, and `your_guild_id` with your actual Discord bot token, client ID, and guild ID.
 
-# Features
+## Usage
 
-- Slash commands ranging from entertainment purposes to moderation and management purposes.
+To start the bot, run the following command:
 
-- Dedicated Dashboard website to manage servers that the bot has joined to.
+```bash
+npm start
+```
 
-- Easy to understand descriptions.
+## Contributing
 
-# Issues
+Contributions are welcome! If you find any bugs or have suggestions for new features, please open an issue on the [GitHub issues page](https://github.com/KIO2gamer/project-kiyo/issues).
 
-To report a issue, you can go to the [issues](https://github.com/KIO2gamer/project-kiyo/issues) page.
+## Software and Languages Used
 
-# LICENSE
+- Node.js
+- discord.js
+- JavaScript
 
-Check the [MIT License](https://github.com/KIO2gamer/project-kiyo/blob/main/LICENSE)
+## License
 
-# Conclusion
-
-You can free to contribute to the project by requesting pull requests for adding your features.
-
-<center>Made with ❤️ by KIO2gamer and the contributors.</center>
+This project is licensed under the MIT License.
