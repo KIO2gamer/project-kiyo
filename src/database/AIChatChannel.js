@@ -1,9 +1,33 @@
 const mongoose = require("mongoose");
 
-// Define AIChatChannel model
-const AIChatChannel = mongoose.model("AIChatChannel", {
-    guildId: String,
-    channelId: String,
+const aiChatChannelSchema = new mongoose.Schema({
+    guildId: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    channelId: {
+        type: String,
+        required: true,
+    },
+    enabled: {
+        type: Boolean,
+        default: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
-module.exports = AIChatChannel;
+// Update the updatedAt field on save
+aiChatChannelSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
+});
+
+module.exports = mongoose.model("AIChatChannel", aiChatChannelSchema);

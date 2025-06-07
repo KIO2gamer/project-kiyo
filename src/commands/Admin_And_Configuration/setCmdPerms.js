@@ -6,20 +6,7 @@ const {
 } = require("discord.js");
 const mongoose = require("mongoose");
 const { handleError } = require("../../utils/errorHandler");
-
-// Create CommandPermissions schema if it doesn't exist already
-const CommandPermissionsSchema = mongoose.model(
-    "CommandPermissions",
-    new mongoose.Schema({
-        guildId: { type: String, required: true },
-        commandName: { type: String, required: true },
-        permissions: {
-            roles: { type: Map, of: Boolean, default: new Map() },
-            users: { type: Map, of: Boolean, default: new Map() },
-        },
-    }),
-    "commandPermissions",
-);
+const CommandPermissionsSchema = require("./../../database/commandPermissions");
 
 module.exports = {
     data: new SlashCommandBuilder()

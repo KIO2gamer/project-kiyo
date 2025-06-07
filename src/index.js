@@ -5,6 +5,7 @@ const fs = require("fs");
 const { REST, Routes, Client, Collection, GatewayIntentBits, ActivityType } = require("discord.js");
 const Logger = require("./utils/logger");
 const PresenceManager = require("./utils/presenceManager");
+const CommandPermissions = require("./database/commandPermissions");
 
 // Client-related functions
 /**
@@ -262,7 +263,6 @@ const setupGracefulShutdown = (client) => {
 // Add to your bot initialization code
 async function loadCommandPermissions(client) {
     try {
-        const CommandPermissions = mongoose.model("CommandPermissions");
         const permissions = await CommandPermissions.find({});
 
         for (const permDoc of permissions) {

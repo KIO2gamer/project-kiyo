@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
-const OAuthCode = require("../../database/OauthCode.js");
+const OAuthCode = require("../../src/database/OauthCode.js");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 // MongoDB connection URI from environment variables
 const mongoUri = process.env.MONGODB_URI;
+const jwtSecret = process.env.JWT_SECRET || "fallback-secret-key";
 
 let isConnected = false;
 
@@ -83,7 +85,12 @@ exports.handler = async function (event) {
             }
 
             await saveOAuthRecord(decryptedState, code, youtubeConnections, userInfo);
-            return createSuccessResponse(youtubeConnections.length, decryptedState, userInfo);
+            return createSuccessResponse(
+                youtubeConnections.length,
+                decryptedState,
+                userInfo,
+                youtubeConnections,
+            );
         } catch (error) {
             handleError("❌ OAuth processing error:", error);
             if (error.message.includes("decrypt")) {
@@ -117,106 +124,17 @@ function getCodeAndState(event) {
     }
 }
 
-// --- HTML Generating Functions ---
+// --- Response Helper Functions ---
 
-function generateHtmlResponse(title, statusCode, message, additionalMessage = "", buttonHtml = "") {
-    const headingClass = title.toLowerCase(); // Use title to dynamically generate heading class
-    return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title} | Project Kiyo</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-                margin-top: 50px;
-                background-color: #f4f4f4;
-                color: #333;
-            }
-            .container {
-                width: 90%;
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 25px;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                background-color: white;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            }
-            h1 {
-                color: #333;
-                margin-bottom: 20px;
-            }
-            p {
-                color: #555;
-                line-height: 1.6;
-                margin-bottom: 15px;
-            }
-            .button {
-                display: inline-block;
-                padding: 12px 24px;
-                background-color: #5865F2; /* Discord blue */
-                color: white;
-                text-decoration: none;
-                border-radius: 8px;
-                margin-top: 20px;
-                transition: background-color 0.3s ease, transform 0.2s ease;
-                font-weight: bold;
-            }
-            .button:hover {
-                background-color: #4752C4;
-                transform: translateY(-2px);
-            }
-            .button:active {
-                transform: translateY(0);
-            }
-            .error-heading {
-                color: #dc2626;
-            }
-            .success-heading {
-                color: #16a34a;
-            }
-            .warning-heading {
-                color: #eab308;
-            }
-            .status-code {
-                font-weight: bold;
-                margin-top: 10px;
-                color: #777;
-            }
-            .user-info {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 20px 0;
-            }
-            .avatar {
-                width: 64px;
-                height: 64px;
-                border-radius: 50%;
-                margin-right: 15px;
-                border: 3px solid #5865F2;
-            }
-            .username {
-                font-size: 1.2em;
-                font-weight: bold;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1 class="${headingClass}-heading">${title}</h1>
-            ${statusCode ? `<p class="status-code">Status Code: ${statusCode}</p>` : ""}
-            ${message ? `<p>${message}</p>` : ""}
-            ${additionalMessage ? `<p>${additionalMessage}</p>` : ""}
-            ${buttonHtml}
-        </div>
-    </body>
-    </html>
-    `;
+function createRedirectResponse(location, statusCode = 302) {
+    return {
+        statusCode,
+        headers: {
+            Location: location,
+            "Cache-Control": "no-cache",
+        },
+        body: "",
+    };
 }
 
 function createErrorResponse(
@@ -224,13 +142,16 @@ function createErrorResponse(
     message,
     additionalMessage = "Please ensure both code and state are provided in the request.",
 ) {
-    const html = generateHtmlResponse("Error", statusCode, message, additionalMessage);
+    // Instead of returning inline HTML, redirect to the static site with error parameters
+    const errorParams = new URLSearchParams({
+        error: "oauth_error",
+        error_description: message,
+        error_details: additionalMessage,
+        status_code: statusCode.toString(),
+    });
 
-    return {
-        statusCode,
-        headers: { "Content-Type": "text/html" },
-        body: html,
-    };
+    const redirectUrl = `/?${errorParams.toString()}`;
+    return createRedirectResponse(redirectUrl);
 }
 
 async function exchangeCodeForToken(code) {
@@ -366,7 +287,7 @@ async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
     }
 }
 
-async function createSuccessResponse(connectionsLength, state, userInfo) {
+async function createSuccessResponse(connectionsLength, state, userInfo, youtubeConnections) {
     try {
         let parsedState;
         try {
@@ -377,41 +298,23 @@ async function createSuccessResponse(connectionsLength, state, userInfo) {
         }
 
         const { guildId, channelId } = parsedState;
-        const discordDeepLink = `discord://discord.com/channels/${guildId}/${channelId}`;
-        const browserLink = `https://discord.com/channels/${guildId}/${channelId}`;
 
-        let userInfoHtml = "";
-        if (userInfo) {
-            const avatarUrl = userInfo.avatar
-                ? `https://cdn.discordapp.com/avatars/${userInfo.id}/${userInfo.avatar}.png?size=128`
-                : "https://cdn.discordapp.com/embed/avatars/0.png";
-
-            userInfoHtml = `
-            <div class="user-info">
-                <img src="${avatarUrl}" alt="Discord Avatar" class="avatar">
-                <span class="username">${userInfo.username}</span>
-            </div>`;
-        }
-
-        const buttonHtml = `
-        ${userInfoHtml}
-        <p>You can now return to Discord and continue using the bot.</p>
-        <a href="${discordDeepLink}" class="button">Return to Discord (App)</a>
-        <a href="${browserLink}" class="button" style="margin-left: 10px; background-color: #7289da;">Open in Browser</a>`;
-
-        const html = generateHtmlResponse(
-            "Success",
-            null,
-            "Your YouTube connections have been successfully linked!",
-            `Number of connections: ${connectionsLength}`,
-            buttonHtml,
-        );
-
-        return {
-            statusCode: 200,
-            headers: { "Content-Type": "text/html" },
-            body: html,
+        // Create success parameters to pass to the static site
+        const successData = {
+            success: "true",
+            connections: connectionsLength.toString(),
+            guild_id: guildId,
+            channel_id: channelId,
+            user_id: userInfo?.id || "",
+            username: userInfo?.username || "",
+            avatar: userInfo?.avatar || "",
+            connection_data: JSON.stringify(youtubeConnections || []),
         };
+
+        const successParams = new URLSearchParams(successData);
+        const redirectUrl = `/?${successParams.toString()}`;
+
+        return createRedirectResponse(redirectUrl);
     } catch (error) {
         handleError("❌ Error creating success response:", error);
         return createErrorResponse(500, "An error occurred while creating the success response");

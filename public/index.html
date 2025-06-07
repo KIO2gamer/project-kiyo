@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project Kiyo OAuth2 Authorization Portal">
+    <title>Project Kiyo - OAuth2 Portal</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="16" fill="url(#gradient)"/>
+                    <path d="M12 10L20 16L12 22V10Z" fill="white"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#5865F2"/>
+                            <stop offset="1" stop-color="#7289DA"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Project Kiyo</span>
+            </div>
+            <nav class="nav">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#support" class="nav-link">Support</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Loading State -->
+            <div class="loading-screen" id="loadingScreen">
+                <div class="spinner"></div>
+                <h2>Processing your authorization...</h2>
+                <p>Please wait while we verify your credentials.</p>
+            </div>
+
+            <!-- Default State -->
+            <div class="content-section" id="defaultContent">
+                <div class="hero">
+                    <div class="hero-badge">
+                        <span class="badge-icon">🔐</span>
+                        <span>Secure OAuth2 Portal</span>
+                    </div>
+                    <h1 class="hero-title">
+                        Welcome to <span class="gradient-text">Project Kiyo</span>
+                    </h1>
+                    <p class="hero-description">
+                        Your secure gateway to YouTube integration with Discord. 
+                        Experience seamless authentication with enterprise-grade security.
+                    </p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="startOAuth()">
+                            <span class="btn-icon">🚀</span>
+                            Start Authorization
+                        </button>
+                        <button class="btn btn-secondary" onclick="scrollToFeatures()">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div class="content-section hidden" id="successContent">
+                <div class="status-card success">
+                    <div class="status-icon">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="32" fill="#10B981" fill-opacity="0.1"/>
+                            <circle cx="32" cy="32" r="20" fill="#10B981"/>
+                            <path d="M24 32L28 36L40 24" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2 class="status-title">Authorization Successful!</h2>
+                    <p class="status-description">Your YouTube connections have been successfully linked to Discord.</p>
+                    
+                    <div class="user-info" id="userInfo">
+                        <!-- User info will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="connection-stats" id="connectionStats">
+                        <!-- Connection stats will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="#" class="btn btn-primary" id="discordAppLink">
+                            <span class="btn-icon">📱</span>
+                            Return to Discord App
+                        </a>
+                        <a href="#" class="btn btn-secondary" id="discordBrowserLink">
+                            <span class="btn-icon">🌐</span>
+                            Open in Browser
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div class="content-section hidden" id="errorContent">
+                <div class="status-card error">
+                    <div class="status-icon">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="32" fill="#EF4444" fill-opacity="0.1"/>
+                            <circle cx="32" cy="32" r="20" fill="#EF4444"/>
+                            <path d="M24 24L40 40M40 24L24 40" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h2 class="status-title">Authorization Failed</h2>
+                    <p class="status-description" id="errorMessage">An error occurred during the authorization process.</p>
+                    
+                    <div class="error-details" id="errorDetails">
+                        <!-- Error details will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="retryAuthorization()">
+                            <span class="btn-icon">🔄</span>
+                            Try Again
+                        </button>
+                        <a href="#support" class="btn btn-secondary">
+                            <span class="btn-icon">💬</span>
+                            Get Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Project Kiyo?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Enterprise Security</h3>
+                    <p>Bank-grade encryption and secure OAuth2 implementation protect your data.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance ensures quick authorization and seamless integration.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Smart Integration</h3>
+                    <p>Intelligent YouTube connection detection and role assignment based on subscriber count.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Real-time Sync</h3>
+                    <p>Automatic updates ensure your Discord roles stay current with your YouTube stats.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">About Project Kiyo</h2>
+                    <p>Project Kiyo is a sophisticated Discord bot that bridges the gap between your YouTube presence and Discord community. Our advanced OAuth2 implementation ensures secure, seamless integration while maintaining the highest standards of privacy and security.</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-number">99.9%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">1M+</div>
+                            <div class="stat-label">Authentications</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Support</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="integration-demo">
+                        <div class="demo-card discord">
+                            <div class="demo-icon">💬</div>
+                            <span>Discord</span>
+                        </div>
+                        <div class="connection-line"></div>
+                        <div class="demo-card youtube">
+                            <div class="demo-icon">📺</div>
+                            <span>YouTube</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="support" id="support">
+        <div class="container">
+            <h2 class="section-title">Need Help?</h2>
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">📚</div>
+                    <h3>Documentation</h3>
+                    <p>Comprehensive guides and tutorials to get you started.</p>
+                    <a href="#" class="support-link">View Docs →</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">💬</div>
+                    <h3>Discord Support</h3>
+                    <p>Join our community server for real-time assistance.</p>
+                    <a href="#" class="support-link">Join Server →</a>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">🐛</div>
+                    <h3>Report Issues</h3>
+                    <p>Found a bug? Let us know and we'll fix it quickly.</p>
+                    <a href="#" class="support-link">Report Bug →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="16" fill="url(#gradient2)"/>
+                            <path d="M12 10L20 16L12 22V10Z" fill="white"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#5865F2"/>
+                                    <stop offset="1" stop-color="#7289DA"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>Project Kiyo</span>
+                    </div>
+                    <p>Secure YouTube-Discord integration platform.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#about">About</a>
+                        <a href="#">Pricing</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <a href="#support">Help Center</a>
+                        <a href="#">Contact</a>
+                        <a href="#">Status</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Legal</h4>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Security</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Project Kiyo. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="GitHub">🔗</a>
+                    <a href="#" aria-label="Discord">💬</a>
+                    <a href="#" aria-label="Twitter">🐦</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/scripts/main.js"></script>
+</body>
+</html>
+
