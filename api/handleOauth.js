@@ -12,7 +12,7 @@ let isConnected = false;
 async function connectToDatabase() {
     if (!isConnected) {
         try {
-            await mongoose.connect(mongoUri, { bufferCommands: false });
+            await mongoose.connect(mongoUri);
             isConnected = true;
             console.log("✅ MongoDB connection established successfully");
         } catch (error) {
