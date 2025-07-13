@@ -119,11 +119,11 @@ function setRichPresence(client, config) {
 const config = {
     // Discord config
     token: process.env.DISCORD_TOKEN,
-    clientId: process.env.DISCORD_CLIENT_ID,
-    guildIds: process.env.DISCORD_GUILD_IDS ? process.env.DISCORD_GUILD_IDS.split(",") : [],
+    clientId: process.env.CLIENTID,
+    guildIds: process.env.GUILDID ? process.env.GUILDID.split(",") : [],
 
     // Database config
-    mongoUri: process.env.MONGODB_URI,
+    mongoUri: process.env.MONGODB_URL,
 
     // Logging config
     logLevel: process.env.LOG_LEVEL || "INFO",
