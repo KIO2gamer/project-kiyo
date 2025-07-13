@@ -247,6 +247,7 @@ async function saveOAuthRecord(state, code, youtubeConnections, userInfo) {
         const oauthRecord = new OAuthCode({
             interactionId,
             code,
+            state, // Add the required state field
             youtubeConnections: youtubeConnections.map((conn) => ({
                 id: conn.id,
                 name: conn.name,
