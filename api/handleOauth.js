@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 // MongoDB connection URI from environment variables
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = process.env.MONGODB_URL;
 const jwtSecret = process.env.JWT_SECRET || "fallback-secret-key";
 
 let isConnected = false;
@@ -148,7 +148,7 @@ async function exchangeCodeForToken(code) {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                client_id: process.env.DISCORD_CLIENT_ID,
+                client_id: process.env.CLIENTID,
                 client_secret: process.env.DISCORD_CLIENT_SECRET,
                 grant_type: "authorization_code",
                 code,
