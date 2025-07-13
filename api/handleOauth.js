@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 // MongoDB connection URI from environment variables
-const mongoUri = process.env.MONGODB_URI;
+const mongoUri = process.env.MONGODB_URL;
 const jwtSecret = process.env.JWT_SECRET || "fallback-secret-key";
 
 let isConnected = false;
