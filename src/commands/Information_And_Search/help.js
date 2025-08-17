@@ -96,9 +96,9 @@ module.exports = {
         for (const [categoryName, commands] of sortedCategories) {
             if (commands.length > 0) {
                 const formattedName = this.formatCategoryName(categoryName);
-                const emoji = this.getCategoryEmoji(categoryName);
+                const category = this.getCategory(client, categoryName);
                 embed.addFields({
-                    name: `${emoji} ${formattedName} (${commands.length})`,
+                    name: `${category.emoji} ${formattedName} (${commands.length})`,
                     value:
                         commands
                             .slice(0, 3)
@@ -114,12 +114,13 @@ module.exports = {
         const categoryOptions = Object.keys(categories)
             .filter((category) => categories[category].length > 0)
             .sort((a, b) => this.formatCategoryName(a).localeCompare(this.formatCategoryName(b)))
-            .map((category) => {
+            .map((categoryName) => {
+                const category = this.getCategory(client, categoryName);
                 return {
-                    label: this.formatCategoryName(category),
-                    value: category,
-                    description: `View ${categories[category].length} commands in this category`,
-                    emoji: this.getCategoryEmoji(category),
+                    label: this.formatCategoryName(categoryName),
+                    value: categoryName,
+                    description: `View ${categories[categoryName].length} commands in this category`,
+                    emoji: category.emoji,
                 };
             });
 
@@ -345,9 +346,10 @@ module.exports = {
             });
         }
 
+        const category = this.getCategory(client, categoryName);
         const embed = new EmbedBuilder()
             .setTitle(
-                `${this.getCategoryEmoji(categoryName)} ${this.formatCategoryName(categoryName)} Commands`,
+                `${category.emoji} ${this.formatCategoryName(categoryName)} Commands`,
             )
             .setDescription("Select a command to view details")
             .setColor("#3498db")
@@ -423,33 +425,13 @@ module.exports = {
     },
 
     /**
-     * Get emoji for category based on folder name
-     * @param {string} category - The category name
-     * @returns {string} - Emoji for the category
+     * Get category information from the client
+     * @param {Client} client - The client object
+     * @param {string} categoryName - The name of the category
+     * @returns {object} - The category object, or a default
      */
-    getCategoryEmoji(category) {
-        const emojis = {
-            // Add all your folder names here
-            admin: "⚙️",
-            admin_and_configuration: "⚙️",
-            api: "🔌",
-            api_integrations: "🔌",
-            fun: "🎮",
-            fun_and_entertainment: "🎮",
-            games: "🎲",
-            info: "ℹ️",
-            information_and_search: "🔍",
-            levels: "📈",
-            levels_and_experience: "📈",
-            misc: "📦",
-            moderation: "🛡️",
-            music: "🎵",
-            utility: "🔧",
-            role_management: "👥",
-            // Add other folder names as needed
-        };
-
-        return emojis[category.toLowerCase()] || "📄";
+    getCategory(client, categoryName) {
+        return client.categories.get(categoryName.toLowerCase()) || { emoji: "📄" };
     },
 
     /**
