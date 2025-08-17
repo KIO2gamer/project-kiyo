@@ -134,6 +134,25 @@ function splitTextIntoChunks(text, maxLength = 1024, separator = "\n\n") {
     return result;
 }
 
+/**
+ * Format a number into a human-readable string with abbreviations (K, M, B).
+ * @param {number} num - The number to format
+ * @returns {string} Formatted number string
+ */
+function formatNumber(num) {
+    if (!num) return "0";
+    if (num >= 1000000000) {
+        return (num / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+    }
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    }
+    return num.toString();
+}
+
 module.exports = {
     calculateSimilarity,
     truncateText,
@@ -143,4 +162,5 @@ module.exports = {
     escapeRegex,
     cleanWhitespace,
     splitTextIntoChunks,
+    formatNumber,
 };

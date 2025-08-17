@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
+const { formatUptime } = require("../../utils/formatUptime");
 
 module.exports = {
     description_full:
@@ -28,22 +29,6 @@ module.exports = {
                     if (ms < 200) return "🟡"; // Good
                     if (ms < 500) return "🟠"; // Fair
                     return "🔴"; // Poor
-                };
-
-                // Format uptime
-                const formatUptime = (seconds) => {
-                    const days = Math.floor(seconds / 86400);
-                    const hours = Math.floor((seconds % 86400) / 3600);
-                    const minutes = Math.floor((seconds % 3600) / 60);
-                    const secs = seconds % 60;
-
-                    const parts = [];
-                    if (days > 0) parts.push(`${days}d`);
-                    if (hours > 0) parts.push(`${hours}h`);
-                    if (minutes > 0) parts.push(`${minutes}m`);
-                    if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
-
-                    return parts.join(" ");
                 };
 
                 const embed = new EmbedBuilder()

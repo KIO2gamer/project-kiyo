@@ -27,6 +27,7 @@ function createClient() {
     // Initialize collections
     client.commands = new Collection();
     client.cooldowns = new Collection();
+    client.categories = new Collection();
 
     return client;
 }
@@ -53,6 +54,18 @@ function loadCommands(client, commandsPath) {
 
         // Skip if not a directory
         if (!fs.statSync(folderPath).isDirectory()) continue;
+
+        // Load category metadata from _category.json
+        const categoryConfigPath = path.join(folderPath, "_category.json");
+        if (fs.existsSync(categoryConfigPath)) {
+            try {
+                const rawConfig = fs.readFileSync(categoryConfigPath, "utf8");
+                const categoryConfig = JSON.parse(rawConfig);
+                client.categories.set(folder.toLowerCase(), categoryConfig);
+            } catch (error) {
+                Logger.error(`Failed to load category config for ${folder}: ${error.message}`);
+            }
+        }
 
         const commandFiles = fs.readdirSync(folderPath).filter((file) => file.endsWith(".js"));
 
@@ -329,6 +342,7 @@ const initializeBot = async () => {
                 Logger.warn(`Failed to start dashboard server: ${error.message}`);
             }
         }
+
 
         // Load commands and events
         loadCommands(client, path.join(__dirname, "./commands"));
