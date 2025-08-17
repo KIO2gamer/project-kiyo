@@ -1,0 +1,348 @@
+<%- include('../layout', { title: 'Servers - Project Kiyo Dashboard' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-server me-2"></i>Server Management</h2>
+    <button class="btn btn-primary" data-action="refresh-stats">
+        <i class="fas fa-sync-alt me-2"></i>Refresh
+    </button>
+</div>
+
+<!-- Server Stats Overview -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-server fa-2x text-primary mb-2"></i>
+                <h4 id="total-servers">-</h4>
+                <small class="text-muted">Total Servers</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-users fa-2x text-success mb-2"></i>
+                <h4 id="total-members">-</h4>
+                <small class="text-muted">Total Members</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-hashtag fa-2x text-info mb-2"></i>
+                <h4 id="total-channels">-</h4>
+                <small class="text-muted">Total Channels</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                <h4 id="owned-servers">-</h4>
+                <small class="text-muted">Owned by You</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Servers Grid -->
+<div class="row" id="servers-container">
+    <div class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading servers...</span>
+        </div>
+        <p class="mt-2 text-muted">Loading your servers...</p>
+    </div>
+</div>
+
+<!-- Server Details Modal -->
+<div class="modal fade" id="serverModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Server Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="manage-server-btn">Manage Server</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class ServerManager {
+    constructor() {
+        this.servers = [];
+        this.init();
+    }
+
+    async init() {
+        await this.loadServers();
+        this.setupEventListeners();
+    }
+
+    async loadServers() {
+        try {
+            const response = await fetch('/api/guilds');
+            this.servers = await response.json();
+            this.renderServers();
+            this.updateStats();
+        } catch (error) {
+            console.error('Error loading servers:', error);
+            this.showError('Failed to load servers');
+        }
+    }
+
+    renderServers() {
+        const container = document.getElementById('servers-container');
+        
+        if (this.servers.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="card">
+                        <div class="card-body py-5">
+                            <i class="fas fa-server fa-3x text-muted mb-3"></i>
+                            <h5>No Servers Found</h5>
+                            <p class="text-muted">The bot is not in any servers you manage, or you don't have permission to view them.</p>
+                            <a href="https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot%20applications.commands" 
+                               class="btn btn-primary" target="_blank">
+                                <i class="fas fa-plus me-2"></i>Invite Bot to Server
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const serverCards = this.servers.map(server => this.createServerCard(server)).join('');
+        container.innerHTML = serverCards;
+    }
+
+    createServerCard(server) {
+        const iconUrl = server.icon || '/images/default-server-icon.png';
+        const memberCount = server.memberCount || 0;
+        const channelCount = server.channels || 0;
+        
+        return `
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card server-card h-100" data-server-id="${server.id}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="${iconUrl}" alt="${server.name}" class="server-icon me-3" 
+                                 onerror="this.src='/images/default-server-icon.png'">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1">${this.escapeHtml(server.name)}</h5>
+                                <small class="text-muted">ID: ${server.id}</small>
+                            </div>
+                            ${server.owner ? '<i class="fas fa-crown text-warning" title="You own this server"></i>' : ''}
+                        </div>
+                        
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="border-end">
+                                    <h6 class="mb-0">${memberCount.toLocaleString()}</h6>
+                                    <small class="text-muted">Members</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="mb-0">${channelCount}</h6>
+                                <small class="text-muted">Channels</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="serverManager.viewServer('${server.id}')">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="serverManager.manageServer('${server.id}')">
+                                <i class="fas fa-cog me-1"></i>Manage
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    updateStats() {
+        const totalServers = this.servers.length;
+        const totalMembers = this.servers.reduce((sum, server) => sum + (server.memberCount || 0), 0);
+        const totalChannels = this.servers.reduce((sum, server) => sum + (server.channels || 0), 0);
+        const ownedServers = this.servers.filter(server => server.owner).length;
+
+        document.getElementById('total-servers').textContent = totalServers;
+        document.getElementById('total-members').textContent = totalMembers.toLocaleString();
+        document.getElementById('total-channels').textContent = totalChannels;
+        document.getElementById('owned-servers').textContent = ownedServers;
+    }
+
+    async viewServer(serverId) {
+        const modal = new bootstrap.Modal(document.getElementById('serverModal'));
+        const modalBody = document.querySelector('#serverModal .modal-body');
+        const modalTitle = document.querySelector('#serverModal .modal-title');
+        const manageBtn = document.getElementById('manage-server-btn');
+        
+        // Show loading state
+        modalBody.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading server details...</p>
+            </div>
+        `;
+        
+        modal.show();
+        
+        try {
+            const response = await fetch(`/api/guild/${serverId}`);
+            const server = await response.json();
+            
+            modalTitle.textContent = server.name;
+            modalBody.innerHTML = this.renderServerDetails(server);
+            manageBtn.onclick = () => this.manageServer(serverId);
+            
+        } catch (error) {
+            console.error('Error loading server details:', error);
+            modalBody.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Failed to load server details: ${error.message}
+                </div>
+            `;
+        }
+    }
+
+    renderServerDetails(server) {
+        const iconUrl = server.icon || '/images/default-server-icon.png';
+        
+        return `
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    <img src="${iconUrl}" alt="${server.name}" class="img-fluid rounded mb-2" style="max-width: 128px;">
+                    <h5>${this.escapeHtml(server.name)}</h5>
+                    <small class="text-muted">Server ID: ${server.id}</small>
+                </div>
+                <div class="col-md-8">
+                    <h6>Server Statistics</h6>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center py-2">
+                                    <h5 class="mb-0">${server.memberCount?.toLocaleString() || 0}</h5>
+                                    <small>Members</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center py-2">
+                                    <h5 class="mb-0">${server.channels?.length || 0}</h5>
+                                    <small>Channels</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6>Recent Activity</h6>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Activity tracking will be available in a future update.
+                    </div>
+                </div>
+            </div>
+            
+            ${server.channels && server.channels.length > 0 ? `
+                <hr>
+                <h6>Channels (${server.channels.length})</h6>
+                <div class="row">
+                    ${server.channels.slice(0, 6).map(channel => `
+                        <div class="col-md-4 mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-hashtag text-muted me-2"></i>
+                                <span class="text-truncate">${this.escapeHtml(channel.name)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${server.channels.length > 6 ? `
+                        <div class="col-12">
+                            <small class="text-muted">... and ${server.channels.length - 6} more channels</small>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+        `;
+    }
+
+    manageServer(serverId) {
+        window.location.href = `/dashboard/server/${serverId}`;
+    }
+
+    setupEventListeners() {
+        // Refresh button
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-action="refresh-stats"]')) {
+                this.loadServers();
+            }
+        });
+    }
+
+    showError(message) {
+        const container = document.getElementById('servers-container');
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${message}
+                </div>
+            </div>
+        `;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    window.serverManager = new ServerManager();
+});
+</script>
+
+<style>
+.server-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.server-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+}
+
+.server-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.border-end {
+    border-right: 1px solid #dee2e6;
+}
+</style>

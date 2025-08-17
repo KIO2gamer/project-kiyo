@@ -15,9 +15,31 @@ module.exports = {
             }
 
             try {
+                // Log command usage
+                await Logger.commandUsage(
+                    interaction.commandName,
+                    interaction.user,
+                    interaction.guild,
+                    true,
+                );
+
                 await command.execute(interaction);
             } catch (error) {
-                Logger.error(error);
+                // Log command failure
+                await Logger.commandUsage(
+                    interaction.commandName,
+                    interaction.user,
+                    interaction.guild,
+                    false,
+                );
+
+                await Logger.errorWithContext(error, {
+                    command: interaction.commandName,
+                    user: interaction.user.tag,
+                    guild: interaction.guild?.name,
+                    channel: interaction.channel?.name,
+                });
+
                 await handleError(
                     interaction,
                     error,

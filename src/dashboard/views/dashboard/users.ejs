@@ -1,0 +1,98 @@
+<%- include('../layout', { title: 'Users - Project Kiyo Dashboard' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users me-2"></i>User Management</h2>
+    <button class="btn btn-primary" data-action="refresh-users">
+        <i class="fas fa-sync-alt me-2"></i>Refresh
+    </button>
+</div>
+
+<!-- User Stats -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <h4 id="total-users">-</h4>
+                <small class="text-muted">Total Users</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                <h4 id="active-users">-</h4>
+                <small class="text-muted">Active Today</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                <h4 id="admin-users">-</h4>
+                <small class="text-muted">Administrators</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-ban fa-2x text-danger mb-2"></i>
+                <h4 id="banned-users">-</h4>
+                <small class="text-muted">Banned Users</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management Interface -->
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="mb-0">User Directory</h5>
+            </div>
+            <div class="col-auto">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="user-search" placeholder="Search users...">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Coming Soon:</strong> User management features will be available in a future update. 
+            This will include user statistics, moderation history, and permission management.
+        </div>
+        
+        <div class="text-center py-5">
+            <i class="fas fa-users fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">User Management Interface</h5>
+            <p class="text-muted">This feature is currently under development and will include:</p>
+            <ul class="list-unstyled text-muted">
+                <li><i class="fas fa-check text-success me-2"></i>User search and filtering</li>
+                <li><i class="fas fa-check text-success me-2"></i>Moderation history tracking</li>
+                <li><i class="fas fa-check text-success me-2"></i>Permission management</li>
+                <li><i class="fas fa-check text-success me-2"></i>Activity monitoring</li>
+                <li><i class="fas fa-check text-success me-2"></i>Bulk user operations</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Placeholder for user management functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Update stats with placeholder data
+    document.getElementById('total-users').textContent = '1,234';
+    document.getElementById('active-users').textContent = '456';
+    document.getElementById('admin-users').textContent = '12';
+    document.getElementById('banned-users').textContent = '3';
+});
+</script>

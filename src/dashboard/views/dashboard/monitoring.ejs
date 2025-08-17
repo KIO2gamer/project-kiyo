@@ -1,0 +1,836 @@
+<%- include('../layout', { title: 'Monitoring - Project Kiyo Dashboard' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line me-2"></i>Bot Monitoring</h2>
+    <div>
+        <button class="btn btn-outline-primary me-2" id="auto-refresh-toggle">
+            <i class="fas fa-sync-alt me-2"></i>Auto Refresh: <span id="auto-refresh-status">ON</span>
+        </button>
+        <button class="btn btn-primary" data-action="refresh-monitoring">
+            <i class="fas fa-refresh me-2"></i>Refresh Now
+        </button>
+    </div>
+</div>
+
+<!-- System Status Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-success">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Bot Status
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold" id="bot-status">
+                            <i class="fas fa-circle text-success me-1"></i>Online
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-robot fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-info">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Latency
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold" id="bot-latency">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-wifi fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-warning">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Memory Usage
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold" id="memory-usage">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-memory fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-primary">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Uptime
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold" id="bot-uptime">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <!-- Performance Chart -->
+    <div class="col-xl-8">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Performance Metrics</h6>
+                <div class="dropdown no-arrow">
+                    <select class="form-select form-select-sm" id="chart-timeframe">
+                        <option value="1h">Last Hour</option>
+                        <option value="6h">Last 6 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Usage -->
+    <div class="col-xl-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Resource Usage</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="resourceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity and Logs Row -->
+<div class="row">
+    <!-- Real-time Logs -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Real-time Logs</h6>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="log-level-filter" style="width: auto;">
+                        <option value="">All Levels</option>
+                        <option value="error">Error</option>
+                        <option value="warn">Warning</option>
+                        <option value="info">Info</option>
+                        <option value="debug">Debug</option>
+                    </select>
+                    <select class="form-select form-select-sm" id="log-module-filter" style="width: auto;">
+                        <option value="">All Modules</option>
+                        <option value="bot">Bot</option>
+                        <option value="commands">Commands</option>
+                        <option value="events">Events</option>
+                        <option value="database">Database</option>
+                        <option value="dashboard">Dashboard</option>
+                        <option value="api">API</option>
+                        <option value="security">Security</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-secondary" id="clear-logs">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" id="refresh-logs">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="log-container" id="log-container" style="height: 400px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.85rem;">
+                    <div class="text-center p-3">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading logs...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <small class="text-muted">
+                            <span id="log-count">0</span> logs displayed | 
+                            Auto-refresh: <span id="log-auto-refresh">ON</span>
+                        </small>
+                    </div>
+                    <div class="col-auto">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="auto-scroll-logs" checked>
+                            <label class="form-check-label" for="auto-scroll-logs">
+                                <small>Auto-scroll</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discord Logging Configuration -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Discord Logging</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="discord-log-guild" class="form-label">Server</label>
+                    <select class="form-select" id="discord-log-guild">
+                        <option value="">Select a server...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="discord-log-channel" class="form-label">Log Channel</label>
+                    <select class="form-select" id="discord-log-channel" disabled>
+                        <option value="">Select a channel...</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <button class="btn btn-primary btn-sm w-100" id="set-discord-channel" disabled>
+                        <i class="fas fa-save me-1"></i>Set Log Channel
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <h6 class="text-xs font-weight-bold text-uppercase mb-2">Current Status</h6>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-circle text-secondary me-2" id="discord-log-status"></i>
+                        <span id="discord-log-status-text">Not configured</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button class="btn btn-outline-secondary btn-sm w-100" id="test-discord-log">
+                        <i class="fas fa-paper-plane me-1"></i>Send Test Log
+                    </button>
+                </div>
+                
+                <div class="alert alert-info alert-sm">
+                    <small>
+                        <i class="fas fa-info-circle me-1"></i>
+                        Only important logs (errors, warnings, security) are sent to Discord.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <h6 class="text-xs font-weight-bold text-uppercase mb-1">Node.js Version</h6>
+                        <p class="mb-3" id="node-version">-</p>
+                        
+                        <h6 class="text-xs font-weight-bold text-uppercase mb-1">Discord.js Version</h6>
+                        <p class="mb-3" id="discordjs-version">-</p>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-xs font-weight-bold text-uppercase mb-1">Platform</h6>
+                        <p class="mb-3" id="platform">-</p>
+                        
+                        <h6 class="text-xs font-weight-bold text-uppercase mb-1">Architecture</h6>
+                        <p class="mb-3" id="architecture">-</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-xs font-weight-bold text-uppercase mb-2">Connected Servers</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" role="progressbar" id="server-progress" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="server-info">Loading...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class MonitoringManager {
+    constructor() {
+        this.autoRefresh = true;
+        this.refreshInterval = null;
+        this.performanceChart = null;
+        this.resourceChart = null;
+        this.activityData = [];
+        this.init();
+    }
+
+    async init() {
+        await this.loadMonitoringData();
+        await this.loadLogs();
+        await this.loadGuilds();
+        this.initCharts();
+        this.setupEventListeners();
+        this.startAutoRefresh();
+    }
+
+    async loadMonitoringData() {
+        try {
+            const response = await fetch('/api/stats');
+            const data = await response.json();
+            this.updateSystemStats(data);
+            this.updateSystemInfo();
+            this.loadActivityLog();
+        } catch (error) {
+            console.error('Error loading monitoring data:', error);
+            this.showError('Failed to load monitoring data');
+        }
+    }
+
+    updateSystemStats(data) {
+        // Update bot status
+        const statusElement = document.getElementById('bot-status');
+        statusElement.innerHTML = '<i class="fas fa-circle text-success me-1"></i>Online';
+
+        // Update latency
+        document.getElementById('bot-latency').textContent = data.ping + 'ms';
+
+        // Update memory usage
+        const memUsage = data.memoryUsage;
+        const usedMB = Math.round(memUsage.used / 1024 / 1024);
+        const totalMB = Math.round(memUsage.rss / 1024 / 1024);
+        document.getElementById('memory-usage').textContent = `${usedMB}MB`;
+
+        // Update uptime
+        const uptime = this.formatUptime(data.uptime);
+        document.getElementById('bot-uptime').textContent = uptime;
+
+        // Update server progress
+        const serverProgress = document.getElementById('server-progress');
+        const serverInfo = document.getElementById('server-info');
+        const maxServers = 100; // Arbitrary max for progress bar
+        const percentage = Math.min((data.guilds / maxServers) * 100, 100);
+        
+        serverProgress.style.width = percentage + '%';
+        serverInfo.textContent = `${data.guilds} servers connected`;
+    }
+
+    updateSystemInfo() {
+        document.getElementById('node-version').textContent = process.version || 'Unknown';
+        document.getElementById('discordjs-version').textContent = '14.x';
+        document.getElementById('platform').textContent = navigator.platform || 'Unknown';
+        document.getElementById('architecture').textContent = 'x64';
+    }
+
+    async loadLogs() {
+        try {
+            const levelFilter = document.getElementById('log-level-filter').value;
+            const moduleFilter = document.getElementById('log-module-filter').value;
+            
+            const params = new URLSearchParams();
+            if (levelFilter) params.append('level', levelFilter);
+            if (moduleFilter) params.append('module', moduleFilter);
+            params.append('limit', '100');
+            
+            const response = await fetch(`/api/logs?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayLogs(data.logs);
+                document.getElementById('log-count').textContent = data.logs.length;
+            } else {
+                this.showError('Failed to load logs: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error loading logs:', error);
+            this.showError('Failed to load logs');
+        }
+    }
+
+    displayLogs(logs) {
+        const container = document.getElementById('log-container');
+        const autoScroll = document.getElementById('auto-scroll-logs').checked;
+        
+        if (logs.length === 0) {
+            container.innerHTML = '<div class="text-center p-3 text-muted">No logs found</div>';
+            return;
+        }
+        
+        container.innerHTML = logs.map(log => {
+            const levelClass = this.getLogLevelClass(log.level);
+            const moduleClass = this.getModuleClass(log.module);
+            const time = new Date(log.timestamp).toLocaleTimeString();
+            
+            return `
+                <div class="log-entry p-2 border-bottom" data-level="${log.level.toLowerCase()}" data-module="${log.module.toLowerCase()}">
+                    <div class="d-flex align-items-start">
+                        <span class="badge ${levelClass} me-2" style="min-width: 60px;">${log.level}</span>
+                        <span class="badge ${moduleClass} me-2" style="min-width: 80px;">${log.module}</span>
+                        <span class="text-muted me-2" style="min-width: 80px; font-size: 0.75rem;">${time}</span>
+                        <span class="flex-grow-1">${this.escapeHtml(log.message)}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        if (autoScroll) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+
+    getLogLevelClass(level) {
+        const classes = {
+            'ERROR': 'bg-danger',
+            'WARN': 'bg-warning text-dark',
+            'INFO': 'bg-info',
+            'SUCCESS': 'bg-success',
+            'DEBUG': 'bg-secondary'
+        };
+        return classes[level] || 'bg-secondary';
+    }
+
+    getModuleClass(module) {
+        const classes = {
+            'BOT': 'bg-primary',
+            'COMMANDS': 'bg-warning text-dark',
+            'EVENTS': 'bg-info',
+            'DATABASE': 'bg-success',
+            'DASHBOARD': 'bg-dark',
+            'API': 'bg-info',
+            'SECURITY': 'bg-danger',
+            'ERROR': 'bg-danger',
+            'WARN': 'bg-warning text-dark'
+        };
+        return classes[module] || 'bg-light text-dark';
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    async loadGuilds() {
+        try {
+            const response = await fetch('/api/guilds');
+            const guilds = await response.json();
+            
+            const guildSelect = document.getElementById('discord-log-guild');
+            guildSelect.innerHTML = '<option value="">Select a server...</option>';
+            
+            guilds.forEach(guild => {
+                const option = document.createElement('option');
+                option.value = guild.id;
+                option.textContent = guild.name;
+                guildSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading guilds:', error);
+        }
+    }
+
+    async loadChannels(guildId) {
+        try {
+            const response = await fetch(`/api/guild/${guildId}`);
+            const data = await response.json();
+            
+            const channelSelect = document.getElementById('discord-log-channel');
+            channelSelect.innerHTML = '<option value="">Select a channel...</option>';
+            
+            if (data.channels) {
+                data.channels
+                    .filter(channel => channel.type === 0) // Text channels only
+                    .forEach(channel => {
+                        const option = document.createElement('option');
+                        option.value = channel.id;
+                        option.textContent = `#${channel.name}`;
+                        channelSelect.appendChild(option);
+                    });
+                
+                channelSelect.disabled = false;
+                document.getElementById('set-discord-channel').disabled = false;
+            }
+        } catch (error) {
+            console.error('Error loading channels:', error);
+        }
+    }
+
+    async setDiscordLogChannel() {
+        try {
+            const guildId = document.getElementById('discord-log-guild').value;
+            const channelId = document.getElementById('discord-log-channel').value;
+            
+            if (!guildId || !channelId) {
+                this.showError('Please select both server and channel');
+                return;
+            }
+            
+            const response = await fetch('/api/logs/discord-channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ guildId, channelId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.updateDiscordLogStatus(true, 'Configured');
+                dashboard.showAlert('success', 'Discord log channel set successfully!');
+            } else {
+                this.showError('Failed to set Discord log channel: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error setting Discord log channel:', error);
+            this.showError('Failed to set Discord log channel');
+        }
+    }
+
+    async testDiscordLog() {
+        try {
+            const response = await fetch('/api/logs/test-discord', {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                dashboard.showAlert('success', 'Test log sent to Discord!');
+            } else {
+                this.showError('Failed to send test log: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error sending test log:', error);
+            this.showError('Failed to send test log');
+        }
+    }
+
+    updateDiscordLogStatus(isConfigured, statusText) {
+        const statusIcon = document.getElementById('discord-log-status');
+        const statusTextElement = document.getElementById('discord-log-status-text');
+        
+        if (isConfigured) {
+            statusIcon.className = 'fas fa-circle text-success me-2';
+            statusTextElement.textContent = statusText;
+        } else {
+            statusIcon.className = 'fas fa-circle text-secondary me-2';
+            statusTextElement.textContent = statusText;
+        }
+    }
+
+    initCharts() {
+        this.initPerformanceChart();
+        this.initResourceChart();
+    }
+
+    initPerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        
+        // Generate sample data for the last 24 hours
+        const labels = [];
+        const latencyData = [];
+        const memoryData = [];
+        const now = new Date();
+        
+        for (let i = 23; i >= 0; i--) {
+            const time = new Date(now.getTime() - (i * 60 * 60 * 1000));
+            labels.push(time.getHours() + ':00');
+            latencyData.push(Math.floor(Math.random() * 50) + 20); // 20-70ms
+            memoryData.push(Math.floor(Math.random() * 100) + 50); // 50-150MB
+        }
+        
+        this.performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Latency (ms)',
+                    data: latencyData,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    yAxisID: 'y'
+                }, {
+                    label: 'Memory (MB)',
+                    data: memoryData,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Latency (ms)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Memory (MB)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+    }
+
+    initResourceChart() {
+        const ctx = document.getElementById('resourceChart').getContext('2d');
+        
+        this.resourceChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Used Memory', 'Free Memory', 'Cached'],
+                datasets: [{
+                    data: [45, 35, 20],
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    setupEventListeners() {
+        // Auto refresh toggle
+        document.getElementById('auto-refresh-toggle').addEventListener('click', () => {
+            this.toggleAutoRefresh();
+        });
+
+        // Manual refresh
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-action="refresh-monitoring"]')) {
+                this.loadMonitoringData();
+            }
+        });
+
+        // Chart timeframe change
+        document.getElementById('chart-timeframe').addEventListener('change', (e) => {
+            this.updateChartTimeframe(e.target.value);
+        });
+
+        // Log filtering
+        document.getElementById('log-level-filter').addEventListener('change', () => {
+            this.loadLogs();
+        });
+
+        document.getElementById('log-module-filter').addEventListener('change', () => {
+            this.loadLogs();
+        });
+
+        // Log controls
+        document.getElementById('refresh-logs').addEventListener('click', () => {
+            this.loadLogs();
+        });
+
+        document.getElementById('clear-logs').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to clear the log history?')) {
+                try {
+                    const response = await fetch('/api/logs', { method: 'DELETE' });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.loadLogs();
+                        dashboard.showAlert('success', 'Log history cleared');
+                    } else {
+                        this.showError('Failed to clear logs: ' + data.error);
+                    }
+                } catch (error) {
+                    this.showError('Failed to clear logs');
+                }
+            }
+        });
+
+        // Discord logging
+        document.getElementById('discord-log-guild').addEventListener('change', (e) => {
+            const guildId = e.target.value;
+            if (guildId) {
+                this.loadChannels(guildId);
+            } else {
+                document.getElementById('discord-log-channel').disabled = true;
+                document.getElementById('set-discord-channel').disabled = true;
+            }
+        });
+
+        document.getElementById('set-discord-channel').addEventListener('click', () => {
+            this.setDiscordLogChannel();
+        });
+
+        document.getElementById('test-discord-log').addEventListener('click', () => {
+            this.testDiscordLog();
+        });
+    }
+
+    toggleAutoRefresh() {
+        this.autoRefresh = !this.autoRefresh;
+        const statusElement = document.getElementById('auto-refresh-status');
+        const toggleButton = document.getElementById('auto-refresh-toggle');
+        
+        if (this.autoRefresh) {
+            statusElement.textContent = 'ON';
+            toggleButton.classList.remove('btn-outline-primary');
+            toggleButton.classList.add('btn-primary');
+            this.startAutoRefresh();
+        } else {
+            statusElement.textContent = 'OFF';
+            toggleButton.classList.remove('btn-primary');
+            toggleButton.classList.add('btn-outline-primary');
+            this.stopAutoRefresh();
+        }
+    }
+
+    startAutoRefresh() {
+        if (this.autoRefresh && !this.refreshInterval) {
+            this.refreshInterval = setInterval(() => {
+                this.loadMonitoringData();
+                this.loadLogs(); // Also refresh logs
+            }, 30000); // Refresh every 30 seconds
+        }
+    }
+
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+    }
+
+    updateChartTimeframe(timeframe) {
+        // This would update the chart with data for the selected timeframe
+        console.log('Updating chart timeframe to:', timeframe);
+        // For now, just regenerate with sample data
+        this.initPerformanceChart();
+    }
+
+    formatUptime(seconds) {
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        
+        if (days > 0) {
+            return `${days}d ${hours}h`;
+        } else if (hours > 0) {
+            return `${hours}h ${minutes}m`;
+        } else {
+            return `${minutes}m`;
+        }
+    }
+
+    formatTime(date) {
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+
+    showError(message) {
+        dashboard.showAlert('danger', message);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    window.monitoringManager = new MonitoringManager();
+});
+</script>
+
+<style>
+.chart-area {
+    position: relative;
+    height: 300px;
+}
+
+.chart-pie {
+    position: relative;
+    height: 200px;
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+</style>

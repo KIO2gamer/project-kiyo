@@ -6,6 +6,7 @@ const { REST, Routes, Client, Collection, GatewayIntentBits, ActivityType } = re
 const Logger = require("./utils/logger");
 const CommandPermissions = require("./database/commandPermissions");
 const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
+const DashboardServer = require("./dashboard/server");
 
 // Client-related functions
 /**
@@ -234,6 +235,11 @@ const setupGracefulShutdown = (client) => {
             await client.oauth2Handler.stop();
         }
 
+        // Stop dashboard server if running
+        if (client.dashboardServer) {
+            await client.dashboardServer.stop();
+        }
+
         await mongoose.connection.close();
         client.destroy();
         process.exit(0);
@@ -309,6 +315,32 @@ const initializeBot = async () => {
             Logger.warn("OAuth2 not configured - YouTube subscriber roles will not work");
         }
 
+        // Start Dashboard Server
+        if (process.env.ENABLE_DASHBOARD !== "false") {
+            try {
+                const dashboardServer = new DashboardServer(client);
+                const dashboardPort = process.env.DASHBOARD_PORT || 3002;
+                await dashboardServer.start(dashboardPort);
+
+                // Store dashboard server for graceful shutdown
+                client.dashboardServer = dashboardServer;
+            } catch (error) {
+                Logger.warn(`Failed to start dashboard server: ${error.message}`);
+            }
+        }
+
+        // Start dashboard server if configured
+        if (process.env.ENABLE_DASHBOARD !== "false") {
+            const dashboardServer = new DashboardServer(client);
+            const dashboardPort = process.env.DASHBOARD_PORT || 3001;
+            try {
+                await dashboardServer.start(dashboardPort);
+                client.dashboardServer = dashboardServer;
+            } catch (error) {
+                Logger.warn(`Failed to start dashboard server: ${error.message}`);
+            }
+        }
+
         // Load commands and events
         loadCommands(client, path.join(__dirname, "./commands"));
         loadEvents(client, path.join(__dirname, "./events"));
@@ -329,6 +361,9 @@ const initializeBot = async () => {
 
         // Set presence
         setRichPresence(client, config);
+
+        // Configure logger with Discord client
+        Logger.setDiscordClient(client);
 
         // Setup graceful shutdown
         setupGracefulShutdown(client);

@@ -1,0 +1,262 @@
+<%- include('../layout', { title: 'Dashboard - Project Kiyo' }) %>
+
+<div class="row">
+    <!-- Welcome Card -->
+    <div class="col-12 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h4 class="card-title mb-1">Welcome back, <%= user.username %>!</h4>
+                        <p class="card-text mb-0">Here's what's happening with your bot today.</p>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-robot fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Bot Stats -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Active Servers
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="guild-count">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-server fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Users
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="user-count">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Bot Ping
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="bot-ping">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-wifi fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Uptime
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="uptime">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Activity Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Bot Activity Overview</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/dashboard/servers" class="btn btn-primary">
+                        <i class="fas fa-server me-2"></i>Manage Servers
+                    </a>
+                    <a href="/dashboard/commands" class="btn btn-success">
+                        <i class="fas fa-terminal me-2"></i>Configure Commands
+                    </a>
+                    <a href="/dashboard/monitoring" class="btn btn-info">
+                        <i class="fas fa-chart-line me-2"></i>View Analytics
+                    </a>
+                    <a href="/dashboard/settings" class="btn btn-warning">
+                        <i class="fas fa-cog me-2"></i>Bot Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memory Usage -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Resources</h6>
+            </div>
+            <div class="card-body">
+                <h4 class="small font-weight-bold">Memory Usage <span class="float-right" id="memory-percent">0%</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar bg-info" role="progressbar" id="memory-bar" style="width: 0%"></div>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted" id="memory-details">Loading...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load dashboard data
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        
+        // Update stats
+        document.getElementById('guild-count').textContent = data.guilds;
+        document.getElementById('user-count').textContent = data.users.toLocaleString();
+        document.getElementById('bot-ping').textContent = data.ping + 'ms';
+        
+        // Format uptime
+        const uptime = data.uptime;
+        const days = Math.floor(uptime / 86400);
+        const hours = Math.floor((uptime % 86400) / 3600);
+        const minutes = Math.floor((uptime % 3600) / 60);
+        document.getElementById('uptime').textContent = `${days}d ${hours}h ${minutes}m`;
+        
+        // Update memory usage
+        const memUsage = data.memoryUsage;
+        const usedMB = Math.round(memUsage.used / 1024 / 1024);
+        const totalMB = Math.round(memUsage.rss / 1024 / 1024);
+        const percentage = Math.round((memUsage.used / memUsage.rss) * 100);
+        
+        document.getElementById('memory-percent').textContent = percentage + '%';
+        document.getElementById('memory-bar').style.width = percentage + '%';
+        document.getElementById('memory-details').textContent = `${usedMB}MB / ${totalMB}MB`;
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+// Initialize activity chart
+function initActivityChart() {
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    
+    // Generate sample data for the last 24 hours
+    const labels = [];
+    const data = [];
+    const now = new Date();
+    
+    for (let i = 23; i >= 0; i--) {
+        const time = new Date(now.getTime() - (i * 60 * 60 * 1000));
+        labels.push(time.getHours() + ':00');
+        data.push(Math.floor(Math.random() * 100) + 20); // Sample data
+    }
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Commands Executed',
+                data: data,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+    initActivityChart();
+    
+    // Refresh data every 30 seconds
+    setInterval(loadDashboardData, 30000);
+});
+</script>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.chart-area {
+    position: relative;
+    height: 300px;
+}
+</style>
