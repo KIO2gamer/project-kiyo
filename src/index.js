@@ -329,17 +329,6 @@ const initializeBot = async () => {
             }
         }
 
-        // Start dashboard server if configured
-        if (process.env.ENABLE_DASHBOARD !== "false") {
-            const dashboardServer = new DashboardServer(client);
-            const dashboardPort = process.env.DASHBOARD_PORT || 3001;
-            try {
-                await dashboardServer.start(dashboardPort);
-                client.dashboardServer = dashboardServer;
-            } catch (error) {
-                Logger.warn(`Failed to start dashboard server: ${error.message}`);
-            }
-        }
 
         // Load commands and events
         loadCommands(client, path.join(__dirname, "./commands"));
