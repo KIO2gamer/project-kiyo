@@ -6,6 +6,7 @@ const {
     ButtonStyle,
 } = require("discord.js");
 const he = require("he");
+const Logger = require("../../utils/logger");
 
 // Constants for styling and timeouts
 const PRIMARY_COLOR = "#7289DA"; // Discord Blurple
@@ -22,7 +23,7 @@ module.exports = {
     description_full: "Tests your knowledge with a multiple-choice trivia question.",
     usage: "/trivia",
     examples: ["/trivia"],
-    
+
     data: new SlashCommandBuilder()
         .setName("trivia")
         .setDescription("Start a trivia game and answer a question!"),
@@ -76,7 +77,7 @@ async function fetchTriviaQuestion() {
         }
         const data = await response.json();
         if (data.results.length === 0) {
-            console.warn("No trivia questions returned from API."); // Log if no questions
+            Logger.warn("No trivia questions returned from API.");
             return null;
         }
         return data.results[0];
@@ -97,9 +98,9 @@ function createTriviaEmbed(questionData) {
     const allAnswers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
     const correctIndex = allAnswers.indexOf(correctAnswer);
 
-    console.log(`Correct Answer from API: ${correctAnswer}`); // Debug log
-    console.log(`All Answers Array: ${JSON.stringify(allAnswers)}`); // Debug log
-    console.log(`Correct Index (calculated): ${correctIndex}`); // Debug log
+    Logger.debug(`Correct Answer from API: ${correctAnswer}`);
+    Logger.debug(`All Answers Array: ${JSON.stringify(allAnswers)}`);
+    Logger.debug(`Correct Index (calculated): ${correctIndex}`);
 
     const embed = new EmbedBuilder()
         .setColor(PRIMARY_COLOR)
@@ -110,10 +111,9 @@ function createTriviaEmbed(questionData) {
         .setFooter({
             text: `Category: ${questionData.category} | Difficulty: ${questionData.difficulty.charAt(0).toUpperCase() + questionData.difficulty.slice(1)}`,
         })
-        .addFields(createAnswerFields(allAnswers)); // Use helper function to create fields
+        .addFields(createAnswerFields(allAnswers));
 
-    // Removed: embed.correctAnswerIndex = correctIndex;  // No longer attaching to embed
-    return { triviaEmbed: embed, correctIndex }; // Return both embed and correctIndex
+    return { triviaEmbed: embed, correctIndex };
 }
 
 function createAnswerFields(answers) {
@@ -149,10 +149,8 @@ function handleCollectorEvents(
     answerFields,
     correctAnswerIndex,
 ) {
-    // Added correctAnswerIndex parameter
     let answered = false;
-    // Removed: const correctAnswerIndex = reply.embeds[0]?.correctAnswerIndex; // No longer needed from embed
-    const answers = answerFields.map((field) => field.value); // Extract answers from embed fields
+    const answers = answerFields.map((field) => field.value);
 
     collector.on("collect", async (i) => {
         answered = true;
@@ -182,9 +180,8 @@ function handleCollectorEvents(
 }
 
 function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction) {
-    // Correct Answer Index parameter
-    console.log(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
-    console.log(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+    Logger.debug(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`);
+    Logger.debug(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`);
 
     const resultEmbed = new EmbedBuilder()
         .setColor(isCorrect ? CORRECT_COLOR : WRONG_COLOR)
@@ -215,9 +212,8 @@ function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerInd
 }
 
 function createTimeoutEmbed(answers, correctAnswerIndex) {
-    // Correct Answer Index parameter
-    console.log(`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`); // Debug log
-    console.log(`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`); // Debug log
+    Logger.debug(`createTimeoutEmbed - Correct Answer Index: ${correctAnswerIndex}`);
+    Logger.debug(`createTimeoutEmbed - Answers Array: ${JSON.stringify(answers)}`);
     return new EmbedBuilder()
         .setColor(TIMEOUT_COLOR)
         .setTitle("⏰ Time's Up! No answer in time. ⏱️")

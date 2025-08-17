@@ -6,10 +6,10 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Temporarily bans a member for the specified duration and reason.",
-    usage: '/temp_ban target:@user duration:"duration" [reason:"ban reason"]',
+    usage: "/temp_ban target:@user duration:\"duration\" [reason:\"ban reason\"]",
     examples: [
-        '/temp_ban target:@user123 duration:"1d"',
-        '/temp_ban target:@user123 duration:"2h" reason:"Spamming"',
+        "/temp_ban target:@user123 duration:\"1d\"",
+        "/temp_ban target:@user123 duration:\"2h\" reason:\"Spamming\"",
     ],
 
     data: new SlashCommandBuilder()

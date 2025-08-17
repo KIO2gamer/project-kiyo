@@ -45,7 +45,112 @@ function findRelatedCommands(command, allCommands) {
         .slice(0, 3);
 }
 
+/**
+ * Extract command options into a simple object
+ * @param {CommandInteraction} interaction - Discord interaction
+ * @returns {Object} Object with option names as keys and values as values
+ */
+function extractCommandOptions(interaction) {
+    const options = {};
+
+    if (!interaction.options) return options;
+
+    // Get all option data
+    const optionData = interaction.options.data || [];
+
+    for (const option of optionData) {
+        switch (option.type) {
+        case 3: // STRING
+            options[option.name] = interaction.options.getString(option.name);
+            break;
+        case 4: // INTEGER
+            options[option.name] = interaction.options.getInteger(option.name);
+            break;
+        case 5: // BOOLEAN
+            options[option.name] = interaction.options.getBoolean(option.name);
+            break;
+        case 6: // USER
+            options[option.name] = interaction.options.getUser(option.name);
+            break;
+        case 7: // CHANNEL
+            options[option.name] = interaction.options.getChannel(option.name);
+            break;
+        case 8: // ROLE
+            options[option.name] = interaction.options.getRole(option.name);
+            break;
+        case 9: // MENTIONABLE
+            options[option.name] = interaction.options.getMentionable(option.name);
+            break;
+        case 10: // NUMBER
+            options[option.name] = interaction.options.getNumber(option.name);
+            break;
+        case 11: // ATTACHMENT
+            options[option.name] = interaction.options.getAttachment(option.name);
+            break;
+        }
+    }
+
+    return options;
+}
+
+/**
+ * Check if a command has a specific option
+ * @param {Object} command - Command object
+ * @param {string} optionName - Name of the option to check
+ * @returns {boolean} Whether the command has the option
+ */
+function hasOption(command, optionName) {
+    return command.data?.options?.some((option) => option.name === optionName) || false;
+}
+
+/**
+ * Get command usage string for help display
+ * @param {Object} command - Command object
+ * @returns {string} Formatted usage string
+ */
+function getCommandUsage(command) {
+    if (!command.data?.options) {
+        return `/${command.data.name}`;
+    }
+
+    const options = command.data.options
+        .map((option) => {
+            const name = option.required ? `<${option.name}>` : `[${option.name}]`;
+            return name;
+        })
+        .join(" ");
+
+    return `/${command.data.name} ${options}`.trim();
+}
+
+/**
+ * Create a standardized embed footer with command info
+ * @param {CommandInteraction} interaction - Discord interaction
+ * @param {Object} additionalInfo - Additional info to include
+ * @returns {Object} Footer object for embeds
+ */
+function createCommandFooter(interaction, additionalInfo = {}) {
+    const footer = {
+        text: `Requested by ${interaction.user.tag}`,
+        iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+    };
+
+    if (additionalInfo.commandName) {
+        footer.text += ` • ${additionalInfo.commandName}`;
+    }
+
+    if (additionalInfo.executionTime) {
+        footer.text += ` • ${additionalInfo.executionTime}ms`;
+    }
+
+    return footer;
+}
+
 module.exports = {
     getOptionTypeInfo,
     findRelatedCommands,
+    extractCommandOptions,
+    hasOption,
+    getCommandUsage,
+    createCommandFooter,
 };

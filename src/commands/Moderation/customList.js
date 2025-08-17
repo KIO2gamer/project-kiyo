@@ -7,6 +7,7 @@ const {
 } = require("discord.js");
 const cc = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");
+const Logger = require("../../utils/logger");
 
 const { MessageFlags } = require("discord.js");
 
@@ -41,12 +42,12 @@ module.exports = {
             // Build query
             const query = searchTerm
                 ? {
-                      $or: [
-                          { name: { $regex: searchTerm, $options: "i" } },
-                          { alias_name: { $regex: searchTerm, $options: "i" } },
-                          { message: { $regex: searchTerm, $options: "i" } },
-                      ],
-                  }
+                    $or: [
+                        { name: { $regex: searchTerm, $options: "i" } },
+                        { alias_name: { $regex: searchTerm, $options: "i" } },
+                        { message: { $regex: searchTerm, $options: "i" } },
+                    ],
+                }
                 : {};
 
             // Fetch commands
@@ -151,18 +152,18 @@ module.exports = {
                 collector.on("collect", async (i) => {
                     try {
                         switch (i.customId) {
-                            case "first":
-                                currentPage = 0;
-                                break;
-                            case "prev":
-                                currentPage = Math.max(0, currentPage - 1);
-                                break;
-                            case "next":
-                                currentPage = Math.min(totalPages - 1, currentPage + 1);
-                                break;
-                            case "last":
-                                currentPage = totalPages - 1;
-                                break;
+                        case "first":
+                            currentPage = 0;
+                            break;
+                        case "prev":
+                            currentPage = Math.max(0, currentPage - 1);
+                            break;
+                        case "next":
+                            currentPage = Math.min(totalPages - 1, currentPage + 1);
+                            break;
+                        case "last":
+                            currentPage = totalPages - 1;
+                            break;
                         }
 
                         await i.update({
@@ -191,7 +192,7 @@ module.exports = {
                             components: [],
                         });
                     } catch (error) {
-                        console.error("Error removing buttons:", error);
+                        Logger.error("Error removing buttons:", error);
                     }
                 });
             }

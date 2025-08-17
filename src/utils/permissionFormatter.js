@@ -124,8 +124,8 @@ function formatCategorizedPermissions(permissions, options = {}) {
     const permsArray = Array.isArray(permissions)
         ? permissions
         : permissions.toArray
-          ? permissions.toArray()
-          : [];
+            ? permissions.toArray()
+            : [];
 
     if (permsArray.length === 0) return "No permissions";
 
@@ -160,7 +160,7 @@ function formatCategorizedPermissions(permissions, options = {}) {
     };
 
     // Build the output
-    let result = [];
+    const result = [];
 
     // Add categorized permissions
     for (const category of ["advanced", "moderation", "general", "text", "voice"]) {
@@ -221,7 +221,7 @@ function formatPermissions(permissions, options = {}) {
 
     // Format based on categorization preference
     if (categorize) {
-        let result = [];
+        const result = [];
 
         // Format allowed permissions if any
         if (allowed.length > 0) {
@@ -245,7 +245,7 @@ function formatPermissions(permissions, options = {}) {
         return result.join("\n\n").substring(0, maxLength);
     } else {
         // Simple list format
-        let result = [];
+        const result = [];
 
         if (allowed.length > 0) {
             result.push(
@@ -445,6 +445,75 @@ function formatPermission(permission) {
         .replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
+/**
+ * Check if a member or role has a specific permission
+ * @param {GuildMember|Role} target - The member or role to check
+ * @param {string} permission - The permission to check for
+ * @param {GuildChannel} channel - Optional channel for channel-specific permissions
+ * @returns {boolean} Whether the target has the permission
+ */
+function hasPermission(target, permission, channel = null) {
+    try {
+        if (channel) {
+            return channel.permissionsFor(target)?.has(permission) || false;
+        }
+        return target.permissions?.has(permission) || false;
+    } catch (error) {
+        return false;
+    }
+}
+
+/**
+ * Check if a member has any of the specified permissions
+ * @param {GuildMember} member - The member to check
+ * @param {string[]} permissions - Array of permissions to check
+ * @param {GuildChannel} channel - Optional channel for channel-specific permissions
+ * @returns {boolean} Whether the member has any of the permissions
+ */
+function hasAnyPermission(member, permissions, channel = null) {
+    return permissions.some((permission) => hasPermission(member, permission, channel));
+}
+
+/**
+ * Check if a member has all of the specified permissions
+ * @param {GuildMember} member - The member to check
+ * @param {string[]} permissions - Array of permissions to check
+ * @param {GuildChannel} channel - Optional channel for channel-specific permissions
+ * @returns {boolean} Whether the member has all of the permissions
+ */
+function hasAllPermissions(member, permissions, channel = null) {
+    return permissions.every((permission) => hasPermission(member, permission, channel));
+}
+
+/**
+ * Get missing permissions from a required set
+ * @param {GuildMember} member - The member to check
+ * @param {string[]} requiredPermissions - Array of required permissions
+ * @param {GuildChannel} channel - Optional channel for channel-specific permissions
+ * @returns {string[]} Array of missing permissions
+ */
+function getMissingPermissions(member, requiredPermissions, channel = null) {
+    return requiredPermissions.filter((permission) => !hasPermission(member, permission, channel));
+}
+
+/**
+ * Create a user-friendly error message for missing permissions
+ * @param {string[]} missingPermissions - Array of missing permissions
+ * @param {string} context - Context where permissions are needed (e.g., "use this command")
+ * @returns {string} Formatted error message
+ */
+function createPermissionErrorMessage(missingPermissions, context = "perform this action") {
+    if (missingPermissions.length === 0) return "";
+
+    const formattedPerms = missingPermissions
+        .map((perm) => `**${formatPermission(perm)}**`)
+        .join(", ");
+
+    const verb = missingPermissions.length === 1 ? "permission" : "permissions";
+
+    return `You need the following ${verb} to ${context}: ${formattedPerms}`;
+}
+
 module.exports = {
     // Constants
     PERMISSION_CATEGORIES,
@@ -464,4 +533,11 @@ module.exports = {
     getPermissionCategory,
     formatChannelPermissions,
     formatPermission,
+
+    // Permission checking utilities
+    hasPermission,
+    hasAnyPermission,
+    hasAllPermissions,
+    getMissingPermissions,
+    createPermissionErrorMessage,
 };

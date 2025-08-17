@@ -58,12 +58,12 @@ class Logger {
             level === "error"
                 ? "red"
                 : level === "warning"
-                  ? "yellow"
-                  : level === "success"
-                    ? "green"
-                    : level === "debug"
-                      ? "gray"
-                      : "blue";
+                    ? "yellow"
+                    : level === "success"
+                        ? "green"
+                        : level === "debug"
+                            ? "gray"
+                            : "blue";
 
         const symbolStr = chalk[levelColor](symbol);
 

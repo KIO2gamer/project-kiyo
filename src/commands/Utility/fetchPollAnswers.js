@@ -4,8 +4,8 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Fetches the current answers/votes for a poll from a specific message.",
-    usage: '/fetch_poll_answers message_id:"message ID" channel:#channel',
-    examples: ['/fetch_poll_answers message_id:"123456789012345678" channel:#polls'],
+    usage: "/fetch_poll_answers message_id:\"message ID\" channel:#channel",
+    examples: ["/fetch_poll_answers message_id:\"123456789012345678\" channel:#polls"],
 
     data: new SlashCommandBuilder()
         .setName("fetch_poll_answers")

@@ -57,14 +57,15 @@ module.exports = {
 
         try {
             // Perform search
-            const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
-                params: {
-                    key: apiKey,
-                    cx: searchEngineId,
-                    q: query,
-                    num: MAX_RESULTS + 2, // Request extra results in case some are filtered
-                },
-            });
+            const baseUrl = "https://www.googleapis.com/customsearch/v1";
+            const searchParams = {
+                key: apiKey,
+                cx: searchEngineId,
+                q: query,
+                num: MAX_RESULTS + 2, // Request extra results in case some are filtered
+            };
+
+            const response = await axios.get(baseUrl, { params: searchParams });
 
             const results = response.data.items || [];
 
@@ -74,7 +75,7 @@ module.exports = {
                     embeds: [
                         new EmbedBuilder()
                             .setColor(GOOGLE_COLORS.blue)
-                            .setTitle(`🔍 No results found`)
+                            .setTitle("🔍 No results found")
                             .setDescription(
                                 `Nothing found for: "${query}"\nTry different keywords or check your spelling.`,
                             )
@@ -88,21 +89,19 @@ module.exports = {
             // Create the search results embed
             const embed = new EmbedBuilder()
                 .setColor(GOOGLE_COLORS.blue)
-                .setTitle(`🔍 Google Search Results`)
+                .setTitle("🔍 Google Search Results")
                 .setDescription(`Search query: **${query}**`)
                 .setThumbnail(
                     "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
                 )
                 .setURL(`https://www.google.com/search?q=${encodeURIComponent(query)}`)
                 .setFooter({
-                    text: `Click the title to see all results • Powered by Google`,
+                    text: "Click the title to see all results • Powered by Google",
                     iconURL: "https://www.google.com/favicon.ico",
                 })
                 .setTimestamp();
 
-            // Add top results as fields (cleaner than description)
             results.slice(0, MAX_RESULTS).forEach((item, index) => {
-                // Clean up snippets, removing HTML and excess whitespace
                 let snippet = item.snippet || "No description available";
                 snippet = snippet.replace(/(\r\n|\n|\r)/gm, " ").trim();
 
@@ -120,7 +119,7 @@ module.exports = {
 
             // Add a view all results button link
             embed.addFields({
-                name: `Want more results?`,
+                name: "Want more results?",
                 value: `[View all results on Google](https://www.google.com/search?q=${encodeURIComponent(query)})`,
             });
 

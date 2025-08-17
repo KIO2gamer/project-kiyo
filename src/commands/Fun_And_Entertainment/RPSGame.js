@@ -6,7 +6,7 @@ module.exports = {
     description_full: "An exciting game of Rock, Paper, Scissors, Lizard, Spock against the bot!",
     usage: "/rpsls <choice>",
     examples: ["/rpsls rock", "/rpsls paper", "/rpsls scissors", "/rpsls lizard", "/rpsls spock"],
-    
+
     data: new SlashCommandBuilder()
         .setName("rpsls")
         .setDescription("Play Rock, Paper, Scissors, Lizard, Spock!")
@@ -71,7 +71,7 @@ module.exports = {
             .setDescription(
                 `You chose ${emojis[userChoice]} ${userChoice}.\nI chose ${emojis[botChoice]} ${botChoice}.\n\n${result}\n${action}`,
             )
-            .setFooter({ text: 'As Sheldon Cooper would say, "Bazinga!"' });
+            .setFooter({ text: "As Sheldon Cooper would say, \"Bazinga!\"" });
 
         await interaction.reply({ embeds: [embed] });
     },

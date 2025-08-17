@@ -1,4 +1,5 @@
 const { ActivityType } = require("discord.js");
+const { logError } = require("./errorHandler");
 const Logger = require("./logger");
 
 class PresenceManager {
@@ -47,7 +48,7 @@ class PresenceManager {
                 status: status,
             });
         } catch (error) {
-            Logger.error(`Failed to update presence: ${error.message}`);
+            logError("Failed to update presence", error, { category: "BOT" });
         }
     }
 

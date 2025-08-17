@@ -1,13 +1,12 @@
-const { SlashCommandBuilder } = require("discord.js");
-
-const { MessageFlags } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:
         "The bot chooses a random number between 1 and 100. The user has 7 tries to guess it.",
     usage: "/guess_the_number",
     examples: ["/guess_the_number"],
-    
+
     data: new SlashCommandBuilder()
         .setName("guess_the_number")
         .setDescription("Try to guess the secret number between 1 and 100!"),

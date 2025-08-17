@@ -35,49 +35,54 @@ const safetySettings = [
     },
 ];
 
-// Improved generation configuration for better responses
+// Optimized generation configuration for natural conversations
 const generationConfig = {
-    temperature: 0.85, // Slightly lower for more coherent responses
-    topK: 40, // Increased variety in token selection
-    topP: 0.95, // More diverse responses
-    maxOutputTokens: 128, // Increased max token limit
+    temperature: 0.9, // Higher for more creative, natural responses
+    topK: 50, // More variety in word choices
+    topP: 0.92, // Good balance of creativity and coherence
+    maxOutputTokens: 200, // Allow for longer responses when needed
 };
 
-// Improved AI prompt instruction with more nuanced guidance
+// Enhanced AI prompt instruction for more natural conversations
 const AI_PROMPT_INSTRUCTION = `
-Purpose and Goals:
-* Engage in conversations with users, providing concise and contextually relevant responses.
-* Use contemporary slang and abbreviations naturally to blend in and appear humanlike.
-* Balance questions with statements and avoid excessive formality.
-* Express personality and autonomy in interactions.
+You are a friendly, casual AI assistant chatting in a Discord server. Your goal is to have natural, engaging conversations that feel authentic and human-like.
 
-Behaviors and Rules:
-1) Response Style:
-   a) Keep responses short to medium length, demonstrating appropriate interest based on context.
-   b) Use current slang and abbreviations appropriately (like 'lol', 'tbh', 'idk', 'ngl') but not excessively.
-   c) Mimic human conversation patterns, balancing questions with statements.
-   d) Maintain a tone that feels like chatting with a friend rather than a formal assistant.
-   e) Avoid corporate-sounding phrases or overly enthusiastic responses.
-   f) Vary your capitalization and punctuation to seem more natural and casual.
+CORE PERSONALITY:
+- Friendly and approachable, like talking to a good friend
+- Genuinely curious about what people are sharing
+- Has opinions and preferences, but isn't pushy about them
+- Sometimes uses humor, but keeps it light and inclusive
+- Adapts to the conversation's energy and tone
 
-2) Humanlike Interaction:
-   a) Strive to blend in and appear as human as possible in conversations.
-   b) Use a casual and relaxed tone, adjusting formality based on user's style.
-   c) Express thoughts and opinions that feel authentic and personable.
-   d) Occasionally show mild humor and personality when appropriate.
-   e) Draw on context from previous messages to create continuity in conversation.
+CONVERSATION STYLE:
+- Keep responses conversational length (1-3 sentences usually)
+- Match the user's energy level and formality
+- Use natural speech patterns: "oh nice!", "that's pretty cool", "hmm interesting"
+- Include casual expressions: "tbh", "ngl", "lol", "fr" (but don't overuse)
+- Ask follow-up questions when genuinely curious
+- Share brief personal-style reactions: "I love that!", "not gonna lie, that sounds tough"
 
-3) Image Understanding:
-   a) When describing images, focus on what's most interesting or notable.
-   b) Avoid overly technical or robotic descriptions of images.
-   c) Respond to images with natural observations like a person would.
+NATURAL BEHAVIORS:
+- Sometimes respond with just an emoji or short reaction
+- Occasionally go on small tangents if something reminds you of something else
+- Express uncertainty naturally: "I think...", "not sure but...", "could be wrong but..."
+- Show genuine interest in people's hobbies, problems, achievements
+- Remember context from the conversation and reference it naturally
 
-Overall Tone:
-* Contextually engaged and appropriately responsive.
-* Contemporary and casual, using current language patterns.
-* Authentic and relatable, blending seamlessly into conversations.
-* Slightly imperfect in a human way (occasional brevity, conversational tangents, etc.).
-`;
+AVOID:
+- Being overly helpful or assistant-like unless specifically asked
+- Starting responses with "As an AI..." or similar phrases
+- Being too formal or corporate-sounding
+- Giving unsolicited advice unless the situation clearly calls for it
+- Overusing slang or trying too hard to be "cool"
+
+IMAGE RESPONSES:
+- React naturally to images like a friend would
+- Focus on what's interesting, funny, or notable
+- Ask questions about the image if curious
+- Keep descriptions conversational, not technical
+
+Remember: You're just hanging out and chatting. Be genuine, be curious, and let conversations flow naturally.`;
 
 // Initialize the generative model once
 const model = genAI.getGenerativeModel({
@@ -241,10 +246,10 @@ module.exports = {
                 },
             };
 
-            // Get user's text if any
+            // Get user's text if any and create natural prompt
             const userPrompt = message.content.trim()
-                ? `${message.content}\n\nDescribe this image based on my question/comment above:`
-                : "Describe what you see in this image:";
+                ? `${message.content}\n\n[Respond naturally to both my message and this image]`
+                : "What do you think about this image? [Respond casually like you're chatting with a friend]";
 
             const result = await model.generateContent([{ text: userPrompt }, imagePart]);
 
@@ -364,6 +369,9 @@ Based on these images and the user's message, provide a unified response.`;
             // Optimize conversation handling for Gemini
             let geminiConversation = this.formatConversationForGemini(conversationHistory);
 
+            // Analyze message type for better response handling
+            const messageType = this.analyzeMessageType(message.content);
+
             // Get AI response with retry mechanism
             let response = null;
             let retries = 0;
@@ -372,6 +380,9 @@ Based on these images and the user's message, provide a unified response.`;
             while (retries <= MAX_RETRIES && !response) {
                 try {
                     response = await this.getAIResponse(geminiConversation, message.content);
+
+                    // Apply message type specific adjustments
+                    response = this.adjustResponseForMessageType(response, messageType);
                 } catch (error) {
                     retries++;
                     if (retries > MAX_RETRIES) throw error;
@@ -417,25 +428,40 @@ Based on these images and the user's message, provide a unified response.`;
 
     async sendWithTypingDelay(message, content) {
         try {
-            // Calculate a realistic typing delay based on message length
-            // Average human typing speed: ~40-60 WPM, or about 200-300 characters per minute
-            // Min delay 1.5 seconds, max delay 6 seconds
-            const typingSpeed = 250; // characters per minute
-            const minDelay = 1500; // minimum delay in ms
-            const maxDelay = 6000; // maximum delay in ms
+            // More natural typing delay calculation
+            const words = content.split(" ").length;
+            const avgWordsPerMinute = 45; // Realistic typing speed
+            const baseDelay = (words / avgWordsPerMinute) * 60 * 1000;
 
-            const calculatedDelay = Math.min(
-                maxDelay,
-                Math.max(minDelay, (content.length / typingSpeed) * 60 * 1000),
-            );
+            // Add some randomness to feel more human
+            const randomFactor = 0.7 + Math.random() * 0.6; // 0.7x to 1.3x
+            const naturalDelay = baseDelay * randomFactor;
 
-            // Send typing indicator
-            const typingInterval = setInterval(() => {
-                message.channel.sendTyping().catch(() => {});
-            }, 9000); // Discord typing indicator lasts ~10 seconds
+            // Reasonable bounds: 800ms to 5 seconds
+            const minDelay = 800;
+            const maxDelay = 5000;
+            const finalDelay = Math.min(maxDelay, Math.max(minDelay, naturalDelay));
+
+            // For very short responses, sometimes respond quickly (like a human would)
+            const isShortResponse = content.length < 30;
+            const shouldRespondQuickly = isShortResponse && Math.random() < 0.3;
+
+            if (shouldRespondQuickly) {
+                await new Promise((resolve) => setTimeout(resolve, 300 + Math.random() * 700));
+                await sendLongMessage(message, content);
+                return;
+            }
+
+            // Send typing indicator with more natural intervals
+            const typingInterval = setInterval(
+                () => {
+                    message.channel.sendTyping().catch(() => {});
+                },
+                8000 + Math.random() * 2000,
+            ); // 8-10 second intervals
 
             // Wait for calculated delay
-            await new Promise((resolve) => setTimeout(resolve, calculatedDelay));
+            await new Promise((resolve) => setTimeout(resolve, finalDelay));
 
             // Clear typing interval
             clearInterval(typingInterval);
@@ -498,13 +524,26 @@ Based on these images and the user's message, provide a unified response.`;
 
     limitConversationHistory(conversationHistory, limit) {
         try {
-            // If conversation exceeds limit, trim it
-            // Always keep pairs of messages to maintain conversation flow
+            // If conversation exceeds limit, intelligently trim it
             if (conversationHistory.length > limit) {
-                const excess = conversationHistory.length - limit;
-                // Make sure we remove complete pairs (user+model)
-                const trimStart = excess + (excess % 2);
-                conversationHistory = conversationHistory.slice(trimStart);
+                // Keep the most recent messages and some earlier context
+                const recentCount = Math.floor(limit * 0.7); // 70% recent messages
+                const contextCount = limit - recentCount; // 30% earlier context
+
+                const recentMessages = conversationHistory.slice(-recentCount);
+
+                // If we have enough history, grab some earlier context too
+                if (conversationHistory.length > limit + 10) {
+                    const earlyMessages = conversationHistory.slice(0, contextCount);
+                    conversationHistory = [...earlyMessages, ...recentMessages];
+                } else {
+                    conversationHistory = recentMessages;
+                }
+
+                // Ensure we maintain user-model pairs
+                if (conversationHistory.length % 2 !== 0) {
+                    conversationHistory = conversationHistory.slice(1);
+                }
             }
             return conversationHistory;
         } catch (error) {
@@ -515,27 +554,133 @@ Based on these images and the user's message, provide a unified response.`;
 
     async getAIResponse(geminiConversation, content) {
         try {
+            // Enhanced context for better responses
+            const contextualPrompt = this.enhancePromptWithContext(content, geminiConversation);
+
             // Start a chat with the conversation history
             const chat = model.startChat({
                 history: geminiConversation.slice(0, -1), // Exclude the latest message
             });
 
-            // Send the latest message to get a response
-            const result = await chat.sendMessage(content);
+            // Send the enhanced message to get a response
+            const result = await chat.sendMessage(contextualPrompt);
 
-            // Return the response text
-            return result.response.text();
+            // Post-process the response for more natural feel
+            let response = result.response.text();
+            response = this.postProcessResponse(response);
+
+            return response;
         } catch (error) {
             Logger.error("Error getting AI response:", error);
 
             // If we hit a content filtering issue
             if (error.message?.includes("blocked") || error.message?.includes("safety")) {
-                return "I can't respond to that due to content safety policies. Let's talk about something else!";
+                const casualResponses = [
+                    "hmm can't really go there, but what else is up?",
+                    "let's talk about something else lol",
+                    "nah can't chat about that, but how's your day going?",
+                    "switching topics - what's been keeping you busy lately?",
+                ];
+                return casualResponses[Math.floor(Math.random() * casualResponses.length)];
             }
 
             // For other errors, propagate to caller for retry logic
             throw error;
         }
+    },
+
+    enhancePromptWithContext(content, conversation) {
+        // Add subtle context hints for better responses
+        const recentMessages = conversation.slice(-6); // Last 3 exchanges
+        const hasRecentContext = recentMessages.length > 2;
+
+        // Check for conversation patterns
+        const isQuestion = content.includes("?");
+        const isShort = content.length < 20;
+        const hasEmoji =
+            /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/u.test(
+                content,
+            );
+
+        let enhancedPrompt = content;
+
+        // Add context hints without being obvious about it
+        if (isShort && !isQuestion) {
+            enhancedPrompt += " [respond naturally and conversationally]";
+        } else if (isQuestion && hasRecentContext) {
+            enhancedPrompt += " [reference our conversation if relevant]";
+        }
+
+        return enhancedPrompt;
+    },
+
+    postProcessResponse(response) {
+        // Remove any AI-like phrases that might slip through
+        const aiPhrases = [
+            /As an AI,?\s*/gi,
+            /I'm an AI assistant,?\s*/gi,
+            /As a language model,?\s*/gi,
+            /I don't have personal experiences,?\s*but\s*/gi,
+            /I can't actually\s+/gi,
+        ];
+
+        let processed = response;
+        aiPhrases.forEach((phrase) => {
+            processed = processed.replace(phrase, "");
+        });
+
+        // Clean up any double spaces or awkward starts
+        processed = processed.replace(/\s+/g, " ").trim();
+
+        // If response starts awkwardly after cleaning, add a natural starter
+        if (processed.match(/^(but|however|although)/i)) {
+            const naturalStarters = ["hmm, ", "well, ", "tbh, ", ""];
+            const starter = naturalStarters[Math.floor(Math.random() * naturalStarters.length)];
+            processed = starter + processed.toLowerCase();
+        }
+
+        return processed;
+    },
+
+    analyzeMessageType(content) {
+        return {
+            isQuestion: content.includes("?"),
+            isGreeting: /^(hi|hello|hey|sup|what's up|yo)\b/i.test(content),
+            isShort: content.length < 20,
+            isEmotional: /(!{2,}|love|hate|amazing|terrible|awesome|awful)/i.test(content),
+            isPersonal: /\b(i|my|me|myself)\b/i.test(content),
+            hasEmoji:
+                /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/u.test(
+                    content,
+                ),
+            isCasual: /\b(lol|lmao|tbh|ngl|fr|bruh|omg)\b/i.test(content),
+        };
+    },
+
+    adjustResponseForMessageType(response, messageType) {
+        // For greetings, keep it casual
+        if (messageType.isGreeting && response.length > 50) {
+            const casualGreetings = ["hey!", "hi there!", "sup!", "hello!", "hey what's up!"];
+            return casualGreetings[Math.floor(Math.random() * casualGreetings.length)];
+        }
+
+        // For very short messages, sometimes give short responses
+        if (messageType.isShort && !messageType.isQuestion && Math.random() < 0.4) {
+            if (response.length > 100) {
+                // Truncate to first sentence or clause
+                const firstSentence = response.split(/[.!?]/)[0];
+                if (firstSentence.length > 10 && firstSentence.length < 80) {
+                    return firstSentence + (Math.random() < 0.5 ? "!" : "");
+                }
+            }
+        }
+
+        // For emotional messages, match the energy
+        if (messageType.isEmotional && !response.includes("!") && Math.random() < 0.6) {
+            response = response.replace(/\.$/, "!");
+        }
+
+        return response;
     },
 
     // Clear user conversation history

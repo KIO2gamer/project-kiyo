@@ -1,7 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { handleError } = require("../../utils/errorHandler");
-
 const { MessageFlags } = require("discord.js");
 
 module.exports = {
@@ -17,7 +15,7 @@ module.exports = {
 
     description_full:
         "Ask any question to Google's Gemini AI model and get an intelligent response. This command allows you to interact with the AI for general knowledge queries, explanations, or assistance with various topics.",
-    
+
     usage: "/ask_gemini <question>",
     examples: [
         "/ask_gemini What is quantum computing?",
@@ -28,6 +26,15 @@ module.exports = {
 
     async execute(interaction) {
         const question = interaction.options.getString("question");
+
+        // Check if API key is configured
+        if (!process.env.GEMINI_API_KEY) {
+            await interaction.reply({
+                content: "AI service is not properly configured. Please contact an administrator.",
+                ephemeral: true,
+            });
+            return;
+        }
 
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -56,18 +63,21 @@ module.exports = {
             }
         } catch (error) {
             console.error("Error in ask-gemini command:", error);
-            
+
             let errorMessage = "Sorry, there was an error processing your request.";
-            
+
             // Handle specific error types
             if (error.message?.includes("API key")) {
-                errorMessage = "AI service is not properly configured. Please contact an administrator.";
+                errorMessage =
+                    "AI service is not properly configured. Please contact an administrator.";
             } else if (error.message?.includes("blocked") || error.message?.includes("safety")) {
-                errorMessage = "I can't respond to that due to content safety policies. Please try a different question.";
+                errorMessage =
+                    "I can't respond to that due to content safety policies. Please try a different question.";
             } else if (error.message?.includes("quota") || error.message?.includes("limit")) {
-                errorMessage = "AI service is temporarily unavailable due to usage limits. Please try again later.";
+                errorMessage =
+                    "AI service is temporarily unavailable due to usage limits. Please try again later.";
             }
-            
+
             await interaction.reply({ content: errorMessage, ephemeral: true });
         }
     },

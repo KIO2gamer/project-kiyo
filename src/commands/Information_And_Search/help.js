@@ -75,28 +75,37 @@ module.exports = {
         const client = interaction.client;
         const categories = this.getCategorizedCommands(client.commands);
 
+        const totalCategories = Object.keys(categories).length;
         const embed = new EmbedBuilder()
             .setTitle("📚 Command Help")
-            .setDescription("Browse commands by category or search for specific commands.")
+            .setDescription(
+                `Browse commands by category or search for specific commands.\n\n**${client.commands.size} commands** available across **${totalCategories} categories**.`,
+            )
             .setColor("#3498db")
             .setFooter({
-                text: `Use the menu below to navigate • ${client.commands.size} commands available`,
+                text: "Use the menu below to navigate • Updated after cleanup",
                 iconURL: client.user.displayAvatarURL(),
             })
             .setTimestamp();
 
         // Add category fields with command counts
-        for (const [categoryName, commands] of Object.entries(categories)) {
+        const sortedCategories = Object.entries(categories).sort(([a], [b]) =>
+            this.formatCategoryName(a).localeCompare(this.formatCategoryName(b)),
+        );
+
+        for (const [categoryName, commands] of sortedCategories) {
             if (commands.length > 0) {
                 const formattedName = this.formatCategoryName(categoryName);
+                const emoji = this.getCategoryEmoji(categoryName);
                 embed.addFields({
-                    name: `${formattedName} (${commands.length})`,
+                    name: `${emoji} ${formattedName} (${commands.length})`,
                     value:
                         commands
                             .slice(0, 3)
                             .map((cmd) => `\`${cmd.data.name}\``)
                             .join(", ") +
                         (commands.length > 3 ? ` and ${commands.length - 3} more...` : ""),
+                    inline: true,
                 });
             }
         }
@@ -104,6 +113,7 @@ module.exports = {
         // Create category select menu
         const categoryOptions = Object.keys(categories)
             .filter((category) => categories[category].length > 0)
+            .sort((a, b) => this.formatCategoryName(a).localeCompare(this.formatCategoryName(b)))
             .map((category) => {
                 return {
                     label: this.formatCategoryName(category),
@@ -165,7 +175,7 @@ module.exports = {
 
         for (const command of commands.values()) {
             // Try to get category from:
-            // 1. Explicit category property
+            // 1. Explicit category property (set by command loader)
             // 2. Folder name from command's file path
             // 3. Fall back to "misc" if nothing else works
             let category;
@@ -176,7 +186,7 @@ module.exports = {
             } else if (command.filePath) {
                 // Extract folder name from file path
                 // Assuming filePath looks like ".../<category_folder>/<command_name>.js"
-                const folderMatch = command.filePath.match(/([^\/\\]+)[\/\\][^\/\\]+\.js$/);
+                const folderMatch = command.filePath.match(/([^/\\]+)[/\\][^/\\]+\.js$/);
                 category = folderMatch ? folderMatch[1].toLowerCase() : "misc";
             } else {
                 category = "misc";
@@ -196,7 +206,15 @@ module.exports = {
             categories[category].sort((a, b) => a.data.name.localeCompare(b.data.name));
         }
 
-        return categories;
+        // Filter out empty categories (shouldn't happen with the improved loader, but safety check)
+        const filteredCategories = {};
+        for (const [categoryName, commandList] of Object.entries(categories)) {
+            if (commandList.length > 0) {
+                filteredCategories[categoryName] = commandList;
+            }
+        }
+
+        return filteredCategories;
     },
 
     /**
@@ -301,10 +319,29 @@ module.exports = {
         const commands = categories[categoryName] || [];
 
         if (commands.length === 0) {
+            const embed = new EmbedBuilder()
+                .setTitle("❌ Category Not Found")
+                .setDescription(
+                    `No commands found in category: **${this.formatCategoryName(categoryName)}**\n\nThis category may have been cleaned up or all commands may have been removed.`,
+                )
+                .setColor("#e74c3c")
+                .setTimestamp();
+
+            const buttonRow = new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId(COMPONENT_IDS.OVERVIEW_BUTTON)
+                    .setLabel("Back to Overview")
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId(COMPONENT_IDS.QUIT_BUTTON)
+                    .setLabel("Close")
+                    .setEmoji("❌")
+                    .setStyle(ButtonStyle.Danger),
+            );
+
             return interaction.update({
-                content: `No commands found in category: ${this.formatCategoryName(categoryName)}`,
-                embeds: [],
-                components: [],
+                embeds: [embed],
+                components: [buttonRow],
             });
         }
 
@@ -312,7 +349,7 @@ module.exports = {
             .setTitle(
                 `${this.getCategoryEmoji(categoryName)} ${this.formatCategoryName(categoryName)} Commands`,
             )
-            .setDescription(`Select a command to view details`)
+            .setDescription("Select a command to view details")
             .setColor("#3498db")
             .setFooter({
                 text: `${commands.length} commands in this category`,
@@ -320,7 +357,6 @@ module.exports = {
             })
             .setTimestamp();
 
-        // Add command fields (up to 10 to avoid hitting embed limits)
         commands.slice(0, 12).forEach((cmd) => {
             embed.addFields({
                 name: cmd.data.name,
@@ -465,15 +501,17 @@ module.exports = {
         const customId = interaction.customId;
 
         switch (customId) {
-            case COMPONENT_IDS.CATEGORY_SELECT:
-                const categoryValue = interaction.values[0];
-                await this.displayCategory(interaction, categoryValue);
-                break;
+        case COMPONENT_IDS.CATEGORY_SELECT: {
+            const categoryValue = interaction.values[0];
+            await this.displayCategory(interaction, categoryValue);
+            break;
+        }
 
-            case COMPONENT_IDS.COMMAND_SELECT:
-                const commandValue = interaction.values[0];
-                await this.displayCommandHelp(interaction, commandValue);
-                break;
+        case COMPONENT_IDS.COMMAND_SELECT: {
+            const commandValue = interaction.values[0];
+            await this.displayCommandHelp(interaction, commandValue);
+            break;
+        }
         }
     },
 
@@ -485,41 +523,41 @@ module.exports = {
         const customId = interaction.customId;
 
         switch (customId) {
-            case COMPONENT_IDS.OVERVIEW_BUTTON:
+        case COMPONENT_IDS.OVERVIEW_BUTTON:
+            await this.displayOverview(interaction);
+            break;
+
+        case COMPONENT_IDS.SEARCH_BUTTON:
+            await this.handleSearchButton(interaction);
+            break;
+
+        case COMPONENT_IDS.REFRESH_BUTTON:
+            // Get the current state and refresh it
+            if (interaction.message.embeds[0].title.includes("Command:")) {
+                // We're viewing a specific command
+                const commandName = interaction.message.embeds[0].title.split(": ")[1];
+                await this.displayCommandHelp(interaction, commandName);
+            } else if (interaction.message.embeds[0].title.includes("Commands")) {
+                // We're viewing a category
+                const categoryName = interaction.message.embeds[0].title
+                    .replace(/^.*? /, "")
+                    .replace(" Commands", "")
+                    .toLowerCase()
+                    .replace(/ /g, "_");
+                await this.displayCategory(interaction, categoryName);
+            } else {
+                // We're at the overview
                 await this.displayOverview(interaction);
-                break;
+            }
+            break;
 
-            case COMPONENT_IDS.SEARCH_BUTTON:
-                await this.handleSearchButton(interaction);
-                break;
-
-            case COMPONENT_IDS.REFRESH_BUTTON:
-                // Get the current state and refresh it
-                if (interaction.message.embeds[0].title.includes("Command:")) {
-                    // We're viewing a specific command
-                    const commandName = interaction.message.embeds[0].title.split(": ")[1];
-                    await this.displayCommandHelp(interaction, commandName);
-                } else if (interaction.message.embeds[0].title.includes("Commands")) {
-                    // We're viewing a category
-                    const categoryName = interaction.message.embeds[0].title
-                        .replace(/^.*? /, "")
-                        .replace(" Commands", "")
-                        .toLowerCase()
-                        .replace(/ /g, "_");
-                    await this.displayCategory(interaction, categoryName);
-                } else {
-                    // We're at the overview
-                    await this.displayOverview(interaction);
-                }
-                break;
-
-            case COMPONENT_IDS.QUIT_BUTTON:
-                await interaction.update({
-                    content: "Help menu closed.",
-                    embeds: [],
-                    components: [],
-                });
-                break;
+        case COMPONENT_IDS.QUIT_BUTTON:
+            await interaction.update({
+                content: "Help menu closed.",
+                embeds: [],
+                components: [],
+            });
+            break;
         }
     },
 
@@ -553,16 +591,30 @@ module.exports = {
      * @param {Object} interaction - The interaction object
      */
     async handleSearchModal(interaction) {
-        const searchTerm = interaction.fields.getTextInputValue("search_term").toLowerCase();
+        const searchTerm = interaction.fields.getTextInputValue("search_term").toLowerCase().trim();
+
+        if (!searchTerm) {
+            return interaction.update({
+                content: "Please provide a search term.",
+                embeds: [],
+                components: [],
+            });
+        }
+
         const commands = interaction.client.commands;
 
         // Find matching commands
         const results = [];
         for (const command of commands.values()) {
             const name = command.data.name.toLowerCase();
-            const description = command.data.description.toLowerCase();
+            const description = (command.data.description || "").toLowerCase();
+            const category = (command.category || "").toLowerCase();
 
-            if (name.includes(searchTerm) || description.includes(searchTerm)) {
+            if (
+                name.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                category.includes(searchTerm)
+            ) {
                 results.push(command);
             }
         }
@@ -580,9 +632,8 @@ module.exports = {
         if (results.length === 0) {
             embed.setDescription("No commands found matching your search term.");
         } else {
-            embed.setDescription(`Here are the commands that match your search:`);
+            embed.setDescription("Here are the commands that match your search:");
 
-            // Add results to the embed (up to 15 to avoid hitting embed limits)
             results.slice(0, 15).forEach((cmd) => {
                 embed.addFields({
                     name: cmd.data.name,

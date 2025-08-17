@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Discord OAuth2 Callback Service</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                text-align: center;
+                padding: 50px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                max-width: 600px;
+            }
+            .icon {
+                font-size: 4em;
+                margin-bottom: 20px;
+            }
+            h1 {
+                margin: 20px 0;
+                font-size: 2.5em;
+            }
+            p {
+                font-size: 1.2em;
+                line-height: 1.6;
+                margin: 20px 0;
+            }
+            .info {
+                color: #e3f2fd;
+            }
+            .endpoints {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                padding: 20px;
+                margin: 20px 0;
+                text-align: left;
+            }
+            .endpoint {
+                font-family: "Courier New", monospace;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 10px;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="icon">🔗</div>
+            <h1>Discord OAuth2 Callback Service</h1>
+            <p class="info">
+                This service handles Discord OAuth2 callbacks for YouTube subscriber role
+                verification.
+            </p>
+
+            <div class="endpoints">
+                <h3>Available Endpoints:</h3>
+                <div class="endpoint">GET /callback - OAuth2 callback handler</div>
+                <div class="endpoint">GET /health - Service health check</div>
+            </div>
+
+            <p>
+                This service is part of a Discord bot that assigns roles based on YouTube subscriber
+                counts.
+            </p>
+            <p><strong>Status:</strong> <span id="status">Checking...</span></p>
+        </div>
+
+        <script>
+            // Check service health
+            fetch("/health")
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById("status").textContent = "✅ Online";
+                    document.getElementById("status").style.color = "#4CAF50";
+                })
+                .catch((error) => {
+                    document.getElementById("status").textContent = "❌ Offline";
+                    document.getElementById("status").style.color = "#f44336";
+                });
+        </script>
+    </body>
+</html>

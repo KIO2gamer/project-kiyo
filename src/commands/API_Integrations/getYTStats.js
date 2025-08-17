@@ -156,8 +156,8 @@ async function extractChannelId(youtube, input) {
     // Channel URL patterns
     const urlPatterns = {
         channel: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:channel|c)\/(UC[\w-]{21}[AQgw])/,
-        custom: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:c|user)\/([^\/\s?]+)/,
-        handle: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/@([^\/\s?]+)/,
+        custom: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:c|user)\/([^/\s?]+)/,
+        handle: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/@([^/\s?]+)/,
         video: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/,
     };
 

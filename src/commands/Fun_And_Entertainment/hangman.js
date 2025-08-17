@@ -38,7 +38,7 @@ module.exports = {
     description_full: "A thrilling multiplayer game of hangman!",
     usage: "/hangman",
     examples: ["/hangman"],
-    
+
     data: new SlashCommandBuilder()
         .setName("hangman")
         .setDescription("Start a multiplayer exciting game of hangman!"),
@@ -52,8 +52,8 @@ module.exports = {
 
             const word = selectWord(words);
             const gameState = initializeGameState(word);
-            let gameActive = true;
-            let winner = null; // Track the user who guesses the word
+            const gameActive = true;
+            const winner = null; // Track the user who guesses the word
 
             const gameEmbed = createGameEmbed(gameState, hangmanImages[0]);
             const msg = await interaction.editReply({ embeds: [gameEmbed] });
@@ -185,7 +185,6 @@ function startGameCollector(
         }
 
         await msg.edit({ embeds: [gameEmbed] });
-        // m.delete(); // Keeping messages for multiplayer context
     });
 
     collector.on("end", async (collected, reason) => {
@@ -225,8 +224,7 @@ function updateWordState(letter, gameState) {
 async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) {
     gameState.remainingGuesses--;
     const funnyMessage = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
-    const reply = await message.reply(`😅 ${funnyMessage} - Nice try, ${message.author}!`); // Mention the user who guessed incorrectly
-    // setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
+    const reply = await message.reply(`😅 ${funnyMessage} - Nice try, ${message.author}!`);
 
     gameEmbed
         .setDescription(`Let's keep the guessing game going!\n\n\`\`\`${gameState.wordState}\`\`\``)
@@ -250,10 +248,8 @@ async function handleIncorrectGuess(message, gameState, gameEmbed, gameMessage) 
 
 async function handleGuess(message) {
     const reply = await message.reply(
-        `${message.author}, you've already guessed that letter! Try another one.`, // Mention the user who repeated guess
+        `${message.author}, you've already guessed that letter! Try another one.`,
     );
-    // setTimeout(() => reply.delete(), DELETE_DELAY); // Keeping messages for multiplayer context
-    // message.delete(); // Keeping messages for multiplayer context - No user message deletion
 }
 
 function checkGameOver(gameState) {

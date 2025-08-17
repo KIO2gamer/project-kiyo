@@ -6,8 +6,8 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Kicks a member from the server with the specified reason.",
-    usage: '/kick target:@user [reason:"kick reason"]',
-    examples: ["/kick target:@user123", '/kick target:@user123 reason:"Violating server rules"'],
+    usage: "/kick target:@user [reason:\"kick reason\"]",
+    examples: ["/kick target:@user123", "/kick target:@user123 reason:\"Violating server rules\""],
 
     data: new SlashCommandBuilder()
         .setName("kick")

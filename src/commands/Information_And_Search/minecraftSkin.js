@@ -73,8 +73,7 @@ async function fetchPlayerData(username) {
     try {
         const response = await axios.get(`${ASHCON_API_BASE}${username}`);
         if (response.status === 204) {
-            // 204 No Content - Player not found on Ashcon API (or Mojang)
-            return null; // Return null to indicate player not found
+            return null;
         }
         return response.data;
     } catch (error) {

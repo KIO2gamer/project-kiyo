@@ -4,8 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const { REST, Routes, Client, Collection, GatewayIntentBits, ActivityType } = require("discord.js");
 const Logger = require("./utils/logger");
-const PresenceManager = require("./utils/presenceManager");
 const CommandPermissions = require("./database/commandPermissions");
+const OAuth2Handler = require("./utils/oauth2Handler");
 
 // Client-related functions
 /**
@@ -44,6 +44,7 @@ function loadCommands(client, commandsPath) {
 
     const commandFolders = fs.readdirSync(commandsPath);
     let commandCount = 0;
+    const emptyFolders = [];
 
     for (const folder of commandFolders) {
         const folderPath = path.join(commandsPath, folder);
@@ -53,22 +54,53 @@ function loadCommands(client, commandsPath) {
 
         const commandFiles = fs.readdirSync(folderPath).filter((file) => file.endsWith(".js"));
 
+        // Handle empty folders gracefully
+        if (commandFiles.length === 0) {
+            emptyFolders.push(folder);
+            Logger.warn(`Empty command folder detected: ${folder}`);
+            continue;
+        }
+
+        let folderCommandCount = 0;
         for (const file of commandFiles) {
             const filePath = path.join(folderPath, file);
-            const command = require(filePath);
 
-            if ("data" in command && "execute" in command) {
-                client.commands.set(command.data.name, command);
-                commandCount++;
-            } else {
-                Logger.warn(
-                    `Command at ${filePath} is missing required "data" or "execute" property`,
-                );
+            try {
+                const command = require(filePath);
+
+                if ("data" in command && "execute" in command) {
+                    // Store the category information for the help command
+                    command.category = folder.toLowerCase();
+                    command.filePath = filePath;
+
+                    client.commands.set(command.data.name, command);
+                    commandCount++;
+                    folderCommandCount++;
+                } else {
+                    Logger.warn(
+                        `Command at ${filePath} is missing required "data" or "execute" property`,
+                    );
+                }
+            } catch (error) {
+                Logger.error(`Failed to load command ${filePath}: ${error.message}`);
             }
+        }
+
+        if (folderCommandCount > 0) {
+            Logger.log("COMMANDS", `Loaded ${folderCommandCount} commands from ${folder}`);
         }
     }
 
-    Logger.success(`Loaded ${commandCount} commands`);
+    // Report empty folders if any
+    if (emptyFolders.length > 0) {
+        Logger.warn(
+            `Found ${emptyFolders.length} empty command folders: ${emptyFolders.join(", ")}`,
+        );
+    }
+
+    Logger.success(
+        `Loaded ${commandCount} commands from ${commandFolders.length - emptyFolders.length} active categories`,
+    );
 }
 
 /**
@@ -108,11 +140,20 @@ function loadEvents(client, eventsPath) {
  * @param {Object} config Bot configuration
  */
 function setRichPresence(client, config) {
-    const presenceManager = new PresenceManager(client, config);
-    presenceManager.startRotation();
-
-    // Store the manager on the client for later access if needed
-    client.presenceManager = presenceManager;
+    try {
+        client.user.setPresence({
+            activities: [
+                {
+                    name: config.presence.activity.name,
+                    type: ActivityType[config.presence.activity.type] || ActivityType.Playing,
+                },
+            ],
+            status: config.presence.status,
+        });
+        Logger.success("Bot presence set successfully");
+    } catch (error) {
+        Logger.error(`Failed to set bot presence: ${error.message}`);
+    }
 }
 
 // Bot configuration
@@ -125,74 +166,13 @@ const config = {
     // Database config
     mongoUri: process.env.MONGODB_URL,
 
-    // Logging config
-    logLevel: process.env.LOG_LEVEL || "INFO",
-    logToFile: process.env.LOG_TO_FILE === "true",
-
-    // Rich presence configuration
+    // Simple presence configuration
     presence: {
-        // Static presence (used as fallback)
-        static: {
-            activity: {
-                name: "with Discord.js",
-                type: "Playing",
-                details: "Managing server tasks",
-                state: "Active and ready",
-            },
-            status: "online",
+        activity: {
+            name: "with Discord.js",
+            type: "Playing",
         },
-
-        // Dynamic presence rotation settings
-        dynamic: {
-            enabled: true,
-            intervalMs: 150000, // 2.5 minutes between rotations
-
-            // Available status options for random selection
-            statusOptions: ["online", "idle", "dnd"],
-
-            // Activities rotation array
-            activities: [
-                {
-                    name: "🎮 Exploring new worlds",
-                    type: "Playing",
-                },
-                {
-                    name: "🎲 Rolling the dice",
-                    type: "Playing",
-                },
-                {
-                    name: "👾 Conquering challenges",
-                    type: "Playing",
-                },
-                {
-                    name: "🎧 music with the team",
-                    type: "Listening",
-                },
-                {
-                    name: "🎤 to your requests",
-                    type: "Listening",
-                },
-                {
-                    name: "👀 over the server",
-                    type: "Watching",
-                },
-                {
-                    name: "🛡️ Guarding your community",
-                    type: "Custom",
-                },
-                {
-                    name: "🎬 New features coming soon!",
-                    type: "Custom",
-                },
-            ],
-        },
-    },
-
-    // Development mode settings
-    development: {
-        enabled: process.env.NODE_ENV !== "production",
-        autoReloadCommands: true,
-        logLevel: "DEBUG",
+        status: "online",
     },
 };
 
@@ -249,9 +229,9 @@ const setupGracefulShutdown = (client) => {
     process.on("SIGINT", async () => {
         Logger.log("BOT", "Shutting down gracefully...");
 
-        // Stop presence rotation if active
-        if (client.presenceManager) {
-            client.presenceManager.stopRotation();
+        // Stop OAuth2 server if running
+        if (client.oauth2Handler) {
+            await client.oauth2Handler.stop();
         }
 
         await mongoose.connection.close();
@@ -284,9 +264,9 @@ async function loadCommandPermissions(client) {
                 }
             }
         }
-        console.log(`Loaded permissions for ${permissions.length} commands`);
+        Logger.log("COMMANDS", `Loaded permissions for ${permissions.length} commands`);
     } catch (error) {
-        console.error("Error loading command permissions:", error);
+        Logger.error("Error loading command permissions:", error);
     }
 }
 
@@ -300,6 +280,34 @@ const initializeBot = async () => {
 
         // Connect to database
         await connectToMongoDB();
+
+        // Start OAuth2 callback server if configured for local development
+        if (
+            process.env.DISCORD_CLIENT_ID &&
+            process.env.DISCORD_CLIENT_SECRET &&
+            process.env.DISCORD_REDIRECT_URI &&
+            process.env.USE_LOCAL_OAUTH === "true"
+        ) {
+            const oauth2Handler = new OAuth2Handler();
+            const port = process.env.OAUTH2_PORT || 3000;
+            try {
+                await oauth2Handler.start(port);
+                Logger.success(`OAuth2 callback server started on port ${port}`);
+
+                // Store oauth2Handler for graceful shutdown
+                client.oauth2Handler = oauth2Handler;
+            } catch (error) {
+                Logger.warn(`Failed to start OAuth2 server: ${error.message}`);
+            }
+        } else if (
+            process.env.DISCORD_CLIENT_ID &&
+            process.env.DISCORD_CLIENT_SECRET &&
+            process.env.DISCORD_REDIRECT_URI
+        ) {
+            Logger.success("OAuth2 configured for external callback service (Netlify)");
+        } else {
+            Logger.warn("OAuth2 not configured - YouTube subscriber roles will not work");
+        }
 
         // Load commands and events
         loadCommands(client, path.join(__dirname, "./commands"));

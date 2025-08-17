@@ -33,10 +33,10 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Issues a warning to a member and logs it in the moderation system.",
-    usage: '/warn target:@user reason:"warn reason"',
+    usage: "/warn target:@user reason:\"warn reason\"",
     examples: [
-        '/warn target:@user123 reason:"First warning for spamming"',
-        '/warn target:@user123 reason:"Second warning for inappropriate behavior"',
+        "/warn target:@user123 reason:\"First warning for spamming\"",
+        "/warn target:@user123 reason:\"Second warning for inappropriate behavior\"",
     ],
 
     data: new SlashCommandBuilder()

@@ -6,7 +6,6 @@ const {
     ButtonStyle,
 } = require("discord.js");
 const { google } = require("googleapis");
-require("dotenv").config();
 
 const youtube = google.youtube({
     version: "v3",
@@ -18,13 +17,6 @@ const pageSize = 3; // Number of results per page
 const { MessageFlags } = require("discord.js");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("ytvideo")
-        .setDescription("Search for a YouTube video")
-        .addStringOption((option) =>
-            option.setName("query").setDescription("The search query").setRequired(true),
-        ),
-
     data: new SlashCommandBuilder()
         .setName("youtube_search")
         .setDescription("Search for YouTube videos")
@@ -71,11 +63,21 @@ module.exports = {
     usage: "/youtube_search <query> [channel] [duration] [order] [type] [max_results]",
     examples: [
         "/youtube_search query:cats",
-        '/youtube_search query:"funny videos" channel:PewDiePie',
+        "/youtube_search query:\"funny videos\" channel:PewDiePie",
         "/youtube_search query:tutorials duration:long order:viewCount type:episode max_results:10",
     ],
 
     async execute(interaction) {
+        // Check if API key is configured
+        if (!process.env.YOUTUBE_API_KEY) {
+            await interaction.reply({
+                content:
+                    "YouTube search service is not properly configured. Please contact an administrator.",
+                ephemeral: true,
+            });
+            return;
+        }
+
         const query = interaction.options.getString("query");
         const channelFilter = interaction.options.getString("channel");
         const durationFilter = interaction.options.getString("duration") || "any";
@@ -136,9 +138,20 @@ module.exports = {
                     components: row ? [row] : [],
                 };
             } catch (error) {
-                handleError("Error fetching YouTube results:", error);
+                console.error("Error fetching YouTube results:", error);
+
+                let errorMessage = "An error occurred while searching YouTube.";
+
+                if (error.code === 403) {
+                    errorMessage = "YouTube API quota exceeded. Please try again tomorrow.";
+                } else if (error.code === 400) {
+                    errorMessage = "Invalid search parameters. Please check your input.";
+                } else if (error.code === 404) {
+                    errorMessage = "No results found for your search.";
+                }
+
                 return {
-                    content: "An error occurred while searching YouTube.",
+                    content: errorMessage,
                     embeds: [],
                     components: [],
                 };
@@ -257,7 +270,7 @@ module.exports = {
                 }
                 return null;
             } catch (error) {
-                handleError("Error fetching channel ID:", error);
+                console.error("Error fetching channel ID:", error);
                 return null;
             }
         };
@@ -291,7 +304,7 @@ module.exports = {
         });
 
         collector.on("end", () => {
-            message.edit({ components: [] }).catch(handleError); // Remove buttons after the collector ends
+            message.edit({ components: [] }).catch(console.error); // Remove buttons after the collector ends
         });
     },
 };

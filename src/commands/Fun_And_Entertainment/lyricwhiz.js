@@ -53,7 +53,6 @@ const GENRES_KEYWORDS = [
 const { MessageFlags } = require("discord.js");
 
 module.exports = {
-    
     data: new SlashCommandBuilder()
         .setName("lyricwhiz")
         .setDescription("Play a lyric fill-in-the-blanks guessing game!") // Updated description

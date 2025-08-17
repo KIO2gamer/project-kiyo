@@ -11,7 +11,7 @@ module.exports = {
         "/emoji_info 🎮",
         "/emoji_info PartyBlob",
     ],
-    
+
     data: new SlashCommandBuilder()
         .setName("emoji_info")
         .setDescription("Provides information about emojis")
@@ -221,13 +221,13 @@ module.exports = {
 // Helper function to get max emoji slots based on boost level
 function getMaxEmojis(premiumTier) {
     switch (premiumTier) {
-        case 1:
-            return "100 static, 100 animated";
-        case 2:
-            return "150 static, 150 animated";
-        case 3:
-            return "250 static, 250 animated";
-        default:
-            return "50 static, 50 animated";
+    case 1:
+        return "100 static, 100 animated";
+    case 2:
+        return "150 static, 150 animated";
+    case 3:
+        return "250 static, 250 animated";
+    default:
+        return "50 static, 50 animated";
     }
 }

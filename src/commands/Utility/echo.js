@@ -10,13 +10,13 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:
-        'Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the "Manage Channels" permission to prevent misuse.',
+        "Echoes the provided text back to you. Optionally, send the echo to a specific channel and choose whether to format it as an embed. Requires the \"Manage Channels\" permission to prevent misuse.",
     usage: "/echo <input:text_to_echo> <channel:channel> [embed:true/false]",
     examples: [
-        '/echo input:"Hello there!" channel:#general',
-        '/echo input:"Important announcement!" channel:#announcements embed:true',
+        "/echo input:\"Hello there!\" channel:#general",
+        "/echo input:\"Important announcement!\" channel:#announcements embed:true",
     ],
-    
+
     data: new SlashCommandBuilder()
         .setName("echo")
         .setDescription("Replies with your input!")

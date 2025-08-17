@@ -33,6 +33,114 @@ function calculateSimilarity(str1, str2) {
     return 1 - track[str2.length][str1.length] / Math.max(str1.length, str2.length);
 }
 
+/**
+ * Truncate text to a specified length with ellipsis
+ * @param {string} text - Text to truncate
+ * @param {number} maxLength - Maximum length
+ * @param {string} suffix - Suffix to add when truncated (default: "...")
+ * @returns {string} Truncated text
+ */
+function truncateText(text, maxLength, suffix = "...") {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength - suffix.length) + suffix;
+}
+
+/**
+ * Capitalize the first letter of a string
+ * @param {string} str - String to capitalize
+ * @returns {string} Capitalized string
+ */
+function capitalize(str) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+/**
+ * Convert string to title case
+ * @param {string} str - String to convert
+ * @returns {string} Title case string
+ */
+function toTitleCase(str) {
+    if (!str) return str;
+    return str.replace(
+        /\w\S*/g,
+        (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+    );
+}
+
+/**
+ * Format a string by replacing underscores with spaces and capitalizing
+ * @param {string} str - String to format
+ * @returns {string} Formatted string
+ */
+function formatIdentifier(str) {
+    if (!str) return str;
+    return str
+        .replace(/([A-Z])/g, " $1")
+        .replace(/_/g, " ")
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+/**
+ * Escape special regex characters in a string
+ * @param {string} str - String to escape
+ * @returns {string} Escaped string
+ */
+function escapeRegex(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Remove extra whitespace and normalize line breaks
+ * @param {string} str - String to clean
+ * @returns {string} Cleaned string
+ */
+function cleanWhitespace(str) {
+    if (!str) return str;
+    return str.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Split text into chunks that fit within a specified length
+ * @param {string} text - Text to split
+ * @param {number} maxLength - Maximum length per chunk
+ * @param {string} separator - Separator to split on (default: "\n\n")
+ * @returns {string[]} Array of text chunks
+ */
+function splitTextIntoChunks(text, maxLength = 1024, separator = "\n\n") {
+    if (text.length <= maxLength) {
+        return [text];
+    }
+
+    const parts = text.split(separator);
+    const result = [];
+    let currentPart = "";
+
+    for (const part of parts) {
+        if (currentPart.length + part.length + separator.length <= maxLength) {
+            currentPart += (currentPart ? separator : "") + part;
+        } else {
+            if (currentPart) result.push(currentPart);
+            currentPart = part;
+        }
+    }
+
+    if (currentPart) {
+        result.push(currentPart);
+    }
+
+    return result;
+}
+
 module.exports = {
     calculateSimilarity,
+    truncateText,
+    capitalize,
+    toTitleCase,
+    formatIdentifier,
+    escapeRegex,
+    cleanWhitespace,
+    splitTextIntoChunks,
 };

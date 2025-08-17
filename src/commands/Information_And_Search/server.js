@@ -30,7 +30,7 @@ module.exports = {
                 ),
         ),
     description_full:
-        'Provides comprehensive information and statistics about the server. Use "/server info" for general server details, or "/server stats" with an optional timeframe to view activity statistics.',
+        "Provides comprehensive information and statistics about the server. Use \"/server info\" for general server details, or \"/server stats\" with an optional timeframe to view activity statistics.",
     usage: "/server info\n/server stats [timeframe]",
     examples: [
         "/server info",
@@ -231,16 +231,16 @@ async function sendServerStats(interaction) {
 // Helper functions for timeframe handling
 function getStartDate(timeframe) {
     switch (timeframe) {
-        case "24h":
-            return moment().subtract(1, "day").toDate();
-        case "7d":
-            return moment().subtract(7, "days").toDate();
-        case "30d":
-            return moment().subtract(30, "days").toDate();
-        case "1M":
-            return moment().subtract(1, "month").toDate();
-        default:
-            return new Date(0); // Beginning of time
+    case "24h":
+        return moment().subtract(1, "day").toDate();
+    case "7d":
+        return moment().subtract(7, "days").toDate();
+    case "30d":
+        return moment().subtract(30, "days").toDate();
+    case "1M":
+        return moment().subtract(1, "month").toDate();
+    default:
+        return new Date(0); // Beginning of time
     }
 }
 
@@ -412,8 +412,8 @@ function createStatsEmbed(guild, timeframe, stats) {
     const activeMembers =
         stats.mostActiveMembers.length > 0
             ? stats.mostActiveMembers
-                  .map((m, i) => `${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`)
-                  .join("\n")
+                .map((m, i) => `${getPositionEmoji(i + 1)} <@${m.id}>: ${m.messages} messages`)
+                .join("\n")
             : "No message activity recorded";
 
     const embed = new EmbedBuilder()

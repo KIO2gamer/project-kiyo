@@ -7,7 +7,7 @@ module.exports = {
         "The bot virtually flips a coin and reveals the result (Heads or Tails). You can also bet on the outcome!",
     usage: "/coin_flip [bet]",
     examples: ["/coin_flip", "/coin_flip heads", "/coin_flip tails"],
-    
+
     data: new SlashCommandBuilder()
         .setName("coin_flip")
         .setDescription("Flip a coin and bet on the outcome!")

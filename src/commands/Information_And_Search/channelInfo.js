@@ -297,23 +297,23 @@ module.exports = {
 // Helper function to get an appropriate emoji based on channel type
 function getChannelIcon(channel) {
     switch (channel.type) {
-        case ChannelType.GuildText:
-            return "💬";
-        case ChannelType.GuildVoice:
-            return "🔊";
-        case ChannelType.GuildCategory:
-            return "📂";
-        case ChannelType.GuildAnnouncement:
-            return "📢";
-        case ChannelType.AnnouncementThread:
-        case ChannelType.PublicThread:
-        case ChannelType.PrivateThread:
-            return "🧵";
-        case ChannelType.GuildStageVoice:
-            return "🎭";
-        case ChannelType.GuildForum:
-            return "📋";
-        default:
-            return "📝";
+    case ChannelType.GuildText:
+        return "💬";
+    case ChannelType.GuildVoice:
+        return "🔊";
+    case ChannelType.GuildCategory:
+        return "📂";
+    case ChannelType.GuildAnnouncement:
+        return "📢";
+    case ChannelType.AnnouncementThread:
+    case ChannelType.PublicThread:
+    case ChannelType.PrivateThread:
+        return "🧵";
+    case ChannelType.GuildStageVoice:
+        return "🎭";
+    case ChannelType.GuildForum:
+        return "📋";
+    default:
+        return "📝";
     }
 }

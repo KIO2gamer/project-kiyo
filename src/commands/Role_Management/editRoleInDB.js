@@ -9,7 +9,7 @@ module.exports = {
         "Edits the name and/or color of a role stored in the database. Provide either the name, color, or both to update.",
     usage: "/edit_role_in_data <role:role> [name:new_name] [color:#hexcolor]",
     examples: [
-        '/edit_role_in_data role:Moderators name:"Senior Moderators"',
+        "/edit_role_in_data role:Moderators name:\"Senior Moderators\"",
         "/edit_role_in_data role:VIP color:#FFD700",
     ],
 

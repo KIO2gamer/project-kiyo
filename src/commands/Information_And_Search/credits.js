@@ -25,20 +25,10 @@ module.exports = {
 
             // Static list of contributors with their contributions
             const contributors = [
-                { command: "steel", name: "steeles.0", contribution: "Command Development" },
-                { command: "koifish", name: "hallow_spice", contribution: "Bot Development" },
-                {
-                    command: "do_not_touch",
-                    name: "umbree_on_toast",
-                    contribution: "Command Development",
-                },
                 { command: "rickroll", name: "flashxdfx", contribution: "Command Development" },
                 { command: "summon", name: "eesmal", contribution: "Command Development" },
-                { command: "snipe", name: "na51f", contribution: "Command Development" },
                 { command: "photo", name: "spheroidon", contribution: "Command Development" },
-                { command: "skibidi", name: "zenoz231", contribution: "Command Development" },
                 { command: "quokka", name: "wickiwacka2", contribution: "Command Development" },
-                { command: "uwu", name: "rizzwan.", contribution: "Command Development" },
                 { command: "boba", name: "pepsi_pro", contribution: "Command Development" },
                 { command: "lyricwhiz", name: "vipraz", contribution: "Command Development" },
             ];

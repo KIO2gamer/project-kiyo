@@ -71,7 +71,6 @@ module.exports = {
                 ); // Announce the winner
                 interaction.followUp({ embeds: [winEmbed] });
             } else if (reason === "idle") {
-                // If the collector ends without a win/lose reason (e.g., channel inactivity)
                 const gameoverEmbed = createEndEmbed(
                     "Game Over!",
                     `${GAME_OVER_EMOJI} No one guessed the word. The word was **${wordToUnscramble}**.`,

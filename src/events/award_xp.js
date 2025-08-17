@@ -95,33 +95,34 @@ async function handleLevelUp(message, levelData, oldLevel, guildSettings) {
         const levelUpMessage = `🎉 Congratulations ${member}! You've leveled up to **Level ${newLevel}**!`;
 
         switch (messageType) {
-            case "public":
-                const channelId = guildSettings.leveling.levelUpChannelId;
-                const channel = channelId
-                    ? message.guild.channels.cache.get(channelId)
-                    : message.channel;
+        case "public": {
+            const channelId = guildSettings.leveling.levelUpChannelId;
+            const channel = channelId
+                ? message.guild.channels.cache.get(channelId)
+                : message.channel;
 
-                if (
-                    channel &&
+            if (
+                channel &&
                     channel.permissionsFor(message.guild.members.me).has("SendMessages")
-                ) {
-                    await channel.send(levelUpMessage);
-                }
-                break;
+            ) {
+                await channel.send(levelUpMessage);
+            }
+            break;
+        }
 
-            case "dm":
-                try {
-                    await member.send(
-                        `🎉 You've leveled up to **Level ${newLevel}** in **${message.guild.name}**!`,
-                    );
-                } catch (err) {
-                    // User might have DMs disabled, silently fail
-                }
-                break;
+        case "dm":
+            try {
+                await member.send(
+                    `🎉 You've leveled up to **Level ${newLevel}** in **${message.guild.name}**!`,
+                );
+            } catch (err) {
+                // User might have DMs disabled, silently fail
+            }
+            break;
 
-            case "disabled":
-                // No message
-                break;
+        case "disabled":
+            // No message
+            break;
         }
 
         // Check for role rewards
@@ -138,8 +139,8 @@ async function handleLevelUp(message, levelData, oldLevel, guildSettings) {
                         if (messageType === "public") {
                             const channel = guildSettings.leveling.levelUpChannelId
                                 ? message.guild.channels.cache.get(
-                                      guildSettings.leveling.levelUpChannelId,
-                                  )
+                                    guildSettings.leveling.levelUpChannelId,
+                                )
                                 : message.channel;
 
                             if (channel) {

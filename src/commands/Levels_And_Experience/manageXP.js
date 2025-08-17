@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require("discord.js");
 const Logger = require("../../utils/logger");
 const { GuildSettingsSchema } = require("../../database/GuildSettingsSchema");
 
@@ -121,97 +121,97 @@ module.exports = {
             }
 
             switch (subcommand) {
-                case "toggle": {
-                    const enabled = interaction.options.getBoolean("enabled");
-                    settings.leveling.enabled = enabled;
+            case "toggle": {
+                const enabled = interaction.options.getBoolean("enabled");
+                settings.leveling.enabled = enabled;
 
-                    await settings.save();
-                    return interaction.reply(
-                        `✅ Leveling system has been ${enabled ? "enabled" : "disabled"} for this server.`,
-                    );
-                }
+                await settings.save();
+                return interaction.reply(
+                    `✅ Leveling system has been ${enabled ? "enabled" : "disabled"} for this server.`,
+                );
+            }
 
-                case "xprate": {
-                    const multiplier = interaction.options.getNumber("multiplier");
-                    settings.leveling.xpRate = multiplier;
+            case "xprate": {
+                const multiplier = interaction.options.getNumber("multiplier");
+                settings.leveling.xpRate = multiplier;
 
-                    await settings.save();
-                    return interaction.reply(
-                        `✅ XP rate multiplier has been set to **${multiplier}x**.`,
-                    );
-                }
+                await settings.save();
+                return interaction.reply(
+                    `✅ XP rate multiplier has been set to **${multiplier}x**.`,
+                );
+            }
 
-                case "levelupmessage": {
-                    const messageType = interaction.options.getString("type");
-                    const channel = interaction.options.getChannel("channel");
+            case "levelupmessage": {
+                const messageType = interaction.options.getString("type");
+                const channel = interaction.options.getChannel("channel");
 
-                    settings.leveling.levelUpMessageType = messageType;
-                    settings.leveling.levelUpChannelId =
+                settings.leveling.levelUpMessageType = messageType;
+                settings.leveling.levelUpChannelId =
                         messageType === "public" && channel ? channel.id : null;
 
-                    await settings.save();
+                await settings.save();
 
-                    let response = `✅ Level-up notifications have been set to **${messageType}**`;
-                    if (messageType === "public" && channel) {
-                        response += ` in ${channel}`;
-                    } else if (messageType === "public") {
-                        response += " (will appear in the channel where user is active)";
-                    }
-
-                    return interaction.reply(response);
+                let response = `✅ Level-up notifications have been set to **${messageType}**`;
+                if (messageType === "public" && channel) {
+                    response += ` in ${channel}`;
+                } else if (messageType === "public") {
+                    response += " (will appear in the channel where user is active)";
                 }
 
-                case "rolerewards": {
-                    const level = interaction.options.getNumber("level");
-                    const role = interaction.options.getRole("role");
+                return interaction.reply(response);
+            }
 
-                    // Initialize role rewards array if it doesn't exist
-                    if (!settings.leveling.roleRewards) {
-                        settings.leveling.roleRewards = [];
-                    }
+            case "rolerewards": {
+                const level = interaction.options.getNumber("level");
+                const role = interaction.options.getRole("role");
 
-                    // Find existing role reward for this level
-                    const existingIndex = settings.leveling.roleRewards.findIndex(
-                        (reward) => reward.level === level,
-                    );
+                // Initialize role rewards array if it doesn't exist
+                if (!settings.leveling.roleRewards) {
+                    settings.leveling.roleRewards = [];
+                }
 
-                    if (!role) {
-                        // If no role provided, remove the reward for this level
-                        if (existingIndex !== -1) {
-                            settings.leveling.roleRewards.splice(existingIndex, 1);
-                            await settings.save();
-                            return interaction.reply(`✅ Removed role reward for level ${level}.`);
-                        } else {
-                            return interaction.reply(`No role reward was set for level ${level}.`);
-                        }
-                    } else {
-                        // Check if the bot can manage this role
-                        if (role.position >= interaction.guild.members.me.roles.highest.position) {
-                            return interaction.reply({
-                                content:
-                                    "I cannot assign this role as it's positioned higher than my highest role.",
-                                flags: MessageFlags.Ephemeral,
-                            });
-                        }
+                // Find existing role reward for this level
+                const existingIndex = settings.leveling.roleRewards.findIndex(
+                    (reward) => reward.level === level,
+                );
 
-                        // Add or update the role reward
-                        const roleReward = { level, roleId: role.id };
-
-                        if (existingIndex !== -1) {
-                            settings.leveling.roleRewards[existingIndex] = roleReward;
-                        } else {
-                            settings.leveling.roleRewards.push(roleReward);
-                        }
-
-                        // Sort rewards by level
-                        settings.leveling.roleRewards.sort((a, b) => a.level - b.level);
-
+                if (!role) {
+                    // If no role provided, remove the reward for this level
+                    if (existingIndex !== -1) {
+                        settings.leveling.roleRewards.splice(existingIndex, 1);
                         await settings.save();
-                        return interaction.reply(
-                            `✅ Set ${role} as the reward for reaching level ${level}.`,
-                        );
+                        return interaction.reply(`✅ Removed role reward for level ${level}.`);
+                    } else {
+                        return interaction.reply(`No role reward was set for level ${level}.`);
                     }
+                } else {
+                    // Check if the bot can manage this role
+                    if (role.position >= interaction.guild.members.me.roles.highest.position) {
+                        return interaction.reply({
+                            content:
+                                    "I cannot assign this role as it's positioned higher than my highest role.",
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    }
+
+                    // Add or update the role reward
+                    const roleReward = { level, roleId: role.id };
+
+                    if (existingIndex !== -1) {
+                        settings.leveling.roleRewards[existingIndex] = roleReward;
+                    } else {
+                        settings.leveling.roleRewards.push(roleReward);
+                    }
+
+                    // Sort rewards by level
+                    settings.leveling.roleRewards.sort((a, b) => a.level - b.level);
+
+                    await settings.save();
+                    return interaction.reply(
+                        `✅ Set ${role} as the reward for reaching level ${level}.`,
+                    );
                 }
+            }
             }
         } catch (error) {
             Logger.log(

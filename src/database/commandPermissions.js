@@ -33,10 +33,9 @@ const commandPermissionsSchema = new mongoose.Schema({
 });
 
 // Update the updatedAt field on save
-commandPermissionsSchema.pre('save', function(next) {
+commandPermissionsSchema.pre("save", function (next) {
     this.updatedAt = Date.now();
     next();
 });
 
 module.exports = mongoose.model("CommandPermissions", commandPermissionsSchema);
-

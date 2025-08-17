@@ -1,6 +1,6 @@
 const { Events, AuditLogEvent, EmbedBuilder, PermissionsBitField } = require("discord.js");
 const MsgLogsConfig = require("./../database/msgLogsConfig");
-const { handleError } = require("./../utils/errorHandler");
+const { handleError, logError } = require("./../utils/errorHandler");
 
 async function fetchPartialMessages(oldMessage, newMessage) {
     if (oldMessage.partial || newMessage.partial) {
@@ -8,7 +8,7 @@ async function fetchPartialMessages(oldMessage, newMessage) {
             oldMessage = await oldMessage.fetch();
             newMessage = await newMessage.fetch();
         } catch (err) {
-            handleError("Error fetching partial messages:", err);
+            logError("Error fetching partial messages", err, { category: "EVENTS" });
             return false;
         }
     }
@@ -18,13 +18,15 @@ async function fetchPartialMessages(oldMessage, newMessage) {
 async function getLogChannel(newMessage) {
     const config = await MsgLogsConfig.findOne();
     if (!config?.channelId) {
-        handleError("Log channel ID is not set.");
+        logError("Message logs", "Log channel ID is not set", { category: "EVENTS" });
         return null;
     }
 
     const logChannel = await newMessage.guild.channels.fetch(config.channelId);
     if (!logChannel) {
-        handleError(`Log channel with ID ${config.channelId} not found.`);
+        logError("Message logs", `Log channel with ID ${config.channelId} not found`, {
+            category: "EVENTS",
+        });
         return null;
     }
 
@@ -37,8 +39,10 @@ async function getLogChannel(newMessage) {
             PermissionsBitField.Flags.EmbedLinks,
         ])
     ) {
-        handleError(
+        logError(
+            "Message logs permission error",
             `Bot lacks permission to send messages or embed links in the channel: ${config.channelId}`,
+            { category: "PERMISSION" },
         );
         return null;
     }

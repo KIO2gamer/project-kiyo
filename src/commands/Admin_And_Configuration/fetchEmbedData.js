@@ -50,7 +50,6 @@ module.exports = {
                 return interaction.reply("The message does not contain any embeds.");
             }
 
-            // Extract the first embed (you can loop through if there are multiple)
             const embedData = data.embeds[0];
 
             // Send the embed data as JSON

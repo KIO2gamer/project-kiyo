@@ -5,10 +5,10 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Unbans a member from the server with the specified reason.",
-    usage: '/unban user:"user ID or unique username" [reason:"unban reason"]',
+    usage: "/unban user:\"user ID or unique username\" [reason:\"unban reason\"]",
     examples: [
-        '/unban user:"123456789012345678"',
-        '/unban user:"yoo_12345" reason:"Ban was a mistake"',
+        "/unban user:\"123456789012345678\"",
+        "/unban user:\"yoo_12345\" reason:\"Ban was a mistake\"",
     ],
 
     data: new SlashCommandBuilder()

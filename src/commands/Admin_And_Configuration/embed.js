@@ -148,27 +148,24 @@ module.exports = {
                         .setRequired(false),
                 ),
         )
-        .addSubcommand(
-            (subcommand) =>
-                subcommand
-                    .setName("preview")
-                    .setDescription("Preview an embed without sending it")
-                    .addStringOption((option) =>
-                        option
-                            .setName("title")
-                            .setDescription("The title of the embed")
-                            .setRequired(true)
-                            .setMaxLength(256),
-                    )
-                    .addStringOption((option) =>
-                        option
-                            .setName("description")
-                            .setDescription("The description of the embed")
-                            .setRequired(true)
-                            .setMaxLength(4096),
-                    ),
-            // Add the same options as create, but don't include channel
-            // (Abbreviated for example, would include all the same options)
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName("preview")
+                .setDescription("Preview an embed without sending it")
+                .addStringOption((option) =>
+                    option
+                        .setName("title")
+                        .setDescription("The title of the embed")
+                        .setRequired(true)
+                        .setMaxLength(256),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName("description")
+                        .setDescription("The description of the embed")
+                        .setRequired(true)
+                        .setMaxLength(4096),
+                ),
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 

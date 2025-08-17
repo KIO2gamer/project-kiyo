@@ -181,6 +181,32 @@ function createErrorEmbed(category, errorMessage, suggestion) {
 }
 
 /**
+ * Simple error logging function for non-interactive errors
+ * @param {string} context - Context where the error occurred
+ * @param {Error|string} error - The error to log
+ * @param {Object} options - Additional options
+ */
+function logError(context, error, options = {}) {
+    const { category = "UNKNOWN", includeStack = true } = options;
+    const timestamp = new Date().toISOString();
+
+    const errorMessage =
+        error instanceof Error ? (includeStack ? error.stack : error.message) : String(error);
+
+    const formattedLog = `
+===========================================
+[${timestamp}] [${category}] ${ERROR_CATEGORIES[category]?.emoji || "❓"} ${context}
+
+Error Message:
+${errorMessage}
+===========================================
+`;
+
+    console.error(formattedLog);
+    updateErrorStats(category, error);
+}
+
+/**
  * Handles and logs errors that occur during command execution.
  * Can be used like console.error() or with Discord interaction objects.
  *
@@ -256,16 +282,16 @@ ${errorMessage}
         const response = sent
             ? await sent.edit({ embeds: [errorEmbed], components: [row] })
             : await (interaction.replied || interaction.deferred
-                  ? interaction.editReply({
-                        embeds: [errorEmbed],
-                        components: [row],
-                        flags: MessageFlags.Ephemeral,
-                    })
-                  : interaction.reply({
-                        embeds: [errorEmbed],
-                        components: [row],
-                        flags: MessageFlags.Ephemeral,
-                    }));
+                ? interaction.editReply({
+                    embeds: [errorEmbed],
+                    components: [row],
+                    flags: MessageFlags.Ephemeral,
+                })
+                : interaction.reply({
+                    embeds: [errorEmbed],
+                    components: [row],
+                    flags: MessageFlags.Ephemeral,
+                }));
 
         // Set up button collector for showing technical details
         const collector = response.createMessageComponentCollector({
@@ -321,6 +347,9 @@ function getErrorStats() {
 
 module.exports = {
     handleError,
+    logError,
     getErrorStats,
     ERROR_CATEGORIES,
+    identifyErrorCategory,
+    getErrorSuggestion,
 };

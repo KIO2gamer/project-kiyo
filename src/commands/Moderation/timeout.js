@@ -6,10 +6,10 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Timeouts a member for the specified duration and reason.",
-    usage: '/timeout target:@user amount:"duration" [reason:"timeout reason"]',
+    usage: "/timeout target:@user amount:\"duration\" [reason:\"timeout reason\"]",
     examples: [
-        '/timeout target:@user123 amount:"1h"',
-        '/timeout target:@user123 amount:"30m" reason:"Being disruptive"',
+        "/timeout target:@user123 amount:\"1h\"",
+        "/timeout target:@user123 amount:\"30m\" reason:\"Being disruptive\"",
     ],
 
     data: new SlashCommandBuilder()

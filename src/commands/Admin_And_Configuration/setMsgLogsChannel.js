@@ -11,7 +11,7 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:
-        'Sets the channel where message logs will be sent. Requires the "Administrator" permission.',
+        "Sets the channel where message logs will be sent. Requires the \"Administrator\" permission.",
     usage: "/set_msg_logs_channel <channel:channel>",
     examples: ["/set_msg_logs_channel channel:#message-logs"],
     data: new SlashCommandBuilder()

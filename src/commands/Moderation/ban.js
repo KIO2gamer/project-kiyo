@@ -6,8 +6,8 @@ const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Bans a member from the server with the specified reason.",
-    usage: '/ban target:@user [reason:"ban reason"]',
-    examples: ["/ban target:@user123", '/ban target:@user123 reason:"Severe rule violation"'],
+    usage: "/ban target:@user [reason:\"ban reason\"]",
+    examples: ["/ban target:@user123", "/ban target:@user123 reason:\"Severe rule violation\""],
 
     data: new SlashCommandBuilder()
         .setName("ban")

@@ -25,7 +25,7 @@ const aiChatChannelSchema = new mongoose.Schema({
 });
 
 // Update the updatedAt field on save
-aiChatChannelSchema.pre('save', function(next) {
+aiChatChannelSchema.pre("save", function (next) {
     this.updatedAt = Date.now();
     next();
 });
