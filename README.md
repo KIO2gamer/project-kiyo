@@ -16,14 +16,37 @@ A streamlined multipurpose Discord bot built with [discord.js](https://discord.j
 -   **Google Generative AI:** AI-powered chat responses and content generation
 -   **Google APIs:** Translation services and search functionality
 -   **Weather API:** Real-time weather information
+-   **YouTube Data API:** Channel statistics and subscriber verification
 -   **External APIs:** Photo search and various web services
 
-### Additional Features
+### Featured Capabilities
 
+-   **🎬 YouTube Subscriber Roles:** Automatically assign Discord roles based on YouTube subscriber count with OAuth2 verification
 -   **Levels & Experience:** User XP tracking and leaderboards
 -   **Role Management:** Automated role assignment and management
 -   **Fun Commands:** Entertainment commands including games, trivia, and interactive features
 -   **Database Integration:** MongoDB for persistent data storage
+
+### 🏗️ **Project Structure**
+
+This project follows a feature-based organization for better maintainability:
+
+```
+project-kiyo/
+├── 📁 src/                          # Main source code
+│   ├── 📁 commands/                 # Discord commands by category
+│   ├── 📁 features/                 # Feature-based organization
+│   │   └── 📁 youtube-subscriber-roles/  # YouTube subscriber role feature
+│   ├── 📁 database/                 # MongoDB schemas
+│   ├── 📁 events/                   # Discord.js event handlers
+│   └── 📁 utils/                    # Utility functions
+├── 📁 docs/                         # Documentation
+├── 📁 deployments/                  # External service deployments
+│   └── 📁 netlify-oauth/            # Netlify OAuth2 callback service
+└── 📁 assets/                       # Static assets
+```
+
+See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detailed information.
 
 ## Installation
 

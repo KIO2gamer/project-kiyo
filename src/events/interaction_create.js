@@ -37,7 +37,7 @@ module.exports = {
 
             // Import the ytSubRoleConfig module to access its handlers
             try {
-                const ytSubRoleConfig = require("../commands/Admin_And_Configuration/ytSubRoleConfig");
+                const ytSubRoleConfig = require("../features/youtube-subscriber-roles/commands/ytSubRoleConfig");
 
                 // Handle YouTube subscriber role config interactions
                 if (
@@ -71,7 +71,7 @@ module.exports = {
 
 // Helper function to handle YouTube config interactions
 async function handleYTConfigInteractions(interaction, userId, ytSubRoleConfig) {
-    const YTSubRoleConfig = require("../database/ytSubRoleConfig");
+    const YTSubRoleConfig = require("../features/youtube-subscriber-roles/database/ytSubRoleConfig");
     const { EmbedBuilder } = require("discord.js");
 
     // Handle add tier button

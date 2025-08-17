@@ -5,7 +5,7 @@ const fs = require("fs");
 const { REST, Routes, Client, Collection, GatewayIntentBits, ActivityType } = require("discord.js");
 const Logger = require("./utils/logger");
 const CommandPermissions = require("./database/commandPermissions");
-const OAuth2Handler = require("./utils/oauth2Handler");
+const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
 
 // Client-related functions
 /**
