@@ -1,7 +1,7 @@
 // Dashboard JavaScript utilities
 
 // Global dashboard object
-window.dashboard = {
+if (typeof window !== "undefined") window.dashboard = {
     // Show alert messages
     showAlert: function (type, message, duration = 5000) {
         const alertContainer =
@@ -22,8 +22,13 @@ window.dashboard = {
             setTimeout(() => {
                 const alert = document.getElementById(alertId);
                 if (alert) {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
+                    if (typeof bootstrap !== "undefined" && window.bootstrap.Alert) {
+                        const bsAlert = new window.bootstrap.Alert(alert);
+                        bsAlert.close();
+                    } else {
+                        // Fallback: remove alert manually if Bootstrap JS is not loaded
+                        alert.parentNode.removeChild(alert);
+                    }
                 }
             }, duration);
         }
@@ -148,11 +153,11 @@ window.dashboard = {
 // Initialize dashboard when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
     // Create alert container
-    dashboard.createAlertContainer();
+    window.dashboard.createAlertContainer();
 
     // Add loading states to elements with data-loading attribute
     document.querySelectorAll("[data-loading]").forEach((element) => {
-        dashboard.setLoading(element.id, true);
+        window.dashboard.setLoading(element.id, true);
     });
 
     // Handle all confirm buttons
@@ -160,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.target.hasAttribute("data-confirm")) {
             e.preventDefault();
             const message = e.target.getAttribute("data-confirm");
-            dashboard.confirm(message, function () {
+            window.dashboard.confirm(message, function () {
                 // If it's a link, navigate to it
                 if (e.target.tagName === "A") {
                     window.location.href = e.target.href;
@@ -178,7 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Utility functions for charts
-window.chartUtils = {
+if (typeof window !== "undefined") window.chartUtils = {
     // Generate random data for demo charts
     generateRandomData: function (count, min = 0, max = 100) {
         const data = [];
@@ -230,7 +235,7 @@ window.chartUtils = {
 };
 
 // Auto-refresh functionality
-window.autoRefresh = {
+if (typeof window !== "undefined") window.autoRefresh = {
     intervals: new Map(),
 
     start: function (name, callback, interval = 30000) {
@@ -255,6 +260,8 @@ window.autoRefresh = {
 };
 
 // Cleanup on page unload
-window.addEventListener("beforeunload", function () {
-    autoRefresh.stopAll();
-});
+if (typeof window !== "undefined") {
+    window.addEventListener("beforeunload", function () {
+        window.autoRefresh.stopAll();
+    });
+}

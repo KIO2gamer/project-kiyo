@@ -22,7 +22,7 @@ module.exports = [
         },
     },
     {
-        files: ["public/**/*.js"],
+        files: ["public/**/*.js", "src/dashboard/public/**/*.js"],
         languageOptions: {
             globals: {
                 ...globals.browser,

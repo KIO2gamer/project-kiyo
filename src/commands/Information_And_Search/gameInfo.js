@@ -8,8 +8,6 @@ const axios = require("axios");
 const { handleError } = require("../../utils/errorHandler");
 require("dotenv").config();
 
-const { MessageFlags } = require("discord.js");
-
 module.exports = {
     description_full:
         "Get detailed information about video games, including release date, ratings, platforms, genres, and more. Uses the IGDB database.",
