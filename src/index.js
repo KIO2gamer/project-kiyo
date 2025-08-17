@@ -7,6 +7,7 @@ const Logger = require("./utils/logger");
 const CommandPermissions = require("./database/commandPermissions");
 const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
 const DashboardServer = require("./dashboard/server");
+const StatsTracker = require("./utils/statsTracker");
 
 // Client-related functions
 /**
@@ -319,22 +320,10 @@ const initializeBot = async () => {
         if (process.env.ENABLE_DASHBOARD !== "false") {
             try {
                 const dashboardServer = new DashboardServer(client);
-                const dashboardPort = process.env.DASHBOARD_PORT || 3002;
+                const dashboardPort = process.env.DASHBOARD_PORT || 3001;
                 await dashboardServer.start(dashboardPort);
 
                 // Store dashboard server for graceful shutdown
-                client.dashboardServer = dashboardServer;
-            } catch (error) {
-                Logger.warn(`Failed to start dashboard server: ${error.message}`);
-            }
-        }
-
-        // Start dashboard server if configured
-        if (process.env.ENABLE_DASHBOARD !== "false") {
-            const dashboardServer = new DashboardServer(client);
-            const dashboardPort = process.env.DASHBOARD_PORT || 3001;
-            try {
-                await dashboardServer.start(dashboardPort);
                 client.dashboardServer = dashboardServer;
             } catch (error) {
                 Logger.warn(`Failed to start dashboard server: ${error.message}`);
@@ -364,6 +353,10 @@ const initializeBot = async () => {
 
         // Configure logger with Discord client
         Logger.setDiscordClient(client);
+
+        // Initialize stats tracker
+        client.statsTracker = new StatsTracker(client);
+        Logger.success("Stats tracker initialized");
 
         // Setup graceful shutdown
         setupGracefulShutdown(client);

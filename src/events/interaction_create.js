@@ -15,6 +15,8 @@ module.exports = {
             }
 
             try {
+                const startTime = Date.now();
+
                 // Log command usage
                 await Logger.commandUsage(
                     interaction.commandName,
@@ -24,7 +26,22 @@ module.exports = {
                 );
 
                 await command.execute(interaction);
+
+                const executionTime = Date.now() - startTime;
+
+                // Track successful command execution
+                if (interaction.client.statsTracker) {
+                    await interaction.client.statsTracker.trackCommand(
+                        interaction.commandName,
+                        interaction.user,
+                        interaction.guild,
+                        true,
+                        executionTime,
+                    );
+                }
             } catch (error) {
+                const executionTime = Date.now() - startTime;
+
                 // Log command failure
                 await Logger.commandUsage(
                     interaction.commandName,
@@ -39,6 +56,18 @@ module.exports = {
                     guild: interaction.guild?.name,
                     channel: interaction.channel?.name,
                 });
+
+                // Track failed command execution
+                if (interaction.client.statsTracker) {
+                    await interaction.client.statsTracker.trackCommand(
+                        interaction.commandName,
+                        interaction.user,
+                        interaction.guild,
+                        false,
+                        executionTime,
+                        error.message,
+                    );
+                }
 
                 await handleError(
                     interaction,

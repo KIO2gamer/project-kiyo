@@ -15,16 +15,23 @@ module.exports = (client) => {
 
     // Get bot stats
     router.get("/stats", requireAuth, (req, res) => {
-        const stats = {
-            guilds: client.guilds.cache.size,
-            users: client.users.cache.size,
-            channels: client.channels.cache.size,
-            commands: client.commands.size,
-            uptime: process.uptime(),
-            memoryUsage: process.memoryUsage(),
-            ping: client.ws.ping,
-        };
-        res.json(stats);
+        try {
+            const stats = client.statsTracker ? 
+                client.statsTracker.getCurrentStats() : 
+                {
+                    guilds: client.guilds.cache.size,
+                    users: client.users.cache.size,
+                    channels: client.channels.cache.size,
+                    commands: client.commands.size,
+                    uptime: process.uptime(),
+                    memoryUsage: process.memoryUsage(),
+                    ping: client.ws.ping,
+                    commandsExecuted: 0
+                };
+            res.json(stats);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     });
 
     // Get user's guilds where bot is present
@@ -408,6 +415,143 @@ module.exports = (client) => {
             const Logger = require("../../utils/logger");
             await Logger.logToDiscord("Test log message from dashboard", "info", "DASHBOARD");
             res.json({ success: true, message: "Test log sent to Discord" });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get historical stats for charts
+    router.get("/stats/history", requireAuth, async (req, res) => {
+        try {
+            const hours = parseInt(req.query.hours) || 24;
+            const stats = client.statsTracker ? 
+                await client.statsTracker.getRecentStats(hours) : [];
+            res.json({ success: true, stats });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get command statistics
+    router.get("/stats/commands", requireAuth, async (req, res) => {
+        try {
+            const hours = parseInt(req.query.hours) || 24;
+            const stats = client.statsTracker ? 
+                await client.statsTracker.getCommandStats(hours) : [];
+            res.json({ success: true, stats });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get user statistics
+    router.get("/stats/users", requireAuth, async (req, res) => {
+        try {
+            const hours = parseInt(req.query.hours) || 24;
+            const stats = client.statsTracker ? 
+                await client.statsTracker.getUserStats(hours) : [];
+            res.json({ success: true, stats });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get recent user activity
+    router.get("/activity/recent", requireAuth, async (req, res) => {
+        try {
+            const limit = parseInt(req.query.limit) || 50;
+            const activity = client.statsTracker ? 
+                await client.statsTracker.getRecentActivity(limit) : [];
+            res.json({ success: true, activity });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get daily stats for charts
+    router.get("/stats/daily", requireAuth, async (req, res) => {
+        try {
+            const days = parseInt(req.query.days) || 7;
+            const stats = client.statsTracker ? 
+                await client.statsTracker.getDailyStats(days) : [];
+            res.json({ success: true, stats });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    // Get/Update dashboard settings
+    router.get("/settings/dashboard/:guildId", requireAuth, async (req, res) => {
+        try {
+            const { guildId } = req.params;
+            
+            // Verify user has permission to manage this guild
+            const userGuild = req.user.guilds?.find(g => g.id === guildId);
+            if (!userGuild || !(userGuild.permissions & 0x20)) {
+                return res.status(403).json({ success: false, error: "Insufficient permissions" });
+            }
+
+            const DashboardSettings = require("../../database/dashboardSettings");
+            let settings = await DashboardSettings.findOne({ guildId });
+            
+            if (!settings) {
+                // Create default settings
+                settings = new DashboardSettings({
+                    guildId,
+                    settings: {},
+                    updatedBy: req.user.id
+                });
+                await settings.save();
+            }
+
+            res.json({ success: true, settings: settings.settings });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    });
+
+    router.post("/settings/dashboard/:guildId", requireAuth, async (req, res) => {
+        try {
+            const { guildId } = req.params;
+            const { settings } = req.body;
+            
+            // Verify user has permission to manage this guild
+            const userGuild = req.user.guilds?.find(g => g.id === guildId);
+            if (!userGuild || !(userGuild.permissions & 0x20)) {
+                return res.status(403).json({ success: false, error: "Insufficient permissions" });
+            }
+
+            const DashboardSettings = require("../../database/dashboardSettings");
+            
+            await DashboardSettings.findOneAndUpdate(
+                { guildId },
+                { 
+                    settings,
+                    updatedBy: req.user.id,
+                    updatedAt: new Date()
+                },
+                { upsert: true, new: true }
+            );
+
+            // Apply settings to bot if it's general settings
+            if (settings.general) {
+                try {
+                    const activityTypes = ['Playing', 'Streaming', 'Listening', 'Watching', 'Competing'];
+                    const activityType = activityTypes.indexOf(settings.general.activityType);
+                    
+                    await client.user.setPresence({
+                        status: settings.general.status,
+                        activities: settings.general.activity ? [{
+                            name: settings.general.activity,
+                            type: activityType >= 0 ? activityType : 0
+                        }] : []
+                    });
+                } catch (presenceError) {
+                    console.error("Error updating bot presence:", presenceError);
+                }
+            }
+
+            res.json({ success: true, message: 'Settings updated successfully' });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }

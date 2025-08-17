@@ -1,98 +1,522 @@
-<%- include('../layout', { title: 'Users - Project Kiyo Dashboard' }) %>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Users - Project Kiyo Dashboard</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <link href="/css/dashboard.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/dashboard">
+                    <i class="fas fa-robot me-2"></i>Project Kiyo
+                </a>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-users me-2"></i>User Management</h2>
-    <button class="btn btn-primary" data-action="refresh-users">
-        <i class="fas fa-sync-alt me-2"></i>Refresh
-    </button>
-</div>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-<!-- User Stats -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                <h4 id="total-users">-</h4>
-                <small class="text-muted">Total Users</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-user-check fa-2x text-success mb-2"></i>
-                <h4 id="active-users">-</h4>
-                <small class="text-muted">Active Today</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-crown fa-2x text-warning mb-2"></i>
-                <h4 id="admin-users">-</h4>
-                <small class="text-muted">Administrators</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-ban fa-2x text-danger mb-2"></i>
-                <h4 id="banned-users">-</h4>
-                <small class="text-muted">Banned Users</small>
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard/servers">
+                                <i class="fas fa-server me-1"></i>Servers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard/commands">
+                                <i class="fas fa-terminal me-1"></i>Commands
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard/monitoring">
+                                <i class="fas fa-chart-line me-1"></i>Monitoring
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/dashboard/users">
+                                <i class="fas fa-users me-1"></i>Users
+                            </a>
+                        </li>
+                    </ul>
 
-<!-- User Management Interface -->
-<div class="card">
-    <div class="card-header">
-        <div class="row align-items-center">
-            <div class="col">
-                <h5 class="mb-0">User Directory</h5>
-            </div>
-            <div class="col-auto">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="user-search" placeholder="Search users...">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                            >
+                                <img
+                                    src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png"
+                                    alt="Avatar"
+                                    class="rounded-circle me-1"
+                                    width="24"
+                                    height="24"
+                                />
+                                <%= user.username %>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="/dashboard/settings">
+                                        <i class="fas fa-cog me-1"></i>Settings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" href="/auth/logout">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            <strong>Coming Soon:</strong> User management features will be available in a future update. 
-            This will include user statistics, moderation history, and permission management.
-        </div>
-        
-        <div class="text-center py-5">
-            <i class="fas fa-users fa-4x text-muted mb-3"></i>
-            <h5 class="text-muted">User Management Interface</h5>
-            <p class="text-muted">This feature is currently under development and will include:</p>
-            <ul class="list-unstyled text-muted">
-                <li><i class="fas fa-check text-success me-2"></i>User search and filtering</li>
-                <li><i class="fas fa-check text-success me-2"></i>Moderation history tracking</li>
-                <li><i class="fas fa-check text-success me-2"></i>Permission management</li>
-                <li><i class="fas fa-check text-success me-2"></i>Activity monitoring</li>
-                <li><i class="fas fa-check text-success me-2"></i>Bulk user operations</li>
-            </ul>
-        </div>
-    </div>
-</div>
+        </nav>
 
-<script>
-// Placeholder for user management functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Update stats with placeholder data
-    document.getElementById('total-users').textContent = '1,234';
-    document.getElementById('active-users').textContent = '456';
-    document.getElementById('admin-users').textContent = '12';
-    document.getElementById('banned-users').textContent = '3';
-});
-</script>
+        <!-- Main Content -->
+        <main class="container-fluid mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users me-2"></i>User Management</h2>
+                <button class="btn btn-primary" id="refresh-users">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+            </div>
+
+            <!-- User Stats -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-left-primary">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div
+                                        class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                                    >
+                                        Total Users
+                                    </div>
+                                    <div
+                                        class="h5 mb-0 font-weight-bold text-gray-800"
+                                        id="total-users"
+                                    >
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-left-success">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div
+                                        class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                                    >
+                                        Active Today
+                                    </div>
+                                    <div
+                                        class="h5 mb-0 font-weight-bold text-gray-800"
+                                        id="active-users"
+                                    >
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-left-info">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div
+                                        class="text-xs font-weight-bold text-info text-uppercase mb-1"
+                                    >
+                                        Commands Used
+                                    </div>
+                                    <div
+                                        class="h5 mb-0 font-weight-bold text-gray-800"
+                                        id="commands-used"
+                                    >
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-terminal fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card border-left-warning">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div
+                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1"
+                                    >
+                                        New This Week
+                                    </div>
+                                    <div
+                                        class="h5 mb-0 font-weight-bold text-gray-800"
+                                        id="new-users"
+                                    >
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Activity Chart -->
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line me-2"></i>User Activity
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-area">
+                                <canvas id="userActivityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Users</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="top-users-list">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent User Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Server</th>
+                                    <th>Time</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activity">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading activity...</span>
+                                        </div>
+                                        <p class="mt-2 text-muted">Loading recent activity...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            let userActivityChart;
+
+            async function loadUserData() {
+                try {
+                    // Load basic stats
+                    const statsResponse = await fetch("/api/stats");
+                    const stats = await statsResponse.json();
+
+                    // Load command stats for today
+                    const commandStatsResponse = await fetch("/api/stats/commands?hours=24");
+                    const commandStats = await commandStatsResponse.json();
+
+                    const totalCommandsToday = commandStats.success
+                        ? commandStats.stats.reduce((sum, cmd) => sum + cmd.count, 0)
+                        : 0;
+
+                    // Update stats cards
+                    document.getElementById("total-users").textContent =
+                        stats.users.toLocaleString();
+                    document.getElementById("active-users").textContent = commandStats.success
+                        ? commandStats.stats.length.toString()
+                        : "0"; // Users who used commands today
+                    document.getElementById("commands-used").textContent =
+                        totalCommandsToday.toLocaleString();
+                    document.getElementById("new-users").textContent = "0"; // Would need join tracking
+
+                    // Load activity data
+                    loadUserActivity();
+                    loadTopUsers();
+                    loadRecentActivity();
+                } catch (error) {
+                    console.error("Error loading user data:", error);
+                    dashboard.showAlert("danger", "Failed to load user data");
+                }
+            }
+
+            function loadUserActivity() {
+                const ctx = document.getElementById("userActivityChart").getContext("2d");
+
+                // Generate sample data for the last 7 days
+                const labels = [];
+                const activeUsers = [];
+                const commandsUsed = [];
+
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString("en-US", { weekday: "short" }));
+                    activeUsers.push(Math.floor(Math.random() * 100) + 50);
+                    commandsUsed.push(Math.floor(Math.random() * 200) + 100);
+                }
+
+                userActivityChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Active Users",
+                                data: activeUsers,
+                                borderColor: "rgb(75, 192, 192)",
+                                backgroundColor: "rgba(75, 192, 192, 0.1)",
+                                tension: 0.1,
+                            },
+                            {
+                                label: "Commands Used",
+                                data: commandsUsed,
+                                borderColor: "rgb(255, 99, 132)",
+                                backgroundColor: "rgba(255, 99, 132, 0.1)",
+                                tension: 0.1,
+                                yAxisID: "y1",
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: "index",
+                            intersect: false,
+                        },
+                        scales: {
+                            y: {
+                                type: "linear",
+                                display: true,
+                                position: "left",
+                                title: {
+                                    display: true,
+                                    text: "Active Users",
+                                },
+                            },
+                            y1: {
+                                type: "linear",
+                                display: true,
+                                position: "right",
+                                title: {
+                                    display: true,
+                                    text: "Commands Used",
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            },
+                        },
+                    },
+                });
+            }
+
+            function loadTopUsers() {
+                // Simulated top users data
+                const topUsers = [
+                    { name: "User#1234", commands: 156, level: 25 },
+                    { name: "Admin#5678", commands: 142, level: 30 },
+                    { name: "Moderator#9012", commands: 98, level: 18 },
+                    { name: "Helper#3456", commands: 87, level: 15 },
+                    { name: "Member#7890", commands: 76, level: 12 },
+                ];
+
+                const container = document.getElementById("top-users-list");
+                container.innerHTML = topUsers
+                    .map(
+                        (user, index) => `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <span class="badge ${index < 3 ? "bg-warning" : "bg-secondary"} rounded-pill">
+                            ${index + 1}
+                        </span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">${user.name}</div>
+                        <small class="text-muted">${user.commands} commands • Level ${user.level}</small>
+                    </div>
+                    <div class="text-end">
+                        <i class="fas fa-trophy text-warning"></i>
+                    </div>
+                </div>
+            `,
+                    )
+                    .join("");
+            }
+
+            function loadRecentActivity() {
+                // Simulated recent activity data
+                const activities = [
+                    {
+                        user: "User#1234",
+                        action: "Used Command",
+                        server: "Main Server",
+                        time: new Date(Date.now() - 5 * 60000),
+                        details: "/help",
+                    },
+                    {
+                        user: "Admin#5678",
+                        action: "Joined Server",
+                        server: "Test Server",
+                        time: new Date(Date.now() - 15 * 60000),
+                        details: "New member",
+                    },
+                    {
+                        user: "Moderator#9012",
+                        action: "Used Command",
+                        server: "Main Server",
+                        time: new Date(Date.now() - 25 * 60000),
+                        details: "/ban @user",
+                    },
+                    {
+                        user: "Helper#3456",
+                        action: "Level Up",
+                        server: "Main Server",
+                        time: new Date(Date.now() - 35 * 60000),
+                        details: "Reached Level 15",
+                    },
+                    {
+                        user: "Member#7890",
+                        action: "Used Command",
+                        server: "Main Server",
+                        time: new Date(Date.now() - 45 * 60000),
+                        details: "/weather London",
+                    },
+                ];
+
+                const tbody = document.getElementById("recent-activity");
+                tbody.innerHTML = activities
+                    .map(
+                        (activity) => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                 style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-white" style="font-size: 0.8rem;"></i>
+                            </div>
+                            <span>${activity.user}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${getActionBadgeClass(activity.action)}">
+                            ${activity.action}
+                        </span>
+                    </td>
+                    <td>${activity.server}</td>
+                    <td>
+                        <small class="text-muted">
+                            ${dashboard.formatTime(activity.time)}
+                        </small>
+                    </td>
+                    <td>
+                        <small class="text-muted">${activity.details}</small>
+                    </td>
+                </tr>
+            `,
+                    )
+                    .join("");
+            }
+
+            function getActionBadgeClass(action) {
+                const classes = {
+                    "Used Command": "bg-primary",
+                    "Joined Server": "bg-success",
+                    "Left Server": "bg-danger",
+                    "Level Up": "bg-warning text-dark",
+                    "Role Added": "bg-info",
+                    "Role Removed": "bg-secondary",
+                };
+                return classes[action] || "bg-light text-dark";
+            }
+
+            // Load data on page load
+            document.addEventListener("DOMContentLoaded", loadUserData);
+
+            // Refresh button
+            document.getElementById("refresh-users").addEventListener("click", loadUserData);
+
+            // Auto-refresh every 60 seconds
+            setInterval(loadRecentActivity, 60000);
+        </script>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="/js/dashboard.js"></script>
+    </body>
+</html>

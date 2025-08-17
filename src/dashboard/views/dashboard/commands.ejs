@@ -1,410 +1,489 @@
-<%- include('../layout', { title: 'Commands - Project Kiyo Dashboard' }) %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands - Project Kiyo Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-robot me-2"></i>Project Kiyo
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard/servers">
+                            <i class="fas fa-server me-1"></i>Servers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard/commands">
+                            <i class="fas fa-terminal me-1"></i>Commands
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard/monitoring">
+                            <i class="fas fa-chart-line me-1"></i>Monitoring
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard/users">
+                            <i class="fas fa-users me-1"></i>Users
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" 
+                                 alt="Avatar" class="rounded-circle me-1" width="24" height="24">
+                            <%= user.username %>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/dashboard/settings">
+                                <i class="fas fa-cog me-1"></i>Settings
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/logout">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-terminal me-2"></i>Command Management</h2>
-    <div>
-        <button class="btn btn-outline-primary me-2" id="filter-btn">
-            <i class="fas fa-filter me-2"></i>Filter
-        </button>
-        <button class="btn btn-primary" data-action="refresh-commands">
-            <i class="fas fa-sync-alt me-2"></i>Refresh
-        </button>
-    </div>
-</div>
+    <!-- Main Content -->
+    <main class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-terminal me-2"></i>Command Management</h2>
+            <div>
+                <button class="btn btn-outline-secondary me-2" id="filter-toggle">
+                    <i class="fas fa-filter me-2"></i>Filters
+                </button>
+                <button class="btn btn-primary" id="refresh-commands">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+            </div>
+        </div>
 
-<!-- Command Stats -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-center">
+        <!-- Filters Panel -->
+        <div class="card mb-4" id="filters-panel" style="display: none;">
             <div class="card-body">
-                <i class="fas fa-terminal fa-2x text-primary mb-2"></i>
-                <h4 id="total-commands">-</h4>
-                <small class="text-muted">Total Commands</small>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="category-filter" class="form-label">Category</label>
+                        <select class="form-select" id="category-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search-filter" class="form-label">Search Commands</label>
+                        <input type="text" class="form-control" id="search-filter" placeholder="Search by name or description...">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-outline-secondary" id="clear-filters">
+                            <i class="fas fa-times me-2"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                <h4 id="enabled-commands">-</h4>
-                <small class="text-muted">Enabled</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
-                <h4 id="disabled-commands">-</h4>
-                <small class="text-muted">Disabled</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-layer-group fa-2x text-info mb-2"></i>
-                <h4 id="total-categories">-</h4>
-                <small class="text-muted">Categories</small>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Filter Controls -->
-<div class="card mb-4" id="filter-panel" style="display: none;">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">Category</label>
-                <select class="form-select" id="category-filter">
-                    <option value="">All Categories</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Status</label>
-                <select class="form-select" id="status-filter">
-                    <option value="">All Commands</option>
-                    <option value="enabled">Enabled</option>
-                    <option value="disabled">Disabled</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Search</label>
-                <input type="text" class="form-control" id="search-filter" placeholder="Search commands...">
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Commands List -->
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Available Commands</h5>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Command</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="commands-table-body">
-                    <tr>
-                        <td colspan="5" class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading commands...</span>
+        <!-- Commands Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-left-primary">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Total Commands
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-commands">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Command Details Modal -->
-<div class="modal fade" id="commandModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Command Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Content will be loaded dynamically -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="save-command-btn">Save Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-class CommandManager {
-    constructor() {
-        this.commands = [];
-        this.filteredCommands = [];
-        this.categories = new Set();
-        this.init();
-    }
-
-    async init() {
-        await this.loadCommands();
-        this.setupEventListeners();
-        this.setupFilters();
-    }
-
-    async loadCommands() {
-        try {
-            const response = await fetch('/api/commands');
-            this.commands = await response.json();
-            this.processCommands();
-            this.renderCommands();
-            this.updateStats();
-        } catch (error) {
-            console.error('Error loading commands:', error);
-            this.showError('Failed to load commands');
-        }
-    }
-
-    processCommands() {
-        this.categories.clear();
-        this.commands.forEach(cmd => {
-            if (cmd.category) {
-                this.categories.add(cmd.category);
-            }
-            // Add default status if not present
-            if (!cmd.status) {
-                cmd.status = 'enabled';
-            }
-        });
-        this.filteredCommands = [...this.commands];
-    }
-
-    renderCommands() {
-        const tbody = document.getElementById('commands-table-body');
-        
-        if (this.filteredCommands.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center py-4">
-                        <i class="fas fa-search fa-2x text-muted mb-2"></i>
-                        <p class="text-muted mb-0">No commands found matching your criteria</p>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        const rows = this.filteredCommands.map(cmd => this.createCommandRow(cmd)).join('');
-        tbody.innerHTML = rows;
-    }
-
-    createCommandRow(command) {
-        const statusClass = command.status === 'enabled' ? 'success' : 'danger';
-        const statusIcon = command.status === 'enabled' ? 'check-circle' : 'times-circle';
-        
-        return `
-            <tr data-command="${command.name}">
-                <td>
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-terminal text-muted me-2"></i>
-                        <div>
-                            <strong>/${command.name}</strong>
+                            <div class="col-auto">
+                                <i class="fas fa-terminal fa-2x text-gray-300"></i>
+                            </div>
                         </div>
                     </div>
-                </td>
-                <td>
-                    <span class="badge bg-secondary">${this.formatCategory(command.category)}</span>
-                </td>
-                <td>
-                    <span class="text-muted">${this.escapeHtml(command.description)}</span>
-                </td>
-                <td>
-                    <span class="badge bg-${statusClass}">
-                        <i class="fas fa-${statusIcon} me-1"></i>
-                        ${command.status}
-                    </span>
-                </td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" onclick="commandManager.viewCommand('${command.name}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" onclick="commandManager.configureCommand('${command.name}')">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                        <button class="btn btn-outline-${command.status === 'enabled' ? 'danger' : 'success'}" 
-                                onclick="commandManager.toggleCommand('${command.name}')">
-                            <i class="fas fa-${command.status === 'enabled' ? 'times' : 'check'}"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    updateStats() {
-        const totalCommands = this.commands.length;
-        const enabledCommands = this.commands.filter(cmd => cmd.status === 'enabled').length;
-        const disabledCommands = totalCommands - enabledCommands;
-        const totalCategories = this.categories.size;
-
-        document.getElementById('total-commands').textContent = totalCommands;
-        document.getElementById('enabled-commands').textContent = enabledCommands;
-        document.getElementById('disabled-commands').textContent = disabledCommands;
-        document.getElementById('total-categories').textContent = totalCategories;
-    }
-
-    setupFilters() {
-        const categoryFilter = document.getElementById('category-filter');
-        
-        // Populate category filter
-        this.categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = this.formatCategory(category);
-            categoryFilter.appendChild(option);
-        });
-    }
-
-    applyFilters() {
-        const categoryFilter = document.getElementById('category-filter').value;
-        const statusFilter = document.getElementById('status-filter').value;
-        const searchFilter = document.getElementById('search-filter').value.toLowerCase();
-
-        this.filteredCommands = this.commands.filter(cmd => {
-            const matchesCategory = !categoryFilter || cmd.category === categoryFilter;
-            const matchesStatus = !statusFilter || cmd.status === statusFilter;
-            const matchesSearch = !searchFilter || 
-                cmd.name.toLowerCase().includes(searchFilter) ||
-                cmd.description.toLowerCase().includes(searchFilter);
-
-            return matchesCategory && matchesStatus && matchesSearch;
-        });
-
-        this.renderCommands();
-    }
-
-    setupEventListeners() {
-        // Filter toggle
-        document.getElementById('filter-btn').addEventListener('click', () => {
-            const panel = document.getElementById('filter-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Filter inputs
-        ['category-filter', 'status-filter', 'search-filter'].forEach(id => {
-            document.getElementById(id).addEventListener('change', () => this.applyFilters());
-            document.getElementById(id).addEventListener('input', () => this.applyFilters());
-        });
-
-        // Refresh button
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('[data-action="refresh-commands"]')) {
-                this.loadCommands();
-            }
-        });
-    }
-
-    viewCommand(commandName) {
-        const command = this.commands.find(cmd => cmd.name === commandName);
-        if (!command) return;
-
-        const modal = new bootstrap.Modal(document.getElementById('commandModal'));
-        const modalTitle = document.querySelector('#commandModal .modal-title');
-        const modalBody = document.querySelector('#commandModal .modal-body');
-
-        modalTitle.textContent = `/${command.name}`;
-        modalBody.innerHTML = this.renderCommandDetails(command);
-        modal.show();
-    }
-
-    renderCommandDetails(command) {
-        return `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Basic Information</h6>
-                    <table class="table table-sm">
-                        <tr>
-                            <td><strong>Name:</strong></td>
-                            <td>/${command.name}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Category:</strong></td>
-                            <td>${this.formatCategory(command.category)}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Status:</strong></td>
-                            <td>
-                                <span class="badge bg-${command.status === 'enabled' ? 'success' : 'danger'}">
-                                    ${command.status}
-                                </span>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6>Description</h6>
-                    <p class="text-muted">${this.escapeHtml(command.description)}</p>
-                    
-                    ${command.options && command.options.length > 0 ? `
-                        <h6>Options</h6>
-                        <ul class="list-unstyled">
-                            ${command.options.map(option => `
-                                <li class="mb-1">
-                                    <code>${option.name}</code> - ${option.description}
-                                    ${option.required ? '<span class="badge bg-warning ms-1">Required</span>' : ''}
-                                </li>
-                            `).join('')}
-                        </ul>
-                    ` : ''}
                 </div>
             </div>
-        `;
-    }
-
-    configureCommand(commandName) {
-        // This would open a configuration modal
-        alert(`Configuration for /${commandName} will be available in a future update.`);
-    }
-
-    async toggleCommand(commandName) {
-        const command = this.commands.find(cmd => cmd.name === commandName);
-        if (!command) return;
-
-        const newStatus = command.status === 'enabled' ? 'disabled' : 'enabled';
-        
-        try {
-            // This would make an API call to toggle the command
-            // For now, just update locally
-            command.status = newStatus;
-            this.renderCommands();
-            this.updateStats();
             
-            dashboard.showAlert('success', `Command /${commandName} ${newStatus}`);
-        } catch (error) {
-            dashboard.showAlert('danger', `Failed to ${newStatus === 'enabled' ? 'enable' : 'disable'} command`);
-        }
-    }
-
-    formatCategory(category) {
-        if (!category) return 'Uncategorized';
-        return category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    showError(message) {
-        const tbody = document.getElementById('commands-table-body');
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center py-4">
-                    <div class="alert alert-danger mb-0">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        ${message}
+            <div class="col-md-3">
+                <div class="card border-left-success">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Categories
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-categories">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-folder fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
                     </div>
-                </td>
-            </tr>
-        `;
-    }
-}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-left-info">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Most Used
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="most-used-command">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-star fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-left-warning">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Admin Only
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="admin-commands">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-shield-alt fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    window.commandManager = new CommandManager();
-});
-</script>
+        <!-- Commands List -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Available Commands</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Options</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commands-table">
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading commands...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Loading commands...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allCommands = [];
+        let filteredCommands = [];
+        
+        async function loadCommands() {
+            try {
+                const response = await fetch('/api/commands');
+                allCommands = await response.json();
+                filteredCommands = [...allCommands];
+                
+                updateStats();
+                populateCategoryFilter();
+                displayCommands();
+                
+            } catch (error) {
+                console.error('Error loading commands:', error);
+                document.getElementById('commands-table').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+                            <h5>Error Loading Commands</h5>
+                            <p class="text-muted">Failed to load command information. Please try again.</p>
+                            <button class="btn btn-primary" onclick="loadCommands()">
+                                <i class="fas fa-retry me-2"></i>Retry
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        function updateStats() {
+            const categories = [...new Set(allCommands.map(cmd => cmd.category))];
+            const adminCommands = allCommands.filter(cmd => 
+                cmd.name.includes('admin') || 
+                cmd.category.toLowerCase().includes('admin') ||
+                cmd.category.toLowerCase().includes('moderation')
+            );
+            
+            document.getElementById('total-commands').textContent = allCommands.length;
+            document.getElementById('total-categories').textContent = categories.length;
+            document.getElementById('most-used-command').textContent = 'help'; // Placeholder
+            document.getElementById('admin-commands').textContent = adminCommands.length;
+        }
+        
+        function populateCategoryFilter() {
+            const categories = [...new Set(allCommands.map(cmd => cmd.category))].sort();
+            const categoryFilter = document.getElementById('category-filter');
+            
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                categoryFilter.appendChild(option);
+            });
+        }
+        
+        function displayCommands() {
+            const tbody = document.getElementById('commands-table');
+            
+            if (filteredCommands.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                            <h5>No Commands Found</h5>
+                            <p class="text-muted">No commands match your current filters.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filteredCommands.map(command => `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-terminal text-primary me-2"></i>
+                            <div>
+                                <strong>/${command.name}</strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <small class="text-muted">${command.description}</small>
+                    </td>
+                    <td>
+                        <span class="badge ${getCategoryBadgeClass(command.category)}">
+                            ${command.category.replace(/_/g, ' ')}
+                        </span>
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            ${command.options ? command.options.length : 0} options
+                        </small>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="viewCommand('${command.name}')" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="testCommand('${command.name}')" title="Test Command">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function getCategoryBadgeClass(category) {
+            const classes = {
+                'admin_and_configuration': 'bg-danger',
+                'moderation': 'bg-warning text-dark',
+                'utility': 'bg-info',
+                'fun_and_entertainment': 'bg-success',
+                'information_and_search': 'bg-primary',
+                'api_integrations': 'bg-secondary',
+                'levels_and_experience': 'bg-dark',
+                'role_management': 'bg-warning text-dark'
+            };
+            return classes[category.toLowerCase()] || 'bg-light text-dark';
+        }
+        
+        function filterCommands() {
+            const categoryFilter = document.getElementById('category-filter').value;
+            const searchFilter = document.getElementById('search-filter').value.toLowerCase();
+            
+            filteredCommands = allCommands.filter(command => {
+                const matchesCategory = !categoryFilter || command.category === categoryFilter;
+                const matchesSearch = !searchFilter || 
+                    command.name.toLowerCase().includes(searchFilter) ||
+                    command.description.toLowerCase().includes(searchFilter);
+                
+                return matchesCategory && matchesSearch;
+            });
+            
+            displayCommands();
+        }
+        
+        function clearFilters() {
+            document.getElementById('category-filter').value = '';
+            document.getElementById('search-filter').value = '';
+            filteredCommands = [...allCommands];
+            displayCommands();
+        }
+        
+        function viewCommand(commandName) {
+            const command = allCommands.find(cmd => cmd.name === commandName);
+            if (!command) return;
+            
+            const modalHtml = `
+                <div class="modal fade" id="commandModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-terminal me-2"></i>/${command.name}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Description</label>
+                                    <p>${command.description}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Category</label>
+                                    <p><span class="badge ${getCategoryBadgeClass(command.category)}">${command.category.replace(/_/g, ' ')}</span></p>
+                                </div>
+                                ${command.options && command.options.length > 0 ? `
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Options</label>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Required</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${command.options.map(option => `
+                                                        <tr>
+                                                            <td><code>${option.name}</code></td>
+                                                            <td><span class="badge bg-secondary">${getOptionType(option.type)}</span></td>
+                                                            <td>${option.required ? '<i class="fas fa-check text-success"></i>' : '<i class="fas fa-times text-muted"></i>'}</td>
+                                                            <td><small>${option.description || 'No description'}</small></td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ` : '<p class="text-muted">This command has no options.</p>'}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="testCommand('${command.name}')">
+                                    <i class="fas fa-play me-2"></i>Test Command
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal
+            const existingModal = document.getElementById('commandModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('commandModal'));
+            modal.show();
+        }
+        
+        function getOptionType(type) {
+            const types = {
+                1: 'Subcommand',
+                2: 'Subcommand Group',
+                3: 'String',
+                4: 'Integer',
+                5: 'Boolean',
+                6: 'User',
+                7: 'Channel',
+                8: 'Role',
+                9: 'Mentionable',
+                10: 'Number',
+                11: 'Attachment'
+            };
+            return types[type] || 'Unknown';
+        }
+        
+        function testCommand(commandName) {
+            dashboard.showAlert('info', `Testing command /${commandName} - This feature is coming soon!`);
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', loadCommands);
+        
+        document.getElementById('refresh-commands').addEventListener('click', loadCommands);
+        
+        document.getElementById('filter-toggle').addEventListener('click', function() {
+            const panel = document.getElementById('filters-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        });
+        
+        document.getElementById('category-filter').addEventListener('change', filterCommands);
+        document.getElementById('search-filter').addEventListener('input', filterCommands);
+        document.getElementById('clear-filters').addEventListener('click', clearFilters);
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
