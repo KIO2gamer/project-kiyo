@@ -1,15 +1,8 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const cc = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");
 const Logger = require("../../utils/logger");
-
-const { MessageFlags } = require("discord.js");
 
 const COMMANDS_PER_PAGE = 10;
 

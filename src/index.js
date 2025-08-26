@@ -8,6 +8,7 @@ const CommandPermissions = require("./database/commandPermissions");
 const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
 const DashboardServer = require("./dashboard/server");
 const StatsTracker = require("./utils/statsTracker");
+const StatusRotator = require("./utils/statusRotator");
 
 // Client-related functions
 /**
@@ -244,6 +245,11 @@ const setupGracefulShutdown = (client) => {
     process.on("SIGINT", async () => {
         Logger.log("BOT", "Shutting down gracefully...");
 
+        // Stop status rotator
+        if (client.statusRotator) {
+            client.statusRotator.stop();
+        }
+
         // Stop OAuth2 server if running
         if (client.oauth2Handler) {
             await client.oauth2Handler.stop();
@@ -362,8 +368,10 @@ const initializeBot = async () => {
             throw new Error("Client failed to initialize properly after login");
         }
 
-        // Set presence
-        setRichPresence(client, config);
+        // Initialize and start status rotator
+        client.statusRotator = new StatusRotator(client);
+        client.statusRotator.start(30000); // Rotate every 30 seconds
+        Logger.success("Status rotator initialized");
 
         // Configure logger with Discord client
         Logger.setDiscordClient(client);

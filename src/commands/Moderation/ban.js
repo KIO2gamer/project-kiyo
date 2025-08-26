@@ -1,8 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Bans a member from the server with the specified reason.",
@@ -31,6 +30,8 @@ module.exports = {
                     interaction,
                     new Error("Could not find the specified user in this server."),
                     "VALIDATION",
+                    "Could not find the specified user in this server.",
+                    false,
                 );
                 return;
             }
@@ -41,6 +42,8 @@ module.exports = {
                     interaction,
                     new Error("I do not have permission to ban this user."),
                     "PERMISSION",
+                    "I do not have permission to ban this user.",
+                    false,
                 );
                 return;
             }
@@ -51,6 +54,8 @@ module.exports = {
                     interaction,
                     new Error("You cannot ban the owner of the server."),
                     "PERMISSION",
+                    "You cannot ban the owner of the server.",
+                    false,
                 );
                 return;
             }
@@ -65,6 +70,8 @@ module.exports = {
                     interaction,
                     new Error("You cannot ban someone with a higher or equal role than yourself."),
                     "PERMISSION",
+                    "You cannot ban someone with a higher or equal role than yourself.",
+                    false,
                 );
                 return;
             }
@@ -74,6 +81,8 @@ module.exports = {
                     interaction,
                     new Error("I cannot ban someone with a higher or equal role than myself."),
                     "PERMISSION",
+                    "I cannot ban someone with a higher or equal role than myself.",
+                    false,
                 );
                 return;
             }
@@ -110,9 +119,10 @@ module.exports = {
                     error,
                     "PERMISSION",
                     "I do not have the required permissions to ban this user.",
+                    false,
                 );
             } else if (error.code === "DATABASE_ERROR") {
-                await handleError(interaction, error, "DATABASE", "Failed to save moderation log.");
+                await handleError(interaction, error, "DATABASE", "Failed to save moderation log.", false);
             } else {
                 await handleError(
                     interaction,

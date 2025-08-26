@@ -1,10 +1,5 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const { google } = require("googleapis");
 
 const youtube = google.youtube({
@@ -13,8 +8,6 @@ const youtube = google.youtube({
 });
 
 const pageSize = 3; // Number of results per page
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

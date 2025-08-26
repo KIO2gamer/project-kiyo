@@ -1,7 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const translate = require("@iamtraction/google-translate");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
 
-const { MessageFlags } = require("discord.js");
+const translate = require("@iamtraction/google-translate");
 
 module.exports = {
     description_full:

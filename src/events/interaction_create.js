@@ -1,6 +1,7 @@
 const { Events, MessageFlags } = require("discord.js");
 const Logger = require("../utils/logger");
 const { handleError } = require("../utils/errorHandler");
+const startTime = Date.now();
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -15,8 +16,6 @@ module.exports = {
             }
 
             try {
-                const startTime = Date.now();
-
                 // Log command usage
                 await Logger.commandUsage(
                     interaction.commandName,
@@ -78,7 +77,22 @@ module.exports = {
             }
         }
 
-        // Handle button interactions, select menus, and modals for YouTube subscriber role config
+        // Handle autocomplete interactions
+        else if (interaction.isAutocomplete()) {
+            const command = interaction.client.commands.get(interaction.commandName);
+            
+            if (!command || !command.autocomplete) {
+                return;
+            }
+
+            try {
+                await command.autocomplete(interaction);
+            } catch (error) {
+                Logger.error(`Error handling autocomplete for ${interaction.commandName}:`, error);
+            }
+        }
+
+        // Handle button interactions, select menus, and modals
         else if (
             interaction.isButton() ||
             interaction.isStringSelectMenu() ||
@@ -86,8 +100,23 @@ module.exports = {
         ) {
             const userId = interaction.user.id;
 
-            // Import the ytSubRoleConfig module to access its handlers
             try {
+                // Handle help command interactions
+                if (interaction.customId?.startsWith("help_")) {
+                    const helpCommand = interaction.client.commands.get("help");
+                    if (helpCommand) {
+                        if (interaction.isStringSelectMenu()) {
+                            await helpCommand.handleSelectMenu(interaction);
+                        } else if (interaction.isButton()) {
+                            await helpCommand.handleButton(interaction);
+                        } else if (interaction.isModalSubmit()) {
+                            await helpCommand.handleSearchModal(interaction);
+                        }
+                    }
+                    return;
+                }
+
+                // Import the ytSubRoleConfig module to access its handlers
                 const ytSubRoleConfig = require("../features/youtube-subscriber-roles/commands/ytSubRoleConfig");
 
                 // Handle YouTube subscriber role config interactions

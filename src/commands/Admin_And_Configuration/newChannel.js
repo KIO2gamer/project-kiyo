@@ -1,9 +1,5 @@
-const {
-    SlashCommandBuilder,
-    ChannelType,
-    PermissionFlagsBits,
-    EmbedBuilder,
-} = require("discord.js");
+const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler");
 const { getChannelType } = require("./../../utils/channelTypes");
 

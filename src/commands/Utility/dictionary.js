@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const axios = require("axios");
 const { handleError } = require("../../utils/errorHandler");
 

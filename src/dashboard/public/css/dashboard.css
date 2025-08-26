@@ -270,6 +270,227 @@
     background: #718096;
 }
 
+/* Enhanced Monitoring Page Styles */
+.monitoring-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.monitoring-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.metric-icon {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+/* Real-time status indicators */
+.status-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Enhanced Settings Page Styles */
+.settings-section {
+    margin-bottom: 2rem;
+}
+
+.settings-card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.settings-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.settings-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+    font-weight: 600;
+}
+
+.settings-card .card-header i {
+    margin-right: 0.5rem;
+}
+
+/* Form enhancements for settings */
+.form-group-enhanced {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-label-enhanced {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label-enhanced i {
+    margin-right: 0.5rem;
+    color: #6c757d;
+}
+
+/* Switch toggle enhancements */
+.form-switch .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    border-radius: 3rem;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+/* API status indicators */
+.api-status {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.api-status:hover {
+    background-color: #e9ecef;
+}
+
+.api-status-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.api-status-connected {
+    background-color: #198754;
+    box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.25);
+}
+
+.api-status-error {
+    background-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.api-status-warning {
+    background-color: #ffc107;
+    box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+}
+
+/* Subscriber tier styling */
+.tier-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tier-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Log entry enhancements */
+.log-entry {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.log-entry[data-level="error"] {
+    border-left-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+.log-entry[data-level="warn"] {
+    border-left-color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.05);
+}
+
+.log-entry[data-level="info"] {
+    border-left-color: #0dcaf0;
+    background-color: rgba(13, 202, 240, 0.05);
+}
+
+.log-entry[data-level="success"] {
+    border-left-color: #198754;
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+/* Chart container enhancements */
+.chart-container {
+    position: relative;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Save button enhancement */
+#save-all-settings {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+#save-all-settings:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0.5rem 1rem rgba(40, 167, 69, 0.3);
+}
+
 /* Utility classes */
 .cursor-pointer {
     cursor: pointer;
@@ -287,4 +508,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+    .metric-value {
+        font-size: 1.25rem;
+    }
+    
+    .settings-card .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .tier-item {
+        padding: 0.75rem;
+    }
+    
+    #save-all-settings {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
 }

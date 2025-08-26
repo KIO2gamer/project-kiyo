@@ -1,10 +1,5 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const axios = require("axios");
 
 const LYRICS_API_BASE_URL = "https://api.lyrics.ovh/v1"; // Free lyrics API base URL
@@ -49,8 +44,6 @@ const GENRES_KEYWORDS = [
     "chill music",
     // Add more genres/keywords as you like!
 ];
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

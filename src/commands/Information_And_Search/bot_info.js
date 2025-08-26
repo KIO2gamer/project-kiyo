@@ -1,10 +1,9 @@
-const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder, version: djsVersion } = require("discord.js");
+
 const { formatUptime } = require("../../utils/formatUptime");
 const { handleError } = require("../../utils/errorHandler");
 const os = require("os");
 const { version } = require("./../../../package.json");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:
@@ -104,11 +103,11 @@ module.exports = {
                         {
                             name: "🔗 Links",
                             value: [
-                                "[Support Server](https://discord.gg/your-support-server)",
+                                "[Support Server](https://discord.gg/HF4BGwYMGm)",
                                 "[Invite Bot](https://discord.com/api/oauth2/authorize?client_id=" +
                                     client.user.id +
                                     "&permissions=8&scope=bot%20applications.commands)",
-                                "[Documentation](https://github.com/KIO2gamer/discordbot/wiki)",
+                                "[Documentation](https://github.com/KIO2gamer/project-kiyo-ARCHIVED/blob/main/README.md)",
                                 "[Report Bug](https://github.com/KIO2gamer/discordbot/issues)",
                             ].join(" • "),
                             inline: false,

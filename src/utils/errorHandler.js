@@ -6,6 +6,7 @@ const {
     MessageFlags,
 } = require("discord.js");
 const Logger = require("./logger");
+const chalk = require("chalk");
 
 // Error categories for better organization and handling
 const ERROR_CATEGORIES = {
@@ -211,8 +212,15 @@ ${errorMessage}
  * Can be used like console.error() or with Discord interaction objects.
  *
  * @param {...any} args - Error arguments, with optional Discord interaction object first
+ * @param {boolean} showDetails - Whether to show technical details button (default: true)
  */
 async function handleError(...args) {
+    let showDetails = true;
+    
+    // Check if last argument is a boolean for showDetails
+    if (typeof args[args.length - 1] === 'boolean') {
+        showDetails = args.pop();
+    }
     const timestamp = new Date().toISOString();
     let interaction = null;
     let sent = null;
@@ -250,73 +258,82 @@ async function handleError(...args) {
     // Update error statistics
     updateErrorStats(category, errorMessage);
 
-    // Format error output for the console terminal
-    const formattedLog = `
-===========================================
-[${timestamp}] [${category}] ${ERROR_CATEGORIES[category].emoji} ${ERROR_CATEGORIES[category].message}
-
-Context:
-${JSON.stringify(commandContext, null, 2)}
-
-Error Message:
-${errorMessage}
-===========================================
-`;
-    // Output to the terminal with formatting
-    console.error(formattedLog);
+    // Format error output for the console terminal with chalk colors
+    const categoryInfo = ERROR_CATEGORIES[category];
+    console.error(chalk.red("\n" + "=".repeat(50)));
+    console.error(chalk.gray(`[${timestamp}]`) + " " + 
+                  chalk.red(`[${category}]`) + " " + 
+                  chalk.yellow(categoryInfo.emoji) + " " + 
+                  chalk.red.bold(categoryInfo.message));
+    
+    if (Object.keys(commandContext).length > 0) {
+        console.error(chalk.cyan("\nContext:"));
+        console.error(chalk.gray(JSON.stringify(commandContext, null, 2)));
+    }
+    
+    console.error(chalk.cyan("\nError Details:"));
+    console.error(chalk.white(errorMessage));
+    console.error(chalk.red("=".repeat(50) + "\n"));
 
     // If no interaction, we're done after logging
     if (!interaction) return;
 
-    // Create error embed and button
+    // Create error embed and conditionally add button
     const errorEmbed = createErrorEmbed(category, errorMessage, suggestion);
-    const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-            .setCustomId("show_full_error")
-            .setLabel("Show Technical Details")
-            .setStyle(ButtonStyle.Secondary),
-    );
+    const components = [];
+    
+    if (showDetails) {
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId("show_full_error")
+                .setLabel("Show Technical Details")
+                .setStyle(ButtonStyle.Secondary),
+        );
+        components.push(row);
+    }
 
     try {
         // Send or edit the error message
         const response = sent
-            ? await sent.edit({ embeds: [errorEmbed], components: [row] })
+            ? await sent.edit({ embeds: [errorEmbed], components })
             : await (interaction.replied || interaction.deferred
                 ? interaction.editReply({
                     embeds: [errorEmbed],
-                    components: [row],
+                    components,
                     flags: MessageFlags.Ephemeral,
                 })
                 : interaction.reply({
                     embeds: [errorEmbed],
-                    components: [row],
+                    components,
                     flags: MessageFlags.Ephemeral,
                 }));
 
-        // Set up button collector for showing technical details
-        const collector = response.createMessageComponentCollector({
-            time: 60000,
-            filter: (i) => i.user.id === interaction.user.id,
-        });
+        // Set up button collector for showing technical details (only if showDetails is true)
+        if (showDetails && components.length > 0) {
+            const collector = response.createMessageComponentCollector({
+                time: 60000,
+                filter: (i) => i.user.id === interaction.user.id,
+            });
 
-        collector.on("collect", async (i) => {
-            if (i.customId === "show_full_error") {
-                const detailsEmbed = new EmbedBuilder()
-                    .setTitle("🔍 Technical Details")
-                    .setDescription(`\`\`\`js\n${errorMessage.substring(0, 1900)}\n\`\`\``)
-                    .setColor(ERROR_CATEGORIES[category].color)
-                    .setTimestamp();
-                await i.update({ embeds: [detailsEmbed], components: [] });
-            }
-        });
+            collector.on("collect", async (i) => {
+                if (i.customId === "show_full_error") {
+                    const detailsEmbed = new EmbedBuilder()
+                        .setTitle("🔍 Technical Details")
+                        .setDescription(`\`\`\`js\n${errorMessage.substring(0, 1900)}\n\`\`\``)
+                        .setColor(ERROR_CATEGORIES[category].color)
+                        .setTimestamp();
+                    await i.update({ embeds: [detailsEmbed], components: [] });
+                }
+            });
 
-        collector.on("end", async () => {
-            try {
-                await response.edit({ components: [] });
-            } catch (err) {
-                // Ignore edit errors after collector ends
-            }
-        });
+            collector.on("end", async () => {
+                try {
+                    await response.edit({ components: [] });
+                } catch (err) {
+                    // Ignore edit errors after collector ends
+                }
+            });
+        }
     } catch (sendError) {
         Logger.log(
             "ERROR",

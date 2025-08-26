@@ -1,13 +1,5 @@
-const {
-    SlashCommandBuilder,
-    PermissionFlagsBits,
-    ChannelType,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    Colors,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");
 

@@ -1,10 +1,5 @@
-const {
-    SlashCommandBuilder,
-    PermissionFlagsBits,
-    ChannelType,
-    EmbedBuilder,
-    MessageFlags,
-} = require("discord.js");
+const {  ChannelType, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler");
 
 async function handleChannelUpdate(channel, newName, permissionChoice, toggleChoice, role) {

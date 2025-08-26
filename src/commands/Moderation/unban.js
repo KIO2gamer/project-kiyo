@@ -1,7 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
-const moderationLogs = require("./../../database/moderationLogs");
+const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
-const { MessageFlags } = require("discord.js");
+const moderationLogs = require("./../../database/moderationLogs");
 
 module.exports = {
     description_full: "Unbans a member from the server with the specified reason.",

@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

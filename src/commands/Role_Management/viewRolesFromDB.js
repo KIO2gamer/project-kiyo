@@ -1,8 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler.js");
 const Role = require("./../../database/roleStorage.js");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Displays a list of roles that have been stored in the database.",

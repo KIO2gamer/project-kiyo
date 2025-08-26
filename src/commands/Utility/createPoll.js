@@ -1,9 +1,8 @@
-const { SlashCommandBuilder, PollLayoutType, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, PollLayoutType, SlashCommandBuilder } = require("discord.js");
 
+const { handleError } = require("../../utils/errorHandler");
 const MAX_POLL_DURATION_HOURS = 32;
 const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Creates a poll with the given question, options, and duration.",
@@ -65,7 +64,7 @@ module.exports = {
                 });
             }
 
-            const durationMinutes = Math.min(durationHours * 60, MAX_POLL_DURATION_MINUTES);
+            const durationMinutes = durationHours * 60;
 
             await interaction.reply({
                 poll: {
@@ -77,11 +76,7 @@ module.exports = {
                 },
             });
         } catch (error) {
-            handleError(error);
-            await interaction.reply({
-                content: "An error occurred while creating the poll.",
-                flags: MessageFlags.Ephemeral,
-            });
+            await handleError(interaction, error, "COMMAND_EXECUTION", "An error occurred while creating the poll.", false);
         }
     },
 };

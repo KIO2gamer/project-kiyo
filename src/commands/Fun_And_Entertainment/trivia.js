@@ -1,10 +1,5 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const he = require("he");
 const Logger = require("../../utils/logger");
 
@@ -16,8 +11,6 @@ const TIMEOUT_COLOR = "#FFA000"; // Orange/Amber
 const TRIVIA_TIMEOUT = 20000; // 20 seconds for answering
 const ANSWER_BUTTON_LABELS = ["A", "B", "C", "D"];
 const API_ENDPOINT = "https://opentdb.com/api.php?amount=1&type=multiple";
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Tests your knowledge with a multiple-choice trivia question.",

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
 
@@ -28,8 +29,6 @@ function checkRolePermissions(interaction, targetUser) {
 
     return null;
 }
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Issues a warning to a member and logs it in the moderation system.",

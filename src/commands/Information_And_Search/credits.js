@@ -1,13 +1,6 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
-const { handleError } = require("../../utils/errorHandler");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
 
-const { MessageFlags } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:

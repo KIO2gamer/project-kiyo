@@ -187,9 +187,10 @@ class Logger {
 
         const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
         const timestampColored = chalk.gray(`[${moment().format("HH:mm:ss")}]`);
-        const moduleStr = this.COLORS[module.toUpperCase()]
-            ? this.COLORS[module.toUpperCase()](`[${module}]`)
-            : chalk.white(`[${module}]`);
+        const moduleString = String(module);
+        const moduleStr = this.COLORS[moduleString.toUpperCase()]
+            ? this.COLORS[moduleString.toUpperCase()](`[${moduleString}]`)
+            : chalk.white(`[${moduleString}]`);
 
         const symbols = this.getSymbols();
         const symbol = symbols[level] || symbols.info;

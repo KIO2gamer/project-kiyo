@@ -1,14 +1,7 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+
 const { google } = require("googleapis");
 const { handleError } = require("../../utils/errorHandler");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:
@@ -85,11 +78,11 @@ module.exports = {
                     return;
                 }
 
-                // Get latest videos with enhanced details
-                const latestVideos = await getLatestVideos(youtube, channelId);
-
-                // Get channel playlists count
-                const playlistsData = await getPlaylistsCount(youtube, channelId);
+                // Get latest videos and playlists data in parallel0.
+                const [latestVideos, playlistsData] = await Promise.all([
+                    getLatestVideos(youtube, channelId),
+                    getPlaylistsCount(youtube, channelId)
+                ]);
 
                 // Create embed and buttons
                 const embed = createChannelEmbed(
@@ -153,83 +146,34 @@ async function extractChannelId(youtube, input) {
         return input;
     }
 
-    // Channel URL patterns
-    const urlPatterns = {
-        channel: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:channel|c)\/(UC[\w-]{21}[AQgw])/,
-        custom: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:c|user)\/([^/\s?]+)/,
-        handle: /(?:https?:\/\/)?(?:www\.)?youtube\.com\/@([^/\s?]+)/,
-        video: /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/,
-    };
-
-    // Check each URL pattern
-    for (const [type, pattern] of Object.entries(urlPatterns)) {
-        const match = input.match(pattern);
-        if (match) {
-            if (type === "video") {
-                try {
-                    const response = await youtube.videos.list({
-                        part: "snippet",
-                        id: match[1],
-                    });
-                    if (response.data.items.length > 0) {
-                        return response.data.items[0].snippet.channelId;
-                    }
-                } catch (error) {
-                    throw new Error("Failed to fetch video details: " + error.message);
-                }
-            } else if (type === "custom" || type === "handle") {
-                try {
-                    const response = await youtube.search.list({
-                        part: "snippet",
-                        q: match[1],
-                        type: "channel",
-                        maxResults: 1,
-                    });
-                    if (response.data.items.length > 0) {
-                        return response.data.items[0].snippet.channelId;
-                    }
-                } catch (error) {
-                    throw new Error("Failed to fetch channel by name: " + error.message);
-                }
-            } else {
-                return match[1];
-            }
-        }
+    // Channel URL with direct ID
+    const channelMatch = input.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:channel|c)\/(UC[\w-]{21}[AQgw])/);
+    if (channelMatch) {
+        return channelMatch[1];
     }
 
-    // Handle (@username) if no URL patterns match
-    if (input.includes("@")) {
-        try {
-            const response = await youtube.search.list({
-                part: "snippet",
-                q: input.replace("@", ""),
-                type: "channel",
-                maxResults: 1,
-            });
-            if (response.data.items.length > 0) {
-                return response.data.items[0].snippet.channelId;
-            }
-        } catch (error) {
-            throw new Error("Failed to fetch channel by handle: " + error.message);
-        }
-    }
-
-    // Try direct search as last resort
-    try {
-        const response = await youtube.search.list({
+    // Video URL - extract channel from video
+    const videoMatch = input.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    if (videoMatch) {
+        const response = await youtube.videos.list({
             part: "snippet",
-            q: input,
-            type: "channel",
-            maxResults: 1,
+            id: videoMatch[1],
         });
         if (response.data.items.length > 0) {
             return response.data.items[0].snippet.channelId;
         }
-    } catch (error) {
-        throw new Error("Failed to search for channel: " + error.message);
     }
 
-    return null;
+    // Handle, custom URL, or search term - use single search call
+    const searchTerm = input.includes("@") ? input.replace("@", "") : input.replace(/.*\//, "");
+    const response = await youtube.search.list({
+        part: "snippet",
+        q: searchTerm,
+        type: "channel",
+        maxResults: 1,
+    });
+    
+    return response.data.items.length > 0 ? response.data.items[0].snippet.channelId : null;
 }
 
 // Helper function to get channel data
@@ -268,12 +212,15 @@ async function getLatestVideos(youtube, channelId) {
     });
 
     // Combine video data
-    return response.data.items.map((item, index) => ({
-        ...item,
-        statistics: statsResponse.data.items[index].statistics,
-        contentDetails: statsResponse.data.items[index].contentDetails,
-        liveStreamingDetails: statsResponse.data.items[index].liveStreamingDetails,
-    }));
+    return response.data.items.map((item, index) => {
+        const statsItem = statsResponse.data.items[index];
+        if (!statsItem) return item;
+        
+        item.statistics = statsItem.statistics || {};
+        item.contentDetails = statsItem.contentDetails || {};
+        item.liveStreamingDetails = statsItem.liveStreamingDetails || {};
+        return item;
+    });
 }
 
 // Helper function to get playlists count
@@ -282,7 +229,7 @@ async function getPlaylistsCount(youtube, channelId) {
         const response = await youtube.playlists.list({
             part: "id",
             channelId: channelId,
-            maxResults: 1,
+            maxResults: 0,
         });
         return {
             totalCount: response.data.pageInfo.totalResults,
@@ -314,135 +261,161 @@ function formatNumber(num) {
 // Helper function to format duration
 function formatDuration(duration) {
     if (!duration) return "0:00";
-    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
     if (!match) return "0:00";
 
-    const hours = (match[1] || "").replace("H", "");
-    const minutes = (match[2] || "").replace("M", "");
-    const seconds = (match[3] || "").replace("S", "");
+    const hours = parseInt(match[1] || "0", 10);
+    const minutes = parseInt(match[2] || "0", 10);
+    const seconds = parseInt(match[3] || "0", 10);
 
-    let result = "";
-    if (hours) result += `${hours}:`;
-    if (hours) {
-        result += `${minutes.padStart(2, "0")}:`;
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     } else {
-        result += `${minutes || "0"}:`;
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     }
-    result += seconds.padStart(2, "0");
-    return result;
 }
 
 // Helper function to create channel buttons
 function createChannelButtons(channelData, latestVideos) {
-    const row = new ActionRowBuilder();
+    const buttons = [];
 
     // Channel URL button
-    row.addComponents(
+    buttons.push(
         new ButtonBuilder()
             .setLabel("Channel")
             .setStyle(ButtonStyle.Link)
-            .setURL(`https://youtube.com/channel/${channelData.id}`),
+            .setURL(`https://youtube.com/channel/${channelData.id}`)
     );
 
     // Latest video button (if available)
     if (latestVideos.length > 0) {
-        row.addComponents(
+        buttons.push(
             new ButtonBuilder()
                 .setLabel("Latest Video")
                 .setStyle(ButtonStyle.Link)
-                .setURL(`https://youtube.com/watch?v=${latestVideos[0].id.videoId}`),
+                .setURL(`https://youtube.com/watch?v=${latestVideos[0].id.videoId}`)
         );
     }
 
     // Custom URL button (if available)
     if (channelData.snippet.customUrl) {
-        row.addComponents(
+        buttons.push(
             new ButtonBuilder()
                 .setLabel("Custom URL")
                 .setStyle(ButtonStyle.Link)
-                .setURL(`https://youtube.com/${channelData.snippet.customUrl}`),
+                .setURL(`https://youtube.com/${channelData.snippet.customUrl}`)
         );
     }
 
+    const row = new ActionRowBuilder().addComponents(...buttons);
     return row;
+}
+
+// Helper functions for embed field creation
+function createStatisticsField(statistics, playlistsData) {
+    const fields = [
+        `**Subscribers:** ${statistics.hiddenSubscriberCount ? "🔒 Hidden" : formatNumber(statistics.subscriberCount)}`,
+        `**Total Views:** ${formatNumber(statistics.viewCount)}`,
+        `**Total Videos:** ${formatNumber(statistics.videoCount)}`,
+    ];
+    
+    if (playlistsData.totalCount) {
+        fields.push(`**Playlists:** ${formatNumber(playlistsData.totalCount)}`);
+    }
+    
+    return {
+        name: "📊 Statistics",
+        value: fields.join("\n"),
+        inline: true,
+    };
+}
+
+function createChannelInfoField(snippet, status) {
+    const fields = [
+        `**Created:** <t:${Math.floor(new Date(snippet.publishedAt).getTime() / 1000)}:R>`,
+        `**Country:** ${snippet.country || "Not specified"}`,
+        `**Language:** ${snippet.defaultLanguage || "Not specified"}`,
+    ];
+    
+    if (status.privacyStatus) fields.push(`**Privacy:** ${status.privacyStatus}`);
+    if (status.madeForKids) fields.push("**Made for Kids:** Yes");
+    
+    return {
+        name: "📅 Channel Info",
+        value: fields.join("\n"),
+        inline: true,
+    };
 }
 
 // Helper function to create channel embed
 function createChannelEmbed(channelData, latestVideos, channelId, playlistsData) {
-    const { snippet, statistics, brandingSettings, contentDetails, status, topicDetails } =
+    const { snippet, statistics, brandingSettings, status, topicDetails } =
         channelData;
 
     const embed = new EmbedBuilder()
         .setTitle(snippet.title)
         .setDescription(
-            snippet.description?.slice(0, 250) + (snippet.description?.length > 250 ? "..." : ""),
+            snippet.description 
+                ? snippet.description.slice(0, 250) + (snippet.description.length > 250 ? "..." : "")
+                : "No description available"
         )
         .setThumbnail(snippet.thumbnails.high?.url || snippet.thumbnails.default?.url)
         .setColor("#FF0000")
         .addFields(
-            {
-                name: "📊 Statistics",
-                value: [
-                    `**Subscribers:** ${statistics.hiddenSubscriberCount ? "🔒 Hidden" : formatNumber(statistics.subscriberCount)}`,
-                    `**Total Views:** ${formatNumber(statistics.viewCount)}`,
-                    `**Total Videos:** ${formatNumber(statistics.videoCount)}`,
-                    playlistsData.totalCount
-                        ? `**Playlists:** ${formatNumber(playlistsData.totalCount)}`
-                        : null,
-                ]
-                    .filter(Boolean)
-                    .join("\n"),
-                inline: true,
-            },
-            {
-                name: "📅 Channel Info",
-                value: [
-                    `**Created:** <t:${Math.floor(new Date(snippet.publishedAt).getTime() / 1000)}:R>`,
-                    `**Country:** ${snippet.country || "Not specified"}`,
-                    `**Language:** ${snippet.defaultLanguage || "Not specified"}`,
-                    status.privacyStatus ? `**Privacy:** ${status.privacyStatus}` : null,
-                    status.madeForKids ? "**Made for Kids:** Yes" : null,
-                ]
-                    .filter(Boolean)
-                    .join("\n"),
-                inline: true,
-            },
+            createStatisticsField(statistics, playlistsData),
+            createChannelInfoField(snippet, status)
         );
 
-    // Add topics if available
+    // Add topics if available (only process up to 5 to avoid unnecessary work)
     if (topicDetails?.topicCategories?.length > 0) {
-        const topics = topicDetails.topicCategories.map((url) =>
-            url.split("/").pop().replace(/_/g, " "),
-        );
+        const maxTopics = 5;
+        const total = Math.min(topicDetails.topicCategories.length, maxTopics);
+        let topicsStr = "";
+        for (let i = 0; i < total; i++) {
+            const url = topicDetails.topicCategories[i];
+            const topic = url.split("/").pop().replace(/_/g, " ");
+            topicsStr += (i === 0 ? "" : "\n") + topic;
+        }
         embed.addFields({
             name: "🏷️ Topics",
-            value: topics.slice(0, 5).join("\n"),
+            value: topicsStr,
             inline: false,
         });
     }
 
     // Add latest videos
     if (latestVideos.length > 0) {
-        const videoList = latestVideos.map((video) => {
-            const isLive =
-                video.liveStreamingDetails?.actualEndTime === undefined &&
-                video.liveStreamingDetails?.scheduledStartTime !== undefined;
-            const duration = isLive ? "🔴 LIVE" : formatDuration(video.contentDetails.duration);
-            const views = formatNumber(video.statistics.viewCount);
-            const timestamp = isLive
-                ? video.liveStreamingDetails.actualStartTime ||
-                  video.liveStreamingDetails.scheduledStartTime
-                : video.snippet.publishedAt;
+        const videoLines = [];
+        for (let i = 0; i < latestVideos.length; i++) {
+            const video = latestVideos[i];
 
-            return [
-                `[${video.snippet.title}](https://youtube.com/watch?v=${video.id.videoId})`,
-                `┗ ${duration} • ${views} views • <t:${Math.floor(new Date(timestamp).getTime() / 1000)}:R>`,
-            ].join("\n");
-        });
+            const {
+                snippet: vSnippet = {},
+                id: vId = {},
+                statistics: vStats = {},
+                contentDetails: vContent = {},
+                liveStreamingDetails: vLive = {},
+            } = video;
+
+            const isLive = !vLive?.actualEndTime && Boolean(vLive?.scheduledStartTime);
+            const duration = isLive ? "🔴 LIVE" : formatDuration(vContent.duration);
+            const views = formatNumber(Number(vStats.viewCount || 0));
+            const timestamp = isLive
+                ? (vLive.actualStartTime || vLive.scheduledStartTime)
+                : vSnippet.publishedAt;
+            const tsSeconds = Math.floor(new Date(timestamp || Date.now()).getTime() / 1000);
+
+            const title = (vSnippet.title || "Untitled").replace(/\n/g, " ");
+            const videoId = vId.videoId || vId;
+
+            videoLines.push(
+                `[${title}](https://youtube.com/watch?v=${videoId})\n┗ ${duration} • ${views} views • <t:${tsSeconds}:R>`
+            );
+        }
 
         embed.addFields({
             name: "📺 Latest Videos",
-            value: videoList.join("\n\n"),
+            value: videoLines.join("\n\n"),
             inline: false,
         });
     }

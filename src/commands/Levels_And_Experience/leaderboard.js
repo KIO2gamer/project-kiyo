@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder, MessageFlags } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const Logger = require("../../utils/logger");
 const { LevelSchema } = require("../../database/xp_data");
 

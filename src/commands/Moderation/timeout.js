@@ -1,8 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require("discord.js");
+const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const ms = require("ms");
 const moderationLogs = require("./../../database/moderationLogs");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Timeouts a member for the specified duration and reason.",

@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const axios = require("axios");
 const NodeCache = require("node-cache");
 const { handleError } = require("../../utils/errorHandler.js");
@@ -7,8 +8,6 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 mi
 const ASHCON_API_BASE = "https://api.ashcon.app/mojang/v2/user/";
 const EMBED_COLOR = "#2ECC71"; // A more visually appealing color for embeds
 const ERROR_COLOR = "#E74C3C"; // Color for error embeds
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:

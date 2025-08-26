@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const fs = require("fs").promises;
 
 // --- Constants ---
@@ -9,8 +10,6 @@ const CORRECT_GUESS_EMOJI = "🎉";
 const INCORRECT_GUESS_EMOJI = "❌";
 const TIME_UP_EMOJI = "⏰";
 const GAME_OVER_EMOJI = "🏁";
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

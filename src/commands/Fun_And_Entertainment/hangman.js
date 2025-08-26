@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
 const fs = require("fs").promises;
 
 // --- Constants ---
@@ -31,8 +32,6 @@ const funnyMessages = [
     "Nope! That letter must be invisible!",
     "Uh-oh! That letter's social distancing from this word!",
 ];
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "A thrilling multiplayer game of hangman!",

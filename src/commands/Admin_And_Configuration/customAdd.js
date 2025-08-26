@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, MessageFlags, PermissionFlagsBits } = require("discord.js");
+const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const CustomCommand = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");
 

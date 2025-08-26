@@ -1,11 +1,6 @@
-const { SlashCommandBuilder } = require("discord.js");
-const {
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-} = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+
+
 const moderationLogs = require("./../../database/moderationLogs");
 const { parseRange } = require("../../utils/rangeParser");
 const { handleError } = require("../../utils/errorHandler");
@@ -18,8 +13,6 @@ const ACTION_CHOICES = [
     { name: "Tempban", value: "tempban" },
     { name: "Unban", value: "unban" },
 ];
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Displays the moderation logs with various filtering options.",

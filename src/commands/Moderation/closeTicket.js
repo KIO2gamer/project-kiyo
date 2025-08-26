@@ -1,12 +1,10 @@
+const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 /**
  * Closes the current ticket channel. Requires the "Manage Channels" permission.
  *
  * @param {import('discord.js').Interaction} interaction - The Discord.js interaction object.
  * @returns {Promise<void>} - A Promise that resolves when the ticket is closed.
  */
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require("discord.js");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full:

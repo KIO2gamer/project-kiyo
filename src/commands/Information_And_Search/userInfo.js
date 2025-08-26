@@ -1,12 +1,5 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ActivityType,
-    PermissionsBitField,
-} = require("discord.js");
+const {  ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, EmbedBuilder, PermissionsBitField, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler");
 
 // Get platform-specific emoji for client status

@@ -1,3 +1,4 @@
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
 /**
  * Provides a Discord slash command to perform mathematical calculations using the mathjs library.
  *
@@ -8,11 +9,9 @@
  * @param {string} expression - The mathematical expression to calculate (e.g., '2 + 5 * 3').
  * @returns {Promise<void>} - Resolves when the calculation result is sent as a reply to the user's interaction.
  */
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+
 const math = require("mathjs"); // Import mathjs
 const { handleError } = require("../../utils/errorHandler");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

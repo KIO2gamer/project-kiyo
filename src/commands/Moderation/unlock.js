@@ -1,12 +1,6 @@
-const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    PermissionFlagsBits,
-    ChannelType,
-} = require("discord.js");
-const { handleError } = require("../../utils/errorHandler");
+const {  ChannelType, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
-const { MessageFlags } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:

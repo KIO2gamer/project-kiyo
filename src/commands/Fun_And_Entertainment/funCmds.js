@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler");
 const axios = require("axios");
 
@@ -112,7 +113,7 @@ async function getRandomGif(searchTerm) {
             },
         });
         return response.data.data.images.original.url;
-    } catch (error) {
+    } catch {
         throw new Error("Failed to fetch GIF from GIPHY API");
     }
 }
@@ -145,24 +146,17 @@ async function handleGifCommand(interaction, searchTerm, message) {
 
 async function handleSummon(interaction) {
     try {
+        await interaction.deferReply();
         const target = interaction.options.getUser("user");
-        if (!target) {
-            await handleError(
-                interaction,
-                new Error("No user specified"),
-                "VALIDATION",
-                "You need to specify a user to summon!",
-            );
-            return;
-        }
+        const gifUrl = await getRandomGif("summon");
 
         const embed = new EmbedBuilder()
             .setColor("#FF69B4")
             .setDescription(`${target} has been summoned by ${interaction.user}!`)
-            .setImage("https://media.giphy.com/media/3o7btXkbsV26U95Uly/giphy.gif")
+            .setImage(gifUrl)
             .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     } catch (error) {
         await handleError(interaction, error, "COMMAND_EXECUTION", "Failed to summon user.");
     }
@@ -170,17 +164,9 @@ async function handleSummon(interaction) {
 
 async function handleKill(interaction) {
     try {
+        await interaction.deferReply();
         const target = interaction.options.getUser("user");
-        if (!target) {
-            await handleError(
-                interaction,
-                new Error("No user specified"),
-                "VALIDATION",
-                "You need to specify a user to kill!",
-            );
-            return;
-        }
-
+        
         if (target.id === interaction.user.id) {
             await handleError(
                 interaction,
@@ -191,13 +177,14 @@ async function handleKill(interaction) {
             return;
         }
 
+        const gifUrl = await getRandomGif("kill");
         const embed = new EmbedBuilder()
             .setColor("#FF0000")
             .setDescription(`${interaction.user} killed ${target}! RIP 💀`)
-            .setImage("https://media.giphy.com/media/3o7btXkbsV26U95Uly/giphy.gif")
+            .setImage(gifUrl)
             .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     } catch (error) {
         await handleError(
             interaction,

@@ -1,7 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const moment = require("moment");
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
 
-const { MessageFlags } = require("discord.js");
+const moment = require("moment");
 
 module.exports = {
     description_full:

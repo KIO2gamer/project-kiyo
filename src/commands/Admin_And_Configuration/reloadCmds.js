@@ -1,9 +1,5 @@
-const {
-    SlashCommandBuilder,
-    PermissionFlagsBits,
-    EmbedBuilder,
-    MessageFlags,
-} = require("discord.js");
+const {  EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+
 const { handleError } = require("../../utils/errorHandler");
 const path = require("path");
 const fs = require("fs");

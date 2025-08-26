@@ -1,3 +1,4 @@
+const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
 /**
  * Generates a random color and displays it along with its hexadecimal code.
  *
@@ -8,9 +9,6 @@
  * @param {import('discord.js').Interaction} interaction - The Discord interaction object.
  * @returns {Promise<void>} - A Promise that resolves when the command has completed.
  */
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-
-const { MessageFlags } = require("discord.js");
 
 module.exports = {
     description_full: "Generates a random color and displays it along with its hexadecimal code.",
