@@ -1,0 +1,22 @@
+[build]
+  # Use the Netlify OAuth deployment subdirectory as the base for this site
+  base = "deployments/netlify-oauth"
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Route friendly paths to serverless functions
+[[redirects]]
+  from = "/callback"
+  to = "/.netlify/functions/callback"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[context.production.environment]
+  NODE_ENV = "production"

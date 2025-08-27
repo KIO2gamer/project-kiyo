@@ -150,27 +150,7 @@ function loadEvents(client, eventsPath) {
     Logger.success(`Loaded ${eventCount} events`);
 }
 
-/**
- * Sets up the rich presence for the bot
- * @param {Client} client Discord client
- * @param {Object} config Bot configuration
- */
-function setRichPresence(client, config) {
-    try {
-        client.user.setPresence({
-            activities: [
-                {
-                    name: config.presence.activity.name,
-                    type: ActivityType[config.presence.activity.type] || ActivityType.Playing,
-                },
-            ],
-            status: config.presence.status,
-        });
-        Logger.success("Bot presence set successfully");
-    } catch (error) {
-        Logger.error(`Failed to set bot presence: ${error.message}`);
-    }
-}
+
 
 // Bot configuration
 const config = {
