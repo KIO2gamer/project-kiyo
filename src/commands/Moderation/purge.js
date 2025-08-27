@@ -1,4 +1,5 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { success } = require("../../utils/moderationEmbeds");
 
 
 const { handleError } = require("../../utils/errorHandler");
@@ -87,19 +88,12 @@ module.exports = {
                 const deleted = await interaction.channel.bulkDelete(validMessages, true);
 
                 // Create success embed
-                const successEmbed = new EmbedBuilder()
-                    .setTitle("Messages Purged")
-                    .setDescription(
-                        user
-                            ? `Successfully deleted ${deleted.size} message(s) from ${user.tag}`
-                            : `Successfully deleted ${deleted.size} message(s)`,
-                    )
-                    .setColor("Green")
-                    .setFooter({
-                        text: `Purged by ${interaction.user.tag}`,
-                        iconURL: interaction.user.displayAvatarURL(),
-                    })
-                    .setTimestamp();
+                const successEmbed = success(interaction, {
+                    title: "Messages Purged",
+                    description: user
+                        ? `Successfully deleted ${deleted.size} message(s) from ${user.tag}`
+                        : `Successfully deleted ${deleted.size} message(s)`,
+                });
 
                 // Add warning if some messages were too old
                 if (validMessages.size < messagesToDelete.size) {

@@ -1,7 +1,8 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const ms = require("ms");
 const { handleError } = require("../../utils/errorHandler");
+const { success, error: errorEmbed } = require("../../utils/moderationEmbeds");
 
 module.exports = {
     description_full:
@@ -35,20 +36,11 @@ module.exports = {
         const duration = ms(durationInput) / 1000;
 
         if (isNaN(duration) || duration < 0 || duration > 21600) {
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("ERROR")
-                        .setDescription(
-                            "Invalid duration. Please provide a duration between 0 seconds and 6 hours.",
-                        )
-                        .setColor("Red")
-                        .setFooter({
-                            text: `Set by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.displayAvatarURL()}`,
-                        }),
-                ],
+            const embed = errorEmbed(interaction, {
+                title: "Invalid Duration",
+                description: "Please provide a duration between 0 seconds and 6 hours.",
             });
+            await interaction.reply({ embeds: [embed] });
             return;
         }
 
@@ -62,18 +54,11 @@ module.exports = {
                 description = `The slowmode for <#${channel.id}> has been set to ${durationInput}.`;
             }
 
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("Slowmode Set")
-                        .setDescription(description)
-                        .setColor("Green")
-                        .setFooter({
-                            text: `Set by: ${interaction.user.username}`,
-                            iconURL: `${interaction.user.displayAvatarURL()}`,
-                        }),
-                ],
+            const embed = success(interaction, {
+                title: "Slowmode Set",
+                description,
             });
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
             handleError(interaction, error);
         }

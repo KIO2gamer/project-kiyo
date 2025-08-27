@@ -1,4 +1,4 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
@@ -87,13 +87,14 @@ module.exports = {
 
             // Try to DM the user before kicking
             try {
-                const dmEmbed = new EmbedBuilder()
-                    .setTitle(`Kicked from ${interaction.guild.name}`)
-                    .setDescription(`You have been kicked for: \`${reason}\``)
-                    .setColor("Orange")
-                    .setTimestamp();
-
-                await targetUser.send({ embeds: [dmEmbed] });
+                const { dmNotice, actionColor } = require("../../utils/moderationEmbeds");
+                const dm = dmNotice({
+                    guildName: interaction.guild.name,
+                    title: `Kicked from ${interaction.guild.name}`,
+                    description: `You have been kicked for: \`${reason}\``,
+                    color: actionColor("kick"),
+                });
+                await targetUser.send({ embeds: [dm] });
             } catch (dmError) {
                 // If DM fails, log it but don't treat it as a command failure
                 await handleError(
@@ -109,17 +110,13 @@ module.exports = {
             await Promise.all([logEntry.save(), targetUser.kick(reason)]);
 
             // Send success message
-            const successEmbed = new EmbedBuilder()
-                .setTitle("User Kicked")
-                .setDescription(`Successfully kicked ${targetUser} for reason: \`${reason}\``)
-                .setColor("Orange")
-                .setFooter({
-                    text: `Kicked by ${interaction.user.tag}`,
-                    iconURL: interaction.user.displayAvatarURL(),
-                })
-                .setTimestamp();
-
-            await interaction.reply({ embeds: [successEmbed] });
+            const { success, actionColor } = require("../../utils/moderationEmbeds");
+            const embed = success(interaction, {
+                title: "User Kicked",
+                description: `Successfully kicked ${targetUser} for reason: \`${reason}\``,
+                color: actionColor("kick"),
+            });
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
             // Handle different types of errors
             if (error.code === 50013) {

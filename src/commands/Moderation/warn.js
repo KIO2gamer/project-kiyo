@@ -1,34 +1,12 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
+const { success, dmNotice, actionColor } = require("../../utils/moderationEmbeds");
 
-function createErrorEmbed(title, description, interaction) {
-    return new EmbedBuilder()
-        .setTitle(title)
-        .setDescription(description)
-        .setColor("Red")
-        .setFooter({
-            text: `Done by: ${interaction.user.username}`,
-            iconURL: `${interaction.user.avatarURL()}`,
-        });
-}
+// createErrorEmbed no longer needed; standardized via errorEmbed()
 
-function checkRolePermissions(interaction, targetUser) {
-    const targetRolePosition = targetUser.roles.highest.position;
-    const requestUserRolePosition = interaction.member.roles.highest.position;
-    const botRolePosition = interaction.guild.members.me.roles.highest.position;
-
-    if (targetRolePosition >= requestUserRolePosition) {
-        return "You cannot warn someone with a higher or equal role than you";
-    }
-
-    if (targetRolePosition >= botRolePosition) {
-        return "I cannot warn someone with a higher or equal role than myself";
-    }
-
-    return null;
-}
+// removed unused checkRolePermissions helper
 
 module.exports = {
     description_full: "Issues a warning to a member and logs it in the moderation system.",
@@ -99,27 +77,22 @@ module.exports = {
                 await logEntry.save();
 
                 // Send success message
-                const successEmbed = new EmbedBuilder()
-                    .setTitle("User Warned")
-                    .setDescription(`Successfully warned ${targetUser} for reason: \`${reason}\``)
-                    .setColor("Yellow")
-                    .setFooter({
-                        text: `Warned by ${interaction.user.tag}`,
-                        iconURL: interaction.user.displayAvatarURL(),
-                    })
-                    .setTimestamp();
-
-                await interaction.reply({ embeds: [successEmbed] });
+                const embed = success(interaction, {
+                    title: "User Warned",
+                    description: `Successfully warned ${targetUser} for reason: \`${reason}\``,
+                    color: actionColor("warn"),
+                });
+                await interaction.reply({ embeds: [embed] });
 
                 // Try to DM the warned user
                 try {
-                    const dmEmbed = new EmbedBuilder()
-                        .setTitle(`Warning from ${interaction.guild.name}`)
-                        .setDescription(`You have been warned for: \`${reason}\``)
-                        .setColor("Yellow")
-                        .setTimestamp();
-
-                    await targetUser.send({ embeds: [dmEmbed] });
+                    const dm = dmNotice({
+                        guildName: interaction.guild.name,
+                        title: `Warning from ${interaction.guild.name}`,
+                        description: `You have been warned for: \`${reason}\``,
+                        color: actionColor("warn"),
+                    });
+                    await targetUser.send({ embeds: [dm] });
                 } catch (dmError) {
                     // If DM fails, log it but don't treat it as a command failure
                     await handleError(

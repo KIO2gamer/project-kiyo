@@ -1,6 +1,7 @@
-const {  ChannelType, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {  ChannelType, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
+const { success, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
 
 module.exports = {
     description_full:
@@ -28,28 +29,22 @@ module.exports = {
         const channel = interaction.options.getChannel("channel") || interaction.channel;
 
         // Check if the bot has the required permissions
-        if (
-            !channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)
-        ) {
-            const noPermissionEmbed = new EmbedBuilder()
-                .setTitle("ERROR")
-                .setColor("Red")
-                .setDescription("I do not have the required permissions to lock the channel.");
-            await interaction.reply({ embeds: [noPermissionEmbed] });
+        if (!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)) {
+            const embed = errorEmbed(interaction, {
+                title: "Permission Error",
+                description: "I do not have the required permissions to lock the channel.",
+            });
+            await interaction.reply({ embeds: [embed] });
             return;
         }
 
         // Check if the channel is already locked
-        if (
-            channel.permissionOverwrites.cache
-                .get(interaction.guild.id)
-                ?.deny.has(PermissionFlagsBits.SendMessages)
-        ) {
-            const alreadyLockedEmbed = new EmbedBuilder()
-                .setTitle("ERROR")
-                .setColor("Red")
-                .setDescription(`${channel} is already locked.`);
-            await interaction.reply({ embeds: [alreadyLockedEmbed] });
+        if (channel.permissionOverwrites.cache.get(interaction.guild.id)?.deny.has(PermissionFlagsBits.SendMessages)) {
+            const embed = errorEmbed(interaction, {
+                title: "Already Locked",
+                description: `${channel} is already locked.`,
+            });
+            await interaction.reply({ embeds: [embed] });
             return;
         }
 
@@ -59,14 +54,11 @@ module.exports = {
                 SendMessages: false,
             });
 
-            const lockEmbed = new EmbedBuilder()
-                .setTitle(`<#${channel.id}> has been locked`)
-                .setColor("Red")
-                .setFooter({
-                    text: `Done by: ${interaction.user.username}`,
-                    iconURL: `${interaction.user.avatarURL()}`,
-                })
-                .setTimestamp();
+            const lockEmbed = success(interaction, {
+                title: `Channel Locked`,
+                description: `<#${channel.id}> has been locked for sending messages.`,
+                color: actionColor("lock"),
+            });
 
             if (channel === interaction.channel) {
                 await interaction.reply({

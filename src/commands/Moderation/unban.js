@@ -1,4 +1,6 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { success, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
+const { handleError } = require("../../utils/errorHandler");
 
 const moderationLogs = require("./../../database/moderationLogs");
 
@@ -37,19 +39,11 @@ module.exports = {
             );
 
             if (!bannedUser) {
-                await interaction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setTitle("Error")
-                            .setDescription("User is not banned or not found")
-                            .setColor("Red")
-                            .setTimestamp()
-                            .setFooter({
-                                text: `Requested by ${interaction.user.tag}`,
-                                iconURL: interaction.user.displayAvatarURL(),
-                            }),
-                    ],
+                const embed = errorEmbed(interaction, {
+                    title: "User Not Found",
+                    description: "User is not banned or not found",
                 });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -64,42 +58,22 @@ module.exports = {
 
             await logEntry.save();
 
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("User Unbanned")
-                        .setDescription(`Successfully unbanned ${bannedUser.user.tag}`)
-                        .addFields(
-                            {
-                                name: "User ID",
-                                value: bannedUser.user.id,
-                                inline: true,
-                            },
-                            { name: "Reason", value: reason, inline: true },
-                        )
-                        .setColor("Green")
-                        .setTimestamp()
-                        .setFooter({
-                            text: `Unbanned by ${interaction.user.tag}`,
-                            iconURL: interaction.user.displayAvatarURL(),
-                        }),
+            const embed = success(interaction, {
+                title: "User Unbanned",
+                description: `Successfully unbanned ${bannedUser.user.tag}`,
+                color: actionColor("unban"),
+                fields: [
+                    { name: "User ID", value: bannedUser.user.id, inline: true },
+                    { name: "Reason", value: reason, inline: true },
                 ],
             });
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
             handleError("Error unbanning user:", error);
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setTitle("Error")
-                        .setDescription("An error occurred while trying to unban the user")
-                        .setColor("Red")
-                        .setTimestamp()
-                        .setFooter({
-                            text: `Requested by ${interaction.user.tag}`,
-                            iconURL: interaction.user.displayAvatarURL(),
-                        }),
-                ],
+            const e = errorEmbed(interaction, {
+                description: "An error occurred while trying to unban the user",
             });
+            await interaction.reply({ embeds: [e] });
         }
     },
 };

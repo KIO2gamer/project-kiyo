@@ -1,4 +1,4 @@
-const { EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
@@ -99,17 +99,13 @@ module.exports = {
             await Promise.all([logEntry.save(), targetUser.ban({ reason: reason })]);
 
             // Send success message
-            const successEmbed = new EmbedBuilder()
-                .setTitle("User Banned")
-                .setDescription(`Successfully banned ${targetUser} for reason: \`${reason}\``)
-                .setColor("Red")
-                .setFooter({
-                    text: `Banned by ${interaction.user.tag}`,
-                    iconURL: interaction.user.displayAvatarURL(),
-                })
-                .setTimestamp();
-
-            await interaction.reply({ embeds: [successEmbed] });
+            const { success, actionColor } = require("../../utils/moderationEmbeds");
+            const embed = success(interaction, {
+                title: "User Banned",
+                description: `Successfully banned ${targetUser} for reason: \`${reason}\``,
+                color: actionColor("ban"),
+            });
+            await interaction.reply({ embeds: [embed] });
         } catch (error) {
             // Handle different types of errors
             if (error.code === 50013) {
