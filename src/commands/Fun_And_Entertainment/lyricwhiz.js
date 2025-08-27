@@ -1,5 +1,5 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 const axios = require("axios");
 
 const LYRICS_API_BASE_URL = "https://api.lyrics.ovh/v1"; // Free lyrics API base URL

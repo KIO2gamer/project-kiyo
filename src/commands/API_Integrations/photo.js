@@ -1,5 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:
@@ -49,6 +49,8 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        await interaction.deferReply();
+
         const query = interaction.options.getString("query");
         const count = interaction.options.getInteger("count") || 1;
         const orientation = interaction.options.getString("orientation");
@@ -73,12 +75,11 @@ module.exports = {
 
         // Check if API key is configured
         if (!apiKey) {
-            await interaction.reply({
-                content:
-                    "Photo search service is not properly configured. Please contact an administrator.",
-                ephemeral: true,
-            });
-            return;
+            return handleError(
+                interaction,
+                new Error("Photo search service is not properly configured. Missing API key."),
+                "CONFIGURATION"
+            );
         }
 
         try {
@@ -97,25 +98,12 @@ module.exports = {
                         .setURL(photo.url);
                 });
 
-                await interaction.reply({ embeds });
+                await interaction.editReply({ embeds });
             } else {
-                await interaction.reply("Sorry, I could not find any photos for that query.");
+                await interaction.editReply("Sorry, I could not find any photos for that query.");
             }
         } catch (error) {
-            console.error("Error fetching photo:", error);
-
-            let errorMessage = "There was an error trying to fetch the photo.";
-
-            if (error.message?.includes("401") || error.message?.includes("Unauthorized")) {
-                errorMessage =
-                    "Photo service authentication failed. Please contact an administrator.";
-            } else if (error.message?.includes("429") || error.message?.includes("rate limit")) {
-                errorMessage = "Photo service rate limit reached. Please try again later.";
-            } else if (error.message?.includes("network") || error.message?.includes("ENOTFOUND")) {
-                errorMessage = "Could not connect to photo service. Please try again later.";
-            }
-
-            await interaction.reply({ content: errorMessage, ephemeral: true });
+            handleError(interaction, error);
         }
     },
 };

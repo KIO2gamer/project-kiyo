@@ -1,5 +1,5 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 const he = require("he");
 const Logger = require("../../utils/logger");
 
@@ -161,7 +161,7 @@ function handleCollectorEvents(
         await i.update({ embeds: [resultEmbed], components: [] });
     });
 
-    collector.on("end", async (collected) => {
+    collector.on("end", async () => {
         if (!answered) {
             const timeoutEmbed = createTimeoutEmbed(answers, correctAnswerIndex);
             await interaction.followUp({

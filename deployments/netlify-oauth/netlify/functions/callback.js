@@ -50,7 +50,7 @@ const TempOAuth2Schema = new mongoose.Schema({
 const TempOAuth2Storage =
     mongoose.models.TempOAuth2 || mongoose.model("TempOAuth2", TempOAuth2Schema);
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
     // Set CORS headers
     const headers = {
         "Access-Control-Allow-Origin": "*",

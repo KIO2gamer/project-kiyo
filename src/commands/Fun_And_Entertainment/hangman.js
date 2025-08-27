@@ -48,8 +48,11 @@ module.exports = {
       // Load words
       const words = await loadWords();
       if (!words || words.length === 0) {
-        return interaction.editReply(
-          "Word list is empty or missing. Please ask an admin to check assets/texts/wordList.txt."
+        return handleError(
+            interaction,
+            new Error("Word list is empty or missing."),
+            "CONFIGURATION",
+            "The hangman game is not properly configured. Please contact an administrator."
         );
       }
 
@@ -84,12 +87,7 @@ module.exports = {
 
             // Already guessed? Reply ephemeral
             if (state.guessedLetters.includes(letter)) {
-              if (i.deferred || i.replied) {
-                await i.followUp({ content: `Already guessed ${letter}.`, ephemeral: true });
-              } else {
-                await i.reply({ content: `Already guessed ${letter}.`, ephemeral: true });
-              }
-              return;
+              return i.reply({ content: `You've already guessed the letter ${letter}.`, ephemeral: true });
             }
 
             // Record guess
@@ -128,15 +126,7 @@ module.exports = {
             return i.update({ embeds: [refreshed], components: updatedComponents });
           }
         } catch (err) {
-          await handleError(interaction, err, false);
-          try {
-            if (!i.deferred && !i.replied) {
-              await i.reply({ content: "An error occurred.", ephemeral: true });
-            }
-          } catch (e2) {
-            // Best-effort error path; log quietly
-            await handleError("Hangman ephemeral reply failed:", e2, false);
-          }
+          handleError(i, err);
         }
       });
 
@@ -149,18 +139,12 @@ module.exports = {
         try {
           await msg.edit({ embeds: [timeoutEmbed], components: [] });
         } catch (e3) {
-          await handleError("Hangman timeout edit failed:", e3, false);
+          // Log quietly, game is over and user can't be notified.
+          handleError(null, e3);
         }
       });
     } catch (error) {
-      await handleError(interaction, error, false);
-      try {
-        await interaction.editReply(
-          "An error occurred while starting Hangman. Please try again."
-        );
-      } catch (e4) {
-        await handleError("Hangman startup reply failed:", e4, false);
-      }
+      handleError(interaction, error);
     }
   },
 };
@@ -176,7 +160,8 @@ async function loadWords() {
       .filter((w) => w && /^[a-zA-Z]+$/.test(w))
       .map((w) => w.toUpperCase());
   } catch (err) {
-    await handleError("Failed to read word list:", err);
+    // Log the error but return null to be handled by the caller
+    handleError(null, new Error(`Failed to read word list: ${err.message}`), "CONFIGURATION");
     return null;
   }
 }
