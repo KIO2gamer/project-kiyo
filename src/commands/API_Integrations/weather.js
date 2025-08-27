@@ -1,6 +1,6 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:
@@ -19,27 +19,27 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        await interaction.deferReply();
         const city = interaction.options.getString("location");
         const apiKey = process.env.WEATHER_API_KEY;
 
         if (!apiKey) {
-            await interaction.reply({
-                content:
-                    "Weather service is not properly configured. Please contact an administrator.",
-                ephemeral: true,
-            });
-            return;
+            return handleError(
+                interaction,
+                new Error("Weather service is not properly configured. Missing API key."),
+                "CONFIGURATION"
+            );
         }
 
         try {
             // Validate city name
             if (!/^[a-zA-Z\s,.-]+$/.test(city)) {
-                await interaction.reply({
-                    content:
-                        "Please provide a valid city name using only letters, spaces, and basic punctuation.",
-                    ephemeral: true,
-                });
-                return;
+                return handleError(
+                    interaction,
+                    new Error("Invalid city name provided."),
+                    "VALIDATION",
+                    "Please provide a valid city name using only letters, spaces, and basic punctuation."
+                );
             }
 
             const baseUrl = "https://api.openweathermap.org/data/2.5/weather";
@@ -87,33 +87,19 @@ module.exports = {
                         "https://openweathermap.org/img/w/" + weatherData.weather[0].icon + ".png",
                 });
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            console.error("Weather API error:", error);
-
-            let errorMessage = "An unexpected error occurred while fetching weather data.";
-
-            if (error.response) {
-                switch (error.response.status) {
-                case 404:
-                    errorMessage = `Could not find weather data for "${city}". Please check the city name and try again.`;
-                    break;
-                case 401:
-                    errorMessage =
-                            "Weather API authentication failed. Please contact an administrator.";
-                    break;
-                case 429:
-                    errorMessage = "Weather API rate limit reached. Please try again later.";
-                    break;
-                default:
-                    errorMessage =
-                            "Weather service is currently unavailable. Please try again later.";
-                }
-            } else if (error.request) {
-                errorMessage = "Could not connect to the weather service. Please try again later.";
+            // Check for 404 specifically to give a better message
+            if (error.response && error.response.status === 404) {
+                return handleError(
+                    interaction,
+                    new Error(`Could not find weather data for "${city}".`),
+                    "VALIDATION",
+                    "Could not find the city. Please check the spelling and try again."
+                );
             }
-
-            await interaction.reply({ content: errorMessage, ephemeral: true });
+            // Use the central handler for all other errors
+            handleError(interaction, error);
         }
     },
 };

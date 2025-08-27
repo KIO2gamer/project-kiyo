@@ -1,5 +1,5 @@
-const { MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full: "Ends a poll from a specific message, preventing further voting.",
@@ -34,8 +34,7 @@ module.exports = {
             message.poll.end();
             await interaction.reply("Poll ended successfully!");
         } catch (error) {
-            handleError(error);
-            await interaction.reply("An error occurred while trying to end the poll.");
+            handleError(interaction, error);
         }
     },
 };

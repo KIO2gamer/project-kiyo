@@ -1,55 +1,50 @@
-const {  ChannelType, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 
 async function handleChannelUpdate(channel, newName, permissionChoice, toggleChoice, role) {
-    try {
-        let response = "";
-        let updated = false;
+    let response = "";
+    let updated = false;
 
-        // Handle name change if provided
-        if (newName && newName !== channel.name) {
-            try {
-                await channel.setName(newName);
-                response += `• Channel name changed to \`${newName}\`\n`;
-                updated = true;
-            } catch (error) {
-                throw new Error(`Failed to update channel name: ${error.message}`);
-            }
+    // Handle name change if provided
+    if (newName && newName !== channel.name) {
+        try {
+            await channel.setName(newName);
+            response += `• Channel name changed to \`${newName}\`\n`;
+            updated = true;
+        } catch (error) {
+            throw new Error(`Failed to update channel name: ${error.message}`);
         }
-
-        // Handle permission changes if provided
-        if (permissionChoice && role) {
-            try {
-                const currentPerms = channel.permissionsFor(role);
-                const newPerms = {};
-
-                switch (permissionChoice) {
-                case "view":
-                    newPerms.ViewChannel = toggleChoice;
-                    break;
-                case "send":
-                    newPerms.SendMessages = toggleChoice;
-                    break;
-                case "manage":
-                    newPerms.ManageMessages = toggleChoice;
-                    break;
-                default:
-                    throw new Error("Invalid permission choice");
-                }
-
-                await channel.permissionOverwrites.edit(role, newPerms);
-                response += `• ${toggleChoice ? "Enabled" : "Disabled"} \`${permissionChoice}\` permission for role \`${role.name}\`\n`;
-                updated = true;
-            } catch (error) {
-                throw new Error(`Failed to update permissions: ${error.message}`);
-            }
-        }
-
-        return { response, updated };
-    } catch (error) {
-        throw error;
     }
+
+    // Handle permission changes if provided
+    if (permissionChoice && role) {
+        try {
+            const newPerms = {};
+
+            switch (permissionChoice) {
+            case "view":
+                newPerms.ViewChannel = toggleChoice;
+                break;
+            case "send":
+                newPerms.SendMessages = toggleChoice;
+                break;
+            case "manage":
+                newPerms.ManageMessages = toggleChoice;
+                break;
+            default:
+                throw new Error("Invalid permission choice");
+            }
+
+            await channel.permissionOverwrites.edit(role, newPerms);
+            response += `• ${toggleChoice ? "Enabled" : "Disabled"} \`${permissionChoice}\` permission for role \`${role.name}\`\n`;
+            updated = true;
+        } catch (error) {
+            throw new Error(`Failed to update permissions: ${error.message}`);
+        }
+    }
+
+    return { response, updated };
 }
 
 module.exports = {
@@ -149,9 +144,8 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+            await interaction.deferReply({ ephemeral: true });
 
-            const subcommand = interaction.options.getSubcommand();
             const channel = interaction.options.getChannel("channel");
             const newChannelName = interaction.options.getString("new_name");
             const permissionChoice = interaction.options.getString("permission");

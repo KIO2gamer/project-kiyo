@@ -1,4 +1,4 @@
-const { MessageFlags, SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { parseRange } = require("../../utils/rangeParser");
@@ -26,35 +26,42 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const logNumber = interaction.options.getInteger("lognumber");
-        const logRange = interaction.options.getString("logrange");
-
-        if (!logNumber && !logRange) {
-            await interaction.reply(
-                "Please provide either a log number or a range of log numbers to delete.",
-            );
-            return;
-        }
-
         try {
+            await interaction.deferReply({ ephemeral: true });
+            const logNumber = interaction.options.getInteger("lognumber");
+            const logRange = interaction.options.getString("logrange");
+
+            if (!logNumber && !logRange) {
+                return handleError(
+                    interaction,
+                    new Error("Please provide either a log number or a range of log numbers to delete."),
+                    "VALIDATION"
+                );
+            }
+
             if (logNumber) {
                 const log = await moderationLogs.findOneAndDelete({
                     logNumber: logNumber,
                 });
 
                 if (log) {
-                    await interaction.reply(`Successfully deleted log #${logNumber}.`);
+                    await interaction.editReply(`Successfully deleted log #${logNumber}.`);
                 } else {
-                    await interaction.reply(`No log found with log number ${logNumber}.`);
+                    return handleError(
+                        interaction,
+                        new Error(`No log found with log number ${logNumber}.`),
+                        "VALIDATION"
+                    );
                 }
             } else if (logRange) {
                 const range = parseRange(logRange);
 
                 if (!range) {
-                    await interaction.reply(
-                        "Invalid log range. Please provide a valid range (e.g., 1-5).",
+                    return handleError(
+                        interaction,
+                        new Error("Invalid log range. Please provide a valid range (e.g., 1-5)."),
+                        "VALIDATION"
                     );
-                    return;
                 }
 
                 const { start, end } = range;
@@ -64,16 +71,29 @@ module.exports = {
                 });
 
                 if (deletedLogs.deletedCount > 0) {
-                    await interaction.reply(
+                    await interaction.editReply(
                         `Successfully deleted ${deletedLogs.deletedCount} logs in the range #${start}-#${end}.`,
                     );
                 } else {
-                    await interaction.reply(`No logs found in the range #${start}-#${end}.`);
+                    await interaction.editReply(`No logs found in the range #${start}-#${end}.`);
                 }
             }
         } catch (error) {
-            handleError(error);
-            await interaction.reply("Failed to delete the log(s). Please try again later.");
+            if (error.name === "MongoError" || error.name === "MongooseError") {
+                handleError(
+                    interaction,
+                    error,
+                    "DATABASE",
+                    "Failed to delete the log(s) from the database."
+                );
+            } else {
+                handleError(
+                    interaction,
+                    error,
+                    "COMMAND_EXECUTION",
+                    "An error occurred while deleting the log(s)."
+                );
+            }
         }
     },
 };

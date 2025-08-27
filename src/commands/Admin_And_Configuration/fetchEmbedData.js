@@ -1,7 +1,5 @@
-const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
-// This command fetches the embed data from a message URL.
-
-const handleError = require("./../../utils/errorHandler");
+const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { handleError } = require("./../../utils/errorHandler");
 
 module.exports = {
     description_full: "Fetches the embed data from a message URL.",
@@ -18,13 +16,14 @@ module.exports = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
         try {
             const url = interaction.options.getString("url"); // Get the URL from the message
             const urlRegex = /https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
             const match = url.match(urlRegex);
 
             if (!match) {
-                return interaction.reply("Invalid message URL.");
+                return handleError(interaction, new Error("Invalid message URL provided."), "VALIDATION");
             }
 
             const [, guildId, channelId, messageId] = match;
@@ -34,27 +33,30 @@ module.exports = {
                 `https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`,
                 {
                     headers: {
-                        Authorization: `Bot ${process.env.DISCORD_TOKEN}`, // Replace with your bot token
+                        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
                     },
                 },
             );
 
             if (!response.ok) {
-                return interaction.reply(
-                    "Failed to fetch the message. Is the URL correct and is your bot in the server?",
+                return handleError(
+                    interaction,
+                    new Error(`Failed to fetch the message. Status: ${response.status}`),
+                    "API",
+                    "Failed to fetch the message. Is the URL correct and is the bot in that server?"
                 );
             }
 
             const data = await response.json();
 
             if (!data.embeds || data.embeds.length === 0) {
-                return interaction.reply("The message does not contain any embeds.");
+                return handleError(interaction, new Error("The specified message does not contain any embeds."), "VALIDATION");
             }
 
             const embedData = data.embeds[0];
 
             // Send the embed data as JSON
-            interaction.reply({
+            await interaction.editReply({
                 content: "Embed Data:",
                 files: [
                     {
@@ -62,11 +64,9 @@ module.exports = {
                         name: "embed.json",
                     },
                 ],
-                flags: MessageFlags.Ephemeral,
             });
         } catch (error) {
-            handleError("Error fetching embed:", error);
-            interaction.reply("An error occurred while fetching the embed.");
+            handleError(interaction, error);
         }
     },
 };

@@ -1,5 +1,5 @@
-const { MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full: "Fetches the current answers/votes for a poll from a specific message.",
@@ -46,8 +46,7 @@ module.exports = {
 
             await interaction.reply(reply);
         } catch (error) {
-            handleError(error);
-            await interaction.reply("An error occurred while fetching the poll answers.");
+            handleError(interaction, error);
         }
     },
 };

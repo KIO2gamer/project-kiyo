@@ -1,5 +1,5 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { handleError } = require("../../utils/errorHandler");
 const translate = require("@iamtraction/google-translate");
 
 module.exports = {
@@ -48,10 +48,7 @@ module.exports = {
 
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            handleError("Error executing translate command:", error);
-            await interaction.reply(
-                "There was an error while executing this command. Please try again later.",
-            );
+            handleError(interaction, error);
         }
     },
 };

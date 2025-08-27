@@ -1,6 +1,6 @@
-const { MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,21 +25,24 @@ module.exports = {
     ],
 
     async execute(interaction) {
+        // Defer the reply to avoid timeout issues
+        await interaction.deferReply();
+
         const question = interaction.options.getString("question");
 
         // Check if API key is configured
         if (!process.env.GEMINI_API_KEY) {
-            await interaction.reply({
-                content: "AI service is not properly configured. Please contact an administrator.",
-                ephemeral: true,
-            });
-            return;
+            return handleError(
+                interaction,
+                new Error("AI service is not properly configured. Missing API key."),
+                "CONFIGURATION" // Using a generic but clear category
+            );
         }
 
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.0-flash",
+                model: "gemini-1.5-flash", // Updated model name
                 systemInstruction:
                     "You are a helpful assistant and your answers are concise and to the point.",
             });
@@ -50,7 +53,7 @@ module.exports = {
 
             // Handle long responses by chunking if necessary
             if (text.length > 2000) {
-                await interaction.reply(text.substring(0, 2000));
+                await interaction.editReply(text.substring(0, 2000));
                 // Send remaining text in follow-up messages
                 let remaining = text.substring(2000);
                 while (remaining.length > 0) {
@@ -59,26 +62,11 @@ module.exports = {
                     remaining = remaining.substring(2000);
                 }
             } else {
-                await interaction.reply(text);
+                await interaction.editReply(text);
             }
         } catch (error) {
-            console.error("Error in ask-gemini command:", error);
-
-            let errorMessage = "Sorry, there was an error processing your request.";
-
-            // Handle specific error types
-            if (error.message?.includes("API key")) {
-                errorMessage =
-                    "AI service is not properly configured. Please contact an administrator.";
-            } else if (error.message?.includes("blocked") || error.message?.includes("safety")) {
-                errorMessage =
-                    "I can't respond to that due to content safety policies. Please try a different question.";
-            } else if (error.message?.includes("quota") || error.message?.includes("limit")) {
-                errorMessage =
-                    "AI service is temporarily unavailable due to usage limits. Please try again later.";
-            }
-
-            await interaction.reply({ content: errorMessage, ephemeral: true });
+            // Centralized error handling
+            handleError(interaction, error);
         }
     },
 };

@@ -1,5 +1,6 @@
 const Reminder = require("./../database/reminderStorage");
 const { Events } = require("discord.js");
+const { handleError } = require("../utils/errorHandler");
 
 module.exports = {
     name: Events.ClientReady,
