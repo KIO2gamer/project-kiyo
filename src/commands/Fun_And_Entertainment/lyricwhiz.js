@@ -2,7 +2,11 @@ const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashComman
 const { handleError } = require("../../utils/errorHandler");
 const axios = require("axios");
 
-const LYRICS_API_BASE_URL = "https://api.lyrics.ovh/v1"; // Free lyrics API base URL
+// Primary/secondary lyrics sources and track search
+const LRCLIB_BASE_URL = "https://lrclib.net/api"; // Free, no key
+const ITUNES_SEARCH_BASE_URL = "https://itunes.apple.com/search"; // Free, no key, for track discovery
+const VAGALUME_BASE_URL = "https://api.vagalume.com.br/search.php"; // Free tier key (optional)
+const LYRICS_OVH_BASE_URL = "https://api.lyrics.ovh/v1"; // Fallback, no key
 const GAME_COLOR = "#7289DA"; // Discord Blurple for game embeds
 const CORRECT_COLOR = "#4CAF50"; // Green for correct answers
 const WRONG_COLOR = "#F44336"; // Red for wrong/time's up
@@ -84,7 +88,7 @@ module.exports = {
                 });
             }
 
-            const { artist, title, lyrics, fillInLyrics } = songData; // Get fillInLyrics as well
+            const { artist, title, fillInLyrics } = songData; // Get fillInLyrics as well
             const questionEmbed = new EmbedBuilder()
                 .setColor(GAME_COLOR)
                 .setTitle(`Lyric Whiz - Round ${currentRound}/${totalRounds}`)
@@ -191,50 +195,120 @@ module.exports = {
     },
 };
 
-// **Updated Function: getRandomSongAndLyricsFromAPI - Now uses lyrics.ovh search**
+// Primary: LRCLIB (no key), fallback: Vagalume (requires key), last resort: lyrics.ovh
 async function getRandomSongAndLyricsFromAPI() {
     const genreKeyword = selectRandomGenreKeyword();
     try {
-        const searchResponse = await axios.get(
-            `https://api.musixmatch.com/ws/1.1/track.search?apikey=${encodeURIComponent(process.env.MUSIXMATCH_API_KEY)}&q_track_artist=${encodeURIComponent(genreKeyword)}&f_has_lyrics=1&s_track_rating=desc&page_size=50`,
-        );
+        // 1) Find candidate tracks via iTunes Search (free)
+        const itunesRes = await axios.get(ITUNES_SEARCH_BASE_URL, {
+            params: {
+                term: genreKeyword,
+                media: "music",
+                entity: "song",
+                limit: 50,
+            },
+            timeout: 7000,
+        });
 
-        const tracks = searchResponse.data.message.body.track_list;
-        if (!tracks?.length) throw new Error(`No tracks found for "${genreKeyword}"`);
+        const items = Array.isArray(itunesRes.data?.results) ? itunesRes.data.results : [];
+        if (!items.length) throw new Error(`No tracks found for "${genreKeyword}"`);
 
-        // Try up to 3 tracks before failing
-        for (let i = 0; i < Math.min(3, tracks.length); i++) {
-            const randomIndex = Math.floor(Math.random() * tracks.length);
-            const track = tracks[randomIndex].track;
-            const artist = encodeURIComponent(track.artist_name.replace(/\([^)]*\)/g, "").trim());
-            const title = encodeURIComponent(track.track_name.replace(/\([^)]*\)/g, "").trim());
+        // Try up to 5 random tracks
+        const pool = [...items];
+        for (let i = 0; i < Math.min(5, pool.length); i++) {
+            const idx = Math.floor(Math.random() * pool.length);
+            const t = pool.splice(idx, 1)[0];
+            const artist = sanitizeName(t.artistName);
+            const title = sanitizeName(t.trackName);
+            const durationSec = t.trackTimeMillis ? Math.round(t.trackTimeMillis / 1000) : undefined;
 
-            try {
-                const lyricsResponse = await axios.get(
-                    `${LYRICS_API_BASE_URL}/${artist}/${title}`,
-                    { timeout: 5000 },
-                );
+            // 2) Try LRCLIB
+            const lrclibLyrics = await fetchLyricsFromLRCLIB({ artist, title, durationSec });
+            if (lrclibLyrics) {
+                const fillInLyrics = createFillInLyrics(lrclibLyrics);
+                return { artist, title, lyrics: lrclibLyrics, fillInLyrics };
+            }
 
-                if (lyricsResponse.data?.lyrics) {
-                    const lyrics = lyricsResponse.data.lyrics;
-                    const fillInLyrics = createFillInLyrics(lyrics);
-                    return {
-                        artist: decodeURIComponent(artist),
-                        title: decodeURIComponent(title),
-                        lyrics,
-                        fillInLyrics,
-                    };
+            // 3) Try Vagalume (if key present)
+            const vagalumeKey = process.env.VAGALUME_API_KEY;
+            if (vagalumeKey) {
+                const vagaLyrics = await fetchLyricsFromVagalume({ artist, title, apikey: vagalumeKey });
+                if (vagaLyrics) {
+                    const fillInLyrics = createFillInLyrics(vagaLyrics);
+                    return { artist, title, lyrics: vagaLyrics, fillInLyrics };
                 }
-            } catch (error) {
-                if (error.response?.status !== 404) throw error;
-                // Remove failed track and retry
-                tracks.splice(randomIndex, 1);
+            }
+
+            // 4) Last resort: lyrics.ovh
+            const ovhLyrics = await fetchLyricsFromLyricsOVH({ artist, title });
+            if (ovhLyrics) {
+                const fillInLyrics = createFillInLyrics(ovhLyrics);
+                return { artist, title, lyrics: ovhLyrics, fillInLyrics };
             }
         }
-        throw new Error(`No lyrics found for 3 random ${genreKeyword} tracks`);
+
+        throw new Error(`No lyrics found for several ${genreKeyword} tracks`);
     } catch (error) {
-        handleError(`Lyric fetch error (${genreKeyword}):`, error.message);
+        handleError(`Lyric fetch error (${genreKeyword}):`, error?.message || error);
         throw new Error(`Couldn't find lyrics for ${genreKeyword} tracks. Try another genre!`);
+    }
+}
+
+function sanitizeName(s) {
+    return String(s || "").replace(/\([^)]*\)/g, "").replace(/\[[^\]]*\]/g, "").trim();
+}
+
+async function fetchLyricsFromLRCLIB({ artist, title, durationSec }) {
+    try {
+        const url = `${LRCLIB_BASE_URL}/get`;
+        const params = new URLSearchParams({
+            track_name: title,
+            artist_name: artist,
+        });
+        if (typeof durationSec === "number" && Number.isFinite(durationSec)) {
+            params.append("duration", String(durationSec));
+        }
+        const res = await axios.get(`${url}?${params.toString()}`, { timeout: 7000 });
+        const plain = res.data?.plainLyrics;
+        if (typeof plain === "string" && plain.trim().length) {
+            return plain.trim();
+        }
+        return null;
+    } catch (e) {
+        await handleError("LRCLIB fetch failed:", e, false);
+        return null;
+    }
+}
+
+async function fetchLyricsFromVagalume({ artist, title, apikey }) {
+    try {
+        const res = await axios.get(VAGALUME_BASE_URL, {
+            params: { art: artist, mus: title, apikey },
+            timeout: 7000,
+        });
+        const mus = res.data?.mus;
+        const text = Array.isArray(mus) && mus[0]?.text;
+        if (typeof text === "string" && text.trim().length) {
+            return text.trim();
+        }
+        return null;
+    } catch (e) {
+        await handleError("Vagalume fetch failed:", e, false);
+        return null;
+    }
+}
+
+async function fetchLyricsFromLyricsOVH({ artist, title }) {
+    try {
+        const res = await axios.get(`${LYRICS_OVH_BASE_URL}/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeout: 6000 });
+        const text = res.data?.lyrics;
+        if (typeof text === "string" && text.trim().length) {
+            return text.trim();
+        }
+        return null;
+    } catch (e) {
+        await handleError("Lyrics.ovh fetch failed:", e, false);
+        return null;
     }
 }
 
