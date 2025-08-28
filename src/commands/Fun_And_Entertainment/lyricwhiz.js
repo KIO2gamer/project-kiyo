@@ -46,7 +46,6 @@ const GENRES_KEYWORDS = [
     "party music",
     "workout songs",
     "chill music",
-    // Add more genres/keywords as you like!
 ];
 
 module.exports = {
