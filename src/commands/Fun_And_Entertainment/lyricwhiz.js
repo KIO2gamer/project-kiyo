@@ -18,34 +18,18 @@ const GUESS_TIME = 30000; // Time to guess in milliseconds (30 seconds)
 const MAX_ROUNDS = 5; // Maximum allowed rounds
 const FILL_BLANK_CHAR = "_____"; // Character to represent blanks
 
-// **New: Genres/Keywords List**
+// Popular genres/keywords only (kept short for better matching)
 const GENRES_KEYWORDS = [
     "pop",
     "rock",
     "hip hop",
-    "country",
+    "r&b",
     "electronic",
-    "jazz",
-    "classical",
-    "blues",
-    "folk",
+    "dance",
+    "country",
+    "latin",
     "indie",
     "metal",
-    "reggae",
-    "ska",
-    "funk",
-    "soul",
-    "disco",
-    "gospel",
-    "r&b",
-    "latin",
-    "ballad",
-    "dance",
-    "summer hits",
-    "love songs",
-    "party music",
-    "workout songs",
-    "chill music",
 ];
 
 module.exports = {
@@ -224,7 +208,7 @@ async function getRandomSongAndLyricsFromAPI() {
             // 2) Try LRCLIB
             const lrclibLyrics = await fetchLyricsFromLRCLIB({ artist, title, durationSec });
             if (lrclibLyrics) {
-                const fillInLyrics = createFillInLyrics(lrclibLyrics);
+                const fillInLyrics = createFillInSnippet(lrclibLyrics, 90);
                 return { artist, title, lyrics: lrclibLyrics, fillInLyrics };
             }
 
@@ -233,7 +217,7 @@ async function getRandomSongAndLyricsFromAPI() {
             if (vagalumeKey) {
                 const vagaLyrics = await fetchLyricsFromVagalume({ artist, title, apikey: vagalumeKey });
                 if (vagaLyrics) {
-                    const fillInLyrics = createFillInLyrics(vagaLyrics);
+                    const fillInLyrics = createFillInSnippet(vagaLyrics, 90);
                     return { artist, title, lyrics: vagaLyrics, fillInLyrics };
                 }
             }
@@ -241,7 +225,7 @@ async function getRandomSongAndLyricsFromAPI() {
             // 4) Last resort: lyrics.ovh
             const ovhLyrics = await fetchLyricsFromLyricsOVH({ artist, title });
             if (ovhLyrics) {
-                const fillInLyrics = createFillInLyrics(ovhLyrics);
+                const fillInLyrics = createFillInSnippet(ovhLyrics, 90);
                 return { artist, title, lyrics: ovhLyrics, fillInLyrics };
             }
         }
@@ -316,34 +300,89 @@ function selectRandomGenreKeyword() {
     return GENRES_KEYWORDS[Math.floor(Math.random() * GENRES_KEYWORDS.length)];
 }
 
-function createFillInLyrics(lyrics) {
-    // Preserve line breaks and stanza structure
-    const lines = lyrics.split("\n");
-    let fillInText = "";
+function createFillInSnippet(lyrics, maxChars = 90) {
+    const snippet = pickSnippet(lyrics, maxChars);
+    return blankEveryThirdWord(snippet);
+}
 
-    lines.forEach((line, lineIndex) => {
-        if (line.trim() === "") return;
-        const words = line.split(/(\s+)/); // Split including whitespace
-        let lineOutput = "";
+function pickSnippet(lyrics, maxChars) {
+    const lines = String(lyrics)
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
 
-        words.forEach((word, wordIndex) => {
-            if (word.trim() === "") {
-                lineOutput += word;
-                return;
-            }
+    if (lines.length === 0) return "";
 
-            // Blank out every 3rd meaningful word (preserves punctuation)
-            if ((wordIndex + lineIndex) % 3 === 1) {
-                lineOutput += FILL_BLANK_CHAR;
-            } else {
-                lineOutput += word;
-            }
-        });
+    // Prefer non-chorus-like lines with decent length
+    let attempts = 0;
+    while (attempts < 5) {
+        attempts++;
+        const idx = Math.floor(Math.random() * lines.length);
+        const base = lines[idx];
 
-        fillInText += lineOutput + "\n";
-    });
+        // If line is too short, try to merge with the next line
+        let text = base;
+        if (text.length < Math.floor(maxChars * 0.6) && idx + 1 < lines.length) {
+            const merged = `${base} ${lines[idx + 1]}`;
+            if (merged.length <= maxChars * 1.6) text = merged;
+        }
 
-    return fillInText;
+        if (text.length <= maxChars) {
+            // Center with ellipses to denote snippet
+            return addEllipses(text);
+        }
+
+        // Window within text to maxChars, cut at word boundary
+        const startMax = Math.max(0, text.length - maxChars);
+        const roughStart = Math.floor(Math.random() * (startMax + 1));
+        let end = Math.min(text.length, roughStart + maxChars);
+        let start = roughStart;
+
+        // Adjust to nearest spaces
+        const spaceAfter = text.indexOf(" ", end);
+        if (spaceAfter !== -1 && spaceAfter - roughStart <= maxChars + 10) end = spaceAfter;
+        const spaceBefore = text.lastIndexOf(" ", roughStart);
+        if (spaceBefore !== -1 && roughStart - spaceBefore <= 10) start = spaceBefore + 1;
+
+        const slice = text.slice(start, end).trim();
+        if (slice.length > 0) return addEllipses(slice);
+    }
+
+    // Fallback to first maxChars
+    return addEllipses(lines[0].slice(0, maxChars).trim());
+}
+
+function addEllipses(text) {
+    const t = text.trim();
+    if (!t) return t;
+    // use single ellipsis on both sides to indicate partial context
+    return `… ${t} …`;
+}
+
+function blankEveryThirdWord(text) {
+    const parts = String(text).split(/(\s+)/); // keep whitespace
+    let output = "";
+    let wordIdx = 0;
+    for (const token of parts) {
+        if (token.trim().length === 0) {
+            output += token;
+            continue;
+        }
+        // Token may include punctuation; only treat as word if contains letters
+        const isWord = /[A-Za-z]/.test(token);
+        if (!isWord) {
+            output += token;
+            continue;
+        }
+
+        if (wordIdx % 3 === 1) {
+            output += FILL_BLANK_CHAR;
+        } else {
+            output += token;
+        }
+        wordIdx++;
+    }
+    return output;
 }
 
 function getFinalMessage(score, rounds) {
