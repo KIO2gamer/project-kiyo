@@ -1,4 +1,4 @@
-const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
 const { handleError } = require("./../../utils/errorHandler");
 
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         try {
             const url = interaction.options.getString("url"); // Get the URL from the message
             const urlRegex = /https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
@@ -26,7 +26,7 @@ module.exports = {
                 return handleError(interaction, new Error("Invalid message URL provided."), "VALIDATION");
             }
 
-            const [, guildId, channelId, messageId] = match;
+            const [, , channelId, messageId] = match;
 
             // Fetch the message using the provided URL
             const response = await fetch(

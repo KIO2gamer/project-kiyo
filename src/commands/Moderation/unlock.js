@@ -74,7 +74,9 @@ module.exports = {
                 });
             }
         } catch (error) {
-            handleError(interaction, error);
+            handleError("Error unlocking channel:", error);
+            const embed = errorEmbed(interaction, { description: "An error occurred while trying to unlock the channel." });
+            await interaction.reply({ embeds: [embed] });
         }
     },
 };

@@ -2,6 +2,7 @@ const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
+const { success, error: errorEmbed, dmNotice, actionColor } = require("../../utils/moderationEmbeds");
 
 module.exports = {
     description_full: "Kicks a member from the server with the specified reason.",
@@ -26,31 +27,22 @@ module.exports = {
 
             // Validate target user
             if (!targetUser) {
-                await handleError(
-                    interaction,
-                    new Error("Could not find the specified user in this server."),
-                    "VALIDATION",
-                );
+                const embed = errorEmbed(interaction, { title: "User not found", description: "Please mention a valid member." });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if user is kickable
             if (!targetUser.kickable) {
-                await handleError(
-                    interaction,
-                    new Error("I do not have permission to kick this user."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have permission to kick this user." });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if target is server owner
             if (targetUser.id === interaction.guild.ownerId) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot kick the owner of the server."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "You cannot kick the owner of the server" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -60,20 +52,14 @@ module.exports = {
             const moderatorRolePosition = interaction.member.roles.highest.position;
 
             if (targetUserRolePosition >= moderatorRolePosition) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot kick someone with a higher or equal role than yourself."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "You cannot kick someone with a higher or equal role than you" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             if (targetUserRolePosition >= botRolePosition) {
-                await handleError(
-                    interaction,
-                    new Error("I cannot kick someone with a higher or equal role than myself."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "I cannot kick someone with a higher or equal role than myself" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -87,7 +73,6 @@ module.exports = {
 
             // Try to DM the user before kicking
             try {
-                const { dmNotice, actionColor } = require("../../utils/moderationEmbeds");
                 const dm = dmNotice({
                     guildName: interaction.guild.name,
                     title: `Kicked from ${interaction.guild.name}`,
@@ -97,20 +82,13 @@ module.exports = {
                 await targetUser.send({ embeds: [dm] });
             } catch (dmError) {
                 // If DM fails, log it but don't treat it as a command failure
-                await handleError(
-                    interaction,
-                    dmError,
-                    "COMMAND_EXECUTION",
-                    "Could not send kick notification DM to user (they may have DMs disabled).",
-                    false, // Don't show this error to the user
-                );
+                handleError("Could not send kick notification DM to user (they may have DMs disabled).", dmError);
             }
 
             // Save log and kick user
             await Promise.all([logEntry.save(), targetUser.kick(reason)]);
 
             // Send success message
-            const { success, actionColor } = require("../../utils/moderationEmbeds");
             const embed = success(interaction, {
                 title: "User Kicked",
                 description: `Successfully kicked ${targetUser} for reason: \`${reason}\``,
@@ -118,23 +96,13 @@ module.exports = {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            // Handle different types of errors
+            handleError("Error kicking user:", error);
             if (error.code === 50013) {
-                await handleError(
-                    interaction,
-                    error,
-                    "PERMISSION",
-                    "I do not have the required permissions to kick this user.",
-                );
-            } else if (error.code === "DATABASE_ERROR") {
-                await handleError(interaction, error, "DATABASE", "Failed to save moderation log.");
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have the required permissions to kick this user." });
+                await interaction.reply({ embeds: [embed] });
             } else {
-                await handleError(
-                    interaction,
-                    error,
-                    "COMMAND_EXECUTION",
-                    "An error occurred while trying to kick the user.",
-                );
+                const embed = errorEmbed(interaction, { description: "An error occurred while trying to kick the user." });
+                await interaction.reply({ embeds: [embed] });
             }
         }
     },

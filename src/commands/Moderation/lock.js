@@ -73,7 +73,9 @@ module.exports = {
                 });
             }
         } catch (error) {
-            await handleError(interaction, error);
+            handleError("Error locking channel:", error);
+            const embed = errorEmbed(interaction, { description: "An error occurred while trying to lock the channel." });
+            await interaction.reply({ embeds: [embed] });
         }
     },
 };

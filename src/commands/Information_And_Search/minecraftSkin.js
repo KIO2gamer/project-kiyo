@@ -5,13 +5,14 @@ const NodeCache = require("node-cache");
 const { handleError } = require("../../utils/errorHandler.js");
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // Cache for 5 minutes (TTL: Time To Live, checkperiod: how often to check for expired entries)
-const ASHCON_API_BASE = "https://api.ashcon.app/mojang/v2/user/";
+const MOJANG_PROFILE_API = "https://api.mojang.com/users/profiles/minecraft/"; // Free official Mojang endpoint for username -> UUID
+const CRAFATAR_BASE = "https://crafatar.com"; // Free image service for skins and renders
 const EMBED_COLOR = "#2ECC71"; // A more visually appealing color for embeds
 const ERROR_COLOR = "#E74C3C"; // Color for error embeds
 
 module.exports = {
     description_full:
-        "Retrieves general information about a Minecraft player from the Ashcon API, including their username, UUID, and skin.",
+        "Retrieves general information about a Minecraft player using Mojang's API (UUID lookup) and Crafatar (skin render).",
     usage: "/minecraft <username>",
     examples: ["/minecraft Notch", "/minecraft Dinnerbone"],
 
@@ -70,62 +71,92 @@ module.exports = {
 
 async function fetchPlayerData(username) {
     try {
-        const response = await axios.get(`${ASHCON_API_BASE}${username}`);
-        if (response.status === 204) {
+        // Mojang: username -> UUID
+        const response = await axios.get(
+            `${MOJANG_PROFILE_API}${encodeURIComponent(username)}`,
+            { validateStatus: () => true },
+        );
+
+        // Not found (Mojang returns 204 No Content or 404)
+        if (!response || response.status === 204 || response.status === 404 || !response.data) {
             return null;
         }
-        return response.data;
+
+        if (response.status !== 200) {
+            throw new Error(
+                `Mojang API error: ${response.status} - ${response.statusText || "Unknown"}`,
+            );
+        }
+
+        const { id, name } = response.data; // id is UUID without dashes
+        const uuidRaw = String(id);
+        const uuidDashed = formatUUID(uuidRaw);
+
+        // Build Crafatar URLs
+        const skinUrl = `${CRAFATAR_BASE}/skins/${uuidRaw}`; // Direct skin PNG
+        const bodyRenderUrl = `${CRAFATAR_BASE}/renders/body/${uuidRaw}?overlay`; // 3D render
+
+        return {
+            username: name,
+            uuid: uuidDashed,
+            uuid_raw: uuidRaw,
+            skinUrl,
+            bodyRenderUrl,
+        };
     } catch (error) {
-        handleError(`Error fetching data from Ashcon API for username ${username}:`, error);
+        handleError(`Error fetching data from Mojang API for username ${username}:`, error);
         if (error.response) {
-            // API responded with an error status code
-            if (error.response.status === 404) {
-                return null; // Treat 404 as player not found as well, though 204 should be the standard for not found
+            if (error.response.status === 404 || error.response.status === 204) {
+                return null;
             }
             throw new Error(
-                `Ashcon API error: ${error.response.status} - ${error.response.statusText}`,
-            ); // More informative API error
+                `Mojang API error: ${error.response.status} - ${error.response.statusText}`,
+            );
         } else if (error.request) {
-            // Request was made but no response was received
-            throw new Error("No response received from Ashcon API. The service might be down.");
+            throw new Error("No response received from Mojang API. The service might be down.");
         } else {
-            // Something happened in setting up the request that triggered an Error
-            throw new Error("Error setting up the request to Ashcon API.");
+            throw new Error("Error setting up the request to Mojang API.");
         }
     }
 }
 
+function formatUUID(uuidNoDashes) {
+    // Ensure we have 32 hex chars, then insert dashes: 8-4-4-4-12
+    const u = (uuidNoDashes || "").replace(/-/g, "").trim();
+    if (u.length !== 32) return uuidNoDashes; // Fallback to original if unexpected
+    return `${u.substring(0, 8)}-${u.substring(8, 12)}-${u.substring(12, 16)}-${u.substring(16, 20)}-${u.substring(20)}`;
+}
+
 function createInfoEmbed(playerData, username, interaction) {
-    const uuid = playerData.uuid;
-    const skinUrl = playerData.textures?.skin?.url; // Use optional chaining in case textures or skin is missing
+    const uuidDashed = playerData.uuid;
+    const uuidRaw = playerData.uuid_raw;
+    const bodyRenderUrl = `https://crafatar.com/renders/body/${uuidDashed}?overlay`;
+    const skinUrl = `https://crafatar.com/skins/${uuidDashed}`;
 
     const embed = new EmbedBuilder()
         .setColor(EMBED_COLOR)
         .setTitle(`Minecraft Player: ${playerData.username}`)
-        .setURL(`https://namemc.com/profile/${uuid}`) // Added NameMC link for easy profile viewing
-        .setDescription(`Information about the Minecraft player **${playerData.username}**`) // Slightly improved description
+        .setURL(`https://namemc.com/profile/${uuidRaw}`) // NameMC profile
+        .setDescription(`Information about the Minecraft player **${playerData.username}**`)
         .addFields(
-            {
-                name: "Username",
-                value: playerData.username || "N/A",
-                inline: true,
-            }, // Fallback value if data is missing
-            { name: "UUID", value: uuid || "N/A", inline: true }, // Fallback value if data is missing
+            { name: "Username", value: playerData.username || "N/A", inline: true },
+            { name: "UUID", value: uuidDashed || "N/A", inline: true },
             {
                 name: "Skin",
-                value: skinUrl ? `[View Skin](${skinUrl})` : "No Skin Available",
+                value: skinUrl ? `[Download Skin](${skinUrl})` : "No Skin Available",
                 inline: true,
-            }, // Handle case where skin URL might be missing
+            },
+            {
+                name: "Body Overlay",
+                value: playerData.bodyRenderUrl ? `[Download Render](${bodyRenderUrl})` : "No Render Available",
+                inline: true,
+            },
         )
         .setFooter({
-            text: "Data provided by Ashcon API",
+            text: "Data via Mojang API + Crafatar",
             iconURL: interaction.client.user.displayAvatarURL(),
-        }) // Added footer with API source and bot icon
+        })
         .setTimestamp();
-
-    if (skinUrl) {
-        embed.setImage(skinUrl.replace("http://", "https://")); // Set skin as large image, ensure https
-    }
 
     return embed;
 }

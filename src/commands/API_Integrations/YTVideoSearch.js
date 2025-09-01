@@ -66,7 +66,7 @@ module.exports = {
             await interaction.reply({
                 content:
                     "YouTube search service is not properly configured. Please contact an administrator.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }

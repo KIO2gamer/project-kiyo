@@ -19,17 +19,18 @@ module.exports = {
     async execute(interaction) {
         if (!interaction.isButton()) return;
 
-        if (interaction.customId === "open-ticket") {
+        // Support both legacy and current button IDs
+        if (interaction.customId === "open-ticket" || interaction.customId === "create_ticket") {
             try {
                 await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
                 // Fetch the ticket category ID from the database
-                const config = await TicketConfig.findOne();
+                const config = await TicketConfig.findOne({ guildId: interaction.guild.id });
                 const ticketCategoryId = config?.ticketCategoryId;
 
                 // Check if the category ID is set
                 if (!ticketCategoryId) {
-                    return interaction.reply({
+                    return interaction.editReply({
                         content:
                             "A ticket category has not been set yet. Please use the `/set_ticket_category` command to set one.",
                     });
@@ -41,7 +42,7 @@ module.exports = {
                 );
 
                 if (existingChannel) {
-                    return interaction.reply({
+                    return interaction.editReply({
                         content: `You already have an open ticket: <#${existingChannel.id}>.`,
                     });
                 }
@@ -88,12 +89,12 @@ module.exports = {
                 await ticketChannel.send({ embeds: [embed] });
 
                 // Send a confirmation to the user
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Your ticket has been created: <#${ticketChannel.id}>.`,
                 });
             } catch (error) {
                 handleError("Error creating ticket channel:", error);
-                await interaction.reply({
+                await interaction.editReply({
                     content: "There was an error creating your ticket. Please try again later.",
                 });
             }

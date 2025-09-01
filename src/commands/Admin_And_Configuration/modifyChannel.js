@@ -1,4 +1,4 @@
-const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 
@@ -144,7 +144,7 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
             const channel = interaction.options.getChannel("channel");
             const newChannelName = interaction.options.getString("new_name");

@@ -2,7 +2,7 @@ const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
-const { success, dmNotice, actionColor } = require("../../utils/moderationEmbeds");
+const { success, dmNotice, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
 
 // createErrorEmbed no longer needed; standardized via errorEmbed()
 
@@ -34,21 +34,21 @@ module.exports = {
 
             // Validate target user
             if (!targetUser) {
-                await handleError(
-                    interaction,
-                    new Error("Could not find the specified user in this server."),
-                    "VALIDATION",
-                );
+                const embed = errorEmbed(interaction, {
+                    title: "User not found",
+                    description: "Please mention a valid member.",
+                });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if target is server owner
             if (targetUser.id === interaction.guild.ownerId) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot warn the owner of the server."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, {
+                    title: "Permission Error",
+                    description: "You cannot warn the owner of the server",
+                });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -57,11 +57,11 @@ module.exports = {
             const moderatorRolePosition = interaction.member.roles.highest.position;
 
             if (targetUserRolePosition >= moderatorRolePosition) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot warn someone with a higher or equal role than yourself."),
-                    "PERMISSION",
-                );
+                const embed = errorEmbed(interaction, {
+                    title: "Hierarchy Error",
+                    description: "You cannot warn someone with a higher or equal role than you",
+                });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -95,37 +95,33 @@ module.exports = {
                     await targetUser.send({ embeds: [dm] });
                 } catch (dmError) {
                     // If DM fails, log it but don't treat it as a command failure
-                    await handleError(
-                        interaction,
-                        dmError,
-                        "COMMAND_EXECUTION",
+                    handleError(
                         "Could not send warning DM to user (they may have DMs disabled).",
-                        false, // Don't show this error to the user
+                        dmError,
                     );
                 }
             } catch (dbError) {
-                await handleError(
-                    interaction,
-                    dbError,
-                    "DATABASE",
-                    "Failed to save warning in the moderation logs.",
-                );
+                handleError("Database error while saving warning:", dbError);
+                const embed = errorEmbed(interaction, {
+                    title: "Database Error",
+                    description: "Failed to save warning in the moderation logs.",
+                });
+                await interaction.reply({ embeds: [embed] });
+                return;
             }
         } catch (error) {
+            handleError("Error warning user:", error);
             if (error.code === 50013) {
-                await handleError(
-                    interaction,
-                    error,
-                    "PERMISSION",
-                    "I do not have the required permissions to warn this user.",
-                );
+                const embed = errorEmbed(interaction, {
+                    title: "Permission Error",
+                    description: "I do not have the required permissions to warn this user.",
+                });
+                await interaction.reply({ embeds: [embed] });
             } else {
-                await handleError(
-                    interaction,
-                    error,
-                    "COMMAND_EXECUTION",
-                    "An error occurred while trying to warn the user.",
-                );
+                const embed = errorEmbed(interaction, {
+                    description: "An error occurred while trying to warn the user.",
+                });
+                await interaction.reply({ embeds: [embed] });
             }
         }
     },

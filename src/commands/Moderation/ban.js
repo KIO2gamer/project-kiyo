@@ -2,6 +2,7 @@ const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
+const { success, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
 
 module.exports = {
     description_full: "Bans a member from the server with the specified reason.",
@@ -26,37 +27,22 @@ module.exports = {
 
             // Validate target user
             if (!targetUser) {
-                await handleError(
-                    interaction,
-                    new Error("Could not find the specified user in this server."),
-                    "VALIDATION",
-                    "Could not find the specified user in this server.",
-                    false,
-                );
+                const embed = errorEmbed(interaction, { title: "User not found", description: "Please mention a valid member." });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if user is bannable
             if (!targetUser.bannable) {
-                await handleError(
-                    interaction,
-                    new Error("I do not have permission to ban this user."),
-                    "PERMISSION",
-                    "I do not have permission to ban this user.",
-                    false,
-                );
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have permission to ban this user." });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if target is server owner
             if (targetUser.id === interaction.guild.ownerId) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot ban the owner of the server."),
-                    "PERMISSION",
-                    "You cannot ban the owner of the server.",
-                    false,
-                );
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "You cannot ban the owner of the server" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -66,24 +52,14 @@ module.exports = {
             const moderatorRolePosition = interaction.member.roles.highest.position;
 
             if (targetUserRolePosition >= moderatorRolePosition) {
-                await handleError(
-                    interaction,
-                    new Error("You cannot ban someone with a higher or equal role than yourself."),
-                    "PERMISSION",
-                    "You cannot ban someone with a higher or equal role than yourself.",
-                    false,
-                );
+                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "You cannot ban someone with a higher or equal role than you" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             if (targetUserRolePosition >= botRolePosition) {
-                await handleError(
-                    interaction,
-                    new Error("I cannot ban someone with a higher or equal role than myself."),
-                    "PERMISSION",
-                    "I cannot ban someone with a higher or equal role than myself.",
-                    false,
-                );
+                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "I cannot ban someone with a higher or equal role than myself" });
+                await interaction.reply({ embeds: [embed] });
                 return;
             }
 
@@ -99,7 +75,6 @@ module.exports = {
             await Promise.all([logEntry.save(), targetUser.ban({ reason: reason })]);
 
             // Send success message
-            const { success, actionColor } = require("../../utils/moderationEmbeds");
             const embed = success(interaction, {
                 title: "User Banned",
                 description: `Successfully banned ${targetUser} for reason: \`${reason}\``,
@@ -107,25 +82,13 @@ module.exports = {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            // Handle different types of errors
+            handleError("Error banning user:", error);
             if (error.code === 50013) {
-                // Missing Permissions error code
-                await handleError(
-                    interaction,
-                    error,
-                    "PERMISSION",
-                    "I do not have the required permissions to ban this user.",
-                    false,
-                );
-            } else if (error.code === "DATABASE_ERROR") {
-                await handleError(interaction, error, "DATABASE", "Failed to save moderation log.", false);
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have the required permissions to ban this user." });
+                await interaction.reply({ embeds: [embed] });
             } else {
-                await handleError(
-                    interaction,
-                    error,
-                    "COMMAND_EXECUTION",
-                    "An error occurred while trying to ban the user.",
-                );
+                const embed = errorEmbed(interaction, { description: "An error occurred while trying to ban the user." });
+                await interaction.reply({ embeds: [embed] });
             }
         }
     },

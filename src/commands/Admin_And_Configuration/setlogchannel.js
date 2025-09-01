@@ -1,4 +1,4 @@
-const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 const Logger = require("../../utils/logger");
 
@@ -22,7 +22,7 @@ module.exports = {
             if (!channel.isTextBased()) {
                 return await interaction.reply({
                     content: "❌ Please select a text channel for logging.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -36,7 +36,7 @@ module.exports = {
                 return await interaction.reply({
                     content:
                         "❌ I don't have permission to send messages and embeds in that channel.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -46,7 +46,7 @@ module.exports = {
             // Send confirmation
             await interaction.reply({
                 content: `✅ Log channel set to ${channel}. Important bot logs will now be sent here.`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
 
             // Send a test log to the channel
@@ -73,7 +73,7 @@ module.exports = {
             if (!interaction.replied) {
                 await interaction.reply({
                     content: "❌ An error occurred while setting the log channel.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
         }

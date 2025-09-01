@@ -1,4 +1,4 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Colors, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");
@@ -96,7 +96,7 @@ module.exports = {
                 return await interaction.editReply({
                     content:
                         "⚠️ Ticket system not configured. Please use `/set_ticket_category` first.",
-                    ephemeral: true,
+                    flags: MessageFlags.Ephemeral,
                 });
             }
 

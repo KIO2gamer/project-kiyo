@@ -1,6 +1,5 @@
 const {  EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
-const mongoose = require("mongoose");
 const { handleError } = require("../../utils/errorHandler");
 const CommandPermissionsSchema = require("./../../database/commandPermissions");
 
@@ -61,7 +60,7 @@ module.exports = {
      */
     async execute(interaction) {
         try {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
             // Check if user is bot owner
             if (interaction.user.id !== process.env.OWNER_ID) {

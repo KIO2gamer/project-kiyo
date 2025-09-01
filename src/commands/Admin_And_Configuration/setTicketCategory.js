@@ -1,4 +1,4 @@
-const {  ChannelType, Colors, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {  ChannelType, Colors, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");
@@ -21,7 +21,7 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         try {
             const category = interaction.options.getChannel("category");
@@ -75,7 +75,7 @@ module.exports = {
                 }
 
                 // Verify config was saved correctly
-                const verifyConfig = await TicketConfig.findOne({ guildId: interaction.guild.id });
+                await TicketConfig.findOne({ guildId: interaction.guild.id });
 
                 // Send success message
                 const embed = new EmbedBuilder()

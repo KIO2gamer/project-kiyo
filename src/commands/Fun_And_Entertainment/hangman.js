@@ -4,6 +4,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  MessageFlags,
 } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 const fs = require("fs").promises;
@@ -87,7 +88,7 @@ module.exports = {
 
             // Already guessed? Reply ephemeral
             if (state.guessedLetters.includes(letter)) {
-              return i.reply({ content: `You've already guessed the letter ${letter}.`, ephemeral: true });
+              return i.reply({ content: `You've already guessed the letter ${letter}.`, flags: MessageFlags.Ephemeral });
             }
 
             // Record guess

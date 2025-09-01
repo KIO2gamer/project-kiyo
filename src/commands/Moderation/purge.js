@@ -1,7 +1,5 @@
 const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
-const { success } = require("../../utils/moderationEmbeds");
-
-
+const { success, error: errorEmbed } = require("../../utils/moderationEmbeds");
 const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
@@ -38,11 +36,8 @@ module.exports = {
 
             // Validate amount
             if (amount < 1 || amount > 100) {
-                await handleError(
-                    interaction,
-                    new Error("Please specify a number between 1 and 100."),
-                    "VALIDATION",
-                );
+                const embed = errorEmbed(interaction, { title: "Invalid Amount", description: "Please specify a number between 1 and 100." });
+                await interaction.editReply({ embeds: [embed] });
                 return;
             }
 
@@ -57,13 +52,8 @@ module.exports = {
                 messagesToDelete = messages.filter((msg) => msg.author.id === user.id);
 
                 if (messagesToDelete.size === 0) {
-                    await handleError(
-                        interaction,
-                        new Error(
-                            `No messages found from user ${user.tag} in the last ${amount} messages.`,
-                        ),
-                        "VALIDATION",
-                    );
+                    const embed = errorEmbed(interaction, { title: "No Messages", description: `No messages found from user ${user.tag} in the last ${amount} messages.` });
+                    await interaction.editReply({ embeds: [embed] });
                     return;
                 }
             }
@@ -75,11 +65,8 @@ module.exports = {
             );
 
             if (validMessages.size === 0) {
-                await handleError(
-                    interaction,
-                    new Error("No messages found that are less than 14 days old."),
-                    "VALIDATION",
-                );
+                const embed = errorEmbed(interaction, { title: "Too Old", description: "No messages found that are less than 14 days old." });
+                await interaction.editReply({ embeds: [embed] });
                 return;
             }
 
@@ -106,50 +93,27 @@ module.exports = {
                 await interaction.editReply({ embeds: [successEmbed] });
             } catch (deleteError) {
                 if (deleteError.code === 50034) {
-                    await handleError(
-                        interaction,
-                        deleteError,
-                        "VALIDATION",
-                        "Cannot delete messages older than 14 days.",
-                    );
+                    const embed = errorEmbed(interaction, { title: "Too Old", description: "Cannot delete messages older than 14 days." });
+                    await interaction.editReply({ embeds: [embed] });
                 } else if (deleteError.code === 50013) {
-                    await handleError(
-                        interaction,
-                        deleteError,
-                        "PERMISSION",
-                        "I do not have permission to delete messages in this channel.",
-                    );
+                    const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have permission to delete messages in this channel." });
+                    await interaction.editReply({ embeds: [embed] });
                 } else {
-                    await handleError(
-                        interaction,
-                        deleteError,
-                        "COMMAND_EXECUTION",
-                        "An error occurred while trying to delete messages.",
-                    );
+                    const embed = errorEmbed(interaction, { description: "An error occurred while trying to delete messages." });
+                    await interaction.editReply({ embeds: [embed] });
                 }
             }
         } catch (error) {
+            handleError("Error purging messages:", error);
             if (error.code === 50013) {
-                await handleError(
-                    interaction,
-                    error,
-                    "PERMISSION",
-                    "I do not have permission to manage messages in this channel.",
-                );
+                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have permission to manage messages in this channel." });
+                await interaction.editReply({ embeds: [embed] });
             } else if (error.code === 50035) {
-                await handleError(
-                    interaction,
-                    error,
-                    "VALIDATION",
-                    "Invalid number of messages specified. Please use a number between 1 and 100.",
-                );
+                const embed = errorEmbed(interaction, { title: "Invalid Amount", description: "Invalid number of messages specified. Please use a number between 1 and 100." });
+                await interaction.editReply({ embeds: [embed] });
             } else {
-                await handleError(
-                    interaction,
-                    error,
-                    "COMMAND_EXECUTION",
-                    "An unexpected error occurred while processing the purge command.",
-                );
+                const embed = errorEmbed(interaction, { description: "An unexpected error occurred while processing the purge command." });
+                await interaction.editReply({ embeds: [embed] });
             }
         }
     },

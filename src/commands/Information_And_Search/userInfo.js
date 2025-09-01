@@ -1,4 +1,4 @@
-const {  ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, EmbedBuilder, PermissionsBitField, SlashCommandBuilder } = require("discord.js");
+const {  ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 
@@ -162,10 +162,8 @@ function generateUserFields(user, member, fetchedUser) {
         {
             name: "🏆 Badges & Boosts",
             value: [
-                `**Badges:**\n${formatUserBadges(user)}`,
-                member.premiumSince
-                    ? `**Server Booster:** Level ${member.premiumValue || 1}`
-                    : null,
+                `**Badges:**\n${formatUserBadges(fetchedUser)}`,
+                member.premiumSince ? `**Server Booster:** Yes` : null,
             ]
                 .filter(Boolean)
                 .join("\n\n"),
@@ -179,7 +177,7 @@ function generateUserFields(user, member, fetchedUser) {
                 `**Account Created:** <t:${Math.floor(user.createdTimestamp / 1000)}:F> (<t:${Math.floor(user.createdTimestamp / 1000)}:R>)`,
                 `**Joined Server:** <t:${Math.floor(member.joinedTimestamp / 1000)}:F> (<t:${Math.floor(member.joinedTimestamp / 1000)}:R>)`,
                 member.premiumSince
-                    ? `**Boosting Since:** <t:${Math.floor(member.premiumSinceTimestamp / 1000)}:F> (<t:${Math.floor(member.premiumSinceTimestamp / 1000)}:R>)`
+                    ? `**Boosting Since:** <t:${Math.floor(member.premiumSince.getTime() / 1000)}:F> (<t:${Math.floor(member.premiumSince.getTime() / 1000)}:R>)`
                     : null,
                 member.communicationDisabledUntil
                     ? `**Timeout Until:** <t:${Math.floor(member.communicationDisabledUntil.getTime() / 1000)}:F> (<t:${Math.floor(member.communicationDisabledUntil.getTime() / 1000)}:R>)`
@@ -324,21 +322,27 @@ module.exports = {
                     .setTimestamp();
 
                 // Create buttons for additional actions
-                const row = new ActionRowBuilder().addComponents(
+                const buttons = [
                     new ButtonBuilder()
                         .setLabel("Avatar")
                         .setStyle(ButtonStyle.Link)
                         .setURL(user.displayAvatarURL({ dynamic: true, size: 4096 })),
                     new ButtonBuilder()
-                        .setLabel("Banner")
-                        .setStyle(ButtonStyle.Link)
-                        .setURL(fetchedUser.bannerURL({ dynamic: true, size: 4096 }))
-                        .setDisabled(!fetchedUser.banner),
-                    new ButtonBuilder()
                         .setLabel("Profile")
                         .setStyle(ButtonStyle.Link)
                         .setURL(`https://discord.com/users/${user.id}`),
-                );
+                ];
+
+                if (fetchedUser.banner) {
+                    buttons.splice(1, 0,
+                        new ButtonBuilder()
+                            .setLabel("Banner")
+                            .setStyle(ButtonStyle.Link)
+                            .setURL(fetchedUser.bannerURL({ dynamic: true, size: 4096 }))
+                    );
+                }
+
+                const row = new ActionRowBuilder().addComponents(...buttons);
 
                 await interaction.editReply({
                     embeds: [embed],

@@ -1,4 +1,4 @@
-const { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 /**
  * Closes the current ticket channel. Requires the "Manage Channels" permission.
@@ -53,7 +53,7 @@ module.exports = {
 
             await interaction.reply({
                 content: "Ticket closed successfully.",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
             await interaction.channel.delete();
         } catch (error) {

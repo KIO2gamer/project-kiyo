@@ -185,11 +185,10 @@ module.exports = {
         const command = interaction.client.commands.get(commandName.toLowerCase());
 
         if (!command) {
-            const msg = {
+            const msgWithFlags = {
                 content: `Command \`${commandName}\` not found. Try using /help to see all available commands.`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             };
-            const msgWithFlags = { ...msg, flags: MessageFlags.Ephemeral };
             return interaction.replied || interaction.deferred
                 ? interaction.followUp(msgWithFlags)
                 : interaction.reply(msgWithFlags);

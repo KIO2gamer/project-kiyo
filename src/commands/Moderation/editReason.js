@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { parseRange } = require("../../utils/rangeParser");
@@ -33,7 +33,7 @@ module.exports = {
 
     async execute(interaction) {
         try {
-            await interaction.deferReply({ ephemeral: true });
+            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
             const logNumber = interaction.options.getInteger("lognumber");
             const logRange = interaction.options.getString("logrange");
             const newReason = interaction.options.getString("reason");

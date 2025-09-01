@@ -60,7 +60,9 @@ module.exports = {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            handleError(interaction, error);
+            handleError("Error setting slowmode:", error);
+            const embed = errorEmbed(interaction, { description: "An error occurred while trying to set slowmode." });
+            await interaction.reply({ embeds: [embed] });
         }
     },
 };
