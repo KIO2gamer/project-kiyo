@@ -20,10 +20,6 @@ const defaultSymbols = {
 let discordClient = null;
 let logChannelId = null;
 
-// Log storage for dashboard
-const logHistory = [];
-const MAX_LOG_HISTORY = 1000;
-
 function formatLogObject(obj) {
     if (obj instanceof Error) {
         return obj.stack || obj.message;
@@ -51,7 +47,6 @@ class Logger {
         INFO: chalk.white,
         SUCCESS: chalk.green,
         AI: chalk.hex("#10a37f"),
-        DASHBOARD: chalk.hex("#ff6b35"),
         API: chalk.hex("#4ecdc4"),
         SECURITY: chalk.hex("#ff4757"),
     };
@@ -67,7 +62,6 @@ class Logger {
         EVENTS: 0xa55eea,   // Purple
         DATABASE: 0x3742fa, // Blue
         DEPLOY: 0x2ed573,   // Green
-        DASHBOARD: 0xff6b35, // Orange
         API: 0x4ecdc4,      // Teal
         SECURITY: 0xff4757, // Red
     };
@@ -166,21 +160,6 @@ class Logger {
         return emojis[level.toLowerCase()] || "ℹ️";
     }
 
-    static addToHistory(logEntry) {
-        logHistory.push(logEntry);
-        if (logHistory.length > MAX_LOG_HISTORY) {
-            logHistory.shift(); // Remove oldest entry
-        }
-    }
-
-    static getHistory(limit = 100) {
-        return logHistory.slice(-limit);
-    }
-
-    static clearHistory() {
-        logHistory.length = 0;
-    }
-
     static async log(module, message, level = "info") {
         // Check if we should log this level
         if (!this.shouldLog(level)) return;
@@ -219,9 +198,6 @@ class Logger {
             level: level.toUpperCase(),
             raw: message
         };
-
-        // Add to history for dashboard
-        this.addToHistory(logEntry);
 
         // Write to file if enabled
         await this.writeToFile(logEntry);
@@ -265,10 +241,6 @@ class Logger {
 
     static async database(message, level = "info") {
         await this.log("DATABASE", message, level);
-    }
-
-    static async dashboard(message, level = "info") {
-        await this.log("DASHBOARD", message, level);
     }
 
     static async api(message, level = "info") {

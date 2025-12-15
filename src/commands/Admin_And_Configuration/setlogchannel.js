@@ -53,7 +53,7 @@ module.exports = {
             await Logger.logToDiscord(
                 `Log channel configured by ${interaction.user.tag} in ${interaction.guild.name}`,
                 "info",
-                "DASHBOARD",
+                "BOT",
             );
 
             // Log the action
