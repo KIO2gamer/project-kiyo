@@ -124,8 +124,8 @@ function formatCategorizedPermissions(permissions, options = {}) {
     const permsArray = Array.isArray(permissions)
         ? permissions
         : permissions.toArray
-            ? permissions.toArray()
-            : [];
+          ? permissions.toArray()
+          : [];
 
     if (permsArray.length === 0) return "No permissions";
 
@@ -453,14 +453,10 @@ function formatPermission(permission) {
  * @returns {boolean} Whether the target has the permission
  */
 function hasPermission(target, permission, channel = null) {
-    try {
-        if (channel) {
-            return channel.permissionsFor(target)?.has(permission) || false;
-        }
-        return target.permissions?.has(permission) || false;
-    } catch (error) {
-        return false;
+    if (channel) {
+        return channel.permissionsFor(target)?.has(permission) || false;
     }
+    return target.permissions?.has(permission) || false;
 }
 
 /**

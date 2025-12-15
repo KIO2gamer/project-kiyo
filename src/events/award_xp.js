@@ -115,7 +115,7 @@ async function handleLevelUp(message, levelData, oldLevel, guildSettings) {
                 await member.send(
                     `🎉 You've leveled up to **Level ${newLevel}** in **${message.guild.name}**!`,
                 );
-            } catch (err) {
+            } catch {
                 // User might have DMs disabled, silently fail
             }
             break;

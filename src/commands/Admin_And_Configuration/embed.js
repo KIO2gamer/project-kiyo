@@ -266,7 +266,7 @@ module.exports = {
         if (thumbnail) {
             try {
                 embed.setThumbnail(thumbnail);
-            } catch (error) {
+            } catch {
                 // Just skip if invalid URL
             }
         }
@@ -276,7 +276,7 @@ module.exports = {
         if (image) {
             try {
                 embed.setImage(image);
-            } catch (error) {
+            } catch {
                 // Just skip if invalid URL
             }
         }

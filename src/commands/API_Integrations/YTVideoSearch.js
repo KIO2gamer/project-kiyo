@@ -1,4 +1,11 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    MessageFlags,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { google } = require("googleapis");
 
@@ -56,7 +63,7 @@ module.exports = {
     usage: "/youtube_search <query> [channel] [duration] [order] [type] [max_results]",
     examples: [
         "/youtube_search query:cats",
-        "/youtube_search query:\"funny videos\" channel:PewDiePie",
+        '/youtube_search query:"funny videos" channel:PewDiePie',
         "/youtube_search query:tutorials duration:long order:viewCount type:episode max_results:10",
     ],
 

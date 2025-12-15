@@ -96,7 +96,7 @@ module.exports = {
                 const { start, end } = range;
 
                 // Continue with fetching logs in the range
-                const logs = await moderationLogs
+                await moderationLogs
                     .find({
                         logNumber: { $gte: start, $lte: end },
                     })

@@ -9,7 +9,8 @@ const {
 } = require("discord.js");
 const { google } = require("googleapis");
 const axios = require("axios");
-const { handleError } = require("../../../utils/errorHandler");
+const { handleError, logError } = require("../../../utils/errorHandler");
+const Logger = require("../../../utils/logger");
 const { formatNumber } = require("../../../utils/stringUtils");
 const YTSubRoleConfig = require("../database/ytSubRoleConfig");
 const TempOAuth2Storage = require("../database/tempOAuth2Storage");
@@ -143,7 +144,9 @@ module.exports = {
                     await buttonInteraction.deferUpdate();
                     await this.verifyYouTubeChannel(buttonInteraction, userId, guildId, roleConfig);
                 } catch (error) {
-                    console.error("Error handling button interaction:", error);
+                    logError("Error handling button interaction", error, {
+                        category: "COMMAND_EXECUTION",
+                    });
 
                     // If the interaction is expired, try to send a new message
                     if (error.code === 10062) {
@@ -155,7 +158,9 @@ module.exports = {
                                 flags: MessageFlags.Ephemeral,
                             });
                         } catch (followUpError) {
-                            console.error("Could not send follow-up message:", followUpError);
+                            logError("Could not send follow-up message", followUpError, {
+                                category: "COMMAND_EXECUTION",
+                            });
                         }
                     } else if (!buttonInteraction.replied && !buttonInteraction.deferred) {
                         try {
@@ -165,7 +170,9 @@ module.exports = {
                                 flags: MessageFlags.Ephemeral,
                             });
                         } catch (replyError) {
-                            console.error("Could not reply to button interaction:", replyError);
+                            logError("Could not reply to button interaction", replyError, {
+                                category: "COMMAND_EXECUTION",
+                            });
                         }
                     }
                 }
@@ -383,11 +390,11 @@ module.exports = {
             });
 
             // Log the role assignment
-            console.log(
+            Logger.success(
                 `YouTube role assigned: ${member.user.tag} (${subscriberCount} subs) -> ${targetRole.name}`,
             );
         } catch (error) {
-            console.error("Error verifying YouTube channel:", error);
+            logError("Error verifying YouTube channel", error, { category: "API" });
 
             let errorMessage = "An error occurred while verifying your YouTube channel.";
             if (error.response?.status === 403) {
@@ -406,4 +413,3 @@ module.exports = {
         }
     },
 };
-

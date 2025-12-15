@@ -1,4 +1,4 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder, version: djsVersion } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder, version: djsVersion } = require("discord.js");
 
 const { formatUptime } = require("../../utils/formatUptime");
 const { handleError } = require("../../utils/errorHandler");

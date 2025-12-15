@@ -1,6 +1,13 @@
-const {  ChannelType, EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    ChannelType,
+    EmbedBuilder,
+    MessageFlags,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const Logger = require("../../utils/logger");
+
 const { GuildSettingsSchema } = require("../../database/GuildSettingsSchema");
 
 module.exports = {
@@ -72,12 +79,12 @@ module.exports = {
     description_full:
         "Configure welcome messages for new members joining your server. Set a custom welcome channel, message format, and optional direct message settings.",
 
-    usage: "/welcomesettings toggle enabled:true|false\n/welcomesettings channel channel:#welcome\n/welcomesettings message content:\"Welcome {user} to {server}!\"\n/welcomesettings dm enabled:true message:\"Thanks for joining!\"",
+    usage: '/welcomesettings toggle enabled:true|false\n/welcomesettings channel channel:#welcome\n/welcomesettings message content:"Welcome {user} to {server}!"\n/welcomesettings dm enabled:true message:"Thanks for joining!"',
     examples: [
         "/welcomesettings toggle enabled:true",
         "/welcomesettings channel channel:#welcome",
-        "/welcomesettings message content:\"Hey {user}, welcome to {server}!\"",
-        "/welcomesettings dm enabled:true message:\"Thanks for joining {server}!\"",
+        '/welcomesettings message content:"Hey {user}, welcome to {server}!"',
+        '/welcomesettings dm enabled:true message:"Thanks for joining {server}!"',
         "/welcomesettings preview",
     ],
 
@@ -119,127 +126,127 @@ module.exports = {
             }
 
             switch (subcommand) {
-            case "toggle": {
-                const enabled = interaction.options.getBoolean("enabled");
-                settings.welcome.enabled = enabled;
+                case "toggle": {
+                    const enabled = interaction.options.getBoolean("enabled");
+                    settings.welcome.enabled = enabled;
 
-                await settings.save();
-                return interaction.reply({
-                    content: `✅ Welcome messages have been ${enabled ? "enabled" : "disabled"} for this server.`,
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
-
-            case "channel": {
-                const channel = interaction.options.getChannel("channel");
-
-                // Ensure bot has permissions to send messages in this channel
-                const permissions = channel.permissionsFor(interaction.guild.members.me);
-                if (!permissions.has("SendMessages") || !permissions.has("ViewChannel")) {
+                    await settings.save();
                     return interaction.reply({
-                        content: "I don't have permission to send messages in that channel.",
+                        content: `✅ Welcome messages have been ${enabled ? "enabled" : "disabled"} for this server.`,
                         flags: MessageFlags.Ephemeral,
                     });
                 }
 
-                settings.welcome.channelId = channel.id;
+                case "channel": {
+                    const channel = interaction.options.getChannel("channel");
 
-                await settings.save();
-                return interaction.reply({
-                    content: `✅ Welcome messages will be sent to ${channel}.`,
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
+                    // Ensure bot has permissions to send messages in this channel
+                    const permissions = channel.permissionsFor(interaction.guild.members.me);
+                    if (!permissions.has("SendMessages") || !permissions.has("ViewChannel")) {
+                        return interaction.reply({
+                            content: "I don't have permission to send messages in that channel.",
+                            flags: MessageFlags.Ephemeral,
+                        });
+                    }
 
-            case "message": {
-                const content = interaction.options.getString("content");
-                settings.welcome.message = content;
+                    settings.welcome.channelId = channel.id;
 
-                await settings.save();
-                return interaction.reply({
-                    content: `✅ Welcome message has been set to:\n> ${content}`,
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
-
-            case "dm": {
-                const enabled = interaction.options.getBoolean("enabled");
-                const message = interaction.options.getString("message");
-
-                settings.welcome.dmEnabled = enabled;
-                if (message && enabled) {
-                    settings.welcome.dmMessage = message;
+                    await settings.save();
+                    return interaction.reply({
+                        content: `✅ Welcome messages will be sent to ${channel}.`,
+                        flags: MessageFlags.Ephemeral,
+                    });
                 }
 
-                await settings.save();
+                case "message": {
+                    const content = interaction.options.getString("content");
+                    settings.welcome.message = content;
 
-                let response = `✅ Welcome direct messages have been ${enabled ? "enabled" : "disabled"}.`;
-                if (enabled && message) {
-                    response += `\n> Message: ${message}`;
+                    await settings.save();
+                    return interaction.reply({
+                        content: `✅ Welcome message has been set to:\n> ${content}`,
+                        flags: MessageFlags.Ephemeral,
+                    });
                 }
 
-                return interaction.reply({
-                    content: response,
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
+                case "dm": {
+                    const enabled = interaction.options.getBoolean("enabled");
+                    const message = interaction.options.getString("message");
 
-            case "preview": {
-                const { welcome } = settings;
+                    settings.welcome.dmEnabled = enabled;
+                    if (message && enabled) {
+                        settings.welcome.dmMessage = message;
+                    }
 
-                // Create embed for preview
-                const embed = new EmbedBuilder()
-                    .setTitle("Welcome Message Configuration")
-                    .setColor("#3498db")
-                    .addFields([
-                        {
-                            name: "Status",
-                            value: welcome.enabled ? "✅ Enabled" : "❌ Disabled",
-                            inline: true,
-                        },
-                        {
-                            name: "Channel",
-                            value: welcome.channelId ? `<#${welcome.channelId}>` : "Not set",
-                            inline: true,
-                        },
-                        {
-                            name: "Direct Messages",
-                            value: welcome.dmEnabled ? "✅ Enabled" : "❌ Disabled",
-                            inline: true,
-                        },
-                    ])
-                    .setTimestamp();
+                    await settings.save();
 
-                // Format welcome message with user and server placeholders
-                const formattedMessage = welcome.message
-                    .replace(/{user}/g, `@${interaction.user.username}`)
-                    .replace(/{server}/g, interaction.guild.name);
+                    let response = `✅ Welcome direct messages have been ${enabled ? "enabled" : "disabled"}.`;
+                    if (enabled && message) {
+                        response += `\n> Message: ${message}`;
+                    }
 
-                embed.addFields([
-                    {
-                        name: "Welcome Message",
-                        value: formattedMessage || "Not set",
-                    },
-                ]);
+                    return interaction.reply({
+                        content: response,
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
 
-                if (welcome.dmEnabled) {
-                    const formattedDM = welcome.dmMessage
+                case "preview": {
+                    const { welcome } = settings;
+
+                    // Create embed for preview
+                    const embed = new EmbedBuilder()
+                        .setTitle("Welcome Message Configuration")
+                        .setColor("#3498db")
+                        .addFields([
+                            {
+                                name: "Status",
+                                value: welcome.enabled ? "✅ Enabled" : "❌ Disabled",
+                                inline: true,
+                            },
+                            {
+                                name: "Channel",
+                                value: welcome.channelId ? `<#${welcome.channelId}>` : "Not set",
+                                inline: true,
+                            },
+                            {
+                                name: "Direct Messages",
+                                value: welcome.dmEnabled ? "✅ Enabled" : "❌ Disabled",
+                                inline: true,
+                            },
+                        ])
+                        .setTimestamp();
+
+                    // Format welcome message with user and server placeholders
+                    const formattedMessage = welcome.message
                         .replace(/{user}/g, `@${interaction.user.username}`)
                         .replace(/{server}/g, interaction.guild.name);
 
                     embed.addFields([
                         {
-                            name: "DM Welcome Message",
-                            value: formattedDM || "Not set",
+                            name: "Welcome Message",
+                            value: formattedMessage || "Not set",
                         },
                     ]);
-                }
 
-                return interaction.reply({
-                    embeds: [embed],
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
+                    if (welcome.dmEnabled) {
+                        const formattedDM = welcome.dmMessage
+                            .replace(/{user}/g, `@${interaction.user.username}`)
+                            .replace(/{server}/g, interaction.guild.name);
+
+                        embed.addFields([
+                            {
+                                name: "DM Welcome Message",
+                                value: formattedDM || "Not set",
+                            },
+                        ]);
+                    }
+
+                    return interaction.reply({
+                        embeds: [embed],
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
             }
         } catch (error) {
             Logger.log(

@@ -1,5 +1,4 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
     description_full: "An exciting game of Rock, Paper, Scissors, Lizard, Spock against the bot!",
@@ -70,7 +69,7 @@ module.exports = {
             .setDescription(
                 `You chose ${emojis[userChoice]} ${userChoice}.\nI chose ${emojis[botChoice]} ${botChoice}.\n\n${result}\n${action}`,
             )
-            .setFooter({ text: "As Sheldon Cooper would say, \"Bazinga!\"" });
+            .setFooter({ text: 'As Sheldon Cooper would say, "Bazinga!"' });
 
         await interaction.reply({ embeds: [embed] });
     },

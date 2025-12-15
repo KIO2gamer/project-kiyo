@@ -1,4 +1,3 @@
-const { EmbedBuilder } = require("discord.js");
 const { GuildSettingsSchema } = require("../database/GuildSettingsSchema");
 const Logger = require("../utils/logger");
 

@@ -1,4 +1,4 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler.js");
 const Role = require("./../../database/roleStorage.js");

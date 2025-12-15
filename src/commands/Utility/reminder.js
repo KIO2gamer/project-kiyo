@@ -1,5 +1,4 @@
-const { MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
 const Reminder = require("./../../database/reminderStorage");
 
 module.exports = {

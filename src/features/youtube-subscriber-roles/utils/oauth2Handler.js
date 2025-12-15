@@ -2,6 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const path = require("path");
 const TempOAuth2Storage = require("../database/tempOAuth2Storage");
+const Logger = require("../../../utils/logger");
+const { logError } = require("../../../utils/errorHandler");
 
 class OAuth2Handler {
     constructor() {
@@ -147,7 +149,7 @@ class OAuth2Handler {
                     `);
                 }
             } catch (error) {
-                console.error("OAuth2 callback error:", error);
+                logError("OAuth2 callback error", error, { category: "API" });
                 res.send(`
                     <html>
                         <head>
@@ -178,7 +180,7 @@ class OAuth2Handler {
                 if (err) {
                     reject(err);
                 } else {
-                    console.log(`OAuth2 callback server running on port ${port}`);
+                    Logger.success(`OAuth2 callback server running on port ${port}`);
                     resolve();
                 }
             });
@@ -189,7 +191,7 @@ class OAuth2Handler {
         return new Promise((resolve) => {
             if (this.server) {
                 this.server.close(() => {
-                    console.log("OAuth2 callback server stopped");
+                    Logger.log("INFO", "OAuth2 callback server stopped");
                     resolve();
                 });
             } else {

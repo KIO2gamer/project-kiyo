@@ -1,8 +1,7 @@
-const { EmbedBuilder, MessageFlags, PollLayoutType, SlashCommandBuilder } = require("discord.js");
+const { MessageFlags, PollLayoutType, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const MAX_POLL_DURATION_HOURS = 32;
-const MAX_POLL_DURATION_MINUTES = MAX_POLL_DURATION_HOURS * 60;
 
 module.exports = {
     description_full: "Creates a poll with the given question, options, and duration.",

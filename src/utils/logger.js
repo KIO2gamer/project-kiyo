@@ -26,7 +26,7 @@ function formatLogObject(obj) {
     } else if (typeof obj === "object" && obj !== null) {
         try {
             return JSON.stringify(obj, null, 2);
-        } catch (e) {
+        } catch {
             return String(obj);
         }
     }
@@ -52,17 +52,17 @@ class Logger {
     };
 
     static DISCORD_COLORS = {
-        ERROR: 0xff4757,    // Red
-        WARN: 0xffa502,     // Orange
-        INFO: 0x3742fa,     // Blue
-        SUCCESS: 0x2ed573,  // Green
-        DEBUG: 0x747d8c,    // Gray
-        BOT: 0x00d2d3,      // Cyan
+        ERROR: 0xff4757, // Red
+        WARN: 0xffa502, // Orange
+        INFO: 0x3742fa, // Blue
+        SUCCESS: 0x2ed573, // Green
+        DEBUG: 0x747d8c, // Gray
+        BOT: 0x00d2d3, // Cyan
         COMMANDS: 0xffa502, // Yellow
-        EVENTS: 0xa55eea,   // Purple
+        EVENTS: 0xa55eea, // Purple
         DATABASE: 0x3742fa, // Blue
-        DEPLOY: 0x2ed573,   // Green
-        API: 0x4ecdc4,      // Teal
+        DEPLOY: 0x2ed573, // Green
+        API: 0x4ecdc4, // Teal
         SECURITY: 0xff4757, // Red
     };
 
@@ -106,7 +106,7 @@ class Logger {
 
             const logFile = path.join(logDir, `${moment().format("YYYY-MM-DD")}.log`);
             const logLine = `${logEntry.timestamp} [${logEntry.level}] [${logEntry.module}] ${logEntry.message}\n`;
-            
+
             fs.appendFileSync(logFile, logLine);
         } catch (error) {
             console.error("Failed to write to log file:", error.message);
@@ -122,23 +122,27 @@ class Logger {
 
             // Only send important logs to Discord (ERROR, WARN, and specific modules)
             const importantModules = ["ERROR", "WARN", "SECURITY", "DATABASE", "DEPLOY"];
-            if (!importantModules.includes(logEntry.module.toUpperCase()) && 
-                !importantModules.includes(logEntry.level.toUpperCase())) {
+            if (
+                !importantModules.includes(logEntry.module.toUpperCase()) &&
+                !importantModules.includes(logEntry.level.toUpperCase())
+            ) {
                 return;
             }
 
             const embed = {
-                color: this.DISCORD_COLORS[logEntry.module.toUpperCase()] || 
-                       this.DISCORD_COLORS[logEntry.level.toUpperCase()] || 
-                       this.DISCORD_COLORS.INFO,
+                color:
+                    this.DISCORD_COLORS[logEntry.module.toUpperCase()] ||
+                    this.DISCORD_COLORS[logEntry.level.toUpperCase()] ||
+                    this.DISCORD_COLORS.INFO,
                 title: `${this.getDiscordEmoji(logEntry.level)} ${logEntry.module}`,
-                description: logEntry.message.length > 2000 ? 
-                    logEntry.message.substring(0, 1997) + "..." : 
-                    logEntry.message,
+                description:
+                    logEntry.message.length > 2000
+                        ? logEntry.message.substring(0, 1997) + "..."
+                        : logEntry.message,
                 timestamp: new Date().toISOString(),
                 footer: {
-                    text: `Level: ${logEntry.level.toUpperCase()}`
-                }
+                    text: `Level: ${logEntry.level.toUpperCase()}`,
+                },
             };
 
             await channel.send({ embeds: [embed] });
@@ -151,11 +155,11 @@ class Logger {
     static getDiscordEmoji(level) {
         const emojis = {
             error: "🔴",
-            warn: "🟡", 
+            warn: "🟡",
             warning: "🟡",
             info: "🔵",
             success: "🟢",
-            debug: "⚪"
+            debug: "⚪",
         };
         return emojis[level.toLowerCase()] || "ℹ️";
     }
@@ -177,12 +181,12 @@ class Logger {
             level === "error"
                 ? "red"
                 : level === "warning"
-                    ? "yellow"
-                    : level === "success"
-                        ? "green"
-                        : level === "debug"
-                            ? "gray"
-                            : "blue";
+                  ? "yellow"
+                  : level === "success"
+                    ? "green"
+                    : level === "debug"
+                      ? "gray"
+                      : "blue";
 
         const symbolStr = chalk[levelColor](symbol);
         const formattedMessage = typeof message === "object" ? formatLogObject(message) : message;
@@ -196,7 +200,7 @@ class Logger {
             module,
             message: formattedMessage,
             level: level.toUpperCase(),
-            raw: message
+            raw: message,
         };
 
         // Write to file if enabled
@@ -258,20 +262,21 @@ class Logger {
             module,
             message: typeof message === "object" ? formatLogObject(message) : message,
             level: level.toUpperCase(),
-            raw: message
+            raw: message,
         };
 
         await this.sendToDiscord(logEntry);
     }
 
     static async commandUsage(commandName, user, guild, success = true) {
-        const message = `Command "${commandName}" ${success ? 'executed' : 'failed'} by ${user.tag} in ${guild?.name || 'DM'}`;
+        const message = `Command "${commandName}" ${success ? "executed" : "failed"} by ${user.tag} in ${guild?.name || "DM"}`;
         await this.log("COMMANDS", message, success ? "info" : "warn");
     }
 
     static async errorWithContext(error, context = {}) {
         const errorMessage = error instanceof Error ? error.stack || error.message : String(error);
-        const contextStr = Object.keys(context).length > 0 ? `\nContext: ${JSON.stringify(context, null, 2)}` : '';
+        const contextStr =
+            Object.keys(context).length > 0 ? `\nContext: ${JSON.stringify(context, null, 2)}` : "";
         await this.log("ERROR", `${errorMessage}${contextStr}`, "error");
     }
 
@@ -329,7 +334,7 @@ Promise.all([
     import("figures").then((module) => {
         figuresCache = module.default;
     }),
-]).catch((error) => {
+]).catch(() => {
     console.log("Note: Using fallback styles (some modules couldn't be loaded)");
 });
 

@@ -1,5 +1,4 @@
-const { EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const moment = require("moment");
 
 module.exports = {
@@ -27,7 +26,7 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName("timeframe")
-                .setDescription("The timeframe to get stats for (e.g., \"24h\", \"7d\", \"1M\")")
+                .setDescription('The timeframe to get stats for (e.g., "24h", "7d", "1M")')
                 .setRequired(false)
                 .addChoices(
                     { name: "Last 24 Hours", value: "24h" },
@@ -45,24 +44,24 @@ module.exports = {
 
         // More robust timeframe handling using moment.js:
         switch (timeframe) {
-        case "24h":
-            startDate = moment().subtract(1, "day").toDate();
-            break;
-        case "7d":
-            startDate = moment().subtract(7, "days").toDate();
-            break;
-        case "30d":
-            startDate = moment().subtract(30, "days").toDate();
-            break;
-        case "1M":
-            startDate = moment().subtract(1, "month").toDate();
-            break;
-        case "all":
-            startDate = new Date(0); // Beginning of time
-            break;
-        default:
-            // Default to 7 days if invalid timeframe is provided
-            startDate = moment().subtract(7, "days").toDate();
+            case "24h":
+                startDate = moment().subtract(1, "day").toDate();
+                break;
+            case "7d":
+                startDate = moment().subtract(7, "days").toDate();
+                break;
+            case "30d":
+                startDate = moment().subtract(30, "days").toDate();
+                break;
+            case "1M":
+                startDate = moment().subtract(1, "month").toDate();
+                break;
+            case "all":
+                startDate = new Date(0); // Beginning of time
+                break;
+            default:
+                // Default to 7 days if invalid timeframe is provided
+                startDate = moment().subtract(7, "days").toDate();
         }
 
         const endDate = new Date();

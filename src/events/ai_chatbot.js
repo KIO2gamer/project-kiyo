@@ -1,4 +1,4 @@
-const { Events, AttachmentBuilder } = require("discord.js");
+const { Events } = require("discord.js");
 const { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } = require("@google/generative-ai");
 const AIChatChannel = require("./../database/AIChatChannel");
 const ChatHistory = require("./../database/ChatHistory");
@@ -114,7 +114,7 @@ module.exports = {
             }
 
             // Start typing indicator
-            const typingIndicator = message.channel.sendTyping();
+            message.channel.sendTyping();
 
             // Handle different message types
             if (message.attachments.size > 0) {
@@ -289,7 +289,7 @@ module.exports = {
                     ]);
 
                     descriptions.push(`**Image ${i + 1}**: ${result.response.text()}`);
-                } catch (error) {
+                } catch {
                     descriptions.push(`**Image ${i + 1}**: Sorry, I couldn't process this image.`);
                 }
             }
@@ -611,6 +611,11 @@ Based on these images and the user's message, provide a unified response.`;
             enhancedPrompt += " [reference our conversation if relevant]";
         }
 
+        // If the message contains emoji and is short, prefer a brief emoji-aware response
+        if (hasEmoji && isShort) {
+            enhancedPrompt += " [include a light emoji reaction and keep it brief]";
+        }
+
         return enhancedPrompt;
     },
 
@@ -692,7 +697,7 @@ Based on these images and the user's message, provide a unified response.`;
             }
 
             // Find and update to ensure we're using the right schema fields
-            const result = await ChatHistory.findOneAndUpdate(
+            await ChatHistory.findOneAndUpdate(
                 { userId, guildId },
                 {
                     $set: {
@@ -794,7 +799,7 @@ async function sendLongMessage(message, content) {
         }
 
         // Handle the case where first message should be a reply
-        const firstMessage = await message.reply(chunks[0]);
+        await message.reply(chunks[0]);
 
         // Send remaining chunks as follow-ups
         for (let i = 1; i < chunks.length; i++) {

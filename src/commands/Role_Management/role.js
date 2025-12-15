@@ -300,7 +300,7 @@ async function handleRoleCreate(interaction) {
         try {
             const perms = permsString.split(",").map((p) => p.trim().toUpperCase());
             permissions = perms.reduce((acc, p) => acc | PermissionFlagsBits[p], 0n);
-        } catch (error) {
+        } catch {
             return interaction.reply("Invalid permissions format");
         }
     }

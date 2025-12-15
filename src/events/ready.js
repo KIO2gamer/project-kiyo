@@ -1,5 +1,4 @@
 const { Events } = require("discord.js");
-const PresenceManager = require("../utils/presenceManager");
 const Logger = require("../utils/logger");
 
 module.exports = {

@@ -79,7 +79,7 @@ module.exports = {
 
             try {
                 // Find and update the document, or create a new one if it doesn't exist
-                const config = await MsgLogsConfig.findOneAndUpdate(
+                await MsgLogsConfig.findOneAndUpdate(
                     { guildId: interaction.guild.id },
                     { channelId: channel.id },
                     { upsert: true, new: true },

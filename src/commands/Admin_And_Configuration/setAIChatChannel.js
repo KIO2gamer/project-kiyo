@@ -83,7 +83,7 @@ module.exports = {
 
             // Update or create AI chat channel configuration
             try {
-                const config = await AIChatChannel.findOneAndUpdate(
+                await AIChatChannel.findOneAndUpdate(
                     { guildId: interaction.guild.id },
                     { channelId: channel.id },
                     { upsert: true, new: true },

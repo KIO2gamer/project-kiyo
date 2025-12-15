@@ -329,7 +329,7 @@ async function handleError(...args) {
             collector.on("end", async () => {
                 try {
                     await response.edit({ components: [] });
-                } catch (err) {
+                } catch {
                     // Ignore edit errors after collector ends
                 }
             });

@@ -1,4 +1,9 @@
-const {  EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    EmbedBuilder,
+    MessageFlags,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const path = require("path");
@@ -132,8 +137,6 @@ module.exports = {
             let reloadedCount = 0;
             let errorCount = 0;
             const errors = [];
-            // Store old commands in case of errors
-            const oldCommands = new Map(interaction.client.commands);
 
             for (const folder of commandFolders) {
                 const folderPath = path.join(foldersPath, folder);

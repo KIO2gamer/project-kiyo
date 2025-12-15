@@ -129,19 +129,9 @@ module.exports = {
             console.error("Google search error:", error);
 
             // Create a simple, clean error message
-            const errorEmbed = new EmbedBuilder()
-                .setColor(GOOGLE_COLORS.red)
-                .setTitle("⚠️ Search Failed")
-                .setDescription("Something went wrong with your search request.")
-                .addFields({
-                    name: "What happened?",
-                    value:
-                        error.response?.data?.error?.message ||
-                        "Could not connect to Google Search. Please try again later.",
-                })
-                .setFooter({ text: "This is most likely a temporary issue" });
-
-            await interaction.editReply({ embeds: [errorEmbed] });
+            // Delegate to centralized error handler (will edit the deferred reply)
+            await handleError(interaction, error, true);
+            return;
         }
     },
 };

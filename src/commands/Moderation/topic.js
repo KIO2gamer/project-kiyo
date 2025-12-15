@@ -1,6 +1,5 @@
 const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
-
 module.exports = {
     description_full:
         "Sends a message to the specified users, requesting them to change the current topic.",

@@ -1,11 +1,10 @@
-const {  ChannelType, EmbedBuilder, PermissionsBitField, SlashCommandBuilder } = require("discord.js");
+const {  ChannelType, EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const { getChannelType } = require("../../utils/channelTypes");
 const {
     formatCategorizedPermissions,
     splitPermissionText,
-    formatChannelPermissions,
 } = require("../../utils/permissionFormatter");
 
 module.exports = {

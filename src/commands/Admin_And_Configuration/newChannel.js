@@ -1,7 +1,5 @@
 const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
-
 const { handleError } = require("../../utils/errorHandler");
-const { getChannelType } = require("./../../utils/channelTypes");
 
 module.exports = {
     description_full: "Creates a new channel in the server with specified settings.",

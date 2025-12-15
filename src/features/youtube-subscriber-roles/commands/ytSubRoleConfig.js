@@ -10,7 +10,7 @@ const {
     TextInputBuilder,
     TextInputStyle,
 } = require("discord.js");
-const { handleError } = require("../../../utils/errorHandler");
+const { handleError, logError } = require("../../../utils/errorHandler");
 const YTSubRoleConfig = require("../database/ytSubRoleConfig");
 
 module.exports = {
@@ -143,7 +143,7 @@ module.exports = {
             await modalSubmission.deferReply();
             await this.processSetupData(modalSubmission, guildId, userId);
         } catch (error) {
-            console.error("Modal submission timeout or error:", error);
+            logError("Modal submission timeout or error", error, { category: "COMMAND_EXECUTION" });
         }
     },
 
@@ -470,7 +470,7 @@ module.exports = {
 
                 await confirmation.update({ embeds: [cancelEmbed], components: [] });
             }
-        } catch (error) {
+        } catch {
             const timeoutEmbed = new EmbedBuilder()
                 .setTitle("⏰ Timeout")
                 .setDescription("Confirmation timeout. Configuration was not cleared.")
