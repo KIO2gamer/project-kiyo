@@ -6,14 +6,40 @@ on:
     pull_request:
         branches: [main, dev]
 
-jobs:
-    lint:
-        name: Lint Code
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-            pull-requests: write
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
 
+jobs:
+    changes:
+        name: Detect changes
+        runs-on: ubuntu-latest
+        outputs:
+            backend: ${{ steps.filter.outputs.backend }}
+            dashboard: ${{ steps.filter.outputs.dashboard }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+            - name: Paths filter
+              id: filter
+              uses: dorny/paths-filter@v3
+              with:
+                  filters: |
+                      backend:
+                        - 'src/**'
+                        - 'package.json'
+                        - 'eslint.config.js'
+                        - '.github/workflows/**'
+                      dashboard:
+                        - 'dashboard/**'
+
+    lint:
+        name: Lint (root only)
+        runs-on: ubuntu-latest
+        needs: changes
+        if: needs.changes.outputs.backend == 'true'
+        permissions:
+            contents: read
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -21,29 +47,25 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "18"
-                  cache: "npm"
+                  node-version: 20
+                  cache: npm
 
-            - name: Install dependencies
+            - name: Install root dependencies
               run: npm ci
 
-            - name: Run ESLint
-              run: npm run lint
+            - name: ESLint
+              run: npx eslint "src/**" "*.js"
 
-            - name: Run Prettier check
+            - name: Prettier (check only)
               run: npx prettier --check .
 
-            - name: Run Prettier write
-              run: npx prettier --write .
-
-    test:
-        name: Run Tests
+    build_dashboard:
+        name: Build Dashboard
         runs-on: ubuntu-latest
-        needs: lint
+        needs: changes
+        if: needs.changes.outputs.dashboard == 'true'
         permissions:
-            contents: write
-            pull-requests: write
-
+            contents: read
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -51,8 +73,66 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "18"
-                  cache: "npm"
+                  node-version: 20
+                  cache: npm
+
+            - name: Install dashboard dependencies
+              run: npm ci --prefix dashboard
+
+            - name: Cache Vite prebundles
+              uses: actions/cache@v4
+              with:
+                  path: dashboard/node_modules/.vite
+                  key: vite-${{ runner.os }}-${{ hashFiles('dashboard/package-lock.json', 'dashboard/vite.config.js') }}
+                  restore-keys: |
+                      vite-${{ runner.os }}-
+
+            - name: Build dashboard
+              run: npm run build:dash
+
+    lint_dashboard:
+        name: Lint Dashboard
+        runs-on: ubuntu-latest
+        needs: changes
+        if: needs.changes.outputs.dashboard == 'true'
+        permissions:
+            contents: read
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Install dashboard deps
+              run: npm ci --prefix dashboard
+
+            - name: ESLint (dashboard)
+              run: npm run lint --prefix dashboard
+
+    test:
+        name: Test (Node ${{ matrix.node }})
+        runs-on: ubuntu-latest
+        needs: [changes, lint]
+        if: needs.changes.outputs.backend == 'true'
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                node: [18, 20, 22]
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
 
             - name: Install dependencies
               run: npm ci

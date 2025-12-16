@@ -34,12 +34,14 @@ This project follows a feature-based organization for better maintainability:
 ```
 project-kiyo/
 ├── 📁 src/                          # Main source code
-│   ├── 📁 commands/                 # Discord commands by category
+│   ├── 📁 commands/                 # Discord commands by category (89 total)
+│   ├── 📁 api/                      # Express API server for dashboard
 │   ├── 📁 features/                 # Feature-based organization
 │   │   └── 📁 youtube-subscriber-roles/  # YouTube subscriber role feature
 │   ├── 📁 database/                 # MongoDB schemas
 │   ├── 📁 events/                   # Discord.js event handlers
 │   └── 📁 utils/                    # Utility functions
+├── 📁 dashboard/                    # Web dashboard (React + Vite + Tailwind)
 ├── 📁 docs/                         # Documentation
 ├── 📁 deployments/                  # External service deployments
 │   └── 📁 netlify-oauth/            # Netlify OAuth2 callback service
@@ -126,39 +128,53 @@ The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the b
     ```
 4. **Build dashboard:**
    `bash
-    npm run build:dash   # outputs to dashboard/dist
-    `
+ npm run build:dash   # outputs to dashboard/dist
+ `
    The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
 
 ## Project Structure
 
 ```
 src/
-├── commands/           # Organized command categories (84 total commands)
-│   ├── Admin_And_Configuration/    # 18 commands
-│   ├── API_Integrations/          # 6 commands
-│   ├── Fun_And_Entertainment/     # 12 commands
+├── commands/           # Organized command categories (89 total commands)
+│   ├── Admin_And_Configuration/    # 20 commands
+│   ├── API_Integrations/          # 7 commands
+│   ├── Fun_And_Entertainment/     # 11 commands
 │   ├── Information_And_Search/    # 12 commands
 │   ├── Levels_And_Experience/     # 3 commands
 │   ├── Moderation/                # 18 commands
 │   ├── Role_Management/           # 5 commands
-│   └── Utility/                   # 10 commands
+│   └── Utility/                   # 13 commands
+├── api/               # Express API server (679 lines)
+│   └── server.js      # Dashboard backend API
 ├── database/          # MongoDB schemas and models
 ├── events/            # Discord event listeners
+├── features/          # Feature-based organization
+│   └── youtube-subscriber-roles/  # YouTube subscriber role feature
 ├── utils/             # Utility modules and helpers
 └── index.js           # Main bot entry point
+
+dashboard/             # Web dashboard frontend
+├── src/               # React components
+│   ├── App.jsx        # Main app component
+│   ├── api.js         # API client
+│   └── main.jsx       # Entry point
+├── dist/              # Build output
+└── vite.config.js     # Vite configuration
 ```
 
 ### Key Dependencies
 
-**Core Dependencies (13 total):**
+**Core Dependencies (20 total):**
 
 -   **discord.js** - Discord API wrapper
 -   **mongoose** - MongoDB object modeling
+-   **express** - Web framework for API server
 -   **@google/generative-ai** - Google AI integration
 -   **googleapis** - Google APIs client
 -   **axios** - HTTP client for API requests
 -   **mathjs** - Mathematical operations
+-   **mathjax-full** - LaTeX rendering support
 -   **moment** - Date/time manipulation
 -   **@iamtraction/google-translate** - Translation services
 -   **chalk** - Terminal colors and styling
@@ -166,6 +182,11 @@ src/
 -   **he** - HTML entity encoding/decoding
 -   **ms** - Time string parsing
 -   **node-cache** - In-memory caching
+-   **cors** - CORS middleware
+-   **cookie-parser** - Cookie parsing
+-   **jsonwebtoken** - JWT authentication
+-   **sharp** - Image processing
+-   **zod** - Schema validation
 
 ## Recent Cleanup & Optimization
 
@@ -188,11 +209,13 @@ This codebase has undergone significant cleanup and optimization:
 
 ### Performance Benefits
 
--   **52% smaller dependency footprint:** Reduced from 27 to 13 production dependencies
+-   **Optimized dependency footprint:** 20 essential production dependencies
 -   **Faster startup times:** Eliminated unused imports and optimized loading
 -   **Better maintainability:** Cleaner code structure and consolidated functionality
 -   **Enhanced security:** Removed dangerous commands and improved error handling
 -   **Streamlined configuration:** Simplified environment variables and removed unused options
+-   **Modern web dashboard:** React + Vite for fast development and builds
+-   **Full-featured API:** Express server with authentication and authorization
 
 ## Contributing
 
