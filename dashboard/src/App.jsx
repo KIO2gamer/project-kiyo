@@ -156,6 +156,10 @@ function AppContent() {
                 ticketCategoryId: settings.ticketCategoryId || null,
                 xp: settings.xp,
                 ytSubRoleConfig: settings.ytSubRoleConfig,
+                moderation: settings.moderation,
+                autoRole: settings.autoRole,
+                levelRewards: settings.levelRewards,
+                rolePermissions: settings.rolePermissions,
             };
             const { data } = await api.put(`/guilds/${selectedGuild}/settings`, payload);
             setSettings(data);
@@ -709,57 +713,98 @@ function AnalyticsPage({ settings }) {
                 actions={<Tag>Top 10</Tag>}
             >
                 <div className="space-y-2">
-                    {[
-                        { cmd: "/help", count: 1234 },
-                        { cmd: "/info", count: 892 },
-                        { cmd: "/userinfo", count: 654 },
-                        { cmd: "/poll", count: 432 },
-                        { cmd: "/translate", count: 321 },
-                    ].map((item, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
-                        >
-                            <span className="text-ink-100 font-medium">{item.cmd}</span>
-                            <div className="flex items-center gap-3">
-                                <div className="h-2 w-32 bg-ink-700 rounded-full overflow-hidden">
+                    {settings.commandStats && settings.commandStats.length > 0 ? (
+                        settings.commandStats
+                            .sort((a, b) => b.count - a.count)
+                            .slice(0, 10)
+                            .map((item, idx) => {
+                                const maxCount = Math.max(
+                                    ...settings.commandStats.map((s) => s.count),
+                                );
+                                return (
                                     <div
-                                        className="h-full bg-gradient-to-r from-jade-500 to-ember-500"
-                                        style={{ width: `${(item.count / 1234) * 100}%` }}
-                                    />
-                                </div>
-                                <span className="text-ink-300 text-sm w-16 text-right">
-                                    {item.count}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                                        key={idx}
+                                        className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
+                                    >
+                                        <span className="text-ink-100 font-medium">
+                                            /{item.command}
+                                        </span>
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-2 w-32 bg-ink-700 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-gradient-to-r from-jade-500 to-ember-500"
+                                                    style={{
+                                                        width: `${(item.count / maxCount) * 100}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="text-ink-300 text-sm w-16 text-right">
+                                                {item.count}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                    ) : (
+                        <p className="text-sm text-ink-400 text-center py-4">
+                            No command statistics available yet.
+                        </p>
+                    )}
                 </div>
             </SectionCard>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <SectionCard title="User Activity" description="Active users over time">
                     <div className="h-48 flex items-end justify-between gap-2">
-                        {[45, 67, 52, 89, 76, 95, 82].map((height, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-                                <div
-                                    className="w-full bg-gradient-to-t from-jade-500 to-ember-500 rounded-t-lg"
-                                    style={{ height: `${height}%` }}
-                                />
-                                <span className="text-xs text-ink-400">
-                                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][idx]}
-                                </span>
+                        {settings.userActivity && settings.userActivity.length === 7 ? (
+                            settings.userActivity.map((count, idx) => {
+                                const maxCount = Math.max(...settings.userActivity);
+                                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="flex-1 flex flex-col items-center gap-2"
+                                    >
+                                        <div
+                                            className="w-full bg-gradient-to-t from-jade-500 to-ember-500 rounded-t-lg"
+                                            style={{ height: `${percentage}%` }}
+                                        />
+                                        <span className="text-xs text-ink-400">
+                                            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][idx]}
+                                        </span>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="w-full flex items-center justify-center text-ink-400">
+                                <p className="text-sm">No user activity data available.</p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </SectionCard>
 
                 <SectionCard title="Event Distribution" description="Last 24 hours">
                     <div className="space-y-3">
-                        <EventBar label="Messages" count={4521} max={5000} />
-                        <EventBar label="Commands" count={1234} max={5000} />
-                        <EventBar label="Joins" count={87} max={5000} />
-                        <EventBar label="Leaves" count={43} max={5000} />
+                        <EventBar
+                            label="Messages"
+                            count={settings.eventStats?.messages || 0}
+                            max={settings.eventStats?.messagesMax || 5000}
+                        />
+                        <EventBar
+                            label="Commands"
+                            count={settings.eventStats?.commands || 0}
+                            max={settings.eventStats?.commandsMax || 5000}
+                        />
+                        <EventBar
+                            label="Joins"
+                            count={settings.eventStats?.joins || 0}
+                            max={settings.eventStats?.joinsMax || 500}
+                        />
+                        <EventBar
+                            label="Leaves"
+                            count={settings.eventStats?.leaves || 0}
+                            max={settings.eventStats?.leavesMax || 500}
+                        />
                     </div>
                 </SectionCard>
             </div>
@@ -828,22 +873,67 @@ function ModerationPage({ settings, setSettings }) {
                 <div className="space-y-4">
                     <label className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700">
                         <span className="text-ink-100">Block spam messages</span>
-                        <input type="checkbox" className="h-4 w-4 rounded" defaultChecked />
+                        <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded"
+                            checked={settings.moderation?.blockSpam || false}
+                            onChange={(e) =>
+                                setSettings((prev) => ({
+                                    ...prev,
+                                    moderation: { ...prev.moderation, blockSpam: e.target.checked },
+                                }))
+                            }
+                        />
                     </label>
                     <label className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700">
                         <span className="text-ink-100">Filter explicit content</span>
-                        <input type="checkbox" className="h-4 w-4 rounded" defaultChecked />
+                        <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded"
+                            checked={settings.moderation?.filterExplicit || false}
+                            onChange={(e) =>
+                                setSettings((prev) => ({
+                                    ...prev,
+                                    moderation: {
+                                        ...prev.moderation,
+                                        filterExplicit: e.target.checked,
+                                    },
+                                }))
+                            }
+                        />
                     </label>
                     <label className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700">
                         <span className="text-ink-100">Auto-mute on excessive caps</span>
-                        <input type="checkbox" className="h-4 w-4 rounded" />
+                        <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded"
+                            checked={settings.moderation?.autoMuteCaps || false}
+                            onChange={(e) =>
+                                setSettings((prev) => ({
+                                    ...prev,
+                                    moderation: {
+                                        ...prev.moderation,
+                                        autoMuteCaps: e.target.checked,
+                                    },
+                                }))
+                            }
+                        />
                     </label>
                     <Field label="Spam detection threshold (messages/min)">
                         <input
                             type="number"
                             min="1"
                             max="20"
-                            defaultValue={5}
+                            value={settings.moderation?.spamThreshold ?? 5}
+                            onChange={(e) =>
+                                setSettings((prev) => ({
+                                    ...prev,
+                                    moderation: {
+                                        ...prev.moderation,
+                                        spamThreshold: Number(e.target.value),
+                                    },
+                                }))
+                            }
                             className="w-full rounded-lg bg-ink-800 border border-ink-700 px-3 py-2 text-ink-50"
                         />
                     </Field>
@@ -852,38 +942,37 @@ function ModerationPage({ settings, setSettings }) {
 
             <SectionCard title="Moderation Logs" description="Recent moderation actions">
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                    {[
-                        { action: "Ban", user: "User#1234", mod: "Admin", reason: "Spam" },
-                        {
-                            action: "Mute",
-                            user: "User#5678",
-                            mod: "Mod1",
-                            reason: "Offensive language",
-                        },
-                        {
-                            action: "Kick",
-                            user: "User#9012",
-                            mod: "Admin",
-                            reason: "Breaking rules",
-                        },
-                    ].map((log, idx) => (
-                        <div
-                            key={idx}
-                            className="p-3 rounded-lg bg-ink-800/60 border border-ink-700 space-y-1"
-                        >
-                            <div className="flex items-center justify-between">
-                                <span className="text-ember-300 font-semibold">{log.action}</span>
-                                <span className="text-xs text-ink-400">Just now</span>
+                    {Array.isArray(settings.moderationLogs) &&
+                    settings.moderationLogs.length > 0 ? (
+                        settings.moderationLogs.map((log, idx) => (
+                            <div
+                                key={idx}
+                                className="p-3 rounded-lg bg-ink-800/60 border border-ink-700 space-y-1"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="text-ember-300 font-semibold">
+                                        {log.action}
+                                    </span>
+                                    <span className="text-xs text-ink-400">
+                                        {log.timestamp
+                                            ? new Date(log.timestamp).toLocaleString()
+                                            : "Just now"}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-ink-200">
+                                    <span className="text-ink-400">User:</span> {log.userId}
+                                </p>
+                                <p className="text-sm text-ink-200">
+                                    <span className="text-ink-400">By:</span> {log.moderatorId}
+                                </p>
+                                <p className="text-xs text-ink-300">{log.reason}</p>
                             </div>
-                            <p className="text-sm text-ink-200">
-                                <span className="text-ink-400">User:</span> {log.user}
-                            </p>
-                            <p className="text-sm text-ink-200">
-                                <span className="text-ink-400">By:</span> {log.mod}
-                            </p>
-                            <p className="text-xs text-ink-300">{log.reason}</p>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-sm text-ink-400 text-center py-4">
+                            No moderation logs yet.
+                        </p>
+                    )}
                 </div>
             </SectionCard>
 
@@ -893,6 +982,19 @@ function ModerationPage({ settings, setSettings }) {
                         rows={5}
                         placeholder="Enter banned words (one per line)"
                         className="w-full rounded-lg bg-ink-800 border border-ink-700 px-3 py-2 text-ink-50"
+                        value={(settings.moderation?.bannedWords || []).join("\n")}
+                        onChange={(e) =>
+                            setSettings((prev) => ({
+                                ...prev,
+                                moderation: {
+                                    ...prev.moderation,
+                                    bannedWords: e.target.value
+                                        .split("\n")
+                                        .map((w) => w.trim())
+                                        .filter(Boolean),
+                                },
+                            }))
+                        }
                     />
                     <Button variant="outline" icon={Save}>
                         Update Filter
@@ -1058,13 +1160,27 @@ function RolesPage({ settings, setSettings }) {
                         <input
                             className="w-full rounded-lg bg-ink-800 border border-ink-700 px-3 py-2 text-ink-50"
                             placeholder="123456789012345678"
+                            value={settings.autoRole?.defaultRoleId || ""}
+                            onChange={(e) =>
+                                setSettings((prev) => ({
+                                    ...prev,
+                                    autoRole: { ...prev.autoRole, defaultRoleId: e.target.value },
+                                }))
+                            }
                         />
                     </Field>
                     <div className="space-y-2">
                         <p className="text-xs text-ink-400">Active auto-roles:</p>
                         <div className="flex flex-wrap gap-2">
-                            <Tag>Member</Tag>
-                            <Tag>Verified</Tag>
+                            {settings.autoRole?.roles && settings.autoRole.roles.length > 0 ? (
+                                settings.autoRole.roles.map((role, idx) => (
+                                    <Tag key={idx}>{role}</Tag>
+                                ))
+                            ) : (
+                                <p className="text-xs text-ink-500">
+                                    No auto-roles configured yet.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1072,24 +1188,49 @@ function RolesPage({ settings, setSettings }) {
 
             <SectionCard title="Level Rewards" description="Roles granted at specific levels">
                 <div className="space-y-2">
-                    {[
-                        { level: 5, role: "Active Member" },
-                        { level: 10, role: "Regular" },
-                        { level: 25, role: "Veteran" },
-                    ].map((reward, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
-                        >
-                            <span className="text-ink-100">
-                                Level {reward.level} → {reward.role}
-                            </span>
-                            <Button variant="outline" icon={ShieldCheck}>
-                                Edit
-                            </Button>
-                        </div>
-                    ))}
-                    <Button variant="ghost" icon={Sparkles}>
+                    {settings.levelRewards && settings.levelRewards.length > 0 ? (
+                        settings.levelRewards.map((reward, idx) => (
+                            <div
+                                key={idx}
+                                className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
+                            >
+                                <span className="text-ink-100">
+                                    Level {reward.level} → {reward.roleId}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    icon={ShieldCheck}
+                                    onClick={() => {
+                                        setSettings((prev) => ({
+                                            ...prev,
+                                            levelRewards: prev.levelRewards.filter(
+                                                (_, i) => i !== idx,
+                                            ),
+                                        }));
+                                    }}
+                                >
+                                    Remove
+                                </Button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-sm text-ink-400 text-center py-4">
+                            No level rewards configured yet.
+                        </p>
+                    )}
+                    <Button
+                        variant="ghost"
+                        icon={Sparkles}
+                        onClick={() =>
+                            setSettings((prev) => ({
+                                ...prev,
+                                levelRewards: [
+                                    ...(prev.levelRewards || []),
+                                    { level: 0, roleId: "" },
+                                ],
+                            }))
+                        }
+                    >
                         Add Reward
                     </Button>
                 </div>
@@ -1097,20 +1238,49 @@ function RolesPage({ settings, setSettings }) {
 
             <SectionCard title="Role Permissions" description="Manage role access">
                 <div className="space-y-2">
-                    {["Admin", "Moderator", "Member"].map((role, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
-                        >
-                            <span className="text-ink-100">{role}</span>
-                            <div className="flex items-center gap-2">
-                                <Tag>{idx === 0 ? "Full" : idx === 1 ? "Limited" : "Basic"}</Tag>
-                                <Button variant="outline" icon={Settings}>
-                                    Configure
-                                </Button>
+                    {settings.rolePermissions && settings.rolePermissions.length > 0 ? (
+                        settings.rolePermissions.map((perm, idx) => (
+                            <div
+                                key={idx}
+                                className="flex items-center justify-between p-3 rounded-lg bg-ink-800/60 border border-ink-700"
+                            >
+                                <span className="text-ink-100">{perm.roleId}</span>
+                                <div className="flex items-center gap-2">
+                                    <Tag>
+                                        {perm.level === "full"
+                                            ? "Full"
+                                            : perm.level === "limited"
+                                              ? "Limited"
+                                              : "Basic"}
+                                    </Tag>
+                                    <Button
+                                        variant="outline"
+                                        icon={Settings}
+                                        onClick={() => {
+                                            const newLevel =
+                                                perm.level === "full"
+                                                    ? "limited"
+                                                    : perm.level === "limited"
+                                                      ? "basic"
+                                                      : "full";
+                                            setSettings((prev) => ({
+                                                ...prev,
+                                                rolePermissions: prev.rolePermissions.map((p, i) =>
+                                                    i === idx ? { ...p, level: newLevel } : p,
+                                                ),
+                                            }));
+                                        }}
+                                    >
+                                        Cycle
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-sm text-ink-400 text-center py-4">
+                            No role permissions configured.
+                        </p>
+                    )}
                 </div>
             </SectionCard>
         </div>
@@ -1221,19 +1391,24 @@ function CommandsPage({
 // ==================== LOGS PAGE ====================
 function LogsPage({ selectedGuild }) {
     const [filter, setFilter] = useState("all");
+    const [logs, setLogs] = useState([]);
+    const [logsLoading, setLogsLoading] = useState(false);
 
-    const logs = [
-        { type: "command", user: "User#1234", action: "Used /help", timestamp: "2 min ago" },
-        { type: "join", user: "User#5678", action: "Joined the server", timestamp: "5 min ago" },
-        { type: "leave", user: "User#9012", action: "Left the server", timestamp: "10 min ago" },
-        {
-            type: "message",
-            user: "User#3456",
-            action: "Sent a message in #general",
-            timestamp: "15 min ago",
-        },
-        { type: "command", user: "User#7890", action: "Used /poll", timestamp: "20 min ago" },
-    ];
+    useEffect(() => {
+        async function fetchLogs() {
+            if (!selectedGuild) return;
+            setLogsLoading(true);
+            try {
+                const { data } = await api.get(`/guilds/${selectedGuild}/logs`);
+                setLogs(data.logs || []);
+            } catch (err) {
+                setLogs([]);
+            } finally {
+                setLogsLoading(false);
+            }
+        }
+        fetchLogs();
+    }, [selectedGuild]);
 
     const filteredLogs = filter === "all" ? logs : logs.filter((log) => log.type === filter);
 
@@ -1261,34 +1436,48 @@ function LogsPage({ selectedGuild }) {
                 actions={<Tag>Real-time</Tag>}
             >
                 <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-                    {filteredLogs.map((log, idx) => (
-                        <div
-                            key={idx}
-                            className="flex items-start gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-700"
-                        >
+                    {logsLoading ? (
+                        <p className="text-sm text-ink-400 text-center py-4">Loading logs...</p>
+                    ) : filteredLogs.length > 0 ? (
+                        filteredLogs.map((log, idx) => (
                             <div
-                                className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                                    log.type === "command"
-                                        ? "bg-jade-500/15 text-jade-300"
-                                        : log.type === "join"
-                                          ? "bg-blue-500/15 text-blue-300"
-                                          : log.type === "leave"
-                                            ? "bg-ember-500/15 text-ember-300"
-                                            : "bg-ink-700 text-ink-300"
-                                }`}
+                                key={idx}
+                                className="flex items-start gap-3 p-3 rounded-lg bg-ink-800/60 border border-ink-700"
                             >
-                                {log.type === "command" && <Wand2 className="h-4 w-4" />}
-                                {log.type === "join" && <Users className="h-4 w-4" />}
-                                {log.type === "leave" && <Users className="h-4 w-4" />}
-                                {log.type === "message" && <FileText className="h-4 w-4" />}
+                                <div
+                                    className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                                        log.type === "command"
+                                            ? "bg-jade-500/15 text-jade-300"
+                                            : log.type === "join"
+                                              ? "bg-blue-500/15 text-blue-300"
+                                              : log.type === "leave"
+                                                ? "bg-ember-500/15 text-ember-300"
+                                                : "bg-ink-700 text-ink-300"
+                                    }`}
+                                >
+                                    {log.type === "command" && <Wand2 className="h-4 w-4" />}
+                                    {log.type === "join" && <Users className="h-4 w-4" />}
+                                    {log.type === "leave" && <Users className="h-4 w-4" />}
+                                    {log.type === "message" && <FileText className="h-4 w-4" />}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-ink-100 font-medium">
+                                        {log.userId || "Unknown"}
+                                    </p>
+                                    <p className="text-sm text-ink-300">{log.action}</p>
+                                    <p className="text-xs text-ink-500 mt-1">
+                                        {log.timestamp
+                                            ? new Date(log.timestamp).toLocaleString()
+                                            : "Just now"}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex-1">
-                                <p className="text-ink-100 font-medium">{log.user}</p>
-                                <p className="text-sm text-ink-300">{log.action}</p>
-                                <p className="text-xs text-ink-500 mt-1">{log.timestamp}</p>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-sm text-ink-400 text-center py-8">
+                            No logs found for this filter.
+                        </p>
+                    )}
                 </div>
             </SectionCard>
         </div>
