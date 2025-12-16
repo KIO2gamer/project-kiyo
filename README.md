@@ -98,25 +98,11 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     npm start
     ```
 
--   **Development Mode (Bot Only):**
+-   **Development Mode:**
 
     ```bash
     npm run dev
     ```
-
--   **Development Mode (Bot + Dashboard):**
-
-    ```bash
-    npm run dev:all      # Runs bot and dashboard together
-    ```
-
--   **Development Mode (Bot + Dashboard + ngrok):**
-
-    ```bash
-    npm run dev:all:public   # Runs bot, dashboard, and exposes API via ngrok
-    ```
-
-    This starts everything and exposes your API publicly via ngrok. Copy the ngrok URL (e.g., `https://xxxx.ngrok-free.app`) and add it to your Netlify environment as `VITE_API_URL`.
 
 -   **Code Quality:**
     ```bash
@@ -137,64 +123,14 @@ The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the b
     ```
 3. **Run dev servers:**
     ```bash
-    npm run dev:all      # Run both bot + dashboard (recommended)
-    # OR run separately:
     npm run dev          # bot + API (port from DASHBOARD_API_PORT)
     npm run dev:dash     # dashboard UI (defaults to http://localhost:5173)
     ```
 4. **Build dashboard:**
-    ```bash
-    npm run build:dash   # outputs to dashboard/dist
-    ```
-    The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
-
-## Dashboard Deployment (Netlify)
-
-Deploy the dashboard to your existing Netlify site with automatic builds from GitHub.
-
-### Setup
-
-1. **Connect your GitHub repo** to Netlify (if not already done)
-
-2. **Configure environment variables** in Netlify UI:
-
-    - Go to **Site Settings** → **Build & Deploy** → **Environment**
-    - Add the following (see `.netlify.env.example` for reference):
-        - `DASHBOARD_CLIENT_ID`, `DASHBOARD_CLIENT_SECRET`
-        - `DASHBOARD_REDIRECT_URI` (your Netlify URL + `/callback`)
-        - `DASHBOARD_BASE_URL` (your Netlify URL)
-        - `DASHBOARD_SESSION_SECRET` (generate a random secure string)
-        - `DASHBOARD_API_PORT=3001`
-        - `DASHBOARD_ALLOW_ORIGINS` (your Netlify URL)
-
-3. **Update Discord OAuth Redirect URIs**:
-
-    - Go to [Discord Developer Portal](https://discord.com/developers/applications)
-    - Select your app → **OAuth2** → **General**
-    - Add your Netlify URL as a valid redirect URI: `https://your-site.netlify.app/callback`
-
-4. **Deploy**:
-    - Push to your `main` or `dev` branch
-    - Netlify automatically builds and deploys the dashboard
-    - The site will serve `dashboard/dist` with OAuth and serverless functions enabled
-
-### How It Works
-
--   **`netlify.toml`** configures the build:
-    -   Builds dashboard via `npm run build:dash`
-    -   Publishes `dashboard/dist` as the site root
-    -   Mounts OAuth serverless functions at `/.netlify/functions/`
-    -   Routes API calls to the backend
-    -   Redirects SPA routes to `index.html` for React Router
-
-### Local Testing
-
-```bash
-npm install -g netlify-cli
-netlify dev
-```
-
-This runs the full stack locally with Netlify emulation.
+   `bash
+ npm run build:dash   # outputs to dashboard/dist
+ `
+   The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
 
 ## Project Structure
 

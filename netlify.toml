@@ -1,19 +1,22 @@
 [build]
-  # Build the dashboard frontend only
-  command = "npm ci && npm --prefix dashboard ci && npm run build:dash"
-  publish = "dashboard/dist"
+  # Use the Netlify OAuth deployment subdirectory as the base for this site
+  base = "deployments/netlify-oauth"
+  publish = "public"
+  functions = "netlify/functions"
 
-# SPA fallback: route all unmatched routes to index.html for React Router
+[functions]
+  node_bundler = "esbuild"
+
+# Route friendly paths to serverless functions
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/callback"
+  to = "/.netlify/functions/callback"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
   status = 200
 
 [context.production.environment]
   NODE_ENV = "production"
-  # Ensure devDependencies (lint/build tools) are installed during Netlify builds
-  NPM_CONFIG_PRODUCTION = "false"
-  # Skip Husky during Netlify CI to avoid missing git hooks
-  HUSKY = "0"
-  # API URL for your bot server (set this in Netlify UI)
-  # VITE_API_URL = "https://your-ngrok-url.ngrok-free.app"
