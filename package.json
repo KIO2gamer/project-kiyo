@@ -8,6 +8,8 @@
         "start": "node src/index.js",
         "dev": "nodemon --ignore 'logs/*' src/index.js",
         "dev:dash": "npm --prefix dashboard run dev",
+        "dev:all": "concurrently --kill-others --names \"BOT,DASH\" --prefix-colors \"cyan,magenta\" \"npm run dev\" \"npm run dev:dash\"",
+        "dev:all:public": "concurrently --kill-others --names \"BOT,DASH,NGROK\" --prefix-colors \"cyan,magenta,green\" \"npm run dev:dash\" \"ngrok http 3001\" \"npm run dev\"",
         "build:dash": "npm --prefix dashboard run build",
         "lint": "eslint . --fix",
         "format": "prettier --write .",
@@ -61,6 +63,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "concurrently": "^9.1.0",
         "eslint": "^9.28.0",
         "globals": "^16.3.0",
         "husky": "^9.1.7",

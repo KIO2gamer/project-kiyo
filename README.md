@@ -98,11 +98,25 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     npm start
     ```
 
--   **Development Mode:**
+-   **Development Mode (Bot Only):**
 
     ```bash
     npm run dev
     ```
+
+-   **Development Mode (Bot + Dashboard):**
+
+    ```bash
+    npm run dev:all      # Runs bot and dashboard together
+    ```
+
+-   **Development Mode (Bot + Dashboard + ngrok):**
+
+    ```bash
+    npm run dev:all:public   # Runs bot, dashboard, and exposes API via ngrok
+    ```
+
+    This starts everything and exposes your API publicly via ngrok. Copy the ngrok URL (e.g., `https://xxxx.ngrok-free.app`) and add it to your Netlify environment as `VITE_API_URL`.
 
 -   **Code Quality:**
     ```bash
@@ -123,6 +137,8 @@ The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the b
     ```
 3. **Run dev servers:**
     ```bash
+    npm run dev:all      # Run both bot + dashboard (recommended)
+    # OR run separately:
     npm run dev          # bot + API (port from DASHBOARD_API_PORT)
     npm run dev:dash     # dashboard UI (defaults to http://localhost:5173)
     ```
