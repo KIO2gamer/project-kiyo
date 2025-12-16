@@ -26,6 +26,10 @@
 
 [context.production.environment]
   NODE_ENV = "production"
+  # Ensure devDependencies (lint/build tools) are installed during Netlify builds
+  NPM_CONFIG_PRODUCTION = "false"
+  # Skip Husky during Netlify CI to avoid missing git hooks
+  HUSKY = "0"
   # Add your environment variables here in the Netlify UI:
   # DASHBOARD_CLIENT_ID
   # DASHBOARD_CLIENT_SECRET
