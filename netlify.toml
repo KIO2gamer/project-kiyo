@@ -1,13 +1,13 @@
 [build]
-  # Use the Netlify OAuth deployment subdirectory as the base for this site
-  base = "deployments/netlify-oauth"
-  publish = "public"
-  functions = "netlify/functions"
+  # Build the dashboard as the primary site
+  command = "npm ci && npm run build:dash"
+  publish = "dashboard/dist"
 
 [functions]
   node_bundler = "esbuild"
+  directory = "deployments/netlify-oauth/netlify/functions"
 
-# Route friendly paths to serverless functions
+# API redirects for OAuth and health checks
 [[redirects]]
   from = "/callback"
   to = "/.netlify/functions/callback"
@@ -18,5 +18,18 @@
   to = "/.netlify/functions/health"
   status = 200
 
+# SPA fallback: route all unmatched routes to index.html for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [context.production.environment]
   NODE_ENV = "production"
+  # Add your environment variables here in the Netlify UI:
+  # DASHBOARD_CLIENT_ID
+  # DASHBOARD_CLIENT_SECRET
+  # DASHBOARD_SESSION_SECRET
+  # DASHBOARD_REDIRECT_URI
+  # DASHBOARD_BASE_URL
+  # DASHBOARD_API_PORT
