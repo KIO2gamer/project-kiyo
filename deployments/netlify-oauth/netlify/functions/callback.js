@@ -198,38 +198,73 @@ function generateSuccessPage(title, message, instructions) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                text-align: center; 
-                padding: 50px; 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
+            * {
                 margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: #1f2937;
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                padding: 20px;
             }
             .container {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 40px;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-                border: 1px solid rgba(255, 255, 255, 0.18);
+                background: white;
+                border-radius: 16px;
+                padding: 60px 40px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
                 max-width: 500px;
+                text-align: center;
+                animation: slideUp 0.5s ease-out;
             }
-            .success { color: #4CAF50; font-size: 3em; margin-bottom: 20px; }
-            .info { color: #2196F3; margin: 20px 0; }
-            h1 { margin: 20px 0; font-size: 2em; }
-            p { font-size: 1.1em; line-height: 1.6; }
-            .icon { font-size: 4em; margin-bottom: 20px; }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .icon {
+                font-size: 5em;
+                margin-bottom: 24px;
+                display: inline-block;
+                animation: bounce 0.6s ease-in-out;
+            }
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            h1 {
+                color: #10b981;
+                font-size: 28px;
+                margin-bottom: 16px;
+                font-weight: 700;
+            }
+            .info {
+                color: #6b7280;
+                font-size: 16px;
+                line-height: 1.6;
+                margin: 20px 0;
+            }
+            p {
+                color: #4b5563;
+                font-size: 15px;
+                line-height: 1.7;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="icon">🎉</div>
-            <h1 class="success">${title}</h1>
+            <h1>${title}</h1>
             <p class="info">${message}</p>
             <p>${instructions}</p>
         </div>
@@ -247,37 +282,69 @@ function generateWarningPage(title, message, instructions) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                text-align: center; 
-                padding: 50px; 
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                color: white;
+            * {
                 margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: #1f2937;
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                padding: 20px;
             }
             .container {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 40px;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-                border: 1px solid rgba(255, 255, 255, 0.18);
+                background: white;
+                border-radius: 16px;
+                padding: 60px 40px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
                 max-width: 500px;
+                text-align: center;
+                animation: slideUp 0.5s ease-out;
+                border-left: 5px solid #f59e0b;
             }
-            .warning { color: #FFA726; font-size: 3em; margin-bottom: 20px; }
-            h1 { margin: 20px 0; font-size: 2em; }
-            p { font-size: 1.1em; line-height: 1.6; }
-            .icon { font-size: 4em; margin-bottom: 20px; }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .icon {
+                font-size: 5em;
+                margin-bottom: 24px;
+                display: inline-block;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+            h1 {
+                color: #d97706;
+                font-size: 28px;
+                margin-bottom: 16px;
+                font-weight: 700;
+            }
+            p {
+                color: #4b5563;
+                font-size: 15px;
+                line-height: 1.7;
+                margin: 12px 0;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="icon">⚠️</div>
-            <h1 class="warning">${title}</h1>
+            <h1>${title}</h1>
             <p>${message}</p>
             <p>${instructions}</p>
         </div>
@@ -295,37 +362,70 @@ function generateErrorPage(title, message) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-            body { 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                text-align: center; 
-                padding: 50px; 
-                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-                color: white;
+            * {
                 margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                color: #1f2937;
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                padding: 20px;
             }
             .container {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 40px;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-                border: 1px solid rgba(255, 255, 255, 0.18);
+                background: white;
+                border-radius: 16px;
+                padding: 60px 40px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
                 max-width: 500px;
+                text-align: center;
+                animation: slideUp 0.5s ease-out;
+                border-left: 5px solid #ef4444;
             }
-            .error { color: #f44336; font-size: 3em; margin-bottom: 20px; }
-            h1 { margin: 20px 0; font-size: 2em; }
-            p { font-size: 1.1em; line-height: 1.6; }
-            .icon { font-size: 4em; margin-bottom: 20px; }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .icon {
+                font-size: 5em;
+                margin-bottom: 24px;
+                display: inline-block;
+                animation: shake 0.5s ease-in-out;
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+            h1 {
+                color: #dc2626;
+                font-size: 28px;
+                margin-bottom: 16px;
+                font-weight: 700;
+            }
+            p {
+                color: #4b5563;
+                font-size: 15px;
+                line-height: 1.7;
+                margin: 12px 0;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="icon">❌</div>
-            <h1 class="error">${title}</h1>
+            <h1>${title}</h1>
             <p>${message}</p>
             <p>You can close this window and try again.</p>
         </div>
