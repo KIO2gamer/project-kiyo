@@ -10,10 +10,7 @@ async function connectToDatabase() {
     }
 
     try {
-        const connection = await mongoose.connect(process.env.MONGODB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        const connection = await mongoose.connect(process.env.MONGODB_URL);
         cachedDb = connection;
         return connection;
     } catch (error) {
