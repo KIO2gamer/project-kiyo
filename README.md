@@ -128,8 +128,8 @@ The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the b
     ```
 4. **Build dashboard:**
    `bash
- npm run build:dash   # outputs to dashboard/dist
- `
+npm run build:dash   # outputs to dashboard/dist
+`
    The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
 
 ## Project Structure
