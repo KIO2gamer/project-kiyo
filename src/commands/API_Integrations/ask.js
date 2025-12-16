@@ -42,7 +42,7 @@ module.exports = {
         try {
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-flash", // Updated model name
+                model: "gemini-2.5-flash", // Updated model name
                 systemInstruction:
                     "You are a helpful assistant and your answers are concise and to the point.",
             });
