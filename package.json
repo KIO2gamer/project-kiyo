@@ -7,6 +7,8 @@
     "scripts": {
         "start": "node src/index.js",
         "dev": "nodemon --ignore 'logs/*' src/index.js",
+        "dev:dash": "npm --prefix dashboard run dev",
+        "build:dash": "npm --prefix dashboard run build",
         "lint": "eslint . --fix",
         "format": "prettier --write .",
         "test": "echo \"No tests specified yet\" && exit 0",
@@ -41,18 +43,22 @@
         "@iamtraction/google-translate": "^2.0.1",
         "axios": "^1.6.2",
         "chalk": "^4.1.2",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
         "discord.js": "^14.19.3",
         "dotenv": "^16.3.1",
         "express": "^4.21.2",
         "googleapis": "^144.0.0",
         "he": "^1.2.0",
+        "jsonwebtoken": "^9.0.2",
         "mathjax-full": "^3.2.2",
         "mathjs": "^13.1.1",
         "moment": "^2.30.1",
         "mongoose": "^8.7.1",
         "ms": "^2.1.3",
         "node-cache": "^5.1.2",
-        "sharp": "^0.33.5"
+        "sharp": "^0.33.5",
+        "zod": "^3.23.8"
     },
     "devDependencies": {
         "eslint": "^9.28.0",

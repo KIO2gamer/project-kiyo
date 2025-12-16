@@ -108,6 +108,28 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     npm run format    # Format code with Prettier
     ```
 
+## Dashboard (web + API)
+
+The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the bot-hosted Express API under `/api`.
+
+1. **Environment:** set the new variables (see `.env.example`):
+    - `DASHBOARD_CLIENT_ID`, `DASHBOARD_CLIENT_SECRET`, `DASHBOARD_REDIRECT_URI`
+    - `DASHBOARD_BASE_URL`, `DASHBOARD_SESSION_SECRET`, `DASHBOARD_API_PORT`, `DASHBOARD_ALLOW_ORIGINS`
+2. **Install dashboard deps:**
+    ```bash
+    npm install --prefix dashboard
+    ```
+3. **Run dev servers:**
+    ```bash
+    npm run dev          # bot + API (port from DASHBOARD_API_PORT)
+    npm run dev:dash     # dashboard UI (defaults to http://localhost:5173)
+    ```
+4. **Build dashboard:**
+   `bash
+    npm run build:dash   # outputs to dashboard/dist
+    `
+   The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
+
 ## Project Structure
 
 ```
