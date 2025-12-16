@@ -1,6 +1,6 @@
 [build]
   # Build the dashboard as the primary site
-  command = "npm ci && npm run build:dash"
+  command = "npm ci && npm --prefix dashboard ci && npm run build:dash"
   publish = "dashboard/dist"
 
 [functions]
