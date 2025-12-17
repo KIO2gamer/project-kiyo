@@ -1,4 +1,9 @@
-const {  EmbedBuilder, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    EmbedBuilder,
+    MessageFlags,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const CommandPermissionsSchema = require("./../../database/commandPermissions");

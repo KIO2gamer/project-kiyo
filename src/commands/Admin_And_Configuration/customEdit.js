@@ -1,4 +1,11 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    MessageFlags,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const cc = require("./../../database/customCommands");
 const { handleError } = require("../../utils/errorHandler");

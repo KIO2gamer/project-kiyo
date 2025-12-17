@@ -6,10 +6,10 @@ const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full: "Edits the reason for a specific log entry or a range of log entries.",
-    usage: "/edit_reason reason:\"new reason\" [lognumber] [logrange]",
+    usage: '/edit_reason reason:"new reason" [lognumber] [logrange]',
     examples: [
-        "/edit_reason reason:\"Spamming\" lognumber:5",
-        "/edit_reason reason:\"Inappropriate behavior\" logrange:10-15",
+        '/edit_reason reason:"Spamming" lognumber:5',
+        '/edit_reason reason:"Inappropriate behavior" logrange:10-15',
     ],
 
     data: new SlashCommandBuilder()
@@ -41,8 +41,10 @@ module.exports = {
             if (!logNumber && !logRange) {
                 return handleError(
                     interaction,
-                    new Error("Please provide either a log number or a range of log numbers to edit."),
-                    "VALIDATION"
+                    new Error(
+                        "Please provide either a log number or a range of log numbers to edit.",
+                    ),
+                    "VALIDATION",
                 );
             }
 
@@ -61,7 +63,7 @@ module.exports = {
                     return handleError(
                         interaction,
                         new Error(`No log found with log number ${logNumber}.`),
-                        "VALIDATION"
+                        "VALIDATION",
                     );
                 }
             } else if (logRange) {
@@ -71,7 +73,7 @@ module.exports = {
                     return handleError(
                         interaction,
                         new Error("Invalid log range. Please provide a valid range (e.g., 1-5)."),
-                        "VALIDATION"
+                        "VALIDATION",
                     );
                 }
 
@@ -96,14 +98,14 @@ module.exports = {
                     interaction,
                     error,
                     "DATABASE",
-                    "Failed to update the log(s) in the database."
+                    "Failed to update the log(s) in the database.",
                 );
             } else {
                 handleError(
                     interaction,
                     error,
                     "COMMAND_EXECUTION",
-                    "An error occurred while updating the log(s)."
+                    "An error occurred while updating the log(s).",
                 );
             }
         }

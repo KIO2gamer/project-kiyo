@@ -1,4 +1,10 @@
-const {  ChannelType, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const {
+    ChannelType,
+    EmbedBuilder,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+    MessageFlags,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 
@@ -23,17 +29,17 @@ async function handleChannelUpdate(channel, newName, permissionChoice, toggleCho
             const newPerms = {};
 
             switch (permissionChoice) {
-            case "view":
-                newPerms.ViewChannel = toggleChoice;
-                break;
-            case "send":
-                newPerms.SendMessages = toggleChoice;
-                break;
-            case "manage":
-                newPerms.ManageMessages = toggleChoice;
-                break;
-            default:
-                throw new Error("Invalid permission choice");
+                case "view":
+                    newPerms.ViewChannel = toggleChoice;
+                    break;
+                case "send":
+                    newPerms.SendMessages = toggleChoice;
+                    break;
+                case "manage":
+                    newPerms.ManageMessages = toggleChoice;
+                    break;
+                default:
+                    throw new Error("Invalid permission choice");
             }
 
             await channel.permissionOverwrites.edit(role, newPerms);
@@ -52,7 +58,7 @@ module.exports = {
     usage: "/modifychannel <subcommand> <channel> [options]",
     examples: [
         "/modifychannel text #general new_name:announcements",
-        "/modifychannel voice \"Voice Chat\" permission:view toggle:true role:@Member",
+        '/modifychannel voice "Voice Chat" permission:view toggle:true role:@Member',
     ],
 
     data: new SlashCommandBuilder()

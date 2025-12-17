@@ -4,43 +4,51 @@ const userActivitySchema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
-        index: true
+        index: true,
     },
     username: {
         type: String,
-        required: true
+        required: true,
     },
     discriminator: {
         type: String,
-        required: true
+        required: true,
     },
     guildId: {
         type: String,
         required: true,
-        index: true
+        index: true,
     },
     guildName: {
         type: String,
-        required: true
+        required: true,
     },
     action: {
         type: String,
         required: true,
-        enum: ['command_used', 'joined_server', 'left_server', 'level_up', 'role_added', 'role_removed', 'message_sent']
+        enum: [
+            "command_used",
+            "joined_server",
+            "left_server",
+            "level_up",
+            "role_added",
+            "role_removed",
+            "message_sent",
+        ],
     },
     commandName: {
         type: String,
-        default: null
+        default: null,
     },
     details: {
         type: String,
-        default: null
+        default: null,
     },
     timestamp: {
         type: Date,
         default: Date.now,
-        index: true
-    }
+        index: true,
+    },
 });
 
 // Index for efficient queries

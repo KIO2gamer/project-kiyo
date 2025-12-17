@@ -6,7 +6,7 @@ module.exports = {
     description_full:
         "Fetches and displays the current weather for a given city using the WeatherAPI. Information includes temperature, feels like temperature, humidity, wind, pressure, UV index, and more.",
     usage: "/weather <city>",
-    examples: ["/weather London", "/weather \"New York\""],
+    examples: ["/weather London", '/weather "New York"'],
 
     data: new SlashCommandBuilder()
         .setName("weather")
@@ -27,7 +27,7 @@ module.exports = {
             return handleError(
                 interaction,
                 new Error("Weather service is not properly configured. Missing API key."),
-                "CONFIGURATION"
+                "CONFIGURATION",
             );
         }
 
@@ -38,7 +38,7 @@ module.exports = {
                     interaction,
                     new Error("Invalid city name provided."),
                     "VALIDATION",
-                    "Please provide a valid city name using only letters, spaces, and basic punctuation."
+                    "Please provide a valid city name using only letters, spaces, and basic punctuation.",
                 );
             }
 
@@ -95,7 +95,7 @@ module.exports = {
                     interaction,
                     new Error(`Could not find weather data for "${city}".`),
                     "VALIDATION",
-                    "Could not find the city. Please check the spelling and try again."
+                    "Could not find the city. Please check the spelling and try again.",
                 );
             }
             // Use the central handler for all other errors

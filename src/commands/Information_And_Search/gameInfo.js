@@ -1,4 +1,9 @@
-const {  ActionRowBuilder, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder } = require("discord.js");
+const {
+    ActionRowBuilder,
+    EmbedBuilder,
+    SlashCommandBuilder,
+    StringSelectMenuBuilder,
+} = require("discord.js");
 
 const axios = require("axios");
 const { handleError } = require("../../utils/errorHandler");
@@ -9,9 +14,9 @@ module.exports = {
         "Get detailed information about video games, including release date, ratings, platforms, genres, and more. Uses the IGDB database.",
     usage: "/game_info <title>",
     examples: [
-        "/game_info \"The Legend of Zelda\"",
-        "/game_info \"Red Dead Redemption 2\"",
-        "/game_info \"Minecraft\"",
+        '/game_info "The Legend of Zelda"',
+        '/game_info "Red Dead Redemption 2"',
+        '/game_info "Minecraft"',
     ],
 
     data: new SlashCommandBuilder()

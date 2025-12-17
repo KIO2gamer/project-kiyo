@@ -1,4 +1,4 @@
-const {  ChannelType, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { ChannelType, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const { success, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
@@ -29,7 +29,9 @@ module.exports = {
         const channel = interaction.options.getChannel("channel") || interaction.channel;
 
         // Check if the bot has the required permissions
-        if (!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)) {
+        if (
+            !channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)
+        ) {
             const embed = errorEmbed(interaction, {
                 title: "Permission Error",
                 description: "I do not have the required permissions to lock the channel.",
@@ -39,7 +41,11 @@ module.exports = {
         }
 
         // Check if the channel is already locked
-        if (channel.permissionOverwrites.cache.get(interaction.guild.id)?.deny.has(PermissionFlagsBits.SendMessages)) {
+        if (
+            channel.permissionOverwrites.cache
+                .get(interaction.guild.id)
+                ?.deny.has(PermissionFlagsBits.SendMessages)
+        ) {
             const embed = errorEmbed(interaction, {
                 title: "Already Locked",
                 description: `${channel} is already locked.`,
@@ -74,7 +80,9 @@ module.exports = {
             }
         } catch (error) {
             handleError("Error locking channel:", error);
-            const embed = errorEmbed(interaction, { description: "An error occurred while trying to lock the channel." });
+            const embed = errorEmbed(interaction, {
+                description: "An error occurred while trying to lock the channel.",
+            });
             await interaction.reply({ embeds: [embed] });
         }
     },

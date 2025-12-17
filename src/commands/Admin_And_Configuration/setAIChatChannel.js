@@ -1,4 +1,9 @@
-const { ChannelType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    ChannelType,
+    MessageFlags,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const AIChatChannel = require("./../../database/AIChatChannel");

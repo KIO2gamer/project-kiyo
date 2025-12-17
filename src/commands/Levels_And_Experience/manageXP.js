@@ -1,8 +1,4 @@
-const {
-    MessageFlags,
-    PermissionFlagsBits,
-    SlashCommandBuilder,
-} = require("discord.js");
+const { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const Logger = require("../../utils/logger");
 const { GuildSettingsSchema } = require("../../database/GuildSettingsSchema");

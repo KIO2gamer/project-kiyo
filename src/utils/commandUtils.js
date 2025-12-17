@@ -60,33 +60,33 @@ function extractCommandOptions(interaction) {
 
     for (const option of optionData) {
         switch (option.type) {
-        case 3: // STRING
-            options[option.name] = interaction.options.getString(option.name);
-            break;
-        case 4: // INTEGER
-            options[option.name] = interaction.options.getInteger(option.name);
-            break;
-        case 5: // BOOLEAN
-            options[option.name] = interaction.options.getBoolean(option.name);
-            break;
-        case 6: // USER
-            options[option.name] = interaction.options.getUser(option.name);
-            break;
-        case 7: // CHANNEL
-            options[option.name] = interaction.options.getChannel(option.name);
-            break;
-        case 8: // ROLE
-            options[option.name] = interaction.options.getRole(option.name);
-            break;
-        case 9: // MENTIONABLE
-            options[option.name] = interaction.options.getMentionable(option.name);
-            break;
-        case 10: // NUMBER
-            options[option.name] = interaction.options.getNumber(option.name);
-            break;
-        case 11: // ATTACHMENT
-            options[option.name] = interaction.options.getAttachment(option.name);
-            break;
+            case 3: // STRING
+                options[option.name] = interaction.options.getString(option.name);
+                break;
+            case 4: // INTEGER
+                options[option.name] = interaction.options.getInteger(option.name);
+                break;
+            case 5: // BOOLEAN
+                options[option.name] = interaction.options.getBoolean(option.name);
+                break;
+            case 6: // USER
+                options[option.name] = interaction.options.getUser(option.name);
+                break;
+            case 7: // CHANNEL
+                options[option.name] = interaction.options.getChannel(option.name);
+                break;
+            case 8: // ROLE
+                options[option.name] = interaction.options.getRole(option.name);
+                break;
+            case 9: // MENTIONABLE
+                options[option.name] = interaction.options.getMentionable(option.name);
+                break;
+            case 10: // NUMBER
+                options[option.name] = interaction.options.getNumber(option.name);
+                break;
+            case 11: // ATTACHMENT
+                options[option.name] = interaction.options.getAttachment(option.name);
+                break;
         }
     }
 

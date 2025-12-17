@@ -16,14 +16,18 @@ module.exports = {
         )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
     async execute(interaction) {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         try {
             const url = interaction.options.getString("url"); // Get the URL from the message
             const urlRegex = /https:\/\/discord\.com\/channels\/(\d+)\/(\d+)\/(\d+)/;
             const match = url.match(urlRegex);
 
             if (!match) {
-                return handleError(interaction, new Error("Invalid message URL provided."), "VALIDATION");
+                return handleError(
+                    interaction,
+                    new Error("Invalid message URL provided."),
+                    "VALIDATION",
+                );
             }
 
             const [, , channelId, messageId] = match;
@@ -43,14 +47,18 @@ module.exports = {
                     interaction,
                     new Error(`Failed to fetch the message. Status: ${response.status}`),
                     "API",
-                    "Failed to fetch the message. Is the URL correct and is the bot in that server?"
+                    "Failed to fetch the message. Is the URL correct and is the bot in that server?",
                 );
             }
 
             const data = await response.json();
 
             if (!data.embeds || data.embeds.length === 0) {
-                return handleError(interaction, new Error("The specified message does not contain any embeds."), "VALIDATION");
+                return handleError(
+                    interaction,
+                    new Error("The specified message does not contain any embeds."),
+                    "VALIDATION",
+                );
             }
 
             const embedData = data.embeds[0];

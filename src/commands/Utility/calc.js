@@ -27,7 +27,7 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName("vars")
-                .setDescription("Variable assignments, e.g. x=2,y=3 or {\"x\":2,\"y\":3}")
+                .setDescription('Variable assignments, e.g. x=2,y=3 or {"x":2,"y":3}')
                 .setRequired(false),
         ),
     description_full:
@@ -141,9 +141,11 @@ module.exports = {
                     {
                         name: "Result (plain):",
                         value:
-                            (typeof result === "object" && result && typeof result.toString === "function")
-                                ? ("`" + result.toString() + "`")
-                                : ("`" + String(result) + "`"),
+                            typeof result === "object" &&
+                            result &&
+                            typeof result.toString === "function"
+                                ? "`" + result.toString() + "`"
+                                : "`" + String(result) + "`",
                         inline: false,
                     },
                 )
@@ -152,16 +154,30 @@ module.exports = {
             // If variables were provided, show them for clarity
             if (Object.keys(scope).length > 0) {
                 const varsDisplay = Object.entries(scope)
-                    .map(([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : String(v)}`)
+                    .map(
+                        ([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : String(v)}`,
+                    )
                     .join(", ");
-                embed.addFields({ name: "Variables:", value: "```\n" + varsDisplay + "\n```", inline: false });
+                embed.addFields({
+                    name: "Variables:",
+                    value: "```\n" + varsDisplay + "\n```",
+                    inline: false,
+                });
             }
 
             // Render images for expression, simplified, and result LaTeX
             const [exprPng, simplifiedPng, resultPng] = await Promise.all([
                 renderLatexToPng(latexExpr, { display: true, padding: 12, background: "#ffffff" }),
-                renderLatexToPng(latexSimplified, { display: true, padding: 12, background: "#ffffff" }),
-                renderLatexToPng(latexResult, { display: true, padding: 12, background: "#ffffff" }),
+                renderLatexToPng(latexSimplified, {
+                    display: true,
+                    padding: 12,
+                    background: "#ffffff",
+                }),
+                renderLatexToPng(latexResult, {
+                    display: true,
+                    padding: 12,
+                    background: "#ffffff",
+                }),
             ]);
 
             const files = [
@@ -186,7 +202,10 @@ module.exports = {
                 .setTitle("Result (image)")
                 .setImage("attachment://result.png");
 
-            await interaction.reply({ embeds: [embed, exprEmbed, simplifiedEmbed, resultEmbed], files });
+            await interaction.reply({
+                embeds: [embed, exprEmbed, simplifiedEmbed, resultEmbed],
+                files,
+            });
         } catch (error) {
             handleError("Error calculating expression:", error);
             await interaction.reply({

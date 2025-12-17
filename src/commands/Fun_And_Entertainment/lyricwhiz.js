@@ -1,4 +1,11 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    SlashCommandBuilder,
+    MessageFlags,
+} = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 const axios = require("axios");
 
@@ -203,7 +210,9 @@ async function getRandomSongAndLyricsFromAPI() {
             const t = pool.splice(idx, 1)[0];
             const artist = sanitizeName(t.artistName);
             const title = sanitizeName(t.trackName);
-            const durationSec = t.trackTimeMillis ? Math.round(t.trackTimeMillis / 1000) : undefined;
+            const durationSec = t.trackTimeMillis
+                ? Math.round(t.trackTimeMillis / 1000)
+                : undefined;
 
             // 2) Try LRCLIB
             const lrclibLyrics = await fetchLyricsFromLRCLIB({ artist, title, durationSec });
@@ -215,7 +224,11 @@ async function getRandomSongAndLyricsFromAPI() {
             // 3) Try Vagalume (if key present)
             const vagalumeKey = process.env.VAGALUME_API_KEY;
             if (vagalumeKey) {
-                const vagaLyrics = await fetchLyricsFromVagalume({ artist, title, apikey: vagalumeKey });
+                const vagaLyrics = await fetchLyricsFromVagalume({
+                    artist,
+                    title,
+                    apikey: vagalumeKey,
+                });
                 if (vagaLyrics) {
                     const fillInLyrics = createFillInSnippet(vagaLyrics, 90);
                     return { artist, title, lyrics: vagaLyrics, fillInLyrics };
@@ -238,7 +251,10 @@ async function getRandomSongAndLyricsFromAPI() {
 }
 
 function sanitizeName(s) {
-    return String(s || "").replace(/\([^)]*\)/g, "").replace(/\[[^\]]*\]/g, "").trim();
+    return String(s || "")
+        .replace(/\([^)]*\)/g, "")
+        .replace(/\[[^\]]*\]/g, "")
+        .trim();
 }
 
 async function fetchLyricsFromLRCLIB({ artist, title, durationSec }) {
@@ -283,7 +299,10 @@ async function fetchLyricsFromVagalume({ artist, title, apikey }) {
 
 async function fetchLyricsFromLyricsOVH({ artist, title }) {
     try {
-        const res = await axios.get(`${LYRICS_OVH_BASE_URL}/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeout: 6000 });
+        const res = await axios.get(
+            `${LYRICS_OVH_BASE_URL}/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`,
+            { timeout: 6000 },
+        );
         const text = res.data?.lyrics;
         if (typeof text === "string" && text.trim().length) {
             return text.trim();

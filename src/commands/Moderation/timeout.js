@@ -7,10 +7,10 @@ const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full: "Timeouts a member for the specified duration and reason.",
-    usage: "/timeout target:@user amount:\"duration\" [reason:\"timeout reason\"]",
+    usage: '/timeout target:@user amount:"duration" [reason:"timeout reason"]',
     examples: [
-        "/timeout target:@user123 amount:\"1h\"",
-        "/timeout target:@user123 amount:\"30m\" reason:\"Being disruptive\"",
+        '/timeout target:@user123 amount:"1h"',
+        '/timeout target:@user123 amount:"30m" reason:"Being disruptive"',
     ],
 
     data: new SlashCommandBuilder()
@@ -39,13 +39,19 @@ module.exports = {
         const durationMs = ms(duration);
 
         if (!targetUser) {
-            const embed = errorEmbed(interaction, { title: "User not found", description: "Please mention a valid member." });
+            const embed = errorEmbed(interaction, {
+                title: "User not found",
+                description: "Please mention a valid member.",
+            });
             await interaction.reply({ embeds: [embed] });
             return;
         }
 
         if (targetUser.id === interaction.guild.ownerId) {
-            const embed = errorEmbed(interaction, { title: "Permission Error", description: "You cannot timeout the owner of the server" });
+            const embed = errorEmbed(interaction, {
+                title: "Permission Error",
+                description: "You cannot timeout the owner of the server",
+            });
             await interaction.reply({ embeds: [embed] });
             return;
         }
@@ -55,19 +61,28 @@ module.exports = {
         const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
         if (targetUserRolePosition >= requestUserRolePosition) {
-            const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "You cannot timeout someone with a higher or equal role than you" });
+            const embed = errorEmbed(interaction, {
+                title: "Hierarchy Error",
+                description: "You cannot timeout someone with a higher or equal role than you",
+            });
             await interaction.reply({ embeds: [embed] });
             return;
         }
 
         if (targetUserRolePosition >= botRolePosition) {
-            const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "I cannot timeout someone with a higher or equal role than myself" });
+            const embed = errorEmbed(interaction, {
+                title: "Hierarchy Error",
+                description: "I cannot timeout someone with a higher or equal role than myself",
+            });
             await interaction.reply({ embeds: [embed] });
             return;
         }
 
         if (!durationMs || durationMs > ms("28d")) {
-            const embed = errorEmbed(interaction, { title: "Invalid Duration", description: "Please provide a valid duration (max 28 days)" });
+            const embed = errorEmbed(interaction, {
+                title: "Invalid Duration",
+                description: "Please provide a valid duration (max 28 days)",
+            });
             await interaction.reply({ embeds: [embed] });
             return;
         }
@@ -82,10 +97,16 @@ module.exports = {
 
             if (newTimeoutDuration <= 0) {
                 await targetUser.timeout(null, reason); // Remove timeout if the new duration is less than or equal to zero
-                const embed = success(interaction, { title: "Timeout Removed", description: `<@${targetUser.id}>'s timeout has been removed. Reason: \`${reason}\`` });
+                const embed = success(interaction, {
+                    title: "Timeout Removed",
+                    description: `<@${targetUser.id}>'s timeout has been removed. Reason: \`${reason}\``,
+                });
                 await interaction.reply({ embeds: [embed] });
             } else if (newTimeoutDuration > ms("28d")) {
-                const embed = errorEmbed(interaction, { title: "Invalid Duration", description: "The total timeout duration exceeds the maximum limit of 28 days." });
+                const embed = errorEmbed(interaction, {
+                    title: "Invalid Duration",
+                    description: "The total timeout duration exceeds the maximum limit of 28 days.",
+                });
                 await interaction.reply({ embeds: [embed] });
             } else {
                 const logEntry = new moderationLogs({
@@ -99,12 +120,18 @@ module.exports = {
                 await logEntry.save();
 
                 await targetUser.timeout(newTimeoutDuration, reason);
-                const embed = success(interaction, { title: "Timeout Updated", description: `<@${targetUser.id}>'s timeout has been updated. Reason: \`${reason}\`\nNew Duration: \`${ms(newTimeoutDuration, { long: true })}\`` });
+                const embed = success(interaction, {
+                    title: "Timeout Updated",
+                    description: `<@${targetUser.id}>'s timeout has been updated. Reason: \`${reason}\`\nNew Duration: \`${ms(newTimeoutDuration, { long: true })}\``,
+                });
                 await interaction.reply({ embeds: [embed] });
             }
         } catch (error) {
             handleError("Failed to timeout user:", error);
-            const embed = errorEmbed(interaction, { title: "Error", description: `An error occurred while trying to timeout the user\n\`${error.message}\`` });
+            const embed = errorEmbed(interaction, {
+                title: "Error",
+                description: `An error occurred while trying to timeout the user\n\`${error.message}\``,
+            });
             await interaction.reply({ embeds: [embed] });
         }
     },

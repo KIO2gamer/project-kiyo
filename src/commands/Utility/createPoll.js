@@ -5,10 +5,10 @@ const MAX_POLL_DURATION_HOURS = 32;
 
 module.exports = {
     description_full: "Creates a poll with the given question, options, and duration.",
-    usage: "/create_poll question:\"poll question\" options:\"option1,option2,...\" multi_select:true/false duration:hours",
+    usage: '/create_poll question:"poll question" options:"option1,option2,..." multi_select:true/false duration:hours',
     examples: [
-        "/create_poll question:\"What is your favorite color?\" options:\"Red,Blue,Green\" multi_select:false duration:1",
-        "/create_poll question:\"Which games do you like?\" options:\"Minecraft,Fortnite,Valorant\" multi_select:true duration:24",
+        '/create_poll question:"What is your favorite color?" options:"Red,Blue,Green" multi_select:false duration:1',
+        '/create_poll question:"Which games do you like?" options:"Minecraft,Fortnite,Valorant" multi_select:true duration:24',
     ],
 
     data: new SlashCommandBuilder()
@@ -75,7 +75,13 @@ module.exports = {
                 },
             });
         } catch (error) {
-            await handleError(interaction, error, "COMMAND_EXECUTION", "An error occurred while creating the poll.", false);
+            await handleError(
+                interaction,
+                error,
+                "COMMAND_EXECUTION",
+                "An error occurred while creating the poll.",
+                false,
+            );
         }
     },
 };

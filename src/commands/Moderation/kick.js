@@ -2,12 +2,17 @@ const { PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { handleError } = require("../../utils/errorHandler");
-const { success, error: errorEmbed, dmNotice, actionColor } = require("../../utils/moderationEmbeds");
+const {
+    success,
+    error: errorEmbed,
+    dmNotice,
+    actionColor,
+} = require("../../utils/moderationEmbeds");
 
 module.exports = {
     description_full: "Kicks a member from the server with the specified reason.",
-    usage: "/kick target:@user [reason:\"kick reason\"]",
-    examples: ["/kick target:@user123", "/kick target:@user123 reason:\"Violating server rules\""],
+    usage: '/kick target:@user [reason:"kick reason"]',
+    examples: ["/kick target:@user123", '/kick target:@user123 reason:"Violating server rules"'],
 
     data: new SlashCommandBuilder()
         .setName("kick")
@@ -27,21 +32,30 @@ module.exports = {
 
             // Validate target user
             if (!targetUser) {
-                const embed = errorEmbed(interaction, { title: "User not found", description: "Please mention a valid member." });
+                const embed = errorEmbed(interaction, {
+                    title: "User not found",
+                    description: "Please mention a valid member.",
+                });
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if user is kickable
             if (!targetUser.kickable) {
-                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have permission to kick this user." });
+                const embed = errorEmbed(interaction, {
+                    title: "Permission Error",
+                    description: "I do not have permission to kick this user.",
+                });
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             // Check if target is server owner
             if (targetUser.id === interaction.guild.ownerId) {
-                const embed = errorEmbed(interaction, { title: "Permission Error", description: "You cannot kick the owner of the server" });
+                const embed = errorEmbed(interaction, {
+                    title: "Permission Error",
+                    description: "You cannot kick the owner of the server",
+                });
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
@@ -52,13 +66,19 @@ module.exports = {
             const moderatorRolePosition = interaction.member.roles.highest.position;
 
             if (targetUserRolePosition >= moderatorRolePosition) {
-                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "You cannot kick someone with a higher or equal role than you" });
+                const embed = errorEmbed(interaction, {
+                    title: "Hierarchy Error",
+                    description: "You cannot kick someone with a higher or equal role than you",
+                });
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
 
             if (targetUserRolePosition >= botRolePosition) {
-                const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "I cannot kick someone with a higher or equal role than myself" });
+                const embed = errorEmbed(interaction, {
+                    title: "Hierarchy Error",
+                    description: "I cannot kick someone with a higher or equal role than myself",
+                });
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
@@ -82,7 +102,10 @@ module.exports = {
                 await targetUser.send({ embeds: [dm] });
             } catch (dmError) {
                 // If DM fails, log it but don't treat it as a command failure
-                handleError("Could not send kick notification DM to user (they may have DMs disabled).", dmError);
+                handleError(
+                    "Could not send kick notification DM to user (they may have DMs disabled).",
+                    dmError,
+                );
             }
 
             // Save log and kick user
@@ -98,10 +121,15 @@ module.exports = {
         } catch (error) {
             handleError("Error kicking user:", error);
             if (error.code === 50013) {
-                const embed = errorEmbed(interaction, { title: "Permission Error", description: "I do not have the required permissions to kick this user." });
+                const embed = errorEmbed(interaction, {
+                    title: "Permission Error",
+                    description: "I do not have the required permissions to kick this user.",
+                });
                 await interaction.reply({ embeds: [embed] });
             } else {
-                const embed = errorEmbed(interaction, { description: "An error occurred while trying to kick the user." });
+                const embed = errorEmbed(interaction, {
+                    description: "An error occurred while trying to kick the user.",
+                });
                 await interaction.reply({ embeds: [embed] });
             }
         }

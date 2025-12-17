@@ -1,4 +1,11 @@
-const {  ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const {
+    ActionRowBuilder,
+    ActivityType,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 
@@ -30,13 +37,13 @@ function getActivityName(activity) {
 
     const timestamps = activity.timestamps
         ? {
-            start: activity.timestamps.start
-                ? `<t:${Math.floor(activity.timestamps.start / 1000)}:R>`
-                : null,
-            end: activity.timestamps.end
-                ? `<t:${Math.floor(activity.timestamps.end / 1000)}:R>`
-                : null,
-        }
+              start: activity.timestamps.start
+                  ? `<t:${Math.floor(activity.timestamps.start / 1000)}:R>`
+                  : null,
+              end: activity.timestamps.end
+                  ? `<t:${Math.floor(activity.timestamps.end / 1000)}:R>`
+                  : null,
+          }
         : null;
 
     const details = [];
@@ -48,22 +55,22 @@ function getActivityName(activity) {
     const detailsText = details.length ? `\n┗ ${details.join("\n┗ ")}` : "";
 
     switch (activity.type) {
-    case ActivityType.Playing:
-        return `🎮 Playing **${activity.name}**${detailsText}`;
-    case ActivityType.Streaming:
-        return `🔴 Streaming **${activity.name}**${detailsText}`;
-    case ActivityType.Listening:
-        return `🎧 Listening to **${activity.name}**${detailsText}`;
-    case ActivityType.Watching:
-        return `👁️ Watching **${activity.name}**${detailsText}`;
-    case ActivityType.Competing:
-        return `🏆 Competing in **${activity.name}**${detailsText}`;
-    case ActivityType.Custom:
-        return activity.state
-            ? `${activity.emoji ? activity.emoji + " " : ""}${activity.state}`
-            : "🏷️ Custom Status";
-    default:
-        return "❓ Unknown Activity";
+        case ActivityType.Playing:
+            return `🎮 Playing **${activity.name}**${detailsText}`;
+        case ActivityType.Streaming:
+            return `🔴 Streaming **${activity.name}**${detailsText}`;
+        case ActivityType.Listening:
+            return `🎧 Listening to **${activity.name}**${detailsText}`;
+        case ActivityType.Watching:
+            return `👁️ Watching **${activity.name}**${detailsText}`;
+        case ActivityType.Competing:
+            return `🏆 Competing in **${activity.name}**${detailsText}`;
+        case ActivityType.Custom:
+            return activity.state
+                ? `${activity.emoji ? activity.emoji + " " : ""}${activity.state}`
+                : "🏷️ Custom Status";
+        default:
+            return "❓ Unknown Activity";
     }
 }
 
@@ -132,11 +139,11 @@ function generateUserFields(user, member, fetchedUser) {
     // Format client status with emojis
     const clientStatusText = Object.keys(clientStatus).length
         ? Object.entries(clientStatus)
-            .map(
-                ([platform, status]) =>
-                    `${getStatusEmoji(platform)} ${platform}: ${formatStatus(status)}`,
-            )
-            .join("\n")
+              .map(
+                  ([platform, status]) =>
+                      `${getStatusEmoji(platform)} ${platform}: ${formatStatus(status)}`,
+              )
+              .join("\n")
         : "No devices active";
 
     const fields = [
@@ -334,11 +341,13 @@ module.exports = {
                 ];
 
                 if (fetchedUser.banner) {
-                    buttons.splice(1, 0,
+                    buttons.splice(
+                        1,
+                        0,
                         new ButtonBuilder()
                             .setLabel("Banner")
                             .setStyle(ButtonStyle.Link)
-                            .setURL(fetchedUser.bannerURL({ dynamic: true, size: 4096 }))
+                            .setURL(fetchedUser.bannerURL({ dynamic: true, size: 4096 })),
                     );
                 }
 

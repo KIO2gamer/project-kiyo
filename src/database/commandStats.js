@@ -4,40 +4,40 @@ const commandStatsSchema = new mongoose.Schema({
     commandName: {
         type: String,
         required: true,
-        index: true
+        index: true,
     },
     guildId: {
         type: String,
         required: true,
-        index: true
+        index: true,
     },
     userId: {
         type: String,
         required: true,
-        index: true
+        index: true,
     },
     username: {
         type: String,
-        required: true
+        required: true,
     },
     success: {
         type: Boolean,
         required: true,
-        default: true
+        default: true,
     },
     executionTime: {
         type: Number,
-        default: 0 // in milliseconds
+        default: 0, // in milliseconds
     },
     errorMessage: {
         type: String,
-        default: null
+        default: null,
     },
     timestamp: {
         type: Date,
         default: Date.now,
-        index: true
-    }
+        index: true,
+    },
 });
 
 // Compound indexes for efficient queries

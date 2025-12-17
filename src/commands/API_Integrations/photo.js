@@ -78,7 +78,7 @@ module.exports = {
             return handleError(
                 interaction,
                 new Error("Photo search service is not properly configured. Missing API key."),
-                "CONFIGURATION"
+                "CONFIGURATION",
             );
         }
 

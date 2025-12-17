@@ -4,9 +4,9 @@ const translate = require("@iamtraction/google-translate");
 
 module.exports = {
     description_full:
-        "Translates the provided text into the specified target language. Use language codes like \"en\" (English), \"es\" (Spanish), \"fr\" (French), etc.",
+        'Translates the provided text into the specified target language. Use language codes like "en" (English), "es" (Spanish), "fr" (French), etc.',
     usage: "/translate <input:text_to_translate> <target_lang:language_code>",
-    examples: ["/translate input:\"Hello, world!\" target_lang:es"],
+    examples: ['/translate input:"Hello, world!" target_lang:es'],
 
     data: new SlashCommandBuilder()
         .setName("translate")

@@ -54,43 +54,43 @@ module.exports = {
             const subcommand = interaction.options.getSubcommand();
 
             switch (subcommand) {
-            case "boba":
-                await handleGifCommand(interaction, "boba", "Enjoy your Boba!");
-                break;
-            case "rickroll":
-                await handleGifCommand(
-                    interaction,
-                    "rickroll",
-                    "***You've been rickrolled!***",
-                );
-                break;
+                case "boba":
+                    await handleGifCommand(interaction, "boba", "Enjoy your Boba!");
+                    break;
+                case "rickroll":
+                    await handleGifCommand(
+                        interaction,
+                        "rickroll",
+                        "***You've been rickrolled!***",
+                    );
+                    break;
 
-            case "summon":
-                await handleSummon(interaction);
-                break;
-            case "quokka":
-                await handleGifCommand(
-                    interaction,
-                    "quokka",
-                    "You have been blessed by the powers of a quokka!",
-                );
-                break;
+                case "summon":
+                    await handleSummon(interaction);
+                    break;
+                case "quokka":
+                    await handleGifCommand(
+                        interaction,
+                        "quokka",
+                        "You have been blessed by the powers of a quokka!",
+                    );
+                    break;
 
-            case "yeet":
-                await handleGifCommand(interaction, "yeet", "Yeet!");
-                break;
-            case "kill":
-                await handleKill(interaction);
-                break;
+                case "yeet":
+                    await handleGifCommand(interaction, "yeet", "Yeet!");
+                    break;
+                case "kill":
+                    await handleKill(interaction);
+                    break;
 
-            default:
-                await handleError(
-                    interaction,
-                    new Error(`Unknown subcommand: ${subcommand}`),
-                    "VALIDATION",
-                    "This subcommand does not exist.",
-                );
-                break;
+                default:
+                    await handleError(
+                        interaction,
+                        new Error(`Unknown subcommand: ${subcommand}`),
+                        "VALIDATION",
+                        "This subcommand does not exist.",
+                    );
+                    break;
             }
         } catch (error) {
             await handleError(
@@ -166,7 +166,7 @@ async function handleKill(interaction) {
     try {
         await interaction.deferReply();
         const target = interaction.options.getUser("user");
-        
+
         if (target.id === interaction.user.id) {
             await handleError(
                 interaction,

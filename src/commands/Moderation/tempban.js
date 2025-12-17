@@ -7,10 +7,10 @@ const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full: "Temporarily bans a member for the specified duration and reason.",
-    usage: "/temp_ban target:@user duration:\"duration\" [reason:\"ban reason\"]",
+    usage: '/temp_ban target:@user duration:"duration" [reason:"ban reason"]',
     examples: [
-        "/temp_ban target:@user123 duration:\"1d\"",
-        "/temp_ban target:@user123 duration:\"2h\" reason:\"Spamming\"",
+        '/temp_ban target:@user123 duration:"1d"',
+        '/temp_ban target:@user123 duration:"2h" reason:"Spamming"',
     ],
 
     data: new SlashCommandBuilder()
@@ -53,13 +53,19 @@ module.exports = {
 
     async checkTargetUser(interaction, targetUser) {
         if (!targetUser) {
-            const embed = errorEmbed(interaction, { title: "User not found", description: "Please mention a valid member." });
+            const embed = errorEmbed(interaction, {
+                title: "User not found",
+                description: "Please mention a valid member.",
+            });
             await interaction.reply({ embeds: [embed] });
             return false;
         }
 
         if (targetUser.id === interaction.guild.ownerId) {
-            const embed = errorEmbed(interaction, { title: "Permission Error", description: "You cannot ban the owner of the server" });
+            const embed = errorEmbed(interaction, {
+                title: "Permission Error",
+                description: "You cannot ban the owner of the server",
+            });
             await interaction.reply({ embeds: [embed] });
             return false;
         }
@@ -73,13 +79,19 @@ module.exports = {
         const botRolePosition = interaction.guild.members.me.roles.highest.position;
 
         if (targetUserRolePosition >= requestUserRolePosition) {
-            const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "You cannot ban someone with a higher or equal role than you" });
+            const embed = errorEmbed(interaction, {
+                title: "Hierarchy Error",
+                description: "You cannot ban someone with a higher or equal role than you",
+            });
             await interaction.reply({ embeds: [embed] });
             return false;
         }
 
         if (targetUserRolePosition >= botRolePosition) {
-            const embed = errorEmbed(interaction, { title: "Hierarchy Error", description: "I cannot ban someone with a higher or equal role than myself" });
+            const embed = errorEmbed(interaction, {
+                title: "Hierarchy Error",
+                description: "I cannot ban someone with a higher or equal role than myself",
+            });
             await interaction.reply({ embeds: [embed] });
             return false;
         }
@@ -90,7 +102,10 @@ module.exports = {
     parseDuration(interaction, duration) {
         const durationMs = ms(duration);
         if (!durationMs) {
-            const embed = errorEmbed(interaction, { title: "Invalid Duration", description: "Invalid duration format. Please use formats like 1h, 1d, etc." });
+            const embed = errorEmbed(interaction, {
+                title: "Invalid Duration",
+                description: "Invalid duration format. Please use formats like 1h, 1d, etc.",
+            });
             interaction.reply({ embeds: [embed] });
             return null;
         }
@@ -110,7 +125,11 @@ module.exports = {
             await logEntry.save();
 
             await targetUser.ban({ reason: reason });
-            const embed = success(interaction, { title: "Temporary Ban", description: `<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``, color: actionColor("ban") });
+            const embed = success(interaction, {
+                title: "Temporary Ban",
+                description: `<@${targetUser.id}> has been banned for ${duration} for: \`${reason}\``,
+                color: actionColor("ban"),
+            });
             await interaction.reply({ embeds: [embed] });
 
             setTimeout(async () => {
@@ -122,7 +141,9 @@ module.exports = {
             }, durationMs);
         } catch (error) {
             handleError("Error banning user:", error);
-            const e = errorEmbed(interaction, { description: "An error occurred while trying to ban the user" });
+            const e = errorEmbed(interaction, {
+                description: "An error occurred while trying to ban the user",
+            });
             await interaction.reply({ embeds: [e] });
         }
     },

@@ -1,4 +1,9 @@
-const { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const {
+    EmbedBuilder,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+    MessageFlags,
+} = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 /**
  * Closes the current ticket channel. Requires the "Manage Channels" permission.
@@ -9,9 +14,9 @@ const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
     description_full:
-        "Closes the current ticket channel. Requires the \"Manage Channels\" permission.",
-    usage: "/close_ticket [reason:\"close reason\"]",
-    examples: ["/close_ticket", "/close_ticket reason:\"Issue resolved\""],
+        'Closes the current ticket channel. Requires the "Manage Channels" permission.',
+    usage: '/close_ticket [reason:"close reason"]',
+    examples: ["/close_ticket", '/close_ticket reason:"Issue resolved"'],
 
     data: new SlashCommandBuilder()
         .setName("close_ticket")

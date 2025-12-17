@@ -1,4 +1,11 @@
-const {  ChannelType, Colors, EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder, MessageFlags } = require("discord.js");
+const {
+    ChannelType,
+    Colors,
+    EmbedBuilder,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+    MessageFlags,
+} = require("discord.js");
 
 const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");

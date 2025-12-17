@@ -1,4 +1,4 @@
-const {  ChannelType, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const { ChannelType, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const { success, error: errorEmbed, actionColor } = require("../../utils/moderationEmbeds");
@@ -25,7 +25,9 @@ module.exports = {
         const channel = interaction.options.getChannel("channel") || interaction.channel;
 
         // Check if the bot has the required permissions
-        if (!channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)) {
+        if (
+            !channel.permissionsFor(interaction.client.user).has(PermissionFlagsBits.ManageChannels)
+        ) {
             const embed = errorEmbed(interaction, {
                 title: "Permission Error",
                 description: "I do not have the required permissions to unlock the channel.",
@@ -75,7 +77,9 @@ module.exports = {
             }
         } catch (error) {
             handleError("Error unlocking channel:", error);
-            const embed = errorEmbed(interaction, { description: "An error occurred while trying to unlock the channel." });
+            const embed = errorEmbed(interaction, {
+                description: "An error occurred while trying to unlock the channel.",
+            });
             await interaction.reply({ embeds: [embed] });
         }
     },

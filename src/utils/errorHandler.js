@@ -216,9 +216,9 @@ ${errorMessage}
  */
 async function handleError(...args) {
     let showDetails = true;
-    
+
     // Check if last argument is a boolean for showDetails
-    if (typeof args[args.length - 1] === 'boolean') {
+    if (typeof args[args.length - 1] === "boolean") {
         showDetails = args.pop();
     }
     const timestamp = new Date().toISOString();
@@ -261,16 +261,21 @@ async function handleError(...args) {
     // Format error output for the console terminal with chalk colors
     const categoryInfo = ERROR_CATEGORIES[category];
     console.error(chalk.red("\n" + "=".repeat(50)));
-    console.error(chalk.gray(`[${timestamp}]`) + " " + 
-                  chalk.red(`[${category}]`) + " " + 
-                  chalk.yellow(categoryInfo.emoji) + " " + 
-                  chalk.red.bold(categoryInfo.message));
-    
+    console.error(
+        chalk.gray(`[${timestamp}]`) +
+            " " +
+            chalk.red(`[${category}]`) +
+            " " +
+            chalk.yellow(categoryInfo.emoji) +
+            " " +
+            chalk.red.bold(categoryInfo.message),
+    );
+
     if (Object.keys(commandContext).length > 0) {
         console.error(chalk.cyan("\nContext:"));
         console.error(chalk.gray(JSON.stringify(commandContext, null, 2)));
     }
-    
+
     console.error(chalk.cyan("\nError Details:"));
     console.error(chalk.white(errorMessage));
     console.error(chalk.red("=".repeat(50) + "\n"));
@@ -281,7 +286,7 @@ async function handleError(...args) {
     // Create error embed and conditionally add button
     const errorEmbed = createErrorEmbed(category, errorMessage, suggestion);
     const components = [];
-    
+
     if (showDetails) {
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -297,16 +302,16 @@ async function handleError(...args) {
         const response = sent
             ? await sent.edit({ embeds: [errorEmbed], components })
             : await (interaction.replied || interaction.deferred
-                ? interaction.editReply({
-                    embeds: [errorEmbed],
-                    components,
-                    flags: MessageFlags.Ephemeral,
-                })
-                : interaction.reply({
-                    embeds: [errorEmbed],
-                    components,
-                    flags: MessageFlags.Ephemeral,
-                }));
+                  ? interaction.editReply({
+                        embeds: [errorEmbed],
+                        components,
+                        flags: MessageFlags.Ephemeral,
+                    })
+                  : interaction.reply({
+                        embeds: [errorEmbed],
+                        components,
+                        flags: MessageFlags.Ephemeral,
+                    }));
 
         // Set up button collector for showing technical details (only if showDetails is true)
         if (showDetails && components.length > 0) {

@@ -80,7 +80,7 @@ module.exports = {
         // Handle autocomplete interactions
         else if (interaction.isAutocomplete()) {
             const command = interaction.client.commands.get(interaction.commandName);
-            
+
             if (!command || !command.autocomplete) {
                 return;
             }

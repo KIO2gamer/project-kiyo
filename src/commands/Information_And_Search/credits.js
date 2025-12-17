@@ -1,4 +1,10 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 

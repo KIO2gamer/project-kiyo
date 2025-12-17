@@ -72,10 +72,9 @@ module.exports = {
 async function fetchPlayerData(username) {
     try {
         // Mojang: username -> UUID
-        const response = await axios.get(
-            `${MOJANG_PROFILE_API}${encodeURIComponent(username)}`,
-            { validateStatus: () => true },
-        );
+        const response = await axios.get(`${MOJANG_PROFILE_API}${encodeURIComponent(username)}`, {
+            validateStatus: () => true,
+        });
 
         // Not found (Mojang returns 204 No Content or 404)
         if (!response || response.status === 204 || response.status === 404 || !response.data) {
@@ -148,7 +147,9 @@ function createInfoEmbed(playerData, username, interaction) {
             },
             {
                 name: "Body Overlay",
-                value: playerData.bodyRenderUrl ? `[Download Render](${bodyRenderUrl})` : "No Render Available",
+                value: playerData.bodyRenderUrl
+                    ? `[Download Render](${bodyRenderUrl})`
+                    : "No Render Available",
                 inline: true,
             },
         )

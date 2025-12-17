@@ -1,14 +1,14 @@
-const {  
-    ActionRowBuilder, 
-    ButtonBuilder, 
-    ButtonStyle, 
-    EmbedBuilder, 
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
     MessageFlags,
-    ModalBuilder, 
-    SlashCommandBuilder, 
-    StringSelectMenuBuilder, 
-    TextInputBuilder, 
-    TextInputStyle 
+    ModalBuilder,
+    SlashCommandBuilder,
+    StringSelectMenuBuilder,
+    TextInputBuilder,
+    TextInputStyle,
 } = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
@@ -295,12 +295,12 @@ module.exports = {
         const client = interaction.client;
         const categories = this.getCategorizedCommands(client.commands);
         const commands = categories[categoryName] || [];
-        
+
         if (commands.length === 0) {
             await interaction.update({
                 content: "No commands found in this category.",
                 embeds: [],
-                components: []
+                components: [],
             });
             return;
         }
@@ -312,25 +312,25 @@ module.exports = {
             .setColor("#3498db")
             .setTimestamp();
 
-        commands.forEach(cmd => {
+        commands.forEach((cmd) => {
             embed.addFields({
                 name: cmd.data.name,
                 value: cmd.data.description || "No description provided.",
-                inline: true
+                inline: true,
             });
         });
 
-        const commandOptions = commands.slice(0, 25).map(cmd => ({
+        const commandOptions = commands.slice(0, 25).map((cmd) => ({
             label: cmd.data.name,
             value: cmd.data.name,
-            description: cmd.data.description.substring(0, 100)
+            description: cmd.data.description.substring(0, 100),
         }));
 
         const selectRow = new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId(COMPONENT_IDS.COMMAND_SELECT)
                 .setPlaceholder("Select a command for details")
-                .addOptions(commandOptions)
+                .addOptions(commandOptions),
         );
 
         const buttonRow = new ActionRowBuilder().addComponents(
@@ -342,7 +342,7 @@ module.exports = {
 
         await interaction.update({
             embeds: [embed],
-            components: [selectRow, buttonRow]
+            components: [selectRow, buttonRow],
         });
     },
 
@@ -412,7 +412,11 @@ module.exports = {
             const name = command.data.name.toLowerCase();
             const description = (command.data.description || "").toLowerCase();
             const category = (command.category || "").toLowerCase();
-            if (name.includes(searchTerm) || description.includes(searchTerm) || category.includes(searchTerm)) {
+            if (
+                name.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                category.includes(searchTerm)
+            ) {
                 results.push(command);
             }
         }

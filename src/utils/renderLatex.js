@@ -48,11 +48,12 @@ async function renderLatexToPng(latex, options = {}) {
     const svgStr = renderLatexToSvg(latex, { display: options.display });
 
     // Optionally scale by wrapping in an outer SVG with transform
-    const scaledSvg = scale !== 1.0
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    const scaledSvg =
+        scale !== 1.0
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
     <g transform="scale(${scale})">${svgStr}</g>
 </svg>`
-        : svgStr;
+            : svgStr;
 
     // Convert to PNG using sharp; add padding by extending the canvas
     let image = sharp(Buffer.from(scaledSvg)).png();
@@ -68,9 +69,7 @@ async function renderLatexToPng(latex, options = {}) {
             background,
         },
     })
-        .composite([
-            { input: Buffer.from(scaledSvg), top: padding, left: padding },
-        ])
+        .composite([{ input: Buffer.from(scaledSvg), top: padding, left: padding }])
         .png();
 
     return await image.toBuffer();

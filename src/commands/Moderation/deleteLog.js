@@ -34,8 +34,10 @@ module.exports = {
             if (!logNumber && !logRange) {
                 return handleError(
                     interaction,
-                    new Error("Please provide either a log number or a range of log numbers to delete."),
-                    "VALIDATION"
+                    new Error(
+                        "Please provide either a log number or a range of log numbers to delete.",
+                    ),
+                    "VALIDATION",
                 );
             }
 
@@ -50,7 +52,7 @@ module.exports = {
                     return handleError(
                         interaction,
                         new Error(`No log found with log number ${logNumber}.`),
-                        "VALIDATION"
+                        "VALIDATION",
                     );
                 }
             } else if (logRange) {
@@ -60,7 +62,7 @@ module.exports = {
                     return handleError(
                         interaction,
                         new Error("Invalid log range. Please provide a valid range (e.g., 1-5)."),
-                        "VALIDATION"
+                        "VALIDATION",
                     );
                 }
 
@@ -84,14 +86,14 @@ module.exports = {
                     interaction,
                     error,
                     "DATABASE",
-                    "Failed to delete the log(s) from the database."
+                    "Failed to delete the log(s) from the database.",
                 );
             } else {
                 handleError(
                     interaction,
                     error,
                     "COMMAND_EXECUTION",
-                    "An error occurred while deleting the log(s)."
+                    "An error occurred while deleting the log(s).",
                 );
             }
         }

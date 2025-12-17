@@ -118,27 +118,27 @@ module.exports = {
 
         try {
             switch (subcommand) {
-            case "info":
-                await handleRoleInfo(interaction);
-                break;
-            case "edit":
-                await handleRoleEdit(interaction);
-                break;
-            case "assign":
-                await handleRoleAssign(interaction);
-                break;
-            case "remove":
-                await handleRoleRemove(interaction);
-                break;
-            case "list":
-                await handleRoleList(interaction);
-                break;
-            case "create":
-                await handleRoleCreate(interaction);
-                break;
-            case "delete":
-                await handleRoleDelete(interaction);
-                break;
+                case "info":
+                    await handleRoleInfo(interaction);
+                    break;
+                case "edit":
+                    await handleRoleEdit(interaction);
+                    break;
+                case "assign":
+                    await handleRoleAssign(interaction);
+                    break;
+                case "remove":
+                    await handleRoleRemove(interaction);
+                    break;
+                case "list":
+                    await handleRoleList(interaction);
+                    break;
+                case "create":
+                    await handleRoleCreate(interaction);
+                    break;
+                case "delete":
+                    await handleRoleDelete(interaction);
+                    break;
             }
         } catch (error) {
             await handleError(interaction, error, "ROLE_MANAGEMENT", "An error occurred");

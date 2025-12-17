@@ -35,7 +35,7 @@ module.exports = {
             return handleError(
                 interaction,
                 new Error("AI service is not properly configured. Missing API key."),
-                "CONFIGURATION" // Using a generic but clear category
+                "CONFIGURATION", // Using a generic but clear category
             );
         }
 

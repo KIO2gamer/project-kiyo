@@ -1,5 +1,12 @@
-const {  ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, MessageFlags, SlashCommandBuilder } = require("discord.js");
-
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ComponentType,
+    EmbedBuilder,
+    MessageFlags,
+    SlashCommandBuilder,
+} = require("discord.js");
 
 const moderationLogs = require("./../../database/moderationLogs");
 const { parseRange } = require("../../utils/rangeParser");
