@@ -272,15 +272,41 @@ async function loadCommandPermissions(client) {
 // Initialize the bot
 const initializeBot = async () => {
     try {
-        Logger.startupBox("Starting Project Kiyo Bot");
+        // Startup banner
+        console.log("\n");
+        Logger.startupBox("🚀 Project Kiyo Discord Bot");
+        console.log("\n");
+
+        // System information
+        Logger.table(
+            {
+                "Node Version": process.version,
+                "Discord.js": require("discord.js").version,
+                Environment: process.env.NODE_ENV || "production",
+                Platform: process.platform,
+                PID: process.pid,
+            },
+            "📊 System Information",
+        );
+        console.log("\n");
+
+        Logger.log("BOT", "Initializing bot components...", "info");
+        console.log("");
 
         // Create client
+        Logger.log("BOT", "→ Creating Discord client...", "info");
         const client = createClient();
+        Logger.success("✓ Discord client created");
 
         // Connect to database
+        Logger.log("DATABASE", "→ Connecting to MongoDB...", "info");
         await connectToMongoDB();
+        console.log("");
+
+        console.log("");
 
         // Start OAuth2 callback server if configured for local development
+        Logger.log("BOT", "→ Checking OAuth2 configuration...", "info");
         if (
             process.env.DISCORD_CLIENT_ID &&
             process.env.DISCORD_CLIENT_SECRET &&
@@ -291,57 +317,89 @@ const initializeBot = async () => {
             const port = process.env.OAUTH2_PORT || 3000;
             try {
                 await oauth2Handler.start(port);
-                Logger.success(`OAuth2 callback server started on port ${port}`);
+                Logger.success(`✓ OAuth2 callback server started on port ${port}`);
 
                 // Store oauth2Handler for graceful shutdown
                 client.oauth2Handler = oauth2Handler;
             } catch (error) {
-                Logger.warn(`Failed to start OAuth2 server: ${error.message}`);
+                Logger.warn(`✗ Failed to start OAuth2 server: ${error.message}`);
             }
         } else if (
             process.env.DISCORD_CLIENT_ID &&
             process.env.DISCORD_CLIENT_SECRET &&
             process.env.DISCORD_REDIRECT_URI
         ) {
-            Logger.success("OAuth2 configured for external callback service (Netlify)");
+            Logger.success("✓ OAuth2 configured for external callback service (Netlify)");
         } else {
-            Logger.warn("OAuth2 not configured - YouTube subscriber roles will not work");
+            Logger.warn("⚠ OAuth2 not configured - YouTube subscriber roles will not work");
         }
+        console.log("");
+
+        console.log("");
 
         // Load commands and events
+        Logger.log("BOT", "→ Loading commands and events...", "info");
         loadCommands(client, path.join(__dirname, "./commands"));
         loadEvents(client, path.join(__dirname, "./events"));
+        console.log("");
 
         // Load command permissions
+        Logger.log("BOT", "→ Loading command permissions...", "info");
         await loadCommandPermissions(client);
+        console.log("");
 
         // Deploy commands
+        Logger.log("DEPLOY", "→ Deploying slash commands...", "info");
         await deployCommands(client);
+        console.log("");
 
         // Login
+        Logger.log("BOT", "→ Logging in to Discord...", "info");
         await client.login(config.token);
 
         // Make sure client is fully initialized before continuing
         if (!client.user) {
             throw new Error("Client failed to initialize properly after login");
         }
+        Logger.success(`✓ Logged in as ${client.user.tag}`);
+        console.log("");
 
         // Initialize and start status rotator
+        Logger.log("BOT", "→ Starting status rotator...", "info");
         client.statusRotator = new StatusRotator(client);
         client.statusRotator.start(30000); // Rotate every 30 seconds
-        Logger.success("Status rotator initialized");
+        Logger.success("✓ Status rotator initialized");
 
         // Configure logger with Discord client
         Logger.setDiscordClient(client);
 
         // Initialize stats tracker
+        Logger.log("BOT", "→ Initializing stats tracker...", "info");
         client.statsTracker = new StatsTracker(client);
-        Logger.success("Stats tracker initialized");
+        Logger.success("✓ Stats tracker initialized");
+        console.log("");
 
         // Setup graceful shutdown
         setupGracefulShutdown(client);
 
-        Logger.success("Bot is running!");
+        // Success summary
+        console.log("");
+        Logger.startupBox("✓ Bot Successfully Started!");
+        console.log("\n");
+        Logger.table(
+            {
+                "Bot User": client.user.tag,
+                "Bot ID": client.user.id,
+                Servers: client.guilds.cache.size.toString(),
+                Commands: client.commands.size.toString(),
+                Channels: client.channels.cache.size.toString(),
+                Users: client.users.cache.size.toString(),
+            },
+            "📈 Bot Statistics",
+        );
+        console.log("\n");
+        Logger.success("🎉 Project Kiyo is now online and ready!");
+        console.log("\n");
 
         return client;
     } catch (error) {
