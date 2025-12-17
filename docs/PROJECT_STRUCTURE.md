@@ -7,7 +7,6 @@ This document outlines the organized structure of the Project Kiyo Discord bot c
 ```
 project-kiyo/
 ├── 📁 src/                          # Main source code
-├── 📁 dashboard/                    # Web dashboard (React + Vite)
 ├── 📁 docs/                         # Documentation
 ├── 📁 deployments/                  # External service deployments
 ├── 📁 assets/                       # Static assets (images, text)
@@ -35,8 +34,6 @@ src/
 │   ├── 📁 Moderation/               # Moderation and management (18 commands)
 │   ├── 📁 Role_Management/          # Role management (5 commands)
 │   └── 📁 Utility/                  # Utility and helper (13 commands)
-├── 📁 api/                         # Express API server for dashboard
-│   └── 📄 server.js                # RESTful API with OAuth2 authentication
 ├── 📁 database/                     # MongoDB schemas and models
 ├── 📁 events/                       # Discord.js event handlers
 ├── 📁 features/                     # Feature-based organization
@@ -70,7 +67,6 @@ docs/
 ├── 📄 PROJECT_STRUCTURE.md         # This file - project organization
 ├── 📄 ORGANIZATION_SUMMARY.md      # Organization completion summary
 ├── 📄 LOGGING_SYSTEM.md            # Universal logging system documentation
-├── 📄 DASHBOARD.md                 # Web dashboard documentation
 └── 📁 youtube-subscriber-roles/    # Feature-specific documentation
     ├── 📄 FEATURE_SUMMARY.md       # Implementation overview
     ├── 📄 SETUP_STATUS.md          # Current setup status
@@ -90,31 +86,6 @@ deployments/
     ├── 📄 deploy.sh                # Deployment script
     └── 📄 README.md                # Deployment documentation
 ```
-
-## 📊 **Dashboard Structure (`dashboard/`)**
-
-```
-dashboard/
-├── 📁 src/                         # React source code
-│   ├── 📄 App.jsx                  # Main application component
-│   ├── 📄 api.js                   # API client utilities
-│   ├── 📄 main.jsx                 # Application entry point
-│   └── 📄 styles.css               # Global styles
-├── 📁 dist/                        # Production build output
-├── 📄 index.html                   # HTML template
-├── 📄 package.json                 # Dashboard dependencies
-├── 📄 vite.config.js               # Vite configuration
-├── 📄 tailwind.config.js           # Tailwind CSS configuration
-└── 📄 postcss.config.js            # PostCSS configuration
-```
-
-### **Dashboard Features**
-
--   ✅ **OAuth2 Authentication** - Discord OAuth integration
--   ✅ **Server Management** - Configure guild settings
--   ✅ **Real-time Monitoring** - View logs and bot statistics
--   ✅ **Modern UI** - Built with React, Vite, and Tailwind CSS
--   ✅ **API Integration** - RESTful API with JWT authentication
 
 ## 🔗 **Compatibility Layer**
 
@@ -200,13 +171,7 @@ The reorganization was done with zero downtime:
 
 This structure supports future improvements:
 
--   **Feature flags** for enabling/disabling features
--   **Plugin system** for third-party features
--   **Microservices** architecture for large-scale deployments
--   **Feature-specific testing** and CI/CD pipelines
--   **Enhanced dashboard** with more configuration options
 -   **Real-time updates** via WebSocket integration
--   **Mobile-responsive design** for dashboard
 
 ## 📞 **Getting Started**
 
@@ -216,7 +181,5 @@ With this new organization:
 2. **Find features** in `src/features/` by name
 3. **Find documentation** in `docs/` by topic
 4. **Find deployments** in `deployments/` by service
-5. **Access dashboard** at `dashboard/` for web interface
-6. **Use API** at `src/api/` for programmatic access
 
 The bot functionality remains exactly the same, but the code is now much more organized and maintainable! 🎉

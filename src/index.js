@@ -9,7 +9,6 @@ const CommandPermissions = require("./database/commandPermissions");
 const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
 const StatsTracker = require("./utils/statsTracker");
 const StatusRotator = require("./utils/statusRotator");
-const { startApiServer } = require("./api/server");
 
 // Client-related functions
 /**
@@ -338,9 +337,6 @@ const initializeBot = async () => {
         // Initialize stats tracker
         client.statsTracker = new StatsTracker(client);
         Logger.success("Stats tracker initialized");
-
-        // Start dashboard API (optional, skips if env is missing)
-        startApiServer(client);
 
         // Setup graceful shutdown
         setupGracefulShutdown(client);

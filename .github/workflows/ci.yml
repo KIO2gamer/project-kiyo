@@ -16,7 +16,6 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
             backend: ${{ steps.filter.outputs.backend }}
-            dashboard: ${{ steps.filter.outputs.dashboard }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -30,8 +29,6 @@ jobs:
                         - 'package.json'
                         - 'eslint.config.js'
                         - '.github/workflows/**'
-                      dashboard:
-                        - 'dashboard/**'
 
     lint:
         name: Lint (root only)
@@ -58,60 +55,6 @@ jobs:
 
             - name: Prettier (check only)
               run: npx prettier --check .
-
-    build_dashboard:
-        name: Build Dashboard
-        runs-on: ubuntu-latest
-        needs: changes
-        if: needs.changes.outputs.dashboard == 'true'
-        permissions:
-            contents: read
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
-                  cache: npm
-
-            - name: Install dashboard dependencies
-              run: npm ci --prefix dashboard
-
-            - name: Cache Vite prebundles
-              uses: actions/cache@v4
-              with:
-                  path: dashboard/node_modules/.vite
-                  key: vite-${{ runner.os }}-${{ hashFiles('dashboard/package-lock.json', 'dashboard/vite.config.js') }}
-                  restore-keys: |
-                      vite-${{ runner.os }}-
-
-            - name: Build dashboard
-              run: npm run build:dash
-
-    lint_dashboard:
-        name: Lint Dashboard
-        runs-on: ubuntu-latest
-        needs: changes
-        if: needs.changes.outputs.dashboard == 'true'
-        permissions:
-            contents: read
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
-                  cache: npm
-
-            - name: Install dashboard deps
-              run: npm ci --prefix dashboard
-
-            - name: ESLint (dashboard)
-              run: npm run lint --prefix dashboard
 
     test:
         name: Test (Node ${{ matrix.node }})

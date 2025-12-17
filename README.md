@@ -35,13 +35,11 @@ This project follows a feature-based organization for better maintainability:
 project-kiyo/
 ├── 📁 src/                          # Main source code
 │   ├── 📁 commands/                 # Discord commands by category (89 total)
-│   ├── 📁 api/                      # Express API server for dashboard
 │   ├── 📁 features/                 # Feature-based organization
 │   │   └── 📁 youtube-subscriber-roles/  # YouTube subscriber role feature
 │   ├── 📁 database/                 # MongoDB schemas
 │   ├── 📁 events/                   # Discord.js event handlers
 │   └── 📁 utils/                    # Utility functions
-├── 📁 dashboard/                    # Web dashboard (React + Vite + Tailwind)
 ├── 📁 docs/                         # Documentation
 ├── 📁 deployments/                  # External service deployments
 │   └── 📁 netlify-oauth/            # Netlify OAuth2 callback service
@@ -110,28 +108,6 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     npm run format    # Format code with Prettier
     ```
 
-## Dashboard (web + API)
-
-The dashboard lives in `dashboard/` (Vite + React + Tailwind) and talks to the bot-hosted Express API under `/api`.
-
-1. **Environment:** set the new variables (see `.env.example`):
-    - `DASHBOARD_CLIENT_ID`, `DASHBOARD_CLIENT_SECRET`, `DASHBOARD_REDIRECT_URI`
-    - `DASHBOARD_BASE_URL`, `DASHBOARD_SESSION_SECRET`, `DASHBOARD_API_PORT`, `DASHBOARD_ALLOW_ORIGINS`
-2. **Install dashboard deps:**
-    ```bash
-    npm install --prefix dashboard
-    ```
-3. **Run dev servers:**
-    ```bash
-    npm run dev          # bot + API (port from DASHBOARD_API_PORT)
-    npm run dev:dash     # dashboard UI (defaults to http://localhost:5173)
-    ```
-4. **Build dashboard:**
-   `bash
-npm run build:dash   # outputs to dashboard/dist
-`
-   The API only starts when the dashboard env vars are present; otherwise it logs a warning and skips.
-
 ## Project Structure
 
 ```
@@ -145,22 +121,12 @@ src/
 │   ├── Moderation/                # 18 commands
 │   ├── Role_Management/           # 5 commands
 │   └── Utility/                   # 13 commands
-├── api/               # Express API server (679 lines)
-│   └── server.js      # Dashboard backend API
 ├── database/          # MongoDB schemas and models
 ├── events/            # Discord event listeners
 ├── features/          # Feature-based organization
 │   └── youtube-subscriber-roles/  # YouTube subscriber role feature
 ├── utils/             # Utility modules and helpers
 └── index.js           # Main bot entry point
-
-dashboard/             # Web dashboard frontend
-├── src/               # React components
-│   ├── App.jsx        # Main app component
-│   ├── api.js         # API client
-│   └── main.jsx       # Entry point
-├── dist/              # Build output
-└── vite.config.js     # Vite configuration
 ```
 
 ### Key Dependencies
@@ -214,8 +180,6 @@ This codebase has undergone significant cleanup and optimization:
 -   **Better maintainability:** Cleaner code structure and consolidated functionality
 -   **Enhanced security:** Removed dangerous commands and improved error handling
 -   **Streamlined configuration:** Simplified environment variables and removed unused options
--   **Modern web dashboard:** React + Vite for fast development and builds
--   **Full-featured API:** Express server with authentication and authorization
 
 ## Contributing
 
