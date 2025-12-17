@@ -5,6 +5,13 @@ const { handleError } = require("../../utils/errorHandler");
 const os = require("os");
 const { version } = require("./../../../package.json");
 
+// Enhanced color scheme
+const COLORS = {
+    PRIMARY: "#5865F2",
+    SUCCESS: "#57F287",
+    INFO: "#3498DB",
+};
+
 module.exports = {
     description_full:
         "Displays detailed information about the bot, including version, uptime, system statistics, and more.",
@@ -53,62 +60,75 @@ module.exports = {
                     ).size;
                 });
 
-                // Create the embed
+                // Create the enhanced embed
                 const embed = new EmbedBuilder()
-                    .setColor("#00FF00")
-                    .setTitle("🤖 Bot Information")
+                    .setColor(COLORS.PRIMARY)
+                    .setAuthor({
+                        name: "Bot Information",
+                        iconURL: client.user.displayAvatarURL(),
+                    })
+                    .setTitle(`🤖 ${client.user.username}`)
+                    .setDescription(
+                        `A powerful Discord bot with **${client.commands.size}** commands across **${categories.size}** categories.\n\n` +
+                            `╭─────────────────────────────╮\n` +
+                            `│ 🟢 **Status:** Online       │\n` +
+                            `│ ⏱️  **Uptime:** ${formatUptime(uptimeSeconds).padEnd(12)}│\n` +
+                            `│ 📊 **Servers:** ${totalGuilds.toString().padEnd(12)}│\n` +
+                            `╰─────────────────────────────╯`,
+                    )
                     .setThumbnail(client.user.displayAvatarURL({ dynamic: true, size: 512 }))
                     .addFields(
                         {
-                            name: "📋 General",
+                            name: "📋 General Information",
                             value: [
-                                `**Name:** ${client.user.username}`,
-                                `**ID:** ${client.user.id}`,
+                                `**Bot Name:** ${client.user.username}`,
+                                `**Bot ID:** \`${client.user.id}\``,
                                 `**Created:** <t:${Math.floor(client.user.createdTimestamp / 1000)}:R>`,
-                                `**Version:** v${version}`,
-                                `**Uptime:** ${formatUptime(uptimeSeconds)}`,
-                                "**Developer:** [KIO2gamer](https://kio2gamer.carrd.co/)",
-                                "**GitHub:** [project-kiyo](https://github.com/KIO2gamer/discordbot)",
+                                `**Version:** \`v${version}\``,
+                                `**Developer:** [KIO2gamer](https://kio2gamer.carrd.co/)`,
+                                `**Repository:** [GitHub](https://github.com/KIO2gamer/discordbot)`,
                             ].join("\n"),
                             inline: false,
                         },
                         {
-                            name: "📊 Statistics",
+                            name: "📊 Bot Statistics",
                             value: [
-                                `**Servers:** ${totalGuilds.toLocaleString()}`,
-                                `**Users:** ${totalUsers.toLocaleString()}`,
-                                `**Channels:** ${totalChannels.toLocaleString()}`,
-                                `**Commands:** ${client.commands.size.toLocaleString()}`,
-                                "\n**Commands by Category:**",
-                                ...Object.entries(commandsByCategory).map(
-                                    ([category, count]) => `• ${category}: ${count}`,
-                                ),
+                                `🏠 **Servers:** ${totalGuilds.toLocaleString()}`,
+                                `👥 **Total Users:** ${totalUsers.toLocaleString()}`,
+                                `💬 **Channels:** ${totalChannels.toLocaleString()}`,
+                                `⚡ **Commands:** ${client.commands.size.toLocaleString()}`,
+                                ``,
+                                `**📁 Commands by Category:**`,
+                                ...Object.entries(commandsByCategory)
+                                    .sort((a, b) => b[1] - a[1])
+                                    .map(([category, count]) => `▫️ ${category}: **${count}**`),
                             ].join("\n"),
                             inline: true,
                         },
                         {
-                            name: "💻 System",
+                            name: "💻 System Information",
                             value: [
-                                `**Platform:** ${process.platform} (${os.type()})`,
-                                `**CPU:** ${cpuModel}`,
-                                `**CPU Cores:** ${cpuCores}`,
-                                `**CPU Usage:** ${cpuPercentage}%`,
-                                `**Memory:** ${memoryUsedMB}MB / ${memoryTotal}MB (${memoryPercentage}%)`,
-                                `**Node.js:** ${process.version}`,
-                                `**Discord.js:** v${djsVersion}`,
-                                `**OS Uptime:** ${formatUptime(Math.floor(os.uptime()))}`,
+                                `🖥️ **Platform:** ${process.platform} (${os.type()})`,
+                                `⚙️ **CPU:** ${cpuModel.substring(0, 30)}...`,
+                                `🔢 **CPU Cores:** ${cpuCores}`,
+                                `📈 **CPU Usage:** ${cpuPercentage}%`,
+                                ``,
+                                `💾 **Memory Usage:**`,
+                                `   ${memoryUsedMB}MB / ${memoryTotal}MB (${memoryPercentage}%)`,
+                                ``,
+                                `📦 **Node.js:** ${process.version}`,
+                                `🤖 **Discord.js:** v${djsVersion}`,
+                                `⏰ **OS Uptime:** ${formatUptime(Math.floor(os.uptime()))}`,
                             ].join("\n"),
                             inline: true,
                         },
                         {
-                            name: "🔗 Links",
+                            name: "🔗 Useful Links",
                             value: [
-                                "[Support Server](https://discord.gg/HF4BGwYMGm)",
-                                "[Invite Bot](https://discord.com/api/oauth2/authorize?client_id=" +
-                                    client.user.id +
-                                    "&permissions=8&scope=bot%20applications.commands)",
-                                "[Documentation](https://github.com/KIO2gamer/project-kiyo-ARCHIVED/blob/main/README.md)",
-                                "[Report Bug](https://github.com/KIO2gamer/discordbot/issues)",
+                                `🆘 [Support Server](https://discord.gg/HF4BGwYMGm)`,
+                                `➕ [Invite Bot](https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot%20applications.commands)`,
+                                `📖 [Documentation](https://github.com/KIO2gamer/project-kiyo-ARCHIVED/blob/main/README.md)`,
+                                `🐛 [Report Bug](https://github.com/KIO2gamer/discordbot/issues)`,
                             ].join(" • "),
                             inline: false,
                         },

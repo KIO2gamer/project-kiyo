@@ -134,27 +134,40 @@ function createInfoEmbed(playerData, username, interaction) {
 
     const embed = new EmbedBuilder()
         .setColor(EMBED_COLOR)
-        .setTitle(`Minecraft Player: ${playerData.username}`)
-        .setURL(`https://namemc.com/profile/${uuidRaw}`) // NameMC profile
-        .setDescription(`Information about the Minecraft player **${playerData.username}**`)
+        .setAuthor({
+            name: "Minecraft Player Information",
+            iconURL: "https://crafatar.com/avatars/8667ba71b85a4004af54457a9734eed7", // Minecraft Steve head
+        })
+        .setTitle(`🎮 ${playerData.username}`)
+        .setURL(`https://namemc.com/profile/${uuidRaw}`)
+        .setDescription(
+            `Detailed information about Minecraft player **${playerData.username}**\n` +
+                `${"-".repeat(40)}`,
+        )
+        .setThumbnail(`https://crafatar.com/avatars/${uuidDashed}?overlay`)
+        .setImage(bodyRenderUrl)
         .addFields(
-            { name: "Username", value: playerData.username || "N/A", inline: true },
-            { name: "UUID", value: uuidDashed || "N/A", inline: true },
             {
-                name: "Skin",
-                value: skinUrl ? `[Download Skin](${skinUrl})` : "No Skin Available",
-                inline: true,
+                name: "👤 Player Details",
+                value: [
+                    `**Username:** \`${playerData.username}\``,
+                    `**UUID:** \`${uuidDashed}\``,
+                    `**Raw UUID:** \`${uuidRaw}\``,
+                ].join("\n"),
+                inline: false,
             },
             {
-                name: "Body Overlay",
-                value: playerData.bodyRenderUrl
-                    ? `[Download Render](${bodyRenderUrl})`
-                    : "No Render Available",
-                inline: true,
+                name: "🖼️ Resources",
+                value: [
+                    `📥 [Download Skin](${skinUrl})`,
+                    `🎨 [Download 3D Render](${bodyRenderUrl})`,
+                    `🌐 [View on NameMC](https://namemc.com/profile/${uuidRaw})`,
+                ].join("\n"),
+                inline: false,
             },
         )
         .setFooter({
-            text: "Data via Mojang API + Crafatar",
+            text: `Data from Mojang API & Crafatar • Requested by ${interaction.user.tag}`,
             iconURL: interaction.client.user.displayAvatarURL(),
         })
         .setTimestamp();

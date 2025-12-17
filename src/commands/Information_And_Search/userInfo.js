@@ -93,17 +93,18 @@ function formatUserBadges(user) {
     };
 
     const flags = user.flags?.toArray() || [];
-    if (flags.length === 0) return "None";
+    if (flags.length === 0) return "❌ No badges";
 
     return flags
         .map((flag) => {
             const badge = badgeMap[flag];
-            return badge ? `${badge.emoji} ${badge.name}` : flag;
+            return badge ? `${badge.emoji} **${badge.name}**` : null;
         })
+        .filter(Boolean)
         .join("\n");
 }
 
-// Get key permissions in a readable format
+// Get key permissions in a readable format with enhanced styling
 function getKeyPermissions(member) {
     const permissionsMap = {
         Administrator: { emoji: "👑", name: "Administrator" },
@@ -126,9 +127,9 @@ function getKeyPermissions(member) {
     const memberPermissions = member.permissions.toArray();
     const keyPerms = Object.entries(permissionsMap)
         .filter(([perm]) => memberPermissions.includes(perm))
-        .map(([, { emoji, name }]) => `${emoji} ${name}`);
+        .map(([, { emoji, name }]) => `${emoji} **${name}**`);
 
-    return keyPerms.length ? keyPerms.join("\n") : "None";
+    return keyPerms.length ? keyPerms.join("\n") : "❌ None";
 }
 
 // Helper function to generate fields for better organization

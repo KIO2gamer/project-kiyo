@@ -78,20 +78,22 @@ module.exports = {
                     return null;
                 };
 
-                // Initialize the embed
+                // Initialize the enhanced embed
                 const embed = new EmbedBuilder()
-                    .setTitle(`${getChannelIcon(channel)} Channel Info: ${channel.name}`)
-                    .setColor(interaction.guild.members.me.displayHexColor)
-                    .setThumbnail(interaction.guild.iconURL({ dynamic: true, size: 128 }))
-                    .addFields(
-                        { name: "📋 ID", value: `\`${channel.id}\``, inline: true },
-                        { name: "📁 Type", value: getChannelType(channel), inline: true },
-                        {
-                            name: "🕒 Created",
-                            value: `<t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
-                            inline: true,
-                        },
-                    );
+                    .setAuthor({
+                        name: "Channel Information",
+                        iconURL: interaction.guild.iconURL(),
+                    })
+                    .setTitle(`${getChannelIcon(channel)} ${channel.name}`)
+                    .setDescription(
+                        (channel.topic ? `*${channel.topic}*\n\n` : "") +
+                            `${"-".repeat(40)}\n\n` +
+                            `🎯 **Channel ID:** \`${channel.id}\`\n` +
+                            `📁 **Type:** ${getChannelType(channel)}\n` +
+                            `📅 **Created:** <t:${Math.floor(channel.createdAt.getTime() / 1000)}:R>`,
+                    )
+                    .setColor("#5865F2")
+                    .setThumbnail(interaction.guild.iconURL({ dynamic: true, size: 128 }));
 
                 // Add fields based on channel type
                 if (
@@ -232,7 +234,7 @@ module.exports = {
                 // Add category and position info for all channel types
                 if (channel.parent) {
                     const siblings = channel.parent.children.cache;
-                    const position = siblings.keyArray().indexOf(channel.id) + 1;
+                    const position = Array.from(siblings.keys()).indexOf(channel.id) + 1;
 
                     embed.addFields(
                         {

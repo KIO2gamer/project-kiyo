@@ -65,10 +65,18 @@ module.exports = {
                         .join(" ");
 
                     const embed = new EmbedBuilder()
-                        .setTitle(`Emojis in ${interaction.guild.name}`)
-                        .setColor("Blue")
+                        .setAuthor({
+                            name: `${interaction.guild.name} - Emoji Collection`,
+                            iconURL: interaction.guild.iconURL(),
+                        })
+                        .setTitle("😀 Server Emojis")
+                        .setDescription(
+                            `Emoji statistics and collection for this server\n` +
+                                `${"-".repeat(40)}`,
+                        )
+                        .setColor("#5865F2")
                         .addFields({
-                            name: "📊 Statistics",
+                            name: "📊 Emoji Statistics",
                             value: [
                                 `**Total Emojis:** ${totalEmojis}`,
                                 `**Static:** ${staticCount}`,
@@ -146,7 +154,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle(`Emoji Info: ${emoji.name}`)
                     .setColor(interaction.guild.members.me.displayHexColor)
-                    .setThumbnail(emoji.url)
+                    .setThumbnail(emoji.imageURL())
                     .addFields(
                         {
                             name: "📋 General",
@@ -169,7 +177,7 @@ module.exports = {
                                 "**In Reaction:**",
                                 `\`${emoji.identifier}\``,
                                 "**As URL:**",
-                                `[Direct Link](${emoji.url})`,
+                                `[Direct Link](${emoji.imageURL()})`,
                             ].join("\n"),
                             inline: false,
                         },

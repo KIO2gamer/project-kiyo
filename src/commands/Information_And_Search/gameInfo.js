@@ -7,16 +7,30 @@ const {
 
 const axios = require("axios");
 const { handleError } = require("../../utils/errorHandler");
-require("dotenv").config();
+
+// Enhanced color scheme
+const COLORS = {
+    PRIMARY: "#5865F2",
+    SUCCESS: "#57F287",
+    INFO: "#3498DB",
+};
+
+// Steam API cache to avoid rate limiting
+const steamAppListCache = {
+    data: null,
+    timestamp: 0,
+    ttl: 24 * 60 * 60 * 1000, // 24 hours
+};
 
 module.exports = {
     description_full:
-        "Get detailed information about video games, including release date, ratings, platforms, genres, and more. Uses the IGDB database.",
+        "Get detailed information about video games from Steam, including release date, ratings, platforms, genres, pricing, and more. Powered by Steam Store API.",
     usage: "/game_info <title>",
     examples: [
         '/game_info "The Legend of Zelda"',
         '/game_info "Red Dead Redemption 2"',
         '/game_info "Minecraft"',
+        '/game_info "Portal 2"',
     ],
 
     data: new SlashCommandBuilder()
@@ -35,105 +49,78 @@ module.exports = {
         try {
             await interaction.deferReply();
 
-            const gameTitle = interaction.options.getString("title");
-            const clientId = process.env.IGDB_CLIENT_ID;
-            const clientSecret = process.env.IGDB_CLIENT_SECRET;
-
-            // Validate API credentials
-            if (!clientId || !clientSecret) {
-                await handleError(
-                    interaction,
-                    new Error("API configuration missing"),
-                    "CONFIGURATION",
-                    "The IGDB API is not properly configured. Please contact the bot administrator.",
-                );
-                return;
-            }
+            const gameTitle = interaction.options.getString("title").trim();
 
             try {
-                const accessToken = await getAccessToken(clientId, clientSecret);
+                // Search for games on Steam
+                const searchResults = await searchSteamGames(gameTitle);
 
-                // Comprehensive game query
-                const query = `
-					search "${gameTitle}";
-					fields name, summary, first_release_date, rating, rating_count,
-						platforms.name, genres.name, cover.url, websites.*, 
-						involved_companies.company.name, involved_companies.developer,
-						involved_companies.publisher, aggregated_rating,
-						aggregated_rating_count, total_rating, total_rating_count,
-						game_modes.name, themes.name, status;
-					limit 5;
-				`;
-
-                const response = await axios({
-                    url: "https://api.igdb.com/v4/games",
-                    method: "POST",
-                    headers: {
-                        "Client-ID": clientId,
-                        Authorization: `Bearer ${accessToken}`,
-                        Accept: "application/json",
-                        "Content-Type": "text/plain",
-                    },
-                    data: query,
-                });
-
-                const games = response.data;
-
-                if (!games || games.length === 0) {
+                if (!searchResults || searchResults.length === 0) {
                     await handleError(
                         interaction,
                         new Error("No games found"),
                         "NOT_FOUND",
-                        `No games found matching "${gameTitle}". Try using a different search term.`,
+                        `No games found on Steam matching "${gameTitle}". Try using a different search term or check the spelling.`,
                     );
                     return;
                 }
 
-                // Check for an exact match first
-                const exactMatch = games.find(
+                // Check for exact match first
+                const exactMatch = searchResults.find(
                     (game) => game.name.toLowerCase() === gameTitle.toLowerCase(),
                 );
 
                 if (exactMatch) {
-                    const embed = createGameEmbed(exactMatch);
-                    await interaction.editReply({ embeds: [embed] });
-                    return;
+                    const gameDetails = await getSteamGameDetails(exactMatch.appid);
+                    if (gameDetails) {
+                        const embed = createGameEmbed(gameDetails);
+                        await interaction.editReply({ embeds: [embed] });
+                        return;
+                    }
                 }
 
-                // If only one game found, show it directly
-                if (games.length === 1) {
-                    const embed = createGameEmbed(games[0]);
-                    await interaction.editReply({ embeds: [embed] });
-                    return;
+                // If only one result, show it directly
+                if (searchResults.length === 1) {
+                    const gameDetails = await getSteamGameDetails(searchResults[0].appid);
+                    if (gameDetails) {
+                        const embed = createGameEmbed(gameDetails);
+                        await interaction.editReply({ embeds: [embed] });
+                        return;
+                    }
                 }
 
                 // Multiple results: Create selection menu
-                const options = games.map((game, index) => ({
+                const options = searchResults.slice(0, 25).map((game) => ({
                     label: game.name.substring(0, 100),
-                    description: game.first_release_date
-                        ? `Released: ${new Date(game.first_release_date * 1000).getFullYear()}`
-                        : "Release date unknown",
-                    value: String(index),
+                    description: `Steam App ID: ${game.appid}`,
+                    value: String(game.appid),
                     emoji: "🎮",
                 }));
 
                 const row = new ActionRowBuilder().addComponents(
                     new StringSelectMenuBuilder()
-                        .setCustomId("select_game")
-                        .setPlaceholder("Select a game")
+                        .setCustomId("select_steam_game")
+                        .setPlaceholder("Select a game from Steam")
                         .addOptions(options),
                 );
 
                 const listEmbed = new EmbedBuilder()
-                    .setTitle("Multiple Games Found")
+                    .setAuthor({
+                        name: "Steam Search Results",
+                        iconURL: "https://cdn.cloudflare.steamstatic.com/store/favicon.ico",
+                    })
+                    .setTitle("🔍 Multiple Games Found")
                     .setDescription(
-                        `Found ${games.length} games matching "${gameTitle}"\nPlease select the correct game from the list below:`,
+                        `Found **${searchResults.length}** game${searchResults.length > 1 ? "s" : ""} matching "${gameTitle}"\n` +
+                            `Select the correct game from the dropdown below:\n` +
+                            `${"-".repeat(40)}`,
                     )
-                    .setColor("Blue")
+                    .setColor(COLORS.INFO)
                     .setFooter({
-                        text: "Selection will expire in 30 seconds",
-                        iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-                    });
+                        text: "Selection expires in 30 seconds • Powered by Steam",
+                        iconURL: interaction.user.displayAvatarURL(),
+                    })
+                    .setTimestamp();
 
                 const embed_response = await interaction.editReply({
                     embeds: [listEmbed],
@@ -143,29 +130,40 @@ module.exports = {
                 // Create collector for selection
                 const collector = embed_response.createMessageComponentCollector({
                     filter: (i) =>
-                        i.customId === "select_game" && i.user.id === interaction.user.id,
+                        i.customId === "select_steam_game" && i.user.id === interaction.user.id,
                     time: 30000,
                     max: 1,
                 });
 
                 collector.on("collect", async (i) => {
                     await i.deferUpdate();
-                    const selectedGame = games[parseInt(i.values[0])];
-                    const embed = createGameEmbed(selectedGame);
-                    await interaction.editReply({
-                        embeds: [embed],
-                        components: [],
-                    });
+                    const appid = parseInt(i.values[0]);
+                    const gameDetails = await getSteamGameDetails(appid);
+
+                    if (gameDetails) {
+                        const embed = createGameEmbed(gameDetails);
+                        await interaction.editReply({
+                            embeds: [embed],
+                            components: [],
+                        });
+                    } else {
+                        await handleError(
+                            interaction,
+                            new Error("Failed to load game details"),
+                            "API_ERROR",
+                            "Failed to load game details from Steam. The game might be region-locked or unavailable.",
+                        );
+                    }
                 });
 
                 collector.on("end", async (collected) => {
                     if (collected.size === 0) {
                         const timeoutEmbed = new EmbedBuilder()
-                            .setTitle("Selection Timed Out")
+                            .setTitle("⏱️ Selection Timed Out")
                             .setDescription(
-                                "No selection was made within 30 seconds. Please try the command again.",
+                                "No selection was made within 30 seconds. Please run the command again.",
                             )
-                            .setColor("Red");
+                            .setColor(COLORS.PRIMARY);
 
                         await interaction.editReply({
                             embeds: [timeoutEmbed],
@@ -179,14 +177,14 @@ module.exports = {
                         interaction,
                         error,
                         "RATE_LIMIT",
-                        "The API rate limit has been reached. Please try again in a few minutes.",
+                        "Steam API rate limit reached. Please try again in a few minutes.",
                     );
                 } else {
                     await handleError(
                         interaction,
                         error,
                         "API_ERROR",
-                        "Failed to fetch game data from IGDB. Please try again later.",
+                        "Failed to fetch game data from Steam. Please try again later.",
                     );
                 }
             }
@@ -201,160 +199,236 @@ module.exports = {
     },
 };
 
-// Helper function to get access token
-async function getAccessToken(clientId, clientSecret) {
+// Helper function to search Steam games (Store search first, fallback to AppList cache)
+async function searchSteamGames(searchTerm) {
+    const UA =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
     try {
-        const params = new URLSearchParams();
-        params.append("client_id", clientId);
-        params.append("client_secret", clientSecret);
-        params.append("grant_type", "client_credentials");
+        // Primary: Steam Store search API — faster and more reliable
+        const storeResp = await axios.get("https://store.steampowered.com/api/storesearch/", {
+            params: { term: searchTerm, cc: "us", l: "english" },
+            headers: { "User-Agent": UA, Accept: "application/json" },
+            timeout: 10000,
+        });
 
-        const response = await axios.post("https://id.twitch.tv/oauth2/token", params);
-        return response.data.access_token;
+        if (storeResp?.data?.items?.length) {
+            // Normalize results into { appid, name }
+            return storeResp.data.items
+                .map((item) => ({ appid: item.id, name: item.name || item.title }))
+                .slice(0, 50);
+        }
+
+        // Fallback: Use ISteamApps GetAppList (cached)
+        const now = Date.now();
+        if (!steamAppListCache.data || now - steamAppListCache.timestamp > steamAppListCache.ttl) {
+            const appListResp = await axios.get(
+                "https://api.steampowered.com/ISteamApps/GetAppList/v2/",
+                {
+                    headers: { "User-Agent": UA, Accept: "application/json" },
+                    timeout: 15000,
+                },
+            );
+            steamAppListCache.data = appListResp.data?.applist?.apps || [];
+            steamAppListCache.timestamp = now;
+        }
+
+        const searchLower = searchTerm.toLowerCase();
+        const matches = (steamAppListCache.data || [])
+            .filter((app) => app.name && app.name.toLowerCase().includes(searchLower))
+            .slice(0, 50);
+
+        return matches;
     } catch (error) {
-        throw new Error("Failed to obtain API access token: " + error.message);
+        console.error("Error searching Steam games:", error?.response?.status || error.message);
+        throw new Error("Failed to search Steam games");
+    }
+}
+
+// Helper function to get Steam game details
+async function getSteamGameDetails(appid) {
+    try {
+        const response = await axios.get(`https://store.steampowered.com/api/appdetails`, {
+            params: {
+                appids: appid,
+                cc: "us", // Country code for pricing
+                l: "english", // Language
+            },
+            timeout: 10000,
+        });
+
+        const data = response.data[appid];
+
+        if (!data || !data.success) {
+            return null;
+        }
+
+        return data.data;
+    } catch (error) {
+        console.error(`Error fetching Steam game details for ${appid}:`, error.message);
+        return null;
     }
 }
 
 // Helper function to create game embed
 function createGameEmbed(gameData) {
-    const embed = new EmbedBuilder().setColor("Blue").setTitle(gameData.name);
+    const embed = new EmbedBuilder()
+        .setColor(COLORS.INFO)
+        .setAuthor({
+            name: "Steam Game Information",
+            iconURL: "https://cdn.cloudflare.steamstatic.com/store/favicon.ico",
+        })
+        .setTitle(`🎮 ${gameData.name}`);
 
-    // Set thumbnail if cover exists
-    if (gameData.cover?.url) {
-        embed.setThumbnail(`https:${gameData.cover.url.replace("t_thumb", "t_cover_big")}`);
+    // Set thumbnail/image
+    if (gameData.header_image) {
+        embed.setImage(gameData.header_image);
     }
 
-    // Add description/summary
-    if (gameData.summary) {
-        embed.setDescription(
-            gameData.summary.length > 2048
-                ? gameData.summary.substring(0, 2045) + "..."
-                : gameData.summary,
-        );
+    // Add description
+    if (gameData.short_description) {
+        const description =
+            gameData.short_description.length > 300
+                ? gameData.short_description.substring(0, 297) + "..."
+                : gameData.short_description;
+        embed.setDescription(`${description}\n${"-".repeat(40)}`);
     }
 
-    // Basic information field
-    const basicInfo = [
-        gameData.first_release_date
-            ? `**Released:** <t:${gameData.first_release_date}:D>`
-            : "**Released:** Unknown",
-        gameData.status ? `**Status:** ${formatGameStatus(gameData.status)}` : null,
-        gameData.platforms?.length
-            ? `**Platforms:** ${gameData.platforms.map((p) => p.name).join(", ")}`
-            : null,
-        gameData.genres?.length
-            ? `**Genres:** ${gameData.genres.map((g) => g.name).join(", ")}`
-            : null,
-        gameData.themes?.length
-            ? `**Themes:** ${gameData.themes.map((t) => t.name).join(", ")}`
-            : null,
-        gameData.game_modes?.length
-            ? `**Game Modes:** ${gameData.game_modes.map((m) => m.name).join(", ")}`
-            : null,
-    ]
-        .filter(Boolean)
-        .join("\n");
+    // Basic information
+    const basicInfo = [];
 
-    embed.addFields({ name: "📋 Game Information", value: basicInfo, inline: false });
+    if (gameData.release_date) {
+        const releaseText = gameData.release_date.coming_soon
+            ? `🔜 **Coming Soon:** ${gameData.release_date.date}`
+            : `📅 **Released:** ${gameData.release_date.date}`;
+        basicInfo.push(releaseText);
+    }
 
-    // Ratings field
-    if (gameData.rating || gameData.aggregated_rating || gameData.total_rating) {
-        const ratings = [
-            gameData.rating
-                ? `**User Rating:** ${(gameData.rating / 10).toFixed(1)}/10 (${gameData.rating_count} ratings)`
-                : null,
-            gameData.aggregated_rating
-                ? `**Critic Rating:** ${(gameData.aggregated_rating / 10).toFixed(1)}/10 (${gameData.aggregated_rating_count} reviews)`
-                : null,
-            gameData.total_rating
-                ? `**Overall Rating:** ${(gameData.total_rating / 10).toFixed(1)}/10 (${gameData.total_rating_count} total)`
-                : null,
-        ]
-            .filter(Boolean)
-            .join("\n");
+    if (gameData.type) {
+        basicInfo.push(`📦 **Type:** ${gameData.type}`);
+    }
 
-        if (ratings) {
-            embed.addFields({ name: "⭐ Ratings", value: ratings, inline: false });
+    if (gameData.developers?.length) {
+        basicInfo.push(`👨‍💻 **Developers:** ${gameData.developers.join(", ")}`);
+    }
+
+    if (gameData.publishers?.length) {
+        basicInfo.push(`🏢 **Publishers:** ${gameData.publishers.join(", ")}`);
+    }
+
+    if (basicInfo.length > 0) {
+        embed.addFields({
+            name: "📋 Game Information",
+            value: basicInfo.join("\n"),
+            inline: false,
+        });
+    }
+
+    // Genres and Categories
+    const genreInfo = [];
+
+    if (gameData.genres?.length) {
+        genreInfo.push(`🎭 **Genres:** ${gameData.genres.map((g) => g.description).join(", ")}`);
+    }
+
+    if (gameData.categories?.length) {
+        const mainCategories = gameData.categories
+            .slice(0, 5)
+            .map((c) => c.description)
+            .join(", ");
+        genreInfo.push(`🏷️ **Features:** ${mainCategories}`);
+    }
+
+    if (genreInfo.length > 0) {
+        embed.addFields({
+            name: "🎨 Categories",
+            value: genreInfo.join("\n"),
+            inline: false,
+        });
+    }
+
+    // Platform support
+    const platforms = [];
+    if (gameData.platforms) {
+        if (gameData.platforms.windows) platforms.push("🪟 Windows");
+        if (gameData.platforms.mac) platforms.push("🍎 macOS");
+        if (gameData.platforms.linux) platforms.push("🐧 Linux");
+    }
+
+    if (platforms.length > 0) {
+        embed.addFields({
+            name: "💻 Platforms",
+            value: platforms.join(" • "),
+            inline: true,
+        });
+    }
+
+    // Pricing information
+    if (gameData.is_free) {
+        embed.addFields({
+            name: "💰 Price",
+            value: "**Free to Play**",
+            inline: true,
+        });
+    } else if (gameData.price_overview) {
+        const price = gameData.price_overview;
+        let priceText = `**${price.final_formatted}**`;
+
+        if (price.discount_percent > 0) {
+            priceText += `\n~~${price.initial_formatted}~~ **-${price.discount_percent}% OFF**`;
         }
+
+        embed.addFields({
+            name: "💰 Price",
+            value: priceText,
+            inline: true,
+        });
     }
 
-    // Companies field
-    if (gameData.involved_companies?.length) {
-        const developers = gameData.involved_companies
-            .filter((ic) => ic.developer)
-            .map((ic) => ic.company.name);
-        const publishers = gameData.involved_companies
-            .filter((ic) => ic.publisher)
-            .map((ic) => ic.company.name);
+    // Requirements
+    if (gameData.pc_requirements?.minimum) {
+        const minReqs = gameData.pc_requirements.minimum
+            .replace(/<br>/gi, "\n")
+            .replace(/<[^>]*>/g, "")
+            .substring(0, 300);
 
-        const companies = [
-            developers.length ? `**Developers:** ${developers.join(", ")}` : null,
-            publishers.length ? `**Publishers:** ${publishers.join(", ")}` : null,
-        ]
-            .filter(Boolean)
-            .join("\n");
-
-        if (companies) {
-            embed.addFields({ name: "🏢 Companies", value: companies, inline: false });
-        }
+        embed.addFields({
+            name: "⚙️ Minimum Requirements",
+            value: minReqs.length === 300 ? minReqs + "..." : minReqs,
+            inline: false,
+        });
     }
 
-    // Links field
-    if (gameData.websites?.length) {
-        const links = gameData.websites
-            .map((site) => {
-                const type = formatWebsiteType(site.category);
-                return `[${type}](${site.url})`;
-            })
-            .join(" • ");
-
-        embed.addFields({ name: "🔗 Links", value: links, inline: false });
+    // Metacritic score
+    if (gameData.metacritic?.score) {
+        embed.addFields({
+            name: "⭐ Metacritic Score",
+            value: `**${gameData.metacritic.score}/100**\n[View on Metacritic](${gameData.metacritic.url})`,
+            inline: true,
+        });
     }
+
+    // Steam links
+    const links = [
+        `[🛒 Store Page](https://store.steampowered.com/app/${gameData.steam_appid})`,
+        `[📊 SteamDB](https://steamdb.info/app/${gameData.steam_appid})`,
+    ];
+
+    if (gameData.website) {
+        links.push(`[🌐 Website](${gameData.website})`);
+    }
+
+    embed.addFields({
+        name: "🔗 Links",
+        value: links.join(" • "),
+        inline: false,
+    });
 
     embed
         .setFooter({
-            text: "Data provided by IGDB",
-            iconURL: "https://www.igdb.com/favicon.ico",
+            text: `Steam App ID: ${gameData.steam_appid} • Powered by Steam Store API`,
+            iconURL: "https://cdn.cloudflare.steamstatic.com/store/favicon.ico",
         })
         .setTimestamp();
 
     return embed;
-}
-
-// Helper function to format website types
-function formatWebsiteType(category) {
-    const types = {
-        1: "Official",
-        2: "Wikia",
-        3: "Wikipedia",
-        4: "Facebook",
-        5: "Twitter",
-        6: "Twitch",
-        8: "Instagram",
-        9: "YouTube",
-        10: "App Store",
-        11: "Google Play",
-        12: "Steam",
-        13: "Subreddit",
-        14: "Epic Games",
-        15: "GOG",
-        16: "Discord",
-    };
-    return types[category] || "Website";
-}
-
-// Helper function to format game status
-function formatGameStatus(status) {
-    const statuses = {
-        0: "Released",
-        2: "Alpha",
-        3: "Beta",
-        4: "Early Access",
-        5: "Offline",
-        6: "Cancelled",
-        7: "Rumored",
-        8: "Delisted",
-    };
-    return statuses[status] || "Unknown";
 }

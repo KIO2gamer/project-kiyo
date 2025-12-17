@@ -3,6 +3,13 @@ const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 const moment = require("moment");
 
+// Enhanced color scheme
+const COLORS = {
+    PRIMARY: "#5865F2",
+    SUCCESS: "#57F287",
+    INFO: "#3498DB",
+};
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("server")
@@ -88,100 +95,101 @@ async function sendServerInfo(interaction) {
             (m) => !m.presence || m.presence.status === "offline",
         ).size;
 
-        // Create embed
+        // Create enhanced embed
         const embed = new EmbedBuilder()
-            .setTitle(`${guild.name} - Server Information`)
-            .setColor(0x00ae86)
+            .setAuthor({
+                name: "Server Information",
+                iconURL: guild.iconURL(),
+            })
+            .setTitle(`🏠 ${guild.name}`)
+            .setDescription(
+                (guild.description ? `*${guild.description}*\n\n` : "") +
+                    `${"-".repeat(40)}\n\n` +
+                    `🎯 **Server ID:** \`${guild.id}\`\n` +
+                    `👑 **Owner:** ${owner.user.tag}\n` +
+                    `📅 **Created:** <t:${serverCreatedTime}:F>\n` +
+                    `⏰ **Age:** ${serverAge}`,
+            )
+            .setColor(COLORS.PRIMARY)
             .setThumbnail(guild.iconURL({ dynamic: true, size: 512 }))
             .setImage(guild.bannerURL({ size: 1024 }) || null)
             .addFields(
-                // Overview section
+                // Member stats
                 {
-                    name: "📋 Overview",
+                    name: "👥 Member Statistics",
                     value: [
-                        `**ID:** \`${guild.id}\``,
-                        `**Owner:** ${owner.user.tag}`,
-                        `**Created:** <t:${serverCreatedTime}:F> (<t:${serverCreatedTime}:R>)`,
-                        `**Age:** ${serverAge}`,
-                        `**Region:** ${guild.preferredLocale}`,
-                    ].join("\n"),
-                    inline: false,
-                },
-
-                // Moderation section
-                {
-                    name: "🛡️ Moderation",
-                    value: [
-                        `**Verification:** ${getVerificationLevelText(guild.verificationLevel)}`,
-                        `**MFA Requirement:** ${getMfaLevelText(guild.mfaLevel)}`,
-                        `**Content Filter:** ${getContentFilterLevel(guild.explicitContentFilter)}`,
-                    ].join("\n"),
-                    inline: true,
-                },
-
-                // Stats section
-                {
-                    name: "📊 Members",
-                    value: [
-                        `**Total:** ${guild.memberCount}`,
-                        `**Humans:** ${humanCount}`,
-                        `**Bots:** ${botCount}`,
-                        `**Online:** ${onlineCount}`,
-                        `**Idle/DND:** ${idleCount + dndCount}`,
-                        `**Offline:** ${offlineCount}`,
+                        `**Total Members:** ${guild.memberCount.toLocaleString()}`,
+                        `• 👤 Humans: **${humanCount.toLocaleString()}**`,
+                        `• 🤖 Bots: **${botCount.toLocaleString()}**`,
+                        ``,
+                        `**Online Status:**`,
+                        `🟢 Online: **${onlineCount}**`,
+                        `🟡 Idle: **${idleCount}**`,
+                        `🔴 DND: **${dndCount}**`,
+                        `⚫ Offline: **${offlineCount}**`,
                     ].join("\n"),
                     inline: true,
                 },
 
                 // Channel section
                 {
-                    name: "📂 Channels",
+                    name: "� Channels",
                     value: [
                         `**Total:** ${totalChannels}`,
-                        `**Text:** ${textChannels}`,
-                        `**Voice:** ${voiceChannels}`,
-                        `**Categories:** ${categoryChannels}`,
-                        `**Forums:** ${forumChannels}`,
-                        `**Threads:** ${threadChannels}`,
+                        `💬 Text: **${textChannels}**`,
+                        `🔊 Voice: **${voiceChannels}**`,
+                        `📂 Categories: **${categoryChannels}**`,
+                        `📝 Forums: **${forumChannels}**`,
+                        `🧵 Threads: **${threadChannels}**`,
                     ].join("\n"),
                     inline: true,
                 },
 
-                // Customization section
+                // Server boost & customization
                 {
-                    name: "✨ Customization",
+                    name: "✨ Boosts & Customization",
                     value: [
-                        `**Roles:** ${guild.roles.cache.size}`,
-                        `**Emojis:** ${guild.emojis.cache.size}`,
-                        `**Stickers:** ${guild.stickers?.cache.size || 0}`,
-                        `**Boost Tier:** ${formatBoostTier(guild.premiumTier)}`,
-                        `**Boosts:** ${guild.premiumSubscriptionCount || 0}`,
+                        `**Boost Status:**`,
+                        `📈 Tier: ${formatBoostTier(guild.premiumTier)}`,
+                        `🚀 Boosts: **${guild.premiumSubscriptionCount || 0}**`,
+                        ``,
+                        `**Customization:**`,
+                        `🎭 Roles: **${guild.roles.cache.size}**`,
+                        `😀 Emojis: **${guild.emojis.cache.size}**`,
+                        `🎫 Stickers: **${guild.stickers?.cache.size || 0}**`,
+                    ].join("\n"),
+                    inline: false,
+                },
+
+                // Security & moderation
+                {
+                    name: "🔒 Security & Moderation",
+                    value: [
+                        `🛡️ **Verification:** ${getVerificationLevelText(guild.verificationLevel)}`,
+                        `🔐 **2FA Requirement:** ${getMfaLevelText(guild.mfaLevel)}`,
+                        `🚫 **Content Filter:** ${getContentFilterLevel(guild.explicitContentFilter)}`,
+                        `🌐 **Locale:** ${guild.preferredLocale}`,
                     ].join("\n"),
                     inline: true,
                 },
 
-                // System section
+                // System channels
                 {
-                    name: "⚙️ System",
+                    name: "⚙️ System Channels",
                     value: [
-                        `**System Channel:** ${guild.systemChannel ? `<#${guild.systemChannel.id}>` : "None"}`,
-                        `**Rules Channel:** ${guild.rulesChannel ? `<#${guild.rulesChannel.id}>` : "None"}`,
-                        `**AFK Channel:** ${guild.afkChannel ? `<#${guild.afkChannel.id}>` : "None"}`,
-                        `**AFK Timeout:** ${guild.afkTimeout / 60} minutes`,
+                        `📢 **System:** ${guild.systemChannel ? `<#${guild.systemChannel.id}>` : "None"}`,
+                        `📜 **Rules:** ${guild.rulesChannel ? `<#${guild.rulesChannel.id}>` : "None"}`,
+                        `😴 **AFK:** ${guild.afkChannel ? `<#${guild.afkChannel.id}>` : "None"}`,
+                        `⏱️ **AFK Timeout:** ${guild.afkTimeout / 60} min`,
                     ].join("\n"),
                     inline: true,
                 },
             );
 
-        // Add server description if present
-        if (guild.description) {
-            embed.setDescription(guild.description);
-        }
-
         // Add server features if present
         if (guild.features.length > 0) {
             embed.addFields({
-                name: "🌟 Special Features",
+                name: "🌟 Server Features",
                 value: features,
                 inline: false,
             });
@@ -190,16 +198,16 @@ async function sendServerInfo(interaction) {
         // Add vanity URL if present
         if (guild.vanityURLCode) {
             embed.addFields({
-                name: "🔗 Vanity URL",
-                value: `discord.gg/${guild.vanityURLCode}`,
+                name: "🔗 Custom Invite",
+                value: `[discord.gg/${guild.vanityURLCode}](https://discord.gg/${guild.vanityURLCode})`,
                 inline: true,
             });
         }
 
         embed
             .setFooter({
-                text: `Requested by ${interaction.user.tag}`,
-                iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+                text: `Requested by ${interaction.user.tag} • Server ID: ${guild.id}`,
+                iconURL: interaction.user.displayAvatarURL(),
             })
             .setTimestamp();
 
