@@ -114,7 +114,7 @@ class OAuth2Handler {
 
                 // Store the access token temporarily
                 const expiresAt = new Date(Date.now() + expires_in * 1000);
-                await TempOAuth2Storage.replaceOne(
+                await TempOAuth2Storage.findOneAndUpdate(
                     { userId, guildId: statePayload.guildId },
                     {
                         userId,
@@ -123,7 +123,7 @@ class OAuth2Handler {
                         refreshToken: refresh_token,
                         expiresAt,
                     },
-                    { upsert: true },
+                    { upsert: true, new: true },
                 );
 
                 if (youtubeConnection) {
@@ -216,115 +216,19 @@ class OAuth2Handler {
 
     renderErrorPage(message) {
         return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Authorization Error</title>
-                <style>
-                    * {
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }
-                    body {
-                        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-                        background: linear-gradient(135deg, #1f1f2e 0%, #0f0f1e 100%);
-                        min-height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 20px;
-                        position: relative;
-                        overflow: hidden;
-                    }
-                    body::before {
-                        content: '';
-                        position: absolute;
-                        width: 500px;
-                        height: 500px;
-                        background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
-                        border-radius: 50%;
-                        top: -100px;
-                        right: -100px;
-                    }
-                    body::after {
-                        content: '';
-                        position: absolute;
-                        width: 400px;
-                        height: 400px;
-                        background: radial-gradient(circle, rgba(220, 38, 38, 0.08) 0%, transparent 70%);
-                        border-radius: 50%;
-                        bottom: -50px;
-                        left: -100px;
-                    }
-                    .container {
-                        background: rgba(31, 31, 46, 0.9);
-                        backdrop-filter: blur(10px);
-                        border: 1px solid rgba(239, 68, 68, 0.2);
-                        border-radius: 20px;
-                        padding: 50px 40px;
-                        max-width: 500px;
-                        text-align: center;
-                        animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        position: relative;
-                        z-index: 10;
-                        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(239, 68, 68, 0.1);
-                    }
-                    @keyframes slideUp {
-                        from {
-                            opacity: 0;
-                            transform: translateY(40px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    .icon {
-                        font-size: 4.5em;
-                        margin-bottom: 28px;
-                        display: inline-block;
-                        animation: pulse-shake 0.6s ease-in-out;
-                        filter: drop-shadow(0 8px 16px rgba(239, 68, 68, 0.25));
-                    }
-                    @keyframes pulse-shake {
-                        0% { transform: scale(1) rotate(0deg); opacity: 0; }
-                        50% { transform: scale(1.1) rotate(-5deg); }
-                        100% { transform: scale(1) rotate(0deg); opacity: 1; }
-                    }
-                    h1 {
-                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        background-clip: text;
-                        font-size: 32px;
-                        margin-bottom: 12px;
-                        font-weight: 800;
-                        letter-spacing: -0.5px;
-                    }
-                    p {
-                        color: #d1d5db;
-                        font-size: 14px;
-                        line-height: 1.8;
-                        margin: 10px 0;
-                    }
-                    p:first-of-type {
-                        font-size: 15px;
-                        font-weight: 500;
-                        color: #e5e7eb;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="icon">🚨</div>
-                    <h1>Authorization Error</h1>
+            <html>
+                <head>
+                    <title>Authorization Error</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .error { color: #ff0000; }
+                    </style>
+                </head>
+                <body>
+                    <h1 class="error">Authorization Error</h1>
                     <p>${message}</p>
                     <p>You can close this window and try again.</p>
-                </div>
-            </body>
+                </body>
             </html>
         `;
     }
