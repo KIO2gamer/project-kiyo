@@ -156,7 +156,6 @@ src/
 -   **dotenv** - Environment variable management
 -   **he** - HTML entity encoding/decoding
 -   **ms** - Time string parsing
--   \*\*nodeImprovements & Enhancements
 
 This codebase has undergone significant cleanup and optimization, with recent enhancements including
 
