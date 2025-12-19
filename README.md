@@ -22,11 +22,12 @@ A streamlined multipurpose Discord bot built with [discord.js](https://discord.j
 
 ### Featured Capabilities
 
--   **🎬 YouTube Subscriber Roles:** Automatically assign Discord roles based on YouTube subscriber count with OAuth2 verification
+-   **🎬 YouTube Subscriber Roles:** Automatically assign Discord roles based on YouTube subscriber count with OAuth2 verification (now with guild-scoped, signed state tokens for enhanced security)
 -   **Levels & Experience:** User XP tracking and leaderboards
 -   **Role Management:** Automated role assignment and management
 -   **Fun Commands:** Entertainment commands including games, trivia, and interactive features
 -   **Database Integration:** MongoDB for persistent data storage
+-   **AI Chatbot:** Natural, conversational AI responses with tuned generation settings
 
 ### 🏗️ **Project Structure**
 
@@ -76,6 +77,13 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     GEMINI_API_KEY=your_gemini_api_key
     GOOGLE_API_KEY=your_google_api_key
     WEATHER_API_KEY=your_weather_api_key
+    YOUTUBE_API_KEY=your_youtube_api_key
+
+    # Discord OAuth2 (for YouTube subscriber roles)
+    DISCORD_CLIENT_ID=your_client_id
+    DISCORD_CLIENT_SECRET=your_client_secret
+    DISCORD_REDIRECT_URI=http://localhost:3000/callback
+    OAUTH_STATE_SECRET=your_random_secret_32_64_bytes  # Optional (falls back to DISCORD_CLIENT_SECRET)
 
     # Optional Configuration
     GUILDID=your_primary_guild_id
@@ -148,9 +156,10 @@ src/
 -   **dotenv** - Environment variable management
 -   **he** - HTML entity encoding/decoding
 -   **ms** - Time string parsing
--   **node-cache** - In-memory caching
--   **cors** - CORS middleware
--   **cookie-parser** - Cookie parsing
+-   \*\*nodeImprovements & Enhancements
+
+This codebase has undergone significant cleanup and optimization, with recent enhancements including
+
 -   **jsonwebtoken** - JWT authentication
 -   **sharp** - Image processing
 -   **zod** - Schema validation
@@ -173,6 +182,12 @@ This codebase has undergone significant cleanup and optimization:
 -   **Cleaned configurations:** Streamlined environment variables and removed unused options
 -   **Removed broken features:** Eliminated non-functional API integrations and low-value commands
 -   **Enhanced security:** Removed eval command and other security risks
+
+### Recent Feature Updates
+
+-   **Auto-Moderation Enhancements:** Richer audit logs with deletion status, message IDs, attachment counts, and jump links for easier moderation review
+-   **AI Chatbot Tuning:** Optimized generation settings (temperature: 0.7, topK: 40) for steadier, more concise conversational responses
+-   **YouTube OAuth2 Security:** Guild-scoped, HMAC-signed state tokens with 15-minute expiry and user/state cross-validation to prevent token replay and cross-guild misuse
 
 ### Performance Benefits
 
