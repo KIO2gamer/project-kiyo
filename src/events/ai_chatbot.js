@@ -48,12 +48,12 @@ const safetySettings = [
     },
 ];
 
-// Optimized generation configuration for natural conversations
+// Tuned generation configuration for balanced, conversational replies
 const generationConfig = {
-    temperature: 0.9, // Higher for more creative, natural responses
-    topK: 50, // More variety in word choices
-    topP: 0.92, // Good balance of creativity and coherence
-    maxOutputTokens: 200, // Allow for longer responses when needed
+    temperature: 0.7, // Steadier tone for chat while keeping some variety
+    topK: 40, // Slightly narrower sampling to reduce randomness
+    topP: 0.9, // Good balance of creativity and coherence
+    maxOutputTokens: 180, // Trim long rambles for quicker chat responses
 };
 
 // Enhanced AI prompt instruction for more natural conversations
@@ -415,6 +415,14 @@ Based on these images and the user's message, provide a unified response.`;
                     // Apply message type specific adjustments
                     response = this.adjustResponseForMessageType(response, messageType);
                 } catch (error) {
+                    // Check if it's a rate limit error
+                    if (error.message?.includes("429") || error.message?.includes("quota")) {
+                        Logger.error("Gemini API rate limit exceeded. Sending fallback response.");
+                        response =
+                            "hey, i'm getting too many requests right now. mind giving me a minute? 😅";
+                        break;
+                    }
+
                     retries++;
                     if (retries > MAX_RETRIES) throw error;
 
@@ -424,7 +432,8 @@ Based on these images and the user's message, provide a unified response.`;
                         `Retry ${retries}: Truncating conversation history`,
                         "warning",
                     );
-                    geminiConversation = geminiConversation.slice(-4); // Keep only last 2 exchanges
+                    // Ensure history starts with 'user' role
+                    geminiConversation = this.ensureValidHistory(geminiConversation.slice(-4));
                 }
             }
 
@@ -568,9 +577,12 @@ Based on these images and the user's message, provide a unified response.`;
             // Enhanced context for better responses
             const contextualPrompt = this.enhancePromptWithContext(content, geminiConversation);
 
+            // Ensure history is valid before starting chat
+            const validHistory = this.ensureValidHistory(geminiConversation.slice(0, -1));
+
             // Start a chat with the conversation history
             const chat = model.startChat({
-                history: geminiConversation.slice(0, -1), // Exclude the latest message
+                history: validHistory,
             });
 
             // Send the enhanced message to get a response
@@ -583,6 +595,11 @@ Based on these images and the user's message, provide a unified response.`;
             return response;
         } catch (error) {
             Logger.error("Error getting AI response:", error);
+
+            // If we hit a rate limit issue
+            if (error.message?.includes("429") || error.message?.includes("quota")) {
+                throw error; // Let the caller handle rate limits
+            }
 
             // If we hit a content filtering issue
             if (error.message?.includes("blocked") || error.message?.includes("safety")) {
@@ -598,6 +615,29 @@ Based on these images and the user's message, provide a unified response.`;
             // For other errors, propagate to caller for retry logic
             throw error;
         }
+    },
+
+    ensureValidHistory(history) {
+        // Gemini requires chat history to start with 'user' role
+        if (!history || history.length === 0) {
+            return [];
+        }
+
+        // Find the first 'user' message
+        const firstUserIndex = history.findIndex((msg) => msg.role === "user");
+
+        if (firstUserIndex === -1) {
+            // No user messages found, return empty history
+            return [];
+        }
+
+        if (firstUserIndex > 0) {
+            // History doesn't start with user, slice from first user message
+            return history.slice(firstUserIndex);
+        }
+
+        // History already starts with user
+        return history;
     },
 
     enhancePromptWithContext(content, conversation) {

@@ -1,5 +1,6 @@
 const axios = require("axios");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 // MongoDB connection
 let cachedDb = null;
@@ -24,7 +25,10 @@ const TempOAuth2Schema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
-        unique: true,
+    },
+    guildId: {
+        type: String,
+        required: true,
     },
     accessToken: {
         type: String,
@@ -43,6 +47,8 @@ const TempOAuth2Schema = new mongoose.Schema({
         expires: 3600, // Auto-delete after 1 hour
     },
 });
+
+TempOAuth2Schema.index({ userId: 1, guildId: 1 }, { unique: true });
 
 const TempOAuth2Storage =
     mongoose.models.TempOAuth2 || mongoose.model("TempOAuth2", TempOAuth2Schema);
@@ -98,6 +104,16 @@ exports.handler = async (event) => {
     }
 
     try {
+        // Verify signed state
+        const statePayload = verifyState(state);
+        if (!statePayload) {
+            return {
+                statusCode: 400,
+                headers,
+                body: generateErrorPage("Invalid Request", "Invalid or expired state."),
+            };
+        }
+
         // Connect to database
         await connectToDatabase();
 
@@ -129,6 +145,15 @@ exports.handler = async (event) => {
 
         const userId = userResponse.data.id;
 
+        // Cross-check state user and ensure guildId present
+        if (userId !== statePayload.userId || !statePayload.guildId) {
+            return {
+                statusCode: 400,
+                headers,
+                body: generateErrorPage("Invalid Request", "State/user mismatch. Please retry."),
+            };
+        }
+
         // Get user's connections
         const connectionsResponse = await axios.get(
             "https://discord.com/api/users/@me/connections",
@@ -145,9 +170,10 @@ exports.handler = async (event) => {
         // Store the access token temporarily
         const expiresAt = new Date(Date.now() + expires_in * 1000);
         await TempOAuth2Storage.findOneAndUpdate(
-            { userId },
+            { userId, guildId: statePayload.guildId },
             {
                 userId,
+                guildId: statePayload.guildId,
                 accessToken: access_token,
                 refreshToken: refresh_token,
                 expiresAt,
@@ -189,6 +215,36 @@ exports.handler = async (event) => {
     }
 };
 
+function verifyState(state) {
+    try {
+        if (!state) return null;
+        const secret = process.env.OAUTH_STATE_SECRET || process.env.DISCORD_CLIENT_SECRET;
+        if (!secret) return null;
+
+        const parts = state.split(".");
+        if (parts.length !== 2) return null;
+        const [payloadB64, signature] = parts;
+
+        const expectedSig = crypto
+            .createHmac("sha256", secret)
+            .update(payloadB64)
+            .digest("base64url");
+        if (signature !== expectedSig) return null;
+
+        const payloadJson = Buffer.from(payloadB64, "base64url").toString("utf8");
+        const payload = JSON.parse(payloadJson);
+
+        // Require userId and guildId, expire after 15 minutes
+        if (!payload.userId || !payload.guildId) return null;
+        if (Date.now() - payload.iat > 15 * 60 * 1000) return null;
+
+        return payload;
+    } catch (err) {
+        console.error("State verification failed:", err.message);
+        return null;
+    }
+}
+
 function generateSuccessPage(title, message, instructions) {
     return `
     <!DOCTYPE html>
@@ -203,29 +259,54 @@ function generateSuccessPage(title, message, instructions) {
                 padding: 0;
                 box-sizing: border-box;
             }
-            body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                color: #1f2937;
+            body {
+                font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 20px;
+                position: relative;
+                overflow: hidden;
+            }
+            body::before {
+                content: '';
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+                border-radius: 50%;
+                top: -100px;
+                right: -100px;
+            }
+            body::after {
+                content: '';
+                position: absolute;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+                border-radius: 50%;
+                bottom: -50px;
+                left: -100px;
             }
             .container {
-                background: white;
-                border-radius: 16px;
-                padding: 60px 40px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                background: rgba(30, 41, 59, 0.8);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(51, 65, 85, 0.5);
+                border-radius: 20px;
+                padding: 50px 40px;
                 max-width: 500px;
                 text-align: center;
-                animation: slideUp 0.5s ease-out;
+                animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 10;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
             }
             @keyframes slideUp {
                 from {
                     opacity: 0;
-                    transform: translateY(20px);
+                    transform: translateY(40px);
                 }
                 to {
                     opacity: 1;
@@ -233,37 +314,44 @@ function generateSuccessPage(title, message, instructions) {
                 }
             }
             .icon {
-                font-size: 5em;
-                margin-bottom: 24px;
+                font-size: 4.5em;
+                margin-bottom: 28px;
                 display: inline-block;
-                animation: bounce 0.6s ease-in-out;
+                animation: float 3s ease-in-out infinite;
+                filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.2));
             }
-            @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-15px); }
             }
             h1 {
-                color: #10b981;
-                font-size: 28px;
-                margin-bottom: 16px;
-                font-weight: 700;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-size: 32px;
+                margin-bottom: 12px;
+                font-weight: 800;
+                letter-spacing: -0.5px;
             }
             .info {
-                color: #6b7280;
+                color: #cbd5e1;
                 font-size: 16px;
                 line-height: 1.6;
-                margin: 20px 0;
+                margin: 16px 0;
+                font-weight: 500;
             }
             p {
-                color: #4b5563;
-                font-size: 15px;
-                line-height: 1.7;
+                color: #94a3b8;
+                font-size: 14px;
+                line-height: 1.8;
+                margin: 10px 0;
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="icon">🎉</div>
+            <div class="icon">✨</div>
             <h1>${title}</h1>
             <p class="info">${message}</p>
             <p>${instructions}</p>
@@ -287,30 +375,54 @@ function generateWarningPage(title, message, instructions) {
                 padding: 0;
                 box-sizing: border-box;
             }
-            body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                color: #1f2937;
+            body {
+                font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 20px;
+                position: relative;
+                overflow: hidden;
+            }
+            body::before {
+                content: '';
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+                border-radius: 50%;
+                top: -100px;
+                right: -100px;
+            }
+            body::after {
+                content: '';
+                position: absolute;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, rgba(234, 88, 12, 0.08) 0%, transparent 70%);
+                border-radius: 50%;
+                bottom: -50px;
+                left: -100px;
             }
             .container {
-                background: white;
-                border-radius: 16px;
-                padding: 60px 40px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                background: rgba(31, 41, 55, 0.85);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(245, 158, 11, 0.2);
+                border-radius: 20px;
+                padding: 50px 40px;
                 max-width: 500px;
                 text-align: center;
-                animation: slideUp 0.5s ease-out;
-                border-left: 5px solid #f59e0b;
+                animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 10;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(245, 158, 11, 0.1);
             }
             @keyframes slideUp {
                 from {
                     opacity: 0;
-                    transform: translateY(20px);
+                    transform: translateY(40px);
                 }
                 to {
                     opacity: 1;
@@ -318,32 +430,43 @@ function generateWarningPage(title, message, instructions) {
                 }
             }
             .icon {
-                font-size: 5em;
-                margin-bottom: 24px;
+                font-size: 4.5em;
+                margin-bottom: 28px;
                 display: inline-block;
-                animation: pulse 2s infinite;
+                animation: wobble 2s ease-in-out infinite;
+                filter: drop-shadow(0 8px 16px rgba(245, 158, 11, 0.15));
             }
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.7; }
+            @keyframes wobble {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-2deg); }
+                75% { transform: rotate(2deg); }
             }
             h1 {
-                color: #d97706;
-                font-size: 28px;
-                margin-bottom: 16px;
-                font-weight: 700;
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-size: 32px;
+                margin-bottom: 12px;
+                font-weight: 800;
+                letter-spacing: -0.5px;
             }
             p {
-                color: #4b5563;
+                color: #d1d5db;
+                font-size: 14px;
+                line-height: 1.8;
+                margin: 10px 0;
+            }
+            p:first-of-type {
                 font-size: 15px;
-                line-height: 1.7;
-                margin: 12px 0;
+                font-weight: 500;
+                color: #e5e7eb;
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="icon">⚠️</div>
+            <div class="icon">⚡</div>
             <h1>${title}</h1>
             <p>${message}</p>
             <p>${instructions}</p>
@@ -367,30 +490,54 @@ function generateErrorPage(title, message) {
                 padding: 0;
                 box-sizing: border-box;
             }
-            body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                color: #1f2937;
+            body {
+                font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                background: linear-gradient(135deg, #1f1f2e 0%, #0f0f1e 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 20px;
+                position: relative;
+                overflow: hidden;
+            }
+            body::before {
+                content: '';
+                position: absolute;
+                width: 500px;
+                height: 500px;
+                background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+                border-radius: 50%;
+                top: -100px;
+                right: -100px;
+            }
+            body::after {
+                content: '';
+                position: absolute;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, rgba(220, 38, 38, 0.08) 0%, transparent 70%);
+                border-radius: 50%;
+                bottom: -50px;
+                left: -100px;
             }
             .container {
-                background: white;
-                border-radius: 16px;
-                padding: 60px 40px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                background: rgba(31, 31, 46, 0.9);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+                border-radius: 20px;
+                padding: 50px 40px;
                 max-width: 500px;
                 text-align: center;
-                animation: slideUp 0.5s ease-out;
-                border-left: 5px solid #ef4444;
+                animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 10;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(239, 68, 68, 0.1);
             }
             @keyframes slideUp {
                 from {
                     opacity: 0;
-                    transform: translateY(20px);
+                    transform: translateY(40px);
                 }
                 to {
                     opacity: 1;
@@ -398,33 +545,43 @@ function generateErrorPage(title, message) {
                 }
             }
             .icon {
-                font-size: 5em;
-                margin-bottom: 24px;
+                font-size: 4.5em;
+                margin-bottom: 28px;
                 display: inline-block;
-                animation: shake 0.5s ease-in-out;
+                animation: pulse-shake 0.6s ease-in-out;
+                filter: drop-shadow(0 8px 16px rgba(239, 68, 68, 0.25));
             }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                75% { transform: translateX(5px); }
+            @keyframes pulse-shake {
+                0% { transform: scale(1) rotate(0deg); opacity: 0; }
+                50% { transform: scale(1.1) rotate(-5deg); }
+                100% { transform: scale(1) rotate(0deg); opacity: 1; }
             }
             h1 {
-                color: #dc2626;
-                font-size: 28px;
-                margin-bottom: 16px;
-                font-weight: 700;
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-size: 32px;
+                margin-bottom: 12px;
+                font-weight: 800;
+                letter-spacing: -0.5px;
             }
             p {
-                color: #4b5563;
+                color: #d1d5db;
+                font-size: 14px;
+                line-height: 1.8;
+                margin: 10px 0;
+            }
+            p:first-of-type {
                 font-size: 15px;
-                line-height: 1.7;
-                margin: 12px 0;
+                font-weight: 500;
+                color: #e5e7eb;
             }
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="icon">❌</div>
+            <div class="icon">🚨</div>
             <h1>${title}</h1>
             <p>${message}</p>
             <p>You can close this window and try again.</p>

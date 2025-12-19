@@ -4,7 +4,10 @@ const TempOAuth2Schema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
-        unique: true,
+    },
+    guildId: {
+        type: String,
+        required: true,
     },
     accessToken: {
         type: String,
@@ -23,5 +26,8 @@ const TempOAuth2Schema = new mongoose.Schema({
         expires: 3600, // Auto-delete after 1 hour
     },
 });
+
+// Ensure one temp token per user per guild
+TempOAuth2Schema.index({ userId: 1, guildId: 1 }, { unique: true });
 
 module.exports = mongoose.model("TempOAuth2", TempOAuth2Schema);

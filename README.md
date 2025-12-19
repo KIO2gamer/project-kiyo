@@ -6,6 +6,7 @@ A streamlined multipurpose Discord bot built with [discord.js](https://discord.j
 
 ### Core Functionality
 
+-   **🛡️ Auto-Moderation:** Advanced auto-moderation system with spam detection, mass mention protection, link filtering, bad word filter, anti-raid protection, and more
 -   **Moderation Commands:** Comprehensive server management with bans, kicks, timeouts, channel locks, and role-based commands
 -   **Information & Search:** User info, server info, avatar lookups, help system, and bot statistics
 -   **Utility Commands:** Translations, weather details, calculator, polls, reminders, and status checks

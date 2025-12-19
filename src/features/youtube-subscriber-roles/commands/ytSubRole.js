@@ -9,6 +9,7 @@ const {
 } = require("discord.js");
 const { google } = require("googleapis");
 const axios = require("axios");
+const crypto = require("crypto");
 const { handleError, logError } = require("../../../utils/errorHandler");
 const Logger = require("../../../utils/logger");
 const { formatNumber } = require("../../../utils/stringUtils");
@@ -76,7 +77,7 @@ module.exports = {
 
             // Create OAuth2 authorization URL
             const scopes = ["connections"];
-            const state = `${userId}-${Date.now()}`;
+            const state = this.createStateToken({ userId, guildId });
             const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scopes.join("%20")}&state=${state}`;
 
             // Create embed with instructions
@@ -218,8 +219,11 @@ module.exports = {
         try {
             // Check if we have stored OAuth2 tokens for this user
             const oauthData = await TempOAuth2Storage.findOne({ userId });
+            // If multiple guilds, prefer guild-bound record
+            const scopedOAuth = await TempOAuth2Storage.findOne({ userId, guildId });
+            const oauthRecord = scopedOAuth || oauthData;
 
-            if (!oauthData || oauthData.expiresAt < new Date()) {
+            if (!oauthRecord || oauthRecord.expiresAt < new Date()) {
                 const embed = new EmbedBuilder()
                     .setTitle("⚠️ Authorization Required")
                     .setDescription(
@@ -241,7 +245,7 @@ module.exports = {
                 "https://discord.com/api/users/@me/connections",
                 {
                     headers: {
-                        Authorization: `Bearer ${oauthData.accessToken}`,
+                        Authorization: `Bearer ${oauthRecord.accessToken}`,
                     },
                 },
             );
@@ -411,5 +415,20 @@ module.exports = {
 
             await interaction.editReply({ embeds: [embed], components: [] });
         }
+    },
+
+    createStateToken({ userId, guildId }) {
+        const secret = process.env.OAUTH_STATE_SECRET || process.env.DISCORD_CLIENT_SECRET;
+        const payload = {
+            userId,
+            guildId,
+            iat: Date.now(),
+        };
+        const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
+        const signature = crypto
+            .createHmac("sha256", secret)
+            .update(payloadB64)
+            .digest("base64url");
+        return `${payloadB64}.${signature}`;
     },
 };
