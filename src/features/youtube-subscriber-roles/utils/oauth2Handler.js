@@ -114,7 +114,7 @@ class OAuth2Handler {
 
                 // Store the access token temporarily
                 const expiresAt = new Date(Date.now() + expires_in * 1000);
-                await TempOAuth2Storage.findOneAndUpdate(
+                await TempOAuth2Storage.replaceOne(
                     { userId, guildId: statePayload.guildId },
                     {
                         userId,
@@ -123,7 +123,7 @@ class OAuth2Handler {
                         refreshToken: refresh_token,
                         expiresAt,
                     },
-                    { upsert: true, new: true },
+                    { upsert: true },
                 );
 
                 if (youtubeConnection) {

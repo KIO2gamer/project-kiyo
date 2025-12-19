@@ -169,7 +169,7 @@ exports.handler = async (event) => {
 
         // Store the access token temporarily
         const expiresAt = new Date(Date.now() + expires_in * 1000);
-        await TempOAuth2Storage.findOneAndUpdate(
+        await TempOAuth2Storage.replaceOne(
             { userId, guildId: statePayload.guildId },
             {
                 userId,
@@ -178,7 +178,7 @@ exports.handler = async (event) => {
                 refreshToken: refresh_token,
                 expiresAt,
             },
-            { upsert: true, new: true },
+            { upsert: true },
         );
 
         if (youtubeConnection) {
