@@ -90,7 +90,7 @@ module.exports = {
                         if (state.guessedLetters.includes(letter)) {
                             return i.reply({
                                 content: `You've already guessed the letter ${letter}.`,
-                                flags: MessageFlags.Ephemeral,
+                                ephemeral: true,
                             });
                         }
 

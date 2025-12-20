@@ -105,6 +105,9 @@ module.exports = {
 
 async function getRandomGif(searchTerm) {
     try {
+        if (!process.env.GIPHY_API_KEY) {
+            throw new Error("Missing GIPHY_API_KEY environment variable");
+        }
         const response = await axios.get("https://api.giphy.com/v1/gifs/random", {
             params: {
                 api_key: process.env.GIPHY_API_KEY,

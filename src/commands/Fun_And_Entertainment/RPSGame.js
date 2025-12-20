@@ -50,26 +50,51 @@ module.exports = {
             spock: { rock: "vaporizes", scissors: "smashes" },
         };
 
-        let result = "";
+        const COLORS = {
+            win: 0x00c853,
+            lose: 0xe53935,
+            tie: 0xffa000,
+        };
+
+        let resultTitle = "";
+        let resultColor = COLORS.tie;
         let action = "";
 
         if (userChoice === botChoice) {
-            result = "It's a tie! Great minds think alike! 🤝";
+            resultTitle = "🤝 It's a Tie!";
+            action = "Great minds think alike!";
         } else if (winConditions[userChoice].includes(botChoice)) {
-            result = "You win! 🎉";
+            resultTitle = "🎉 You Win!";
+            resultColor = COLORS.win;
             action = `${emojis[userChoice]} ${actionDescriptions[userChoice][botChoice]} ${emojis[botChoice]}`;
         } else {
-            result = "You lose! Better luck next time! 😢";
+            resultTitle = "😢 You Lose!";
+            resultColor = COLORS.lose;
             action = `${emojis[botChoice]} ${actionDescriptions[botChoice][userChoice]} ${emojis[userChoice]}`;
         }
 
         const embed = new EmbedBuilder()
-            .setColor("#0099ff")
-            .setTitle("Rock, Paper, Scissors, Lizard, Spock")
-            .setDescription(
-                `You chose ${emojis[userChoice]} ${userChoice}.\nI chose ${emojis[botChoice]} ${botChoice}.\n\n${result}\n${action}`,
+            .setColor(resultColor)
+            .setTitle(resultTitle)
+            .addFields(
+                {
+                    name: "Your Choice",
+                    value: `${emojis[userChoice]} **${userChoice.charAt(0).toUpperCase() + userChoice.slice(1)}**`,
+                    inline: true,
+                },
+                {
+                    name: "Bot's Choice",
+                    value: `${emojis[botChoice]} **${botChoice.charAt(0).toUpperCase() + botChoice.slice(1)}**`,
+                    inline: true,
+                },
+                { name: "\u200B", value: "\u200B", inline: false },
+                { name: "Result", value: action, inline: false },
             )
-            .setFooter({ text: 'As Sheldon Cooper would say, "Bazinga!"' });
+            .setFooter({
+                text: `Played by ${interaction.user.tag} | "Bazinga!" - Sheldon Cooper`,
+                iconURL: interaction.user.displayAvatarURL(),
+            })
+            .setTimestamp();
 
         await interaction.reply({ embeds: [embed] });
     },

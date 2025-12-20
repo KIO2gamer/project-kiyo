@@ -39,6 +39,7 @@ module.exports = {
                 });
             }
 
+            const questionAskedAt = Date.now();
             const { triviaEmbed, correctIndex } = createTriviaEmbed(questionData); // Get correctIndex from createTriviaEmbed
             const answerRow = createAnswerRow();
 
@@ -55,6 +56,7 @@ module.exports = {
                 questionData,
                 triviaEmbed.data.fields,
                 correctIndex,
+                questionAskedAt,
             ); // Pass correctIndex
         } catch (error) {
             handleError("Trivia command error:", error);
@@ -124,10 +126,14 @@ function createAnswerFields(answers) {
     }));
 }
 
-function createAnswerRow() {
+function createAnswerRow(disabled = false) {
     return new ActionRowBuilder().addComponents(
         ANSWER_BUTTON_LABELS.map((letter) =>
-            new ButtonBuilder().setCustomId(letter).setLabel(letter).setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(letter)
+                .setLabel(letter)
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(disabled),
         ),
     );
 }
@@ -148,6 +154,7 @@ function handleCollectorEvents(
     questionData,
     answerFields,
     correctAnswerIndex,
+    askedAt,
 ) {
     let answered = false;
     const answers = answerFields.map((field) => field.value);
@@ -157,6 +164,7 @@ function handleCollectorEvents(
         collector.stop(); // Stop collector immediately after an answer is collected
         const userAnswerIndex = ANSWER_BUTTON_LABELS.indexOf(i.customId); // userAnswerIndex from button click
         const isCorrect = userAnswerIndex === correctAnswerIndex;
+        const answeredAt = Date.now();
 
         const resultEmbed = createResultEmbed(
             isCorrect,
@@ -164,6 +172,7 @@ function handleCollectorEvents(
             correctAnswerIndex,
             userAnswerIndex,
             interaction,
+            answeredAt - askedAt,
         );
         await i.update({ embeds: [resultEmbed], components: [] });
     });
@@ -171,17 +180,24 @@ function handleCollectorEvents(
     collector.on("end", async () => {
         if (!answered) {
             const timeoutEmbed = createTimeoutEmbed(answers, correctAnswerIndex);
-            await interaction.followUp({
-                embeds: [timeoutEmbed],
-                components: [],
-            }); // Use followUp for timeout message
+            await reply.edit({ components: [createAnswerRow(true)] });
+            await interaction.followUp({ embeds: [timeoutEmbed], components: [] }); // Use followUp for timeout message
         }
     });
 }
 
-function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerIndex, interaction) {
+function createResultEmbed(
+    isCorrect,
+    answers,
+    correctAnswerIndex,
+    userAnswerIndex,
+    interaction,
+    timeTakenMs,
+) {
     Logger.debug(`createResultEmbed - Correct Answer Index: ${correctAnswerIndex}`);
     Logger.debug(`createResultEmbed - Answers Array: ${JSON.stringify(answers)}`);
+
+    const timeTakenSeconds = Math.max(timeTakenMs || 0, 0) / 1000;
 
     const resultEmbed = new EmbedBuilder()
         .setColor(isCorrect ? CORRECT_COLOR : WRONG_COLOR)
@@ -206,7 +222,7 @@ function createResultEmbed(isCorrect, answers, correctAnswerIndex, userAnswerInd
             },
         )
         .setFooter({
-            text: `Answered in ${((interaction.createdTimestamp - interaction.createdTimestamp) / 1000).toFixed(2)} seconds! (This part needs fixing)`, // Time calculation is incorrect, needs to use interaction timestamps properly
+            text: `Answered in ${timeTakenSeconds.toFixed(2)} seconds!`,
         });
     return resultEmbed;
 }

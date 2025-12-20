@@ -114,7 +114,12 @@ async function runGame(interaction, gameState) {
                 await sleep(GAME_CONFIG.TIMING.ROUND_DELAY);
             }
         } catch (error) {
-            await handleError("Game round error:", error);
+            await handleError(
+                interaction,
+                error,
+                "COMMAND_EXECUTION",
+                "LyricWhiz failed to run this round.",
+            );
             await sendErrorEmbed(interaction);
             return;
         }
@@ -314,7 +319,9 @@ async function fetchTracksFromItunes(genre) {
             durationSec: track.trackTimeMillis ? Math.round(track.trackTimeMillis / 1000) : null,
         }));
     } catch (error) {
-        await handleError("iTunes API error:", error);
+        await handleError(
+            new Error(`iTunes API error while fetching tracks: ${error.message || error}`),
+        );
         return [];
     }
 }
