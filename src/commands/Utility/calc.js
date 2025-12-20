@@ -14,6 +14,9 @@ const math = require("mathjs"); // Import mathjs
 const { handleError } = require("../../utils/errorHandler");
 const { renderLatexToPng } = require("../../utils/renderLatex");
 
+// Cache for built-in math functions/constants to avoid repeated lookups
+const MATH_BUILTINS = new Set(Object.keys(math));
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("calculate")
@@ -43,46 +46,7 @@ module.exports = {
         const varsStr = interaction.options.getString("vars");
 
         // Parse variables into a mathjs scope
-        const scope = {};
-        if (varsStr && varsStr.trim()) {
-            const raw = varsStr.trim();
-            try {
-                if (raw.startsWith("{") && raw.endsWith("}")) {
-                    const obj = JSON.parse(raw);
-                    for (const [k, v] of Object.entries(obj)) {
-                        if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(k)) {
-                            // Evaluate numeric-like strings; otherwise assign as-is
-                            if (typeof v === "string") {
-                                try {
-                                    scope[k] = math.evaluate(v);
-                                } catch {
-                                    scope[k] = v;
-                                }
-                            } else {
-                                scope[k] = v;
-                            }
-                        }
-                    }
-                } else {
-                    // Parse CSV/semicolon/space-separated pairs like x=2,y=3
-                    const pairs = raw.split(/[,;\s]+/).filter(Boolean);
-                    for (const p of pairs) {
-                        const idx = p.indexOf("=");
-                        if (idx === -1) continue;
-                        const key = p.slice(0, idx).trim();
-                        const valStr = p.slice(idx + 1).trim();
-                        if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
-                        try {
-                            scope[key] = math.evaluate(valStr);
-                        } catch {
-                            scope[key] = valStr;
-                        }
-                    }
-                }
-            } catch {
-                // If parsing variables fails, proceed without them
-            }
-        }
+        const scope = parseVariables(varsStr);
 
         try {
             // Parse the expression to generate LaTeX and evaluate
@@ -90,15 +54,7 @@ module.exports = {
             const simplified = math.simplify(node);
 
             // Detect unbound symbols (variables not provided in scope and not built-ins)
-            let hasUnbound = false;
-            node.traverse((n) => {
-                if (n && n.isSymbolNode) {
-                    const name = n.name;
-                    if (Object.prototype.hasOwnProperty.call(scope, name)) return;
-                    if (math[name] !== undefined) return; // built-in constant/function
-                    hasUnbound = true;
-                }
-            });
+            const hasUnbound = hasUnboundSymbols(node, scope);
 
             // Evaluate numerically only when no unbound symbols
             let result;
@@ -111,18 +67,7 @@ module.exports = {
             // Build LaTeX strings
             const latexExpr = node.toTex({ parenthesis: "keep", implicit: "show" });
             const latexSimplified = simplified.toTex({ parenthesis: "keep", implicit: "show" });
-            // Convert result to LaTeX (numeric -> parse back; symbolic -> use node's toTex)
-            let latexResult;
-            if (result && typeof result === "object" && typeof result.toTex === "function") {
-                latexResult = result.toTex({ parenthesis: "keep", implicit: "show" });
-            } else {
-                try {
-                    const resultNode = math.parse(math.format(result));
-                    latexResult = resultNode.toTex({ parenthesis: "keep", implicit: "show" });
-                } catch {
-                    latexResult = String(result);
-                }
-            }
+            const latexResult = resultToLatex(result);
 
             const embed = new EmbedBuilder()
                 .setColor("#0099ff")
@@ -215,3 +160,90 @@ module.exports = {
         }
     },
 };
+
+/**
+ * Parse variable assignments from a string
+ * @param {string|null} varsStr - Variable string in format "x=2,y=3" or JSON
+ * @returns {Object} Scope object with parsed variables
+ */
+function parseVariables(varsStr) {
+    const scope = {};
+    if (!varsStr || !varsStr.trim()) return scope;
+
+    const raw = varsStr.trim();
+    try {
+        if (raw.startsWith("{") && raw.endsWith("}")) {
+            const obj = JSON.parse(raw);
+            for (const [k, v] of Object.entries(obj)) {
+                if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(k)) {
+                    scope[k] = typeof v === "string" ? evaluateOrString(v) : v;
+                }
+            }
+        } else {
+            // Parse CSV/semicolon/space-separated pairs like x=2,y=3
+            const pairs = raw.split(/[,;\s]+/).filter(Boolean);
+            for (const p of pairs) {
+                const idx = p.indexOf("=");
+                if (idx === -1) continue;
+                const key = p.slice(0, idx).trim();
+                const valStr = p.slice(idx + 1).trim();
+                if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+                scope[key] = evaluateOrString(valStr);
+            }
+        }
+    } catch {
+        // If parsing variables fails, proceed without them
+    }
+    return scope;
+}
+
+/**
+ * Evaluate a string as math or return as-is
+ * @param {string} valStr - Value string to evaluate
+ * @returns {*} Evaluated or original value
+ */
+function evaluateOrString(valStr) {
+    try {
+        return math.evaluate(valStr);
+    } catch {
+        return valStr;
+    }
+}
+
+/**
+ * Check if node has unbound symbols
+ * @param {Object} node - Math.js parse node
+ * @param {Object} scope - Variable scope
+ * @returns {boolean} True if unbound symbols exist
+ */
+function hasUnboundSymbols(node, scope) {
+    let found = false;
+    node.traverse((n) => {
+        if (found) return; // Early exit if already found
+        if (n && n.isSymbolNode) {
+            const name = n.name;
+            if (scope.hasOwnProperty(name) || MATH_BUILTINS.has(name)) return;
+            found = true;
+        }
+    });
+    return found;
+}
+
+/**
+ * Convert result to LaTeX representation
+ * @param {*} result - Result value
+ * @returns {string} LaTeX string
+ */
+function resultToLatex(result) {
+    if (result && typeof result === "object" && typeof result.toTex === "function") {
+        return result.toTex({ parenthesis: "keep", implicit: "show" });
+    }
+    try {
+        // Format and parse back to get proper LaTeX
+        const formatted = math.format(result, { precision: 14 });
+        const resultNode = math.parse(formatted);
+        return resultNode.toTex({ parenthesis: "keep", implicit: "show" });
+    } catch {
+        return String(result);
+    }
+}

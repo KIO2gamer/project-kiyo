@@ -3,8 +3,11 @@ const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs");
 const { REST, Routes, Client, Collection, GatewayIntentBits } = require("discord.js");
+const { Player } = require("discord-player");
+const { DefaultExtractors } = require("@discord-player/extractor");
 const Logger = require("./utils/logger");
 require("./utils/slowBufferCompat");
+
 const CommandPermissions = require("./database/commandPermissions");
 const OAuth2Handler = require("./features/youtube-subscriber-roles/utils/oauth2Handler");
 const StatsTracker = require("./utils/statsTracker");
@@ -22,6 +25,7 @@ function createClient() {
             GatewayIntentBits.GuildMessages,
             GatewayIntentBits.MessageContent,
             GatewayIntentBits.GuildMembers,
+            GatewayIntentBits.GuildVoiceStates,
         ],
     });
 
@@ -29,6 +33,19 @@ function createClient() {
     client.commands = new Collection();
     client.cooldowns = new Collection();
     client.categories = new Collection();
+
+    // Initialize music player
+    const player = new Player(client, {
+        ytdlOptions: {
+            quality: "highestaudio",
+            highWaterMark: 1 << 25,
+        },
+    });
+
+    // Load extractors
+    player.extractors.loadMulti(DefaultExtractors).catch((error) => {
+        Logger.error(`Failed to load music extractors: ${error.message}`);
+    });
 
     return client;
 }

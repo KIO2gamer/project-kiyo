@@ -8,6 +8,8 @@ A streamlined multipurpose Discord bot built with [discord.js](https://discord.j
 
 -   **🛡️ Auto-Moderation:** Advanced auto-moderation system with spam detection, mass mention protection, link filtering, bad word filter, anti-raid protection, and more
 -   **Moderation Commands:** Comprehensive server management with bans, kicks, timeouts, channel locks, and role-based commands
+-   **Music Playback:** Full music support with play, queue, skip, pause, resume, volume control, and now playing display
+-   **Support Tickets:** Create, manage, and close support tickets with dedicated ticket categories
 -   **Information & Search:** User info, server info, avatar lookups, help system, and bot statistics
 -   **Utility Commands:** Translations, weather details, calculator, polls, reminders, and status checks
 -   **Admin & Configuration:** Channel management, custom commands, embed creation, and bot configuration
@@ -36,12 +38,12 @@ This project follows a feature-based organization for better maintainability:
 ```
 project-kiyo/
 ├── 📁 src/                          # Main source code
-│   ├── 📁 commands/                 # Discord commands by category (89 total)
+│   ├── 📁 commands/                 # Discord commands by category (100 total)
 │   ├── 📁 features/                 # Feature-based organization
 │   │   └── 📁 youtube-subscriber-roles/  # YouTube subscriber role feature
-│   ├── 📁 database/                 # MongoDB schemas
-│   ├── 📁 events/                   # Discord.js event handlers
-│   └── 📁 utils/                    # Utility functions
+│   ├── 📁 database/                 # MongoDB schemas (17 schemas)
+│   ├── 📁 events/                   # Discord.js event handlers (14 handlers)
+│   └── 📁 utils/                    # Utility functions (16 utilities)
 ├── 📁 docs/                         # Documentation
 ├── 📁 deployments/                  # External service deployments
 │   └── 📁 netlify-oauth/            # Netlify OAuth2 callback service
@@ -50,7 +52,27 @@ project-kiyo/
 
 See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detailed information.
 
+### Documentation Reference
+
+-   **[Installation & Setup Guide](docs/INSTALLATION_AND_SETUP.md)** - Complete setup instructions
+-   **[Commands Reference](docs/COMMANDS_REFERENCE.md)** - All 100 commands quick reference
+-   **[Codebase Overview](docs/CODEBASE_OVERVIEW.md)** - Architecture and component guide
+-   **[Music & Support Features](docs/MUSIC_AND_SUPPORT.md)** - Music playback and ticket management guide
+-   **[Auto-Moderation System](docs/AUTO_MODERATION.md)** - Comprehensive moderation documentation
+-   **[Logging System](docs/LOGGING_SYSTEM.md)** - Universal logging documentation
+-   **[YouTube Subscriber Roles](docs/youtube-subscriber-roles/YOUTUBE_SUBSCRIBER_ROLES_SETUP.md)** - Setup and usage guide
+-   **[Project Structure](docs/PROJECT_STRUCTURE.md)** - File organization and architecture
+
+### Developer Resources
+
+-   **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+-   **[Troubleshooting Guide](TROUBLESHOOTING.md)** - Solutions for common issues
+
 ## Installation
+
+**Quick Start:** Follow our [Installation & Setup Guide](docs/INSTALLATION_AND_SETUP.md) for complete step-by-step instructions.
+
+### Quick Version
 
 1. **Clone the Repository:**
 
@@ -60,81 +82,69 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
     ```
 
 2. **Install Dependencies:**
+
     ```bash
     npm ci
     ```
-3. **Environment Variables:**
 
-    Create a `.env` file in the project root with the following keys (see `.env.example` for reference):
+3. **Configure Environment:**
 
-    ```
-    # Required
-    DISCORD_TOKEN=your_discord_token
-    CLIENTID=your_client_id
-    MONGODB_URL=your_mongodb_url
+    - Copy `.env.example` to `.env`
+    - Add `DISCORD_TOKEN`, `CLIENTID`, and `MONGODB_URL`
+    - (Optional) Add API keys for additional features
 
-    # Optional API Keys
-    GEMINI_API_KEY=your_gemini_api_key
-    GOOGLE_API_KEY=your_google_api_key
-    WEATHER_API_KEY=your_weather_api_key
-    YOUTUBE_API_KEY=your_youtube_api_key
-
-    # Discord OAuth2 (for YouTube subscriber roles)
-    DISCORD_CLIENT_ID=your_client_id
-    DISCORD_CLIENT_SECRET=your_client_secret
-    DISCORD_REDIRECT_URI=http://localhost:3000/callback
-    OAUTH_STATE_SECRET=your_random_secret_32_64_bytes  # Optional (falls back to DISCORD_CLIENT_SECRET)
-
-    # Optional Configuration
-    GUILDID=your_primary_guild_id
-    LOG_LEVEL=INFO
-    LOG_TO_FILE=false
-    LOG_FOLDER=logs
-    ```
-
-4. **Prepare Git Hooks (if needed):**
+4. **Start the Bot:**
     ```bash
-    npm run prepare
+    npm start              # Production
+    npm run dev           # Development with auto-reload
     ```
 
-## Usage
+For detailed setup with all available options, see [Installation & Setup Guide](docs/INSTALLATION_AND_SETUP.md).
 
--   **Run the Bot:**
+## Environment Variables
 
-    ```bash
-    npm start
-    ```
+**Required:**
 
--   **Development Mode:**
+```env
+DISCORD_TOKEN=your_discord_bot_token
+CLIENTID=your_client_id
+MONGODB_URL=your_mongodb_url
+```
 
-    ```bash
-    npm run dev
-    ```
+**Optional (for features):**
 
--   **Code Quality:**
-    ```bash
-    npm run lint      # Run ESLint with auto-fix
-    npm run format    # Format code with Prettier
-    ```
+```env
+GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_API_KEY=your_google_api_key
+WEATHER_API_KEY=your_weather_api_key
+YOUTUBE_API_KEY=your_youtube_api_key
+DISCORD_CLIENT_SECRET=your_oauth2_secret    # For YouTube roles
+LOG_LEVEL=INFO
+LOG_TO_FILE=false
+```
+
+See `.env.example` for all available options and [Installation & Setup Guide](docs/INSTALLATION_AND_SETUP.md) for detailed configuration.
 
 ## Project Structure
 
 ```
 src/
-├── commands/           # Organized command categories (89 total commands)
+├── commands/           # Organized command categories (100 total commands)
 │   ├── Admin_And_Configuration/    # 20 commands
-│   ├── API_Integrations/          # 7 commands
+│   ├── API_Integrations/          # 8 commands
 │   ├── Fun_And_Entertainment/     # 11 commands
 │   ├── Information_And_Search/    # 12 commands
-│   ├── Levels_And_Experience/     # 3 commands
-│   ├── Moderation/                # 18 commands
+│   ├── Levels_And_Experience/     # 4 commands
+│   ├── Moderation/                # 19 commands
+│   ├── Music/                     # 10 commands
 │   ├── Role_Management/           # 5 commands
-│   └── Utility/                   # 13 commands
-├── database/          # MongoDB schemas and models
-├── events/            # Discord event listeners
+│   ├── Support_And_Tickets/       # 6 commands
+│   └── Utility/                   # 5 commands
+├── database/          # MongoDB schemas and models (17 schemas)
+├── events/            # Discord event listeners (14 handlers)
 ├── features/          # Feature-based organization
 │   └── youtube-subscriber-roles/  # YouTube subscriber role feature
-├── utils/             # Utility modules and helpers
+├── utils/             # Utility modules and helpers (16 utilities)
 └── index.js           # Main bot entry point
 ```
 
@@ -169,7 +179,6 @@ This codebase has undergone significant cleanup and optimization:
 
 ### Removed Dependencies & Features
 
--   **Music functionality:** Removed incomplete music commands and related dependencies (`discord-player`, `@discordjs/opus`, `@discordjs/voice`, `ytdl-core`, `play-dl`, `ffmpeg-static`)
 -   **Unused utilities:** Removed redundant terminal styling packages (`boxen`, `figures`)
 -   **Security improvements:** Removed eval command and other potentially dangerous development artifacts
 -   **Broken API integrations:** Cleaned up non-functional API commands and deprecated services
@@ -184,13 +193,15 @@ This codebase has undergone significant cleanup and optimization:
 
 ### Recent Feature Updates
 
+-   **Music System:** Full music playback support with queue management, volume control, and Now Playing display
+-   **Ticket Support System:** Create, manage, and close support tickets with dedicated ticket categories
 -   **Auto-Moderation Enhancements:** Richer audit logs with deletion status, message IDs, attachment counts, and jump links for easier moderation review
 -   **AI Chatbot Tuning:** Optimized generation settings (temperature: 0.7, topK: 40) for steadier, more concise conversational responses
 -   **YouTube OAuth2 Security:** Guild-scoped, HMAC-signed state tokens with 15-minute expiry and user/state cross-validation to prevent token replay and cross-guild misuse
 
 ### Performance Benefits
 
--   **Optimized dependency footprint:** 20 essential production dependencies
+-   **Optimized dependency footprint:** 25 production dependencies with music and ticket support
 -   **Faster startup times:** Eliminated unused imports and optimized loading
 -   **Better maintainability:** Cleaner code structure and consolidated functionality
 -   **Enhanced security:** Removed dangerous commands and improved error handling

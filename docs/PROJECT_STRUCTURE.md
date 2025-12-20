@@ -25,15 +25,17 @@ project-kiyo/
 
 ```
 src/
-├── 📁 commands/                     # Discord slash commands (organized by category - 89 total)
+├── 📁 commands/                     # Discord slash commands (organized by category - 100 total)
 │   ├── 📁 Admin_And_Configuration/  # Admin and server configuration (20 commands)
-│   ├── 📁 API_Integrations/         # External API integration (7 commands)
+│   ├── 📁 API_Integrations/         # External API integration (8 commands)
 │   ├── 📁 Fun_And_Entertainment/    # Fun and entertainment (11 commands)
 │   ├── 📁 Information_And_Search/   # Information and search (12 commands)
-│   ├── 📁 Levels_And_Experience/    # XP and leveling system (3 commands)
-│   ├── 📁 Moderation/               # Moderation and management (18 commands)
+│   ├── 📁 Levels_And_Experience/    # XP and leveling system (4 commands)
+│   ├── 📁 Moderation/               # Moderation and management (19 commands)
+│   ├── 📁 Music/                    # Music playback and control (10 commands)
 │   ├── 📁 Role_Management/          # Role management (5 commands)
-│   └── 📁 Utility/                  # Utility and helper (13 commands)
+│   ├── 📁 Support_And_Tickets/      # Support ticket management (6 commands)
+│   └── 📁 Utility/                  # Utility and helper (5 commands)
 ├── 📁 database/                     # MongoDB schemas and models
 ├── 📁 events/                       # Discord.js event handlers
 ├── 📁 features/                     # Feature-based organization

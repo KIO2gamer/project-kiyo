@@ -42,14 +42,17 @@ module.exports = {
                 level: 0,
                 xp: 0,
                 totalXp: 0,
+                dailyStreak: 0,
+                messageCount: 0,
+                voiceTime: 0,
                 rank: "N/A",
             };
 
             // Calculate XP needed for next level
             const xpForNextLevel = calculateXpForLevel(levelData.level + 1);
             const currentLevelXp = calculateXpForLevel(levelData.level);
-            const xpProgress = levelData.xp - currentLevelXp;
-            const xpNeeded = xpForNextLevel - currentLevelXp;
+            const xpProgress = Math.max(0, levelData.xp - currentLevelXp);
+            const xpNeeded = Math.max(1, xpForNextLevel - currentLevelXp);
             const progressPercentage = Math.floor((xpProgress / xpNeeded) * 100);
 
             // Get user rank
@@ -58,9 +61,23 @@ module.exports = {
             // Create progress bar
             const progressBar = createProgressBar(progressPercentage);
 
+            // Calculate active boost
+            let boostInfo = "";
+            if (
+                levelData.xpBoost &&
+                levelData.xpBoost.multiplier > 1.0 &&
+                levelData.xpBoost.expiresAt &&
+                new Date() < levelData.xpBoost.expiresAt
+            ) {
+                const hoursRemaining = Math.ceil(
+                    (levelData.xpBoost.expiresAt - new Date()) / (1000 * 60 * 60),
+                );
+                boostInfo = `\n🚀 Active XP Boost: **${levelData.xpBoost.multiplier}x** (${hoursRemaining}h remaining)`;
+            }
+
             const embed = new EmbedBuilder()
                 .setTitle(`${member.user.username}'s Level`)
-                .setDescription(`XP progress for ${member}`)
+                .setDescription(`XP progress for ${member}${boostInfo}`)
                 .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
                 .setColor(member.displayHexColor || "#5865F2")
                 .addFields(
@@ -74,6 +91,21 @@ module.exports = {
                     {
                         name: "Progress",
                         value: `${progressBar}\n${xpProgress.toLocaleString()}/${xpNeeded.toLocaleString()} XP (${progressPercentage}%)`,
+                    },
+                    {
+                        name: "🔥 Daily Streak",
+                        value: `${levelData.dailyStreak || 0} day${levelData.dailyStreak !== 1 ? "s" : ""}`,
+                        inline: true,
+                    },
+                    {
+                        name: "💬 Messages",
+                        value: `${(levelData.messageCount || 0).toLocaleString()}`,
+                        inline: true,
+                    },
+                    {
+                        name: "🎤 Voice Time",
+                        value: `${Math.floor((levelData.voiceTime || 0) / 60)}h ${(levelData.voiceTime || 0) % 60}m`,
+                        inline: true,
                     },
                 )
                 .setFooter({
@@ -96,7 +128,10 @@ module.exports = {
 function calculateXpForLevel(level) {
     // Base XP for level 1 is 100
     // Each level requires 50 more XP than the previous level
-    return level === 0 ? 0 : 100 + (level - 1) * 50 + calculateXpForLevel(level - 1);
+    // Formula: Total XP = 100*level + 50*(1+2+...+(level-1))
+    // = 100*level + 50*level*(level-1)/2
+    if (level <= 0) return 0;
+    return 100 * level + (50 * level * (level - 1)) / 2;
 }
 
 async function getUserRank(userId, guildId) {
