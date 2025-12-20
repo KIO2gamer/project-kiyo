@@ -55,22 +55,26 @@ module.exports = {
             }
 
             // Fetch log channel configuration
-            const config = await MsgLogsConfig.findOne({}).catch((err) => {
-                Logger.error("Failed to fetch message log configuration:", err);
-                return null;
-            });
+            const config = await MsgLogsConfig.findOne({ guildId: message.guild.id }).catch(
+                (err) => {
+                    Logger.error("Failed to fetch message log configuration:", err);
+                    return null;
+                },
+            );
 
-            if (!config?.channelId) {
-                Logger.debug("Message log channel not configured");
+            const targetChannelId =
+                config?.resolveChannelId?.("message_delete") || config?.channelId;
+            if (!targetChannelId) {
+                Logger.debug("Message delete log channel not configured");
                 return;
             }
 
             // Get log channel safely
             const logChannel = await message.guild.channels
-                .fetch(config.channelId)
+                .fetch(targetChannelId)
                 .catch(() => null);
             if (!logChannel) {
-                Logger.warn(`Invalid log channel ID in configuration: ${config.channelId}`);
+                Logger.warn(`Invalid log channel ID in configuration: ${targetChannelId}`);
                 return;
             }
 

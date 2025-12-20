@@ -6,6 +6,11 @@ const startTime = Date.now();
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
+        // Initialize cooldown store on the client (in-memory, per process)
+        if (!interaction.client.commandCooldowns) {
+            interaction.client.commandCooldowns = new Map();
+        }
+
         // Handle slash commands
         if (interaction.isChatInputCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
@@ -14,6 +19,28 @@ module.exports = {
                 Logger.error(`No command matching ${interaction.commandName} was found.`);
                 return;
             }
+
+            // Lightweight cooldown handling per user per command
+            const now = Date.now();
+            const cooldownSeconds = typeof command.cooldown === "number" ? command.cooldown : 5;
+            const cooldowns = interaction.client.commandCooldowns;
+            const key = `${interaction.user.id}:${interaction.commandName}`;
+            const expiresAt = cooldowns.get(key);
+
+            if (expiresAt && expiresAt > now) {
+                const remaining = Math.ceil((expiresAt - now) / 1000);
+                try {
+                    await interaction.reply({
+                        content: `⏳ You're on cooldown for ${remaining}s before using /${interaction.commandName} again.`,
+                        flags: MessageFlags.Ephemeral,
+                    });
+                } catch {
+                    Logger.debug("Cooldown reply failed (possibly already replied)");
+                }
+                return;
+            }
+
+            cooldowns.set(key, now + cooldownSeconds * 1000);
 
             try {
                 // Log command usage

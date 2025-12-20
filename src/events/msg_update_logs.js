@@ -15,16 +15,18 @@ async function fetchPartialMessages(oldMessage, newMessage) {
     return true;
 }
 
-async function getLogChannel(newMessage) {
-    const config = await MsgLogsConfig.findOne();
-    if (!config?.channelId) {
+async function getLogChannel(newMessage, eventKey = "message_update") {
+    const config = await MsgLogsConfig.findOne({ guildId: newMessage.guildId });
+    const targetChannelId = config?.resolveChannelId?.(eventKey) || config?.channelId;
+
+    if (!targetChannelId) {
         logError("Message logs", "Log channel ID is not set", { category: "EVENTS" });
         return null;
     }
 
-    const logChannel = await newMessage.guild.channels.fetch(config.channelId);
+    const logChannel = await newMessage.guild.channels.fetch(targetChannelId).catch(() => null);
     if (!logChannel) {
-        logError("Message logs", `Log channel with ID ${config.channelId} not found`, {
+        logError("Message logs", `Log channel with ID ${targetChannelId} not found`, {
             category: "EVENTS",
         });
         return null;
@@ -41,7 +43,7 @@ async function getLogChannel(newMessage) {
     ) {
         logError(
             "Message logs permission error",
-            `Bot lacks permission to send messages or embed links in the channel: ${config.channelId}`,
+            `Bot lacks permission to send messages or embed links in the channel: ${targetChannelId}`,
             { category: "PERMISSION" },
         );
         return null;
@@ -128,7 +130,7 @@ async function execute(oldMessage, newMessage) {
     if (!(await fetchPartialMessages(oldMessage, newMessage))) return;
 
     try {
-        const logChannel = await getLogChannel(newMessage);
+        const logChannel = await getLogChannel(newMessage, "message_update");
         if (!logChannel) return;
 
         // **Ignore edits in the log channel to prevent recursive logging**
