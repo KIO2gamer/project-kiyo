@@ -3,7 +3,7 @@ const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
 } = require("discord.js");
 const { handleError } = require("../../utils/errorHandler");
 const fs = require("fs").promises;

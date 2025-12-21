@@ -284,8 +284,8 @@ module.exports = {
                     ],
                 });
 
-            case "setlog":
-                { const logChannel = interaction.options.getChannel("channel");
+            case "setlog": {
+                const logChannel = interaction.options.getChannel("channel");
                 config.logChannelId = logChannel.id;
                 await config.save();
                 return interaction.reply({
@@ -295,10 +295,11 @@ module.exports = {
                             .setTitle("📝 Log Channel Set")
                             .setDescription(`Auto-mod logs will be sent to ${logChannel}`),
                     ],
-                }); }
+                });
+            }
 
-            case "spam":
-                { config.spamDetection.enabled = interaction.options.getBoolean("enabled");
+            case "spam": {
+                config.spamDetection.enabled = interaction.options.getBoolean("enabled");
 
                 const maxMessages = interaction.options.getInteger("max_messages");
                 if (maxMessages) config.spamDetection.maxMessages = maxMessages;
@@ -338,10 +339,11 @@ module.exports = {
                                 },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "mentions":
-                { config.massMention.enabled = interaction.options.getBoolean("enabled");
+            case "mentions": {
+                config.massMention.enabled = interaction.options.getBoolean("enabled");
 
                 const maxMentions = interaction.options.getInteger("max_mentions");
                 if (maxMentions) config.massMention.maxMentions = maxMentions;
@@ -369,10 +371,11 @@ module.exports = {
                                 { name: "Action", value: config.massMention.action, inline: true },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "invites":
-                { config.inviteFilter.enabled = interaction.options.getBoolean("enabled");
+            case "invites": {
+                config.inviteFilter.enabled = interaction.options.getBoolean("enabled");
 
                 const inviteAction = interaction.options.getString("action");
                 if (inviteAction) config.inviteFilter.action = inviteAction;
@@ -392,10 +395,11 @@ module.exports = {
                                 { name: "Action", value: config.inviteFilter.action, inline: true },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "links":
-                { config.linkFilter.enabled = interaction.options.getBoolean("enabled");
+            case "links": {
+                config.linkFilter.enabled = interaction.options.getBoolean("enabled");
 
                 const whitelist = interaction.options.getString("whitelist");
                 if (whitelist) {
@@ -423,10 +427,11 @@ module.exports = {
                                 },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "badwords":
-                { config.wordFilter.enabled = interaction.options.getBoolean("enabled");
+            case "badwords": {
+                config.wordFilter.enabled = interaction.options.getBoolean("enabled");
 
                 const words = interaction.options.getString("words");
                 if (words) {
@@ -455,10 +460,11 @@ module.exports = {
                             ),
                     ],
                     ephemeral: true,
-                }); }
+                });
+            }
 
-            case "caps":
-                { config.capsFilter.enabled = interaction.options.getBoolean("enabled");
+            case "caps": {
+                config.capsFilter.enabled = interaction.options.getBoolean("enabled");
 
                 const percentage = interaction.options.getInteger("percentage");
                 if (percentage) config.capsFilter.percentage = percentage;
@@ -482,10 +488,11 @@ module.exports = {
                                 },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "emojis":
-                { config.emojiSpam.enabled = interaction.options.getBoolean("enabled");
+            case "emojis": {
+                config.emojiSpam.enabled = interaction.options.getBoolean("enabled");
 
                 const maxEmojis = interaction.options.getInteger("max_emojis");
                 if (maxEmojis) config.emojiSpam.maxEmojis = maxEmojis;
@@ -509,10 +516,11 @@ module.exports = {
                                 },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "antiraid":
-                { config.antiRaid.enabled = interaction.options.getBoolean("enabled");
+            case "antiraid": {
+                config.antiRaid.enabled = interaction.options.getBoolean("enabled");
 
                 const joinThreshold = interaction.options.getInteger("join_threshold");
                 if (joinThreshold) config.antiRaid.joinThreshold = joinThreshold;
@@ -544,10 +552,11 @@ module.exports = {
                                 },
                             ),
                     ],
-                }); }
+                });
+            }
 
-            case "ignore":
-                { const ignoreChannel = interaction.options.getChannel("channel");
+            case "ignore": {
+                const ignoreChannel = interaction.options.getChannel("channel");
                 const ignoreRole = interaction.options.getRole("role");
 
                 if (ignoreChannel) {
@@ -574,10 +583,11 @@ module.exports = {
                     }
                 }
 
-                return interaction.reply("Please specify a channel or role to ignore."); }
+                return interaction.reply("Please specify a channel or role to ignore.");
+            }
 
-            case "unignore":
-                { const unignoreChannel = interaction.options.getChannel("channel");
+            case "unignore": {
+                const unignoreChannel = interaction.options.getChannel("channel");
                 const unignoreRole = interaction.options.getRole("role");
 
                 if (unignoreChannel) {
@@ -602,10 +612,11 @@ module.exports = {
                     }
                 }
 
-                return interaction.reply("Please specify a channel or role to unignore."); }
+                return interaction.reply("Please specify a channel or role to unignore.");
+            }
 
-            case "status":
-                { const statusEmbed = new EmbedBuilder()
+            case "status": {
+                const statusEmbed = new EmbedBuilder()
                     .setColor(config.enabled ? "#00FF00" : "#FF0000")
                     .setTitle("🛡️ Auto-Moderation Status")
                     .setDescription(
@@ -677,7 +688,8 @@ module.exports = {
                     .setFooter({ text: `Guild ID: ${interaction.guild.id}` })
                     .setTimestamp();
 
-                return interaction.reply({ embeds: [statusEmbed] }); }
+                return interaction.reply({ embeds: [statusEmbed] });
+            }
         }
     },
 };
