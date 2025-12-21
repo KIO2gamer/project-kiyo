@@ -72,8 +72,6 @@ module.exports = {
             );
             const totalXP = BASE_DAILY_XP + streakBonus;
 
-            const oldLevel = levelData.level;
-
             // Award XP
             levelData.xp += totalXP;
             levelData.totalXp += totalXP;

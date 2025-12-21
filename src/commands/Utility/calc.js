@@ -222,7 +222,9 @@ function hasUnboundSymbols(node, scope) {
         if (found) return; // Early exit if already found
         if (n && n.isSymbolNode) {
             const name = n.name;
-            if (scope.hasOwnProperty(name) || MATH_BUILTINS.has(name)) return;
+            // Use safe call to Object.prototype.hasOwnProperty to avoid accessing prototype methods
+            if (Object.prototype.hasOwnProperty.call(scope, name) || MATH_BUILTINS.has(name))
+                return;
             found = true;
         }
     });
