@@ -33,6 +33,8 @@ const COLORS = {
     DANGER: "#ED4245",
 };
 
+const COMMAND_LINK_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("help")
@@ -76,6 +78,7 @@ module.exports = {
         const client = interaction.client;
         const categories = this.getCategorizedCommands(client.commands);
         const totalCategories = Object.keys(categories).length;
+        const commandLinks = await this.getCommandLinkMap(interaction);
 
         const embed = new EmbedBuilder()
             .setAuthor({
@@ -112,7 +115,7 @@ module.exports = {
                 const category = this.getCategory(client, categoryName);
                 const preview = commands
                     .slice(0, 4)
-                    .map((cmd) => `\`${cmd.data.name}\``)
+                    .map((cmd) => this.getCommandMention(commandLinks, cmd.data.name))
                     .join(" • ");
                 const more = commands.length > 4 ? ` *+${commands.length - 4} more*` : "";
 
@@ -218,6 +221,7 @@ module.exports = {
      */
     async displayCommandHelp(interaction, commandName) {
         const command = interaction.client.commands.get(commandName.toLowerCase());
+        const commandLinks = await this.getCommandLinkMap(interaction);
 
         if (!command) {
             const embed = new EmbedBuilder()
@@ -263,7 +267,7 @@ module.exports = {
             })
             .setTitle(`📌 /${command.data.name}`)
             .setDescription(
-                `${command.description_full || command.data.description}\n\n` + `${"─".repeat(40)}`,
+                `${this.getCommandMention(commandLinks, command.data.name)}\n\n${command.description_full || command.data.description}\n\n${"─".repeat(40)}`,
             )
             .setColor(COLORS.INFO)
             .setTimestamp();
@@ -306,7 +310,7 @@ module.exports = {
         // Examples section
         if (command.examples?.length > 0) {
             const exampleText = command.examples
-                .map((example, index) => `**${index + 1}.** \`${example}\``)
+                .map((example, index) => `**${index + 1}.** ${example}`)
                 .join("\n");
 
             embed.addFields({
@@ -468,6 +472,7 @@ module.exports = {
         const client = interaction.client;
         const categories = this.getCategorizedCommands(client.commands);
         const commands = categories[categoryName] || [];
+        const commandLinks = await this.getCommandLinkMap(interaction);
 
         if (commands.length === 0) {
             const embed = new EmbedBuilder()
@@ -504,7 +509,7 @@ module.exports = {
         const commandList = commands
             .map((cmd, index) => {
                 const num = `${index + 1}.`.padEnd(4);
-                return `${num}\`/${cmd.data.name}\` - ${cmd.data.description}`;
+                return `${num}${this.getCommandMention(commandLinks, cmd.data.name)} - ${cmd.data.description}`;
             })
             .join("\n");
 
@@ -642,6 +647,7 @@ module.exports = {
         const searchTerm = interaction.fields.getTextInputValue("search_term").toLowerCase().trim();
         const commands = interaction.client.commands;
         const results = [];
+        const commandLinks = await this.getCommandLinkMap(interaction);
 
         // Search through commands
         for (const command of commands.values()) {
@@ -707,7 +713,7 @@ module.exports = {
                     : "Misc";
 
                 embed.addFields({
-                    name: `${index + 1}. /${cmd.data.name}`,
+                    name: `${index + 1}. ${this.getCommandMention(commandLinks, cmd.data.name)}`,
                     value: `${cmd.data.description}\n*Category: ${categoryText}*`,
                     inline: false,
                 });
@@ -766,5 +772,53 @@ module.exports = {
             components,
             flags: MessageFlags.Ephemeral,
         });
+    },
+
+    /**
+     * Build a guild-scoped map of command mentions for quick reuse
+     */
+    async getCommandLinkMap(interaction) {
+        if (!interaction.guild) return null;
+
+        const client = interaction.client;
+        if (!client.commandLinkCache) {
+            client.commandLinkCache = new Map();
+        }
+
+        const cacheEntry = client.commandLinkCache.get(interaction.guild.id);
+        const now = Date.now();
+
+        if (cacheEntry && now - cacheEntry.timestamp < COMMAND_LINK_CACHE_TTL) {
+            return cacheEntry.map;
+        }
+
+        try {
+            const guildCommands = await interaction.guild.commands.fetch();
+            const linkMap = new Map();
+
+            guildCommands.forEach((cmd) => {
+                linkMap.set(cmd.name, `</${cmd.name}:${cmd.id}>`);
+            });
+
+            client.commandLinkCache.set(interaction.guild.id, {
+                map: linkMap,
+                timestamp: now,
+            });
+
+            return linkMap;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    /**
+     * Return a clickable command mention when available, otherwise fallback to /command text
+     */
+    getCommandMention(commandLinks, commandName) {
+        if (commandLinks?.has(commandName)) {
+            return commandLinks.get(commandName);
+        }
+
+        return `/${commandName}`;
     },
 };
