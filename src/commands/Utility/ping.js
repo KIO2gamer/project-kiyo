@@ -58,7 +58,7 @@ module.exports = {
                     dbStatus = "🔴";
                     dbPing = "Disconnected";
                 }
-            } catch (error) {
+            } catch {
                 dbStatus = "🔴";
                 dbPing = "Error";
             }
@@ -67,7 +67,6 @@ module.exports = {
             const memUsage = process.memoryUsage();
             const memUsedMB = (memUsage.heapUsed / 1024 / 1024).toFixed(2);
             const memTotalMB = (memUsage.heapTotal / 1024 / 1024).toFixed(2);
-            const memPercent = ((memUsage.heapUsed / memUsage.heapTotal) * 100).toFixed(1);
 
             // Bot statistics
             const guildCount = interaction.client.guilds.cache.size;

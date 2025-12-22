@@ -10,7 +10,6 @@ const {
 } = require("discord.js");
 const TicketConfig = require("./../database/ticketConfig");
 const TicketStorage = require("./../database/ticketStorage");
-const { handleError } = require("./../utils/errorHandler");
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -264,8 +263,8 @@ module.exports = {
 
                     try {
                         await ticketCreator.send({ embeds: [userNotificationEmbed] });
-                    } catch (e) {
-                        console.log("Could not DM ticket creator");
+                    } catch {
+                        console.log("Could not DM ticket creator (Maybe they have DMs disabled).");
                     }
                 }
 

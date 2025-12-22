@@ -806,7 +806,7 @@ module.exports = {
             });
 
             return linkMap;
-        } catch (error) {
+        } catch {
             return null;
         }
     },
