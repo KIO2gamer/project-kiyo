@@ -25,6 +25,11 @@ module.exports = {
                 .setDescription("Only delete messages from this user")
                 .setRequired(false),
         )
+        .addBooleanOption((option) =>
+            option
+                .setName("dry_run")
+                .setDescription("Preview what would be deleted without deleting"),
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
     async execute(interaction) {
@@ -33,6 +38,7 @@ module.exports = {
 
             const amount = interaction.options.getInteger("amount");
             const user = interaction.options.getUser("user");
+            const dryRun = interaction.options.getBoolean("dry_run") ?? false;
 
             // Validate amount
             if (amount < 1 || amount > 100) {
@@ -44,10 +50,20 @@ module.exports = {
                 return;
             }
 
-            // Fetch messages
+            // Fetch messages - use Math.min to ensure limit never exceeds 100
+            const limit = Math.min(amount, 100);
             const messages = await interaction.channel.messages.fetch({
-                limit: amount + 1, // +1 to account for the command message
+                limit: limit,
             });
+
+            if (messages.size === 0) {
+                const embed = errorEmbed(interaction, {
+                    title: "No Messages",
+                    description: "No messages found in this channel.",
+                });
+                await interaction.editReply({ embeds: [embed] });
+                return;
+            }
 
             // Filter messages if user specified
             let messagesToDelete = messages;
@@ -79,16 +95,40 @@ module.exports = {
                 return;
             }
 
+            // If dry-run, show preview
+            if (dryRun) {
+                const preview = Array.from(validMessages.values())
+                    .slice(0, 5)
+                    .map(
+                        (msg) =>
+                            `• **${msg.author.username}**: ${msg.content.substring(0, 50)}${msg.content.length > 50 ? "..." : ""}`,
+                    )
+                    .join("\n");
+
+                const previewEmbed = success(interaction, {
+                    title: "🔍 Dry Run Preview",
+                    description: `Would delete **${validMessages.size}** message(s)\n\n${preview}${validMessages.size > 5 ? `\n...and ${validMessages.size - 5} more` : ""}`,
+                });
+                await interaction.editReply({ embeds: [previewEmbed] });
+                return;
+            }
+
             // Delete messages
             try {
                 const deleted = await interaction.channel.bulkDelete(validMessages, true);
 
-                // Create success embed
+                // Create success embed with detailed info
                 const successEmbed = success(interaction, {
-                    title: "Messages Purged",
+                    title: "🗑️ Messages Purged",
                     description: user
                         ? `Successfully deleted ${deleted.size} message(s) from ${user.tag}`
                         : `Successfully deleted ${deleted.size} message(s)`,
+                });
+
+                // Add statistics
+                successEmbed.addFields({
+                    name: "📊 Statistics",
+                    value: `• Scanned: ${messages.size} messages\n• Filtered: ${messagesToDelete.size} messages\n• Deleted: ${deleted.size} messages`,
                 });
 
                 // Add warning if some messages were too old
@@ -99,48 +139,36 @@ module.exports = {
                     });
                 }
 
+                successEmbed.setTimestamp();
                 await interaction.editReply({ embeds: [successEmbed] });
             } catch (deleteError) {
                 if (deleteError.code === 50034) {
                     const embed = errorEmbed(interaction, {
-                        title: "Too Old",
+                        title: "❌ Too Old",
                         description: "Cannot delete messages older than 14 days.",
                     });
                     await interaction.editReply({ embeds: [embed] });
                 } else if (deleteError.code === 50013) {
                     const embed = errorEmbed(interaction, {
-                        title: "Permission Error",
+                        title: "❌ Permission Error",
                         description: "I do not have permission to delete messages in this channel.",
                     });
                     await interaction.editReply({ embeds: [embed] });
                 } else {
                     const embed = errorEmbed(interaction, {
-                        description: "An error occurred while trying to delete messages.",
+                        title: "❌ Deletion Error",
+                        description: `An error occurred: ${deleteError.message}`,
                     });
                     await interaction.editReply({ embeds: [embed] });
                 }
             }
         } catch (error) {
-            handleError("Error purging messages:", error);
-            if (error.code === 50013) {
-                const embed = errorEmbed(interaction, {
-                    title: "Permission Error",
-                    description: "I do not have permission to manage messages in this channel.",
-                });
-                await interaction.editReply({ embeds: [embed] });
-            } else if (error.code === 50035) {
-                const embed = errorEmbed(interaction, {
-                    title: "Invalid Amount",
-                    description:
-                        "Invalid number of messages specified. Please use a number between 1 and 100.",
-                });
-                await interaction.editReply({ embeds: [embed] });
-            } else {
-                const embed = errorEmbed(interaction, {
-                    description: "An unexpected error occurred while processing the purge command.",
-                });
-                await interaction.editReply({ embeds: [embed] });
-            }
+            handleError(interaction, error, "MODERATION", "An error occurred during purge");
+            const embed = errorEmbed(interaction, {
+                title: "❌ Command Error",
+                description: "An unexpected error occurred while processing the purge command.",
+            });
+            await interaction.editReply({ embeds: [embed] }).catch(() => {});
         }
     },
 };

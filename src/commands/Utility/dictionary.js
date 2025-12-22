@@ -13,61 +13,129 @@ module.exports = {
 
     async execute(interaction) {
         const word = interaction.options.getString("word");
-        const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+
+        await interaction.deferReply();
 
         try {
-            const response = await axios.get(apiUrl);
-            const data = response.data[0];
+            // Try primary API first
+            let data = await this.fetchFromPrimaryAPI(word);
+
+            // If primary fails, try fallback API
+            if (!data) {
+                data = await this.fetchFromFallbackAPI(word);
+            }
 
             if (!data) {
-                // Use handleError for validation errors
-                await handleError(
-                    interaction,
-                    new Error(`No definition found for "${word}"`),
-                    "VALIDATION",
-                );
+                await interaction.editReply(`❌ No definition found for "**${word}**".`);
                 return;
             }
 
-            const definition = data.meanings[0].definitions[0].definition;
-            const partOfSpeech = data.meanings[0].partOfSpeech;
-
-            const embed = new EmbedBuilder()
-                .setTitle(word)
-                .setDescription(definition)
-                .addFields({
-                    name: "Part of Speech",
-                    value: partOfSpeech,
-                })
-                .setFooter({
-                    text: "Powered by DictionaryAPI",
-                    iconURL: "https://i.imgur.com/AfFp7pu.png",
-                })
-                .setTimestamp();
-
-            await interaction.reply({ embeds: [embed] });
+            const embed = this.createDefinitionEmbed(data);
+            await interaction.editReply({ embeds: [embed] });
         } catch (error) {
-            // Handle different types of errors appropriately
-            if (error.response) {
-                if (error.response.status === 404) {
-                    await handleError(
-                        interaction,
-                        new Error(`Could not find definition for "${word}"`),
-                        "VALIDATION",
-                    );
-                } else {
-                    await handleError(
-                        interaction,
-                        error,
-                        "API",
-                        `Error accessing dictionary API: ${error.response.status}`,
-                    );
-                }
-            } else if (error.request) {
-                await handleError(interaction, error, "API", "Dictionary API is not responding");
-            } else {
-                await handleError(interaction, error);
-            }
+            await handleError(interaction, error, "API", "Failed to fetch word definition");
         }
+    },
+
+    async fetchFromPrimaryAPI(word) {
+        try {
+            const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+            const response = await axios.get(apiUrl);
+            const data = response.data[0];
+
+            if (!data) return null;
+
+            // Extract comprehensive information
+            const meanings = data.meanings || [];
+            const phonetic = data.phonetic || data.phonetics?.find((p) => p.text)?.text || "";
+
+            const definitions = [];
+            meanings.slice(0, 3).forEach((meaning) => {
+                const defs = meaning.definitions.slice(0, 2);
+                defs.forEach((def) => {
+                    definitions.push({
+                        partOfSpeech: meaning.partOfSpeech,
+                        definition: def.definition,
+                        example: def.example || null,
+                    });
+                });
+            });
+
+            return {
+                word: data.word,
+                phonetic,
+                definitions,
+                source: "DictionaryAPI",
+            };
+        } catch (error) {
+            if (error.response?.status === 404) {
+                return null;
+            }
+            throw error;
+        }
+    },
+
+    async fetchFromFallbackAPI(word) {
+        try {
+            // Use WordsAPI-style free alternative (Merriam-Webster Collegiate Thesaurus is free)
+            // Using the free API from words.bighugelabs.com as fallback
+            const apiUrl = `https://api.datamuse.com/words?sp=${word}&md=d&max=1`;
+            const response = await axios.get(apiUrl);
+
+            if (!response.data || response.data.length === 0) return null;
+
+            const wordData = response.data[0];
+            if (!wordData.defs) return null;
+
+            const definitions = wordData.defs.slice(0, 3).map((def) => {
+                const [partOfSpeech, ...defParts] = def.split("\t");
+                return {
+                    partOfSpeech,
+                    definition: defParts.join(" "),
+                    example: null,
+                };
+            });
+
+            return {
+                word: wordData.word,
+                phonetic: "",
+                definitions,
+                source: "Datamuse",
+            };
+        } catch {
+            return null;
+        }
+    },
+
+    createDefinitionEmbed(data) {
+        const embed = new EmbedBuilder()
+            .setTitle(`📖 ${data.word}`)
+            .setColor(0x5865f2)
+            .setTimestamp();
+
+        if (data.phonetic) {
+            embed.setDescription(`**Pronunciation:** ${data.phonetic}\n`);
+        }
+
+        // Add definitions as fields
+        data.definitions.forEach((def, index) => {
+            let fieldValue = def.definition;
+            if (def.example) {
+                fieldValue += `\n*Example: "${def.example}"*`;
+            }
+
+            embed.addFields({
+                name: `${index + 1}. ${def.partOfSpeech}`,
+                value: fieldValue.substring(0, 1024), // Discord field value limit
+                inline: false,
+            });
+        });
+
+        embed.setFooter({
+            text: `Powered by ${data.source}`,
+            iconURL: "https://i.imgur.com/AfFp7pu.png",
+        });
+
+        return embed;
     },
 };

@@ -1,4 +1,9 @@
-const { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require("discord.js");
+const {
+    EmbedBuilder,
+    PermissionFlagsBits,
+    SlashCommandBuilder,
+    MessageFlags,
+} = require("discord.js");
 
 const { handleError } = require("../../utils/errorHandler");
 const {
@@ -70,7 +75,32 @@ const command = new SlashCommandBuilder()
             ),
     )
     // List subcommand
-    .addSubcommand((sub) => sub.setName("list").setDescription("Show all roles in the server"))
+    .addSubcommand((sub) =>
+        sub
+            .setName("list")
+            .setDescription("Show all roles in the server")
+            .addStringOption((opt) =>
+                opt.setName("filter").setDescription("Filter: all, managed, hoisted, regular"),
+            )
+            .addIntegerOption((opt) =>
+                opt.setName("page").setDescription("Page number").setMinValue(1),
+            ),
+    )
+    // Bulk assign subcommand
+    .addSubcommand((sub) =>
+        sub
+            .setName("bulk_assign")
+            .setDescription("Assign multiple roles to a user at once")
+            .addUserOption((opt) =>
+                opt.setName("user").setDescription("User to assign roles to").setRequired(true),
+            )
+            .addStringOption((opt) =>
+                opt
+                    .setName("roles")
+                    .setDescription("Role IDs or mentions (comma-separated)")
+                    .setRequired(true),
+            ),
+    )
     // Create subcommand
     .addSubcommand((sub) =>
         sub
@@ -132,6 +162,9 @@ module.exports = {
                     break;
                 case "list":
                     await handleRoleList(interaction);
+                    break;
+                case "bulk_assign":
+                    await handleBulkAssign(interaction);
                     break;
                 case "create":
                     await handleRoleCreate(interaction);
@@ -255,35 +288,123 @@ async function handleRoleRemove(interaction) {
     await interaction.reply(`Removed ${role} role from ${user}`);
 }
 
-// Role list handler
+// Role list handler with pagination
 async function handleRoleList(interaction) {
-    const roles = interaction.guild.roles.cache.sort((a, b) => b.position - a.position);
+    const filter = interaction.options.getString("filter") || "all";
+    const pageNum = interaction.options.getInteger("page") || 1;
+    const rolesPerPage = 10;
 
-    // Group roles
-    const managedRoles = roles.filter((r) => r.managed);
-    const hoistedRoles = roles.filter((r) => r.hoist && !r.managed);
-    const regularRoles = roles.filter((r) => !r.hoist && !r.managed);
+    const allRoles = interaction.guild.roles.cache.sort((a, b) => b.position - a.position);
+
+    // Filter roles
+    let filtered;
+    switch (filter) {
+        case "managed":
+            filtered = allRoles.filter((r) => r.managed);
+            break;
+        case "hoisted":
+            filtered = allRoles.filter((r) => r.hoist && !r.managed);
+            break;
+        case "regular":
+            filtered = allRoles.filter((r) => !r.hoist && !r.managed);
+            break;
+        default:
+            filtered = allRoles;
+    }
+
+    const totalPages = Math.ceil(filtered.size / rolesPerPage);
+    const page = Math.max(1, Math.min(pageNum, totalPages));
+
+    const rolesArray = Array.from(filtered.values());
+    const start = (page - 1) * rolesPerPage;
+    const pageRoles = rolesArray.slice(start, start + rolesPerPage);
 
     const embed = new EmbedBuilder()
-        .setTitle(`Server Roles (${roles.size})`)
+        .setTitle(`🎯 Server Roles (${filtered.size} total, ${filter.toUpperCase()})`)
         .setColor("Orange")
-        .addFields(
-            {
-                name: `Managed (${managedRoles.size})`,
-                value: managedRoles.map((r) => `${r}: ${r.members.size}`).join("\n") || "None",
-            },
-            {
-                name: `Displayed Separately (${hoistedRoles.size})`,
-                value: hoistedRoles.map((r) => `${r}: ${r.members.size}`).join("\n") || "None",
-            },
-            {
-                name: `Regular (${regularRoles.size})`,
-                value: regularRoles.map((r) => `${r}: ${r.members.size}`).join("\n") || "None",
-            },
+        .setDescription(
+            pageRoles.map((r) => `${r}: **${r.members.size}** members`).join("\n") || "No roles",
         )
+        .setFooter({
+            text: `Page ${page} of ${totalPages || 1} | Use page: option to navigate`,
+        })
         .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });
+}
+
+// Bulk assign roles to a user
+async function handleBulkAssign(interaction) {
+    const user = interaction.options.getUser("user");
+    const rolesInput = interaction.options.getString("roles");
+    const member = await interaction.guild.members.fetch(user.id);
+
+    // Parse role input (IDs or mentions)
+    const roleMatches = rolesInput.match(/<@&(\d+)>|\b\d{17,19}\b/g) || [];
+    const roleIds = roleMatches.map((m) => m.replace(/[<@&>]/g, ""));
+
+    if (roleIds.length === 0) {
+        return interaction.reply({
+            content: "⚠️ No valid roles found. Use role IDs or @mentions (comma-separated).",
+            flags: MessageFlags.Ephemeral,
+        });
+    }
+
+    let assigned = 0;
+    let failed = 0;
+    const errors = [];
+
+    for (const roleId of roleIds) {
+        const role = interaction.guild.roles.cache.get(roleId);
+        if (!role) {
+            failed++;
+            errors.push(`Role \`${roleId}\` not found`);
+            continue;
+        }
+
+        if (interaction.guild.members.me.roles.highest.position <= role.position) {
+            failed++;
+            errors.push(`Can't assign ${role.name} (higher than my role)`);
+            continue;
+        }
+
+        if (member.roles.cache.has(role.id)) {
+            failed++;
+            errors.push(`${user.username} already has ${role.name}`);
+            continue;
+        }
+
+        try {
+            await member.roles.add(role);
+            assigned++;
+        } catch {
+            failed++;
+            errors.push(`Failed to assign ${role.name}`);
+        }
+    }
+
+    const resultEmbed = new EmbedBuilder()
+        .setTitle("📋 Bulk Assign Results")
+        .setColor(assigned > 0 ? "Green" : "Red")
+        .addFields(
+            {
+                name: "Assigned",
+                value: `✅ ${assigned} role${assigned !== 1 ? "s" : ""}`,
+                inline: true,
+            },
+            { name: "Failed", value: `❌ ${failed} role${failed !== 1 ? "s" : ""}`, inline: true },
+        );
+
+    if (errors.length > 0) {
+        resultEmbed.addFields({
+            name: "Issues",
+            value:
+                errors.slice(0, 5).join("\n") +
+                (errors.length > 5 ? `\n...+${errors.length - 5} more` : ""),
+        });
+    }
+
+    await interaction.reply({ embeds: [resultEmbed], flags: MessageFlags.Ephemeral });
 }
 
 // Role create handler

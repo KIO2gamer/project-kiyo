@@ -14,6 +14,16 @@ const ITUNES_SEARCH_BASE_URL = "https://itunes.apple.com/search";
 const VAGALUME_BASE_URL = "https://api.vagalume.com.br/search.php";
 const LYRICS_OVH_BASE_URL = "https://api.lyrics.ovh/v1";
 
+// API Health Check
+const apiHealth = {
+    lrclib: { failures: 0, lastCheck: 0 },
+    vagalume: { failures: 0, lastCheck: 0 },
+    lyricsOvh: { failures: 0, lastCheck: 0 },
+    itunes: { failures: 0, lastCheck: 0 },
+    MAX_FAILURES: 3,
+    COOLDOWN_MS: 60000, // 1 minute
+};
+
 // Game Configuration
 const GAME_CONFIG = {
     COLORS: {
@@ -27,7 +37,7 @@ const GAME_CONFIG = {
     TIMING: {
         ROUND_DELAY: 5000,
         GUESS_TIME: 30000,
-        API_TIMEOUT: 7000,
+        API_TIMEOUT: 10000, // Increased from 7000 to 10000
     },
     GAME: {
         MAX_ROUNDS: 5,
@@ -264,6 +274,45 @@ function normalizeText(text) {
 // ============================================================
 
 /**
+ * Checks if an API is healthy (not in cooldown)
+ */
+function isApiHealthy(apiName) {
+    const health = apiHealth[apiName];
+    if (!health) return true;
+
+    const now = Date.now();
+    if (health.failures >= apiHealth.MAX_FAILURES) {
+        if (now - health.lastCheck < apiHealth.COOLDOWN_MS) {
+            return false;
+        }
+        // Reset after cooldown
+        health.failures = 0;
+    }
+    return true;
+}
+
+/**
+ * Records API failure
+ */
+function recordApiFailure(apiName) {
+    const health = apiHealth[apiName];
+    if (health) {
+        health.failures++;
+        health.lastCheck = Date.now();
+    }
+}
+
+/**
+ * Records API success
+ */
+function recordApiSuccess(apiName) {
+    const health = apiHealth[apiName];
+    if (health) {
+        health.failures = Math.max(0, health.failures - 1);
+    }
+}
+
+/**
  * Fetches song data with lyrics from multiple sources
  */
 async function fetchSongData() {
@@ -302,6 +351,10 @@ async function fetchSongData() {
  * Fetches tracks from iTunes API
  */
 async function fetchTracksFromItunes(genre) {
+    if (!isApiHealthy("itunes")) {
+        throw new Error("iTunes API is temporarily unavailable. Please try again later.");
+    }
+
     try {
         const response = await axios.get(ITUNES_SEARCH_BASE_URL, {
             params: {
@@ -311,18 +364,39 @@ async function fetchTracksFromItunes(genre) {
                 limit: 50,
             },
             timeout: GAME_CONFIG.TIMING.API_TIMEOUT,
+            headers: {
+                "User-Agent": "Discord-Bot-LyricWhiz",
+            },
         });
 
-        return (response.data?.results || []).map((track) => ({
+        if (!response.data || !response.data.results) {
+            throw new Error("Invalid response from iTunes API");
+        }
+
+        const tracks = (response.data.results || []).map((track) => ({
             artist: sanitizeText(track.artistName),
             title: sanitizeText(track.trackName),
             durationSec: track.trackTimeMillis ? Math.round(track.trackTimeMillis / 1000) : null,
         }));
+
+        if (tracks.length === 0) {
+            throw new Error("No tracks found from iTunes API");
+        }
+
+        recordApiSuccess("itunes");
+        return tracks;
     } catch (error) {
-        await handleError(
-            new Error(`iTunes API error while fetching tracks: ${error.message || error}`),
-        );
-        return [];
+        recordApiFailure("itunes");
+        console.error(`iTunes API error while fetching tracks: ${error.message || error}`);
+
+        if (error.code === "ECONNABORTED") {
+            throw new Error("iTunes API request timed out. Please try again.");
+        }
+        if (error.response?.status === 429) {
+            throw new Error("iTunes API rate limit exceeded. Please wait a moment.");
+        }
+
+        throw error;
     }
 }
 
@@ -330,20 +404,56 @@ async function fetchTracksFromItunes(genre) {
  * Attempts to fetch lyrics from multiple sources
  */
 async function fetchLyrics({ artist, title, durationSec }) {
+    let lastError = null;
+
     // Try LRCLIB first (best quality)
-    let lyrics = await fetchLyricsFromLRCLIB({ artist, title, durationSec });
-    if (lyrics) return lyrics;
+    if (isApiHealthy("lrclib")) {
+        try {
+            const lyrics = await fetchLyricsFromLRCLIB({ artist, title, durationSec });
+            if (lyrics) {
+                recordApiSuccess("lrclib");
+                return lyrics;
+            }
+        } catch (error) {
+            recordApiFailure("lrclib");
+            lastError = error;
+        }
+    }
 
     // Try Vagalume if API key is available
     const vagalumeKey = process.env.VAGALUME_API_KEY;
-    if (vagalumeKey) {
-        lyrics = await fetchLyricsFromVagalume({ artist, title, apikey: vagalumeKey });
-        if (lyrics) return lyrics;
+    if (vagalumeKey && isApiHealthy("vagalume")) {
+        try {
+            const lyrics = await fetchLyricsFromVagalume({ artist, title, apikey: vagalumeKey });
+            if (lyrics) {
+                recordApiSuccess("vagalume");
+                return lyrics;
+            }
+        } catch (error) {
+            recordApiFailure("vagalume");
+            lastError = error;
+        }
     }
 
     // Last resort: lyrics.ovh
-    lyrics = await fetchLyricsFromLyricsOVH({ artist, title });
-    return lyrics;
+    if (isApiHealthy("lyricsOvh")) {
+        try {
+            const lyrics = await fetchLyricsFromLyricsOVH({ artist, title });
+            if (lyrics) {
+                recordApiSuccess("lyricsOvh");
+                return lyrics;
+            }
+        } catch (error) {
+            recordApiFailure("lyricsOvh");
+            lastError = error;
+        }
+    }
+
+    if (lastError) {
+        console.error(`All lyrics APIs failed for "${title}" by ${artist}:`, lastError.message);
+    }
+
+    return null;
 }
 
 /**
@@ -362,11 +472,27 @@ async function fetchLyricsFromLRCLIB({ artist, title, durationSec }) {
 
         const response = await axios.get(`${LRCLIB_BASE_URL}/get?${params.toString()}`, {
             timeout: GAME_CONFIG.TIMING.API_TIMEOUT,
+            headers: {
+                "User-Agent": "Discord-Bot-LyricWhiz",
+            },
         });
 
         const lyrics = response.data?.plainLyrics;
-        return lyrics && lyrics.trim().length > 50 ? lyrics.trim() : null;
-    } catch {
+        if (!lyrics || typeof lyrics !== "string") {
+            return null;
+        }
+
+        const trimmed = lyrics.trim();
+        return trimmed.length > 50 ? trimmed : null;
+    } catch (error) {
+        if (error.code === "ECONNABORTED") {
+            console.warn("LRCLIB API timeout");
+        } else if (error.response?.status === 404) {
+            // Song not found is expected, not an error
+            return null;
+        } else {
+            console.error("LRCLIB API error:", error.message);
+        }
         return null;
     }
 }
@@ -375,16 +501,38 @@ async function fetchLyricsFromLRCLIB({ artist, title, durationSec }) {
  * Fetches lyrics from Vagalume API
  */
 async function fetchLyricsFromVagalume({ artist, title, apikey }) {
+    if (!apikey || typeof apikey !== "string") {
+        return null;
+    }
+
     try {
         const response = await axios.get(VAGALUME_BASE_URL, {
             params: { art: artist, mus: title, apikey },
             timeout: GAME_CONFIG.TIMING.API_TIMEOUT,
+            headers: {
+                "User-Agent": "Discord-Bot-LyricWhiz",
+            },
         });
 
         const musArray = response.data?.mus;
         const lyrics = Array.isArray(musArray) && musArray[0]?.text;
-        return lyrics && lyrics.trim().length > 50 ? lyrics.trim() : null;
-    } catch {
+
+        if (!lyrics || typeof lyrics !== "string") {
+            return null;
+        }
+
+        const trimmed = lyrics.trim();
+        return trimmed.length > 50 ? trimmed : null;
+    } catch (error) {
+        if (error.code === "ECONNABORTED") {
+            console.warn("Vagalume API timeout");
+        } else if (error.response?.status === 403) {
+            console.error("Vagalume API: Invalid API key");
+        } else if (error.response?.status === 404) {
+            return null; // Song not found is expected
+        } else {
+            console.error("Vagalume API error:", error.message);
+        }
         return null;
     }
 }
@@ -397,11 +545,27 @@ async function fetchLyricsFromLyricsOVH({ artist, title }) {
         const url = `${LYRICS_OVH_BASE_URL}/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
         const response = await axios.get(url, {
             timeout: GAME_CONFIG.TIMING.API_TIMEOUT,
+            headers: {
+                "User-Agent": "Discord-Bot-LyricWhiz",
+            },
         });
 
         const lyrics = response.data?.lyrics;
-        return lyrics && lyrics.trim().length > 50 ? lyrics.trim() : null;
-    } catch {
+
+        if (!lyrics || typeof lyrics !== "string") {
+            return null;
+        }
+
+        const trimmed = lyrics.trim();
+        return trimmed.length > 50 ? trimmed : null;
+    } catch (error) {
+        if (error.code === "ECONNABORTED") {
+            console.warn("Lyrics.ovh API timeout");
+        } else if (error.response?.status === 404) {
+            return null; // Song not found is expected
+        } else {
+            console.error("Lyrics.ovh API error:", error.message);
+        }
         return null;
     }
 }

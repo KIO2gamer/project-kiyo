@@ -103,26 +103,105 @@ module.exports = {
     },
 };
 
+// Rate limiting for GIPHY API
+const giphyRateLimit = {
+    requests: new Map(),
+    MAX_REQUESTS: 10,
+    WINDOW_MS: 60000, // 1 minute
+};
+
+/**
+ * Fetches a random GIF from GIPHY with improved error handling
+ */
 async function getRandomGif(searchTerm) {
+    if (!process.env.GIPHY_API_KEY) {
+        throw new Error("GIPHY API key is not configured. Please contact an administrator.");
+    }
+
     try {
-        if (!process.env.GIPHY_API_KEY) {
-            throw new Error("Missing GIPHY_API_KEY environment variable");
-        }
         const response = await axios.get("https://api.giphy.com/v1/gifs/random", {
             params: {
                 api_key: process.env.GIPHY_API_KEY,
                 tag: searchTerm,
                 rating: "g",
             },
+            timeout: 8000,
+            headers: {
+                "User-Agent": "Discord-Bot-Fun-Commands",
+            },
         });
+
+        // Validate response structure
+        if (!response.data?.data?.images?.original?.url) {
+            throw new Error("Invalid response structure from GIPHY API");
+        }
+
         return response.data.data.images.original.url;
-    } catch {
-        throw new Error("Failed to fetch GIF from GIPHY API");
+    } catch (error) {
+        if (error.response) {
+            // API returned an error response
+            const status = error.response.status;
+            if (status === 429) {
+                throw new Error("GIPHY API rate limit exceeded. Please try again in a moment.");
+            } else if (status === 403) {
+                throw new Error("GIPHY API access denied. Invalid API key.");
+            } else if (status === 404) {
+                throw new Error(`No GIF found for "${searchTerm}". Try a different search term.`);
+            }
+        }
+
+        if (error.code === "ECONNABORTED") {
+            throw new Error("GIPHY API request timed out. Please try again.");
+        }
+
+        throw new Error(`Failed to fetch GIF: ${error.message || "Unknown error"}`);
     }
+}
+
+/**
+ * Checks rate limit for user
+ */
+function checkRateLimit(userId) {
+    const now = Date.now();
+    const userRequests = giphyRateLimit.requests.get(userId) || [];
+
+    // Filter out old requests
+    const recentRequests = userRequests.filter(
+        (timestamp) => now - timestamp < giphyRateLimit.WINDOW_MS,
+    );
+
+    if (recentRequests.length >= giphyRateLimit.MAX_REQUESTS) {
+        return false;
+    }
+
+    recentRequests.push(now);
+    giphyRateLimit.requests.set(userId, recentRequests);
+
+    // Cleanup old entries
+    if (giphyRateLimit.requests.size > 1000) {
+        const entriesToDelete = [];
+        for (const [id, timestamps] of giphyRateLimit.requests.entries()) {
+            if (timestamps.every((t) => now - t > giphyRateLimit.WINDOW_MS)) {
+                entriesToDelete.push(id);
+            }
+        }
+        entriesToDelete.forEach((id) => giphyRateLimit.requests.delete(id));
+    }
+
+    return true;
 }
 
 async function handleGifCommand(interaction, searchTerm, message) {
     try {
+        // Check rate limit
+        if (!checkRateLimit(interaction.user.id)) {
+            await interaction.reply({
+                content: `⏱️ Slow down! You can only use GIF commands ${giphyRateLimit.MAX_REQUESTS} times per minute.`,
+                ephemeral: true,
+            });
+            return;
+        }
+
         await interaction.deferReply();
         const gifUrl = await getRandomGif(searchTerm);
 
@@ -141,8 +220,8 @@ async function handleGifCommand(interaction, searchTerm, message) {
         await handleError(
             interaction,
             error,
-            "API",
-            "Failed to fetch a GIF. Please try again later.",
+            "API_ERROR",
+            error.message || "Failed to fetch a GIF. Please try again later.",
         );
     }
 }

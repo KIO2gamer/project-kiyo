@@ -101,6 +101,12 @@ function loadCommands(client, commandsPath) {
             try {
                 const command = require(filePath);
 
+                // Allow opt-out of registration for helper-only command modules
+                if (command.disabled === true) {
+                    Logger.warn(`Skipping disabled command: ${filePath}`);
+                    continue;
+                }
+
                 if ("data" in command && "execute" in command) {
                     // Store the category information for the help command
                     command.category = folder.toLowerCase();

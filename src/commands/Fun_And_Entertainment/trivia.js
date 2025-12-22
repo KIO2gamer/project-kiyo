@@ -18,6 +18,15 @@ const TIMEOUT_COLOR = "#FFA000"; // Orange/Amber
 const TRIVIA_TIMEOUT = 20000; // 20 seconds for answering
 const ANSWER_BUTTON_LABELS = ["A", "B", "C", "D"];
 const API_ENDPOINT = "https://opentdb.com/api.php?amount=1&type=multiple";
+const API_TIMEOUT = 10000; // 10 seconds for API request
+
+// Simple cache for trivia questions (helps with rate limiting)
+const questionCache = {
+    questions: [],
+    lastFetch: 0,
+    CACHE_DURATION: 300000, // 5 minutes
+    MAX_CACHE_SIZE: 50,
+};
 
 module.exports = {
     description_full: "Tests your knowledge with a multiple-choice trivia question.",
@@ -71,20 +80,83 @@ module.exports = {
 // --- Helper Functions ---
 
 async function fetchTriviaQuestion() {
+    // Check cache first
+    if (questionCache.questions.length > 0) {
+        const question = questionCache.questions.shift();
+        Logger.debug(`Using cached trivia question. ${questionCache.questions.length} remaining.`);
+        return question;
+    }
+
+    // Fetch new batch of questions
     try {
-        const response = await fetch(API_ENDPOINT);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+        const response = await fetch(
+            `https://opentdb.com/api.php?amount=${questionCache.MAX_CACHE_SIZE}&type=multiple`,
+            { signal: controller.signal },
+        );
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-            handleError(`HTTP error! status: ${response.status}`); // Log HTTP errors
+            Logger.error(`Trivia API HTTP error! status: ${response.status}`);
+            return await fetchFallbackQuestion();
+        }
+
+        const data = await response.json();
+
+        // Handle API response codes
+        if (data.response_code === 1) {
+            Logger.warn("No trivia questions available from API.");
             return null;
         }
-        const data = await response.json();
-        if (data.results.length === 0) {
+        if (data.response_code === 2) {
+            Logger.error("Invalid parameter in trivia API request.");
+            return null;
+        }
+        if (data.response_code === 3 || data.response_code === 4) {
+            Logger.warn("Trivia API token issues or rate limit.");
+            return await fetchFallbackQuestion();
+        }
+
+        if (!data.results || data.results.length === 0) {
             Logger.warn("No trivia questions returned from API.");
             return null;
         }
+
+        // Cache questions and return first one
+        questionCache.questions = data.results.slice(1);
+        questionCache.lastFetch = Date.now();
+        Logger.debug(`Cached ${questionCache.questions.length} trivia questions.`);
+
         return data.results[0];
     } catch (error) {
-        handleError("Error fetching trivia question from API:", error);
+        if (error.name === "AbortError") {
+            Logger.error("Trivia API request timed out.");
+        } else {
+            Logger.error("Error fetching trivia question from API:", error);
+        }
+        return await fetchFallbackQuestion();
+    }
+}
+
+/**
+ * Fetches a single question as fallback (when batch fetch fails)
+ */
+async function fetchFallbackQuestion() {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+        const response = await fetch(API_ENDPOINT, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) return null;
+
+        const data = await response.json();
+        return data.results?.[0] || null;
+    } catch (error) {
+        Logger.error("Fallback trivia fetch also failed:", error);
         return null;
     }
 }

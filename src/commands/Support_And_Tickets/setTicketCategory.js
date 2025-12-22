@@ -11,13 +11,17 @@ const TicketConfig = require("./../../database/ticketConfig");
 const { handleError } = require("../../utils/errorHandler");
 
 module.exports = {
-    description_full: "Sets the category where ticket channels will be created",
-    usage: "/set_ticket_category category:category",
-    examples: ["/set_ticket_category category:Support Tickets"],
+    description_full:
+        "Configure ticket system settings (category, support role, max tickets, etc.)",
+    usage: "/set_ticket_category category:category [support_role:role] [max_tickets:number]",
+    examples: [
+        "/set_ticket_category category:Support",
+        "/set_ticket_category category:Support support_role:@Support max_tickets:10",
+    ],
 
     data: new SlashCommandBuilder()
         .setName("set_ticket_category")
-        .setDescription("Set the category for ticket channels")
+        .setDescription("Configure ticket system settings")
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption((option) =>
             option
@@ -25,6 +29,22 @@ module.exports = {
                 .setDescription("The category where tickets will be created")
                 .setRequired(true)
                 .addChannelTypes(ChannelType.GuildCategory),
+        )
+        .addRoleOption((option) =>
+            option.setName("support_role").setDescription("Role to ping for new tickets"),
+        )
+        .addIntegerOption((option) =>
+            option
+                .setName("max_tickets")
+                .setDescription("Maximum open tickets per user (default: 5)")
+                .setMinValue(1)
+                .setMaxValue(50),
+        )
+        .addStringOption((option) =>
+            option
+                .setName("ticket_prefix")
+                .setDescription("Custom prefix for ticket channels (default: ticket)")
+                .setMaxLength(10),
         ),
 
     async execute(interaction) {
@@ -32,6 +52,9 @@ module.exports = {
 
         try {
             const category = interaction.options.getChannel("category");
+            const supportRole = interaction.options.getRole("support_role");
+            const maxTickets = interaction.options.getInteger("max_tickets");
+            const ticketPrefix = interaction.options.getString("ticket_prefix");
 
             // Basic validation
             if (!category) {
@@ -46,7 +69,7 @@ module.exports = {
                 return await interaction.editReply("⚠️ The category must be in this server.");
             }
 
-            // Check permissions
+            // Check bot permissions in the category
             const botMember = interaction.guild.members.me;
             const requiredPermissions = [
                 { flag: PermissionFlagsBits.ViewChannel, name: "View Channel" },
@@ -65,40 +88,54 @@ module.exports = {
             }
 
             try {
-                // Find existing config first
+                // Find existing config
                 let config = await TicketConfig.findOne({ guildId: interaction.guild.id });
 
-                if (config) {
-                    // Update existing config
-                    config.ticketCategoryId = category.id;
-                    await config.save();
-                } else {
-                    // Create new config
-                    config = new TicketConfig({
-                        guildId: interaction.guild.id,
-                        ticketCategoryId: category.id,
-                    });
-                    await config.save();
+                if (!config) {
+                    config = new TicketConfig({ guildId: interaction.guild.id });
                 }
 
-                // Verify config was saved correctly
-                await TicketConfig.findOne({ guildId: interaction.guild.id });
+                // Update configuration
+                config.ticketCategoryId = category.id;
+                if (supportRole) config.supportRoleId = supportRole.id;
+                if (maxTickets) config.maxOpenTickets = maxTickets;
+                if (ticketPrefix) config.ticketPrefix = ticketPrefix;
+                config.updatedAt = new Date();
 
-                // Send success message
+                await config.save();
+
+                // Create response embed with current settings
+                const settingsFields = [
+                    { name: "Category", value: `${category.name}`, inline: true },
+                    { name: "Category ID", value: category.id, inline: true },
+                    {
+                        name: "Support Role",
+                        value: supportRole ? `${supportRole}` : "Not set",
+                        inline: true,
+                    },
+                    {
+                        name: "Max Tickets/User",
+                        value: `${config.maxOpenTickets}`,
+                        inline: true,
+                    },
+                    {
+                        name: "Ticket Prefix",
+                        value: `\`${config.ticketPrefix}\``,
+                        inline: true,
+                    },
+                ];
+
                 const embed = new EmbedBuilder()
-                    .setTitle("✅ Ticket Category Set")
-                    .setDescription(`The ticket category has been set to **${category.name}**`)
+                    .setTitle("✅ Ticket Configuration Updated")
+                    .setDescription(`Ticket system has been configured successfully`)
                     .setColor(Colors.Green)
-                    .addFields([
-                        { name: "Category", value: category.name, inline: true },
-                        { name: "Category ID", value: category.id, inline: true },
-                        {
-                            name: "Next Step",
-                            value: "Use `/send_ticket_message` to create a panel where users can open tickets",
-                        },
-                    ])
+                    .addFields(settingsFields)
+                    .addFields({
+                        name: "Next Step",
+                        value: "Use `/send_ticket_message` to create a panel where users can open tickets",
+                    })
                     .setFooter({
-                        text: `Set by ${interaction.user.tag}`,
+                        text: `Updated by ${interaction.user.tag}`,
                         iconURL: interaction.user.displayAvatarURL(),
                     })
                     .setTimestamp();
@@ -115,7 +152,7 @@ module.exports = {
                 interaction,
                 error,
                 "COMMAND_EXECUTION",
-                "There was an error setting the ticket category. Please try again.",
+                "There was an error configuring the ticket system. Please try again.",
             );
         }
     },
