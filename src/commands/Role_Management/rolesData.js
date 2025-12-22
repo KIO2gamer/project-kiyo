@@ -59,7 +59,9 @@ module.exports = {
                     opt.setName("role").setDescription("Role to delete").setRequired(true),
                 ),
         )
-        .addSubcommand((sub) => sub.setName("stats").setDescription("View database role statistics")),
+        .addSubcommand((sub) =>
+            sub.setName("stats").setDescription("View database role statistics"),
+        ),
 
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
@@ -128,7 +130,9 @@ module.exports = {
 
             // Filter by search term if provided
             if (search) {
-                roles = roles.filter((r) => r.roleName.toLowerCase().includes(search.toLowerCase()));
+                roles = roles.filter((r) =>
+                    r.roleName.toLowerCase().includes(search.toLowerCase()),
+                );
 
                 if (roles.length === 0) {
                     return interaction.reply({
@@ -194,7 +198,7 @@ module.exports = {
                 embed.addFields({
                     name: "Recently Added",
                     value: recent.map((r) => `• **${r.roleName}**`).join("\n"),
-                    inline: false
+                    inline: false,
                 });
             }
 
