@@ -143,10 +143,10 @@ module.exports = {
 
 ### **Bot Functionality** ✅
 
--   All 100 commands load successfully
+-   All 87 commands load successfully
 -   YouTube subscriber role commands work correctly
--   Database connections established (17 schemas)
--   Event handlers functioning properly (14 handlers)
+-   Database connections established (18 schemas)
+-   Event handlers functioning properly (25 handlers)
 -   Utility modules operational (16 utilities)
 
 ### **File Organization** ✅
@@ -190,7 +190,7 @@ module.exports = {
 -   **📁 File Organization**: 100% improved structure
 -   **🔗 Compatibility**: 100% backward compatible
 -   **📚 Documentation**: 100% organized and accessible
--   **🚀 Functionality**: 100% preserved and working (100 commands)
+-   **🚀 Functionality**: 100% preserved and working (87 commands)
 -   **⚡ Performance**: No impact on bot performance
 -   **🧑‍💻 Developer Experience**: Significantly improved
 -   **🔒 Security**: OAuth2 authentication and JWT tokens

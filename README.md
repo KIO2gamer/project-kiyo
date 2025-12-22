@@ -38,11 +38,11 @@ This project follows a feature-based organization for better maintainability:
 ```
 project-kiyo/
 ├── 📁 src/                          # Main source code
-│   ├── 📁 commands/                 # Discord commands by category (100 total)
+│   ├── 📁 commands/                 # Discord commands by category (87 total)
 │   ├── 📁 features/                 # Feature-based organization
 │   │   └── 📁 youtube-subscriber-roles/  # YouTube subscriber role feature
-│   ├── 📁 database/                 # MongoDB schemas (17 schemas)
-│   ├── 📁 events/                   # Discord.js event handlers (14 handlers)
+│   ├── 📁 database/                 # MongoDB schemas (18 schemas)
+│   ├── 📁 events/                   # Discord.js event handlers (25 handlers)
 │   └── 📁 utils/                    # Utility functions (16 utilities)
 ├── 📁 docs/                         # Documentation
 ├── 📁 deployments/                  # External service deployments
@@ -55,7 +55,7 @@ See [📁 Project Structure Documentation](docs/PROJECT_STRUCTURE.md) for detail
 ### Documentation Reference
 
 -   **[Installation & Setup Guide](docs/INSTALLATION_AND_SETUP.md)** - Complete setup instructions
--   **[Commands Reference](docs/COMMANDS_REFERENCE.md)** - All 100 commands quick reference
+-   **[Commands Reference](docs/COMMANDS_REFERENCE.md)** - All 87 commands quick reference
 -   **[Codebase Overview](docs/CODEBASE_OVERVIEW.md)** - Architecture and component guide
 -   **[Music & Support Features](docs/MUSIC_AND_SUPPORT.md)** - Music playback and ticket management guide
 -   **[Auto-Moderation System](docs/AUTO_MODERATION.md)** - Comprehensive moderation documentation
